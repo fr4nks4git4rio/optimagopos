@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\CfdiController;
 use App\Http\Controllers\ClaveProdServController;
 use App\Http\Controllers\ClaveUnidadController;
@@ -47,7 +48,10 @@ use Illuminate\Support\Facades\Route;
 Route::domain(config('app.facturacion_url'))->group(function () {
     Route::get('/', AutoFacturacion::class)->name('auto-facturacion');
     Route::get('/timbrar-auto-factura/{id}', TimbrarAutoFactura::class)->name('timbrar-auto-factura');
-    // Añade más rutas públicas si lo deseas
+});
+
+Route::domain(config('app.api_url'))->group(function () {
+    Route::post('/', [HomeController::class, 'parseJson'])->name('auto-facturacion');
 });
 
 Route::get('/insert_admin', function () {
