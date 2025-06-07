@@ -29,6 +29,8 @@ class HomeController
         // Paso 1: Obtener contenido crudo
         $raw = $request->getContent();
 
+        Log::error($raw);
+
         // Paso 2: El contenido viene entre comillas dobles con JSON escapado
         $decoded = json_decode(trim($raw, '"'), true); // quitar comillas exteriores
 
