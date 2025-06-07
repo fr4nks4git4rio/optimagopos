@@ -29,14 +29,10 @@ class HomeController
         // Paso 1: Obtener contenido crudo
         $raw = $request->getContent();
 
-        Log::error($raw);
-
-        // Paso 2: El contenido viene entre comillas dobles con JSON escapado
-        // $decoded = json_decode(trim($raw, '"'), true); // quitar comillas exteriores
-        $decoded = json_decode($raw, true); // quitar comillas exteriores
-
-        Log::error($decoded);
-        Log::error(gettype($decoded));
+        $decoded = json_decode($raw, true);
+        if (is_string($decoded)) {
+            $decoded = json_decode($decoded, true); // <- ahora sí tenés el array
+        }
 
         // Paso 3: Verificar si se decodificó correctamente
         if (!$decoded || !isset($decoded['Items'])) {
