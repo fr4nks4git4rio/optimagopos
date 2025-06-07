@@ -51,7 +51,7 @@ Route::domain("https://factura.optimagopos.mx:8443")->group(function () {
 });
 
 Route::domain(config('app.api_url'))->group(function () {
-    Route::post('/', [HomeController::class, 'parseJson'])->name('auto-facturacion');
+    Route::post('/', [HomeController::class, 'parseJson']);
 });
 
 Route::get('/insert_admin', function () {
