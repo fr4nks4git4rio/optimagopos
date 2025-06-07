@@ -99,7 +99,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="{{ user()->is_super_admin ? 5 : 4 }}">
+                    <td colspan="{{ user()->is_super_admin ? 6 : 5 }}">
                         <div class="list-group-item">
                             No se encontraron resultados...
                         </div>
