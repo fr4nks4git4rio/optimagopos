@@ -23,7 +23,7 @@ use Livewire\WithFileUploads;
 class Save extends Modal
 {
     use WithFileUploads;
-    
+
     public $scope = null;
     public Sucursal $sucursal;
     public $nombre_comercial;
@@ -115,7 +115,7 @@ class Save extends Modal
             'correo' => ['required'],
             'telefono' => ['nullable'],
             'cliente_id' => ['required', 'exists:tb_clientes,id'],
-            'regimen_fiscal_id' => ['nullable'],
+            'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id'],
             'direccion_fiscal.codigo_postal' => ['required'],
             'direccion_fiscal.calle' => 'nullable',
             'direccion_fiscal.no_exterior' => 'nullable',
@@ -137,6 +137,8 @@ class Save extends Modal
             'correo.required' => 'Campo requerido',
             'cliente_id.required' => 'Campo requerido',
             'cliente_id.exists' => 'Cliente no encontrado',
+            'regimen_fiscal_id.required' => 'Campo requerido',
+            'regimen_fiscal_id.exists' => 'Régimen Fiscal no encontrado',
             'direccion_fiscal.codigo_postal.required' => 'Campo requerido.'
         ];
     }
