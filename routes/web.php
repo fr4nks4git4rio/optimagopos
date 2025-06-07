@@ -45,7 +45,7 @@ use Illuminate\Support\Facades\Route;
 
 //Auth::routes();
 
-Route::domain("https://factura.optimagopos.mx:8443")->group(function () {
+Route::domain("https://factura.optimagopos.mx:8444")->group(function () {
     Route::get('/auto-facturacion', AutoFacturacion::class)->name('auto-facturacion');
     Route::get('/timbrar-auto-factura/{id}', TimbrarAutoFactura::class)->name('timbrar-auto-factura');
 });
