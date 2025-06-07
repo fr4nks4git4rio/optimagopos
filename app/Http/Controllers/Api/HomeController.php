@@ -16,8 +16,10 @@ use App\Models\Ventas\OrdenServicio;
 use App\Models\Ventas\OrdenServicioEvidencia;
 use App\Models\Ventas\OrdenServicioImagen;
 use App\Notifications\SiteNotification;
+use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -39,6 +41,8 @@ class HomeController
             return response()->json(['error' => 'JSON inválido o incompleto'], 400);
         }
 
+        // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
+
         $terminal = Terminal::findByIdentificador($decoded['Company']);
 
         if (!$terminal) {
@@ -49,7 +53,7 @@ class HomeController
         if (!$clerk) {
             $clerk = Empleado::create([
                 'id_empleado' => $decoded['ClerkId'],
-                'nombre' => $decoded['ClerkName'],
+                'nombre' => $decoded['ClerkName'] ? Crypt::encrypt($decoded['ClerkName']) : '',
                 'sucursal_id' => $terminal->sucursal_id
             ]);
         }
@@ -59,7 +63,7 @@ class HomeController
         $ticket = Ticket::create([
             'ubicacion' => $decoded['Location'] ?? '',
             'id_transaccion' => $decoded['TransactionId'],
-            'fecha_transaccion' => $decoded['TransactionStartTime'] ?? null,
+            'fecha_transaccion' => Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'),
             'empleado_id' => $clerk->id,
             'sucursal_id' => $terminal->sucursal_id,
             'terminal_id' => $terminal->id
@@ -84,7 +88,7 @@ class HomeController
                     'nombre' => $item['Name'] ?? '',
                     'monto' => $item['Amount'] ?? 0
                 ]);
-                if ($item['Tip'] != '') {
+                if ($item['Tip'] != '' && (float)$item['Tip'] > 0) {
                     $ticket->propinas()->create([
                         'monto' => (float)$item['Tip'],
                         'empleado_id' => $clerk->id
@@ -122,7 +126,9 @@ class HomeController
                 }
 
                 if ($correccion) {
-                    $prod = $ticket->productos()->where('producto_id', $producto->id)->where('departamento_id', $departamento->id)->first();
+                    $prod = $ticket->productos()->where('producto_id', $producto->id)
+                        ->where('departamento_id', $departamento->id)
+                        ->first();
                     $correccion->producto_id = optional($prod)->id;
                     $correccion->cantidad = abs($item['Qty']);
                     $correccion->precio = abs($item['Amount']);
@@ -131,6 +137,8 @@ class HomeController
                     continue;
                 } else {
                     $ticketProducto = $ticket->productos()->create([
+                        'producto_id' => $producto->id,
+                        'departamento_id' => $departamento->id,
                         'precio' => $item['Amount'] ?? 0,
                         'cantidad' => $item['Qty'] ?? 0,
                         'descuento' => $item['Discount'] ?? 0,
@@ -139,6 +147,8 @@ class HomeController
                 }
             }
         }
+        $ticket->importe = $importe;
+        $ticket->save();
 
         return response()->json(['success' => true]);
     }

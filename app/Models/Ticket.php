@@ -33,7 +33,7 @@ class Ticket extends Model
     public $fillable = [
         'ubicacion',
         'id_transaccion',
-        'fecha_trasaccion',
+        'fecha_transaccion',
         'importe',
         'propina',
         'moneda',
@@ -51,7 +51,7 @@ class Ticket extends Model
     protected $casts = [
         'ubicacion' => 'string',
         'id_transaccion' => 'string',
-        'fecha_trasaccion' => 'string',
+        'fecha_transaccion' => 'string',
         'propina' => 'float',
         'importe' => 'float',
         'moneda' => 'string',

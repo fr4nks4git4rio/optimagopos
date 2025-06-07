@@ -25,10 +25,12 @@ use App\Http\Livewire\Comensales\Index as IndexComensales;
 use App\Http\Livewire\Sucursales\Index as IndexSucursales;
 use App\Http\Livewire\Terminales\Index as IndexTerminales;
 use App\Http\Livewire\Facturas\IndexAlmacen as IndexAlmacenFacturas;
+use App\Http\Livewire\Reportes\Tickets\Index as IndexReportesTickets;
 use App\Http\Livewire\TimbrarAutoFactura;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+
 
 //use App\Http\Livewire\Cotizador\Catalogos\Productos\SaveV2 as SaveProductos;
 
@@ -91,6 +93,11 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/cabecera-factura', CabeceraFactura::class)->name('cabecera-factura');
         Route::get('/obtener-timbres-disponibles/{rfc}', [SoapController::class, 'obtenerTimbresDisponibles']);
+    });
+
+    Route::middleware(['hasRole:2'])->prefix('reportes')->group(function(){
+
+        Route::get('/tickets', IndexReportesTickets::class)->name('reportes.tickets');
     });
 });
 

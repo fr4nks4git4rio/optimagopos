@@ -104,6 +104,27 @@
                     </li>
                 </ul>
             </li>
+            <li class="w-100 pb-2" :class="menu_absolute">
+                <a href="#submenu_reportes" data-bs-toggle="collapse"
+                    class="nav-link align-middle"
+                    @if($this->reportes_routes_active) aria-expanded="true" @endif>
+                    <i class="bi bi-file-earmark-code fs-6 float-end border border-2 border-dark"
+                        title="Reportes"></i>
+                    <span class="ms-1 d-none text-uppercase fw-semibold fs-6"
+                        :class="display"> Reportes </span>
+                </a>
+                <ul class="collapse nav flex-column ms-1 @if($this->reportes_routes_active) show @endif"
+                    :class="submenu_absolute"
+                    id="submenu_reportes"
+                    data-bs-parent="#submenu_reportes">
+                    <li class="w-100 li-item {{ active_route('reportes/tickets*') }}">
+                        <a href="{{route('reportes.tickets')}}"
+                            class="nav-link submenu">
+                            <i class="bi bi-cart fs-6"></i> <span
+                                class="d-sm-inline px-2">Tickets</span></a>
+                    </li>
+                </ul>
+            </li>
             @endif
         </ul>
         {{--<hr>--}}
