@@ -57,23 +57,8 @@ Route::domain(config('app.facturacion_url'))->group(function () {
 });
 
 Route::domain(config('app.api_url'))->group(function () {
-    Route::post('/', [HomeController::class, 'parseJson']);
+    Route::post('/parse-ticket-json', [HomeController::class, 'parseTicketJson']);
 });
-
-Route::get('/insert_admin', function () {
-    DB::table('tb_usuarios')
-        ->insert([
-            'email' => 'admin@admin.com',
-            'nombre' => 'Super Admin',
-            'apellidos' => 'Administrador',
-            'password' => Hash::make('Admin123**'),
-            'rol_id' => 1
-        ]);
-
-    echo "ECHO!!!!";
-});
-
-Route::post('/', []);
 
 Route::get('/load-estados', [EstadoController::class, 'loadEstados'])->name('estados.load-estados');
 Route::get('/load-municipios', [MunicipioController::class, 'loadMunicipios'])->name('municipios.load-municipios');

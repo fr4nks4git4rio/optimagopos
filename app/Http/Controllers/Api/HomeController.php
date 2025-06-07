@@ -24,7 +24,7 @@ use Illuminate\Support\Str;
 
 class HomeController
 {
-    public function parseJson(Request $request)
+    public function parseTicketJson(Request $request)
     {
         // Paso 1: Obtener contenido crudo
         $raw = $request->getContent();
