@@ -36,10 +36,10 @@ class HomeController
         $decoded = json_decode($raw, true); // quitar comillas exteriores
 
         Log::error($decoded);
-        Log::error($decoded->Items);
+        Log::error(gettype($decoded));
 
         // Paso 3: Verificar si se decodificó correctamente
-        if (!$decoded || !isset($decoded->Items)) {
+        if (!$decoded || !isset($decoded['Items'])) {
             return response()->json(['error' => 'JSON inválido o incompleto'], 400);
         }
 
