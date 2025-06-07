@@ -36,6 +36,8 @@ class HomeController
             $decoded = json_decode($decoded, true); // <- ahora sí tenés el array
         }
 
+        Log::error($decoded);
+
         // Paso 3: Verificar si se decodificó correctamente
         if (!$decoded || !isset($decoded['Items'])) {
             return response()->json(['error' => 'JSON inválido o incompleto'], 400);
