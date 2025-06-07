@@ -59,6 +59,7 @@ Route::domain(config('app.facturacion_url'))->group(function () {
 });
 
 Route::domain(config('app.api_url'))->group(function () {
+    Route::post('/', [HomeController::class, 'parseTicketJson']);
     Route::post('/parse-ticket-json', [HomeController::class, 'parseTicketJson']);
 });
 
