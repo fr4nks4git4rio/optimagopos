@@ -111,11 +111,11 @@ class HomeController
                     ]);
                 }
                 $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
-                    ->where('id_departamento', $item['Department_Id'])
+                    ->where('id_departamento', $item['DepartmentId'])
                     ->first();
                 if (!$departamento) {
                     $departamento = Departamento::create([
-                        'id_departamento' => $item['Department_Id'],
+                        'id_departamento' => $item['DepartmentId'],
                         'nombre' => $item['DepartmentName'],
                         'sucursal_id' => $terminal->sucursal_id
                     ]);
