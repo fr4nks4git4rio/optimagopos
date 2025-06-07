@@ -33,7 +33,7 @@ class HomeController
 
         // Paso 2: El contenido viene entre comillas dobles con JSON escapado
         // $decoded = json_decode(trim($raw, '"'), true); // quitar comillas exteriores
-        $decoded = json_decode($raw); // quitar comillas exteriores
+        $decoded = json_decode($raw, true); // quitar comillas exteriores
 
         Log::error($decoded);
 
