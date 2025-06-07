@@ -51,7 +51,7 @@ class Index extends Component
                 'f.folio_interno as factura',
                 't.importe',
                 DB::raw("GROUP_CONCAT(CONCAT(p.nombre, ' (', tp.cantidad, ')')) as productos"),
-                DB::raw("GROUP_CONCAT(d.nombre) as departamentos")
+                DB::raw("GROUP_CONCAT(distinct d.nombre) as departamentos")
             )
             ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id')
             ->leftJoin('tb_terminales as ter', 'ter.id', '=', 't.terminal_id')
