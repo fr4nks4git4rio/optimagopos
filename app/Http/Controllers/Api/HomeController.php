@@ -34,6 +34,8 @@ class HomeController
         // Paso 2: El contenido viene entre comillas dobles con JSON escapado
         $decoded = json_decode(trim($raw, '"'), true); // quitar comillas exteriores
 
+        Log::error($decoded);
+
         // Paso 3: Verificar si se decodificó correctamente
         if (!$decoded || !isset($decoded['Items'])) {
             return response()->json(['error' => 'JSON inválido o incompleto'], 400);
