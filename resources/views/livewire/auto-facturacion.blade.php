@@ -223,7 +223,7 @@
                             wire:click="$set('ticketImageClass', '')"></button>
                     </div>
                     <div class="modal-body pb-0 text-center">
-                        <img src="{{ '/img/image-ticket-not-found.png' }}" class="m-auto w-100" alt="Ticket Muestra">
+                        <img src="{{ '/img/Ticket.png' }}" class="m-auto w-100" alt="Ticket Muestra">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
