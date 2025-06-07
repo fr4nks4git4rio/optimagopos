@@ -60,7 +60,8 @@ class Index extends Component
             ->leftJoin('tb_clientes as c', 'c.id', '=', 'f.cliente_id')
             ->leftJoin('tb_ticket_productos as tp', 'tp.ticket_id', '=', 't.id')
             ->leftJoin('tb_productos as p', 'p.id', '=', 'tp.producto_id')
-            ->leftJoin('tb_departamentos as d', 'd.id', '=', 'tp.departamento_id');
+            ->leftJoin('tb_departamentos as d', 'd.id', '=', 'tp.departamento_id')
+            ->groupBy('t.id');
 
         if (user()->is_admin) {
             $query->where('s.cliente_id', user()->cliente_id);
