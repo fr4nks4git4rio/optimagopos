@@ -46,10 +46,7 @@ use Illuminate\Support\Facades\Route;
 //Auth::routes();
 
 Route::domain(config('app.facturacion_url'))->group(function () {
-    Route::get('/', AutoFacturacion::class)->name('auto-facturacion');
-    Route::get('/login', function(){
-        return redirect()->route('auto-facturacion');
-    });
+    Route::get('/auto-facturacion', AutoFacturacion::class)->name('auto-facturacion');
     Route::get('/timbrar-auto-factura/{id}', TimbrarAutoFactura::class)->name('timbrar-auto-factura');
 });
 
