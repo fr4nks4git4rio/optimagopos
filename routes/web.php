@@ -125,14 +125,3 @@ Route::get('/parse_json', function () {
     $json6 = json_decode("{\"ClerkId\":\"1\",\"ClerkName\":\"Daniela \",\"Company\":\"Optima\",\"Items\":[{\"Amount\":\"480\",\"DepartmentId\":\"3\",\"DepartmentName\":\"FILETES\",\"Discount\":\"0\",\"ExemptedTaxAmount\":\"0\",\"Id\":\"16\",\"MerchantFee\":\"0\",\"Name\":\"Filete Natural\",\"PriceLevel\":\"1\",\"Qty\":\"1\",\"SKU\":\"\",\"Surcharge\":\"0\",\"Taxable\":\"0\",\"Tip\":\"0\",\"Type\":\"Product\"},{\"Amount\":\"495\",\"DepartmentId\":\"3\",\"DepartmentName\":\"FILETES\",\"Discount\":\"0\",\"ExemptedTaxAmount\":\"0\",\"Id\":\"22\",\"MerchantFee\":\"0\",\"Name\":\"Filete a la P. Verde\",\"PriceLevel\":\"1\",\"Qty\":\"1\",\"SKU\":\"\",\"Surcharge\":\"0\",\"Taxable\":\"0\",\"Tip\":\"0\",\"Type\":\"Product\"},{\"Amount\":\"975\",\"DepartmentId\":\"0\",\"DepartmentName\":\"\",\"Discount\":\"0\",\"ExemptedTaxAmount\":\"0\",\"Id\":\"2\",\"MerchantFee\":\"0\",\"Name\":\"MXN\",\"PriceLevel\":null,\"Qty\":\"1\",\"SKU\":\"\",\"Surcharge\":\"0\",\"Taxable\":\"0\",\"Tip\":\"1000\",\"Type\":\"Tender\"}],\"Location\":\"Head office\",\"PosId\":\"1\",\"TransactionEndTime\":\"30\\\/01\\\/2025 15:09:57\",\"TransactionId\":\"0001000038\",\"TransactionStartTime\":\"30\\\/01\\\/2025 17:35:00\"}");
     dd($json1, $json2, $json3, $json4, $json5, $json6);
 });
-
-Route::get('/insert_empleado', function(){
-    DB::table('tb_empleados')
-    ->insert([
-        'id_empleado' => 1,
-        'nombre' => 'Frank',
-        'sucursal_id' => 1
-    ]);
-
-    echo "ECHO!!!";
-});
