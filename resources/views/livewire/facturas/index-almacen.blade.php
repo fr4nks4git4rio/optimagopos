@@ -123,9 +123,6 @@
                     <td class="text-center">
                         {{$factura->folio_interno}}
                     </td>
-                    <td class="text-center">
-                        <span class="badge {{$classTipo}}">{{$factura->tipo}}</span>
-                    </td>
                     <td>{{$factura->receptor}}</td>
                     <td class="text-center">
                         <span class="badge {{$classEstado}}">{{$factura->estado}}</span>
