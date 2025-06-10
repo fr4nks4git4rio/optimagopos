@@ -54,7 +54,7 @@
         </div>
         <div class="col-sm-4">
             <x-select2-ajax label="Cliente" placeholder="Seleccione..."
-                class="form-control" url="{{route('clientes.load-clientes')}}"
+                class="form-control" url="{{route('clientes.load-comensales')}}"
                 model="cliente" />
         </div>
         <div class="col-sm-2">

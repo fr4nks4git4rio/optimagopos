@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', Home::class)->name('home');
 
     Route::get('/load-clientes', [ClienteController::class, 'loadClientes'])->name('clientes.load-clientes');
+    Route::get('/load-comensales', [ClienteController::class, 'loadComensales'])->name('clientes.load-comensales');
     Route::get('/load-cfdis', [CfdiController::class, 'loadCfdis'])->name('cfdis.load-cfdis');
     Route::get('/load-claves-prod-servs', [ClaveProdServController::class, 'loadClavesProdServs'])->name('claves-prod-servs.load-claves-prod-servs');
     Route::get('/load-claves-unidades', [ClaveUnidadController::class, 'loadClavesUnidades'])->name('claves-unidades.load-claves-unidades');
