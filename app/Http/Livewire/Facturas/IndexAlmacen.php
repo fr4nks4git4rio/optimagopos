@@ -126,12 +126,12 @@ class IndexAlmacen extends Component
         $final_records = collect();
         foreach ($records as $record) {
             $folio_interno = strtoupper($record->folio_interno);
-            $receptor = strtoupper(Crypt::decrypt($record->receptor));
+            $record->receptor = strtoupper(Crypt::decrypt($record->receptor));
             if (
                 !$this->search
                 || str_contains($record->fecha_certificacion, $this->search)
                 || str_contains($folio_interno, $this->search)
-                || str_contains($receptor, $this->search)
+                || str_contains($record->receptor, $this->search)
                 || str_contains($record->estado, $this->search)
                 || str_contains($record->moneda, $this->search)
                 || str_contains($record->subtotal, $this->search)
