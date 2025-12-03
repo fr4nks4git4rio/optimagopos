@@ -13,16 +13,16 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models
  * @version January 12, 2021, 7:46 pm CST
  *
- * @property string ubicacion
- * @property string id_transaccion
- * @property string fecha_transaccion
- * @property float importe
- * @property float propina
- * @property string moneda
- * @property integer empleado_id
- * @property integer sucursal_id
- * @property integer terminal_id
- * @property integer factura_id
+ * @property string $ubicacion
+ * @property string $id_transaccion
+ * @property string $fecha_transaccion
+ * @property float $importe
+ * @property float $propina
+ * @property string $moneda
+ * @property integer $empleado_id
+ * @property integer $sucursal_id
+ * @property integer $terminal_id
+ * @property integer $factura_id
  */
 class Ticket extends Model
 {

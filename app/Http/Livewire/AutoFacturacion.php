@@ -63,7 +63,7 @@ class AutoFacturacion extends Component
         ]
     ];
 
-    protected $queryString = ['codigo', 'ticket'];
+    protected $queryString = ['codigo', 'ticket', 'rfc'];
 
     protected $listeners = ['$refresh'];
 
