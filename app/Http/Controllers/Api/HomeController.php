@@ -45,7 +45,7 @@ class HomeController
 
         // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
 
-        $terminal = Terminal::findByIdentificador($decoded['Company']);
+        $terminal = Terminal::findByIdentificador($decoded['APIUserName']);
 
         if (!$terminal) {
             return response()->json(['error' => 'Terminal no encontrada'], 400);
