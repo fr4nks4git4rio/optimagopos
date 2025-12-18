@@ -93,13 +93,19 @@
                     <li class="w-100 li-item {{ active_route('cabecera-factura*') }}">
                         <a href="{{route('cabecera-factura')}}"
                             class="nav-link submenu">
-                            <i class="bi bi-cart fs-6"></i> <span
+                            <i class="bi bi-gear fs-6"></i> <span
                                 class="d-sm-inline px-2">Cabecera de Facturas</span></a>
+                    </li>
+                    <li class="w-100 li-item {{ active_route('pre-facturas*') }}">
+                        <a href="{{route('pre-facturas.index')}}"
+                            class="nav-link submenu">
+                            <i class="bi bi-database fs-6"></i> <span
+                                class="d-sm-inline px-2">Facturas</span></a>
                     </li>
                     <li class="w-100 li-item {{ active_route('almacen-facturas*') }}">
                         <a href="{{route('almacen-facturas.index')}}"
                             class="nav-link submenu">
-                            <i class="bi bi-database fs-6"></i> <span
+                            <i class="bi bi-database-check fs-6"></i> <span
                                 class="d-sm-inline px-2">Almacén de Facturas</span></a>
                     </li>
                 </ul>

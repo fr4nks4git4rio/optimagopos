@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Models\Administracion\CodificadoresGenerales\PuntoRuta;
 use App\Models\API\CargaObject;
 use App\Models\API\GlobalSiteValues;
+use App\Models\Cliente;
 use App\Models\Departamento;
 use App\Models\Empleado;
 use App\Models\Producto;
 use App\Models\Terminal;
 use App\Models\Ticket;
 use App\Models\TicketProductoCorreccion;
+use App\Models\TipoCambio;
 use App\Models\User;
 use App\Models\Ventas\OrdenServicio;
 use App\Models\Ventas\OrdenServicioEvidencia;
@@ -40,7 +42,7 @@ class HomeController
 
         // Paso 3: Verificar si se decodificó correctamente
         if (!$decoded || !isset($decoded['Items'])) {
-            return response()->json(['error' => 'JSON inválido o incompleto'], 400);
+            return response()->json(['success' => false, 'error' => 'JSON inválido o incompleto'], 400);
         }
 
         // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
@@ -48,7 +50,7 @@ class HomeController
         $terminal = Terminal::findByIdentificador($decoded['APIUserName']);
 
         if (!$terminal) {
-            return response()->json(['error' => 'Terminal no encontrada'], 400);
+            return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
         }
         // Paso 4: Acceder a datos generales
         $clerk = Empleado::where('sucursal_id', $terminal->sucursal_id)->where('id_empleado', $decoded['ClerkId'])->first();
@@ -59,16 +61,52 @@ class HomeController
                 'sucursal_id' => $terminal->sucursal_id
             ]);
         }
+        $comensal = null;
+        if (isset($decoded['CustomerFiscalId']) && $decoded['CustomerFiscalId']) {
+            $comensal = Cliente::where('rfc', $decoded['CustomerFiscalId'])->get()->first();
+            if (!$comensal) {
+                $comensal = Cliente::create([
+                    'rfc' => $decoded['CustomerFiscalId'],
+                    'es_comensal' => 1
+                ]);
+            } else {
+                $comensal->es_comensal = 1;
+                $comensal->save();
+            }
+        }
 
         $items = $decoded['Items'] ?? [];
 
+        $vigencia_facturacion = null;
+        switch ($terminal->sucursal->tipo_vigencia_ticket_facturacion) {
+            case 'last_day_month':
+                $vigencia_facturacion = today()->copy()->lastOfMonth();
+                break;
+            case 'days_number_after_emitted':
+                $vigencia_facturacion = today()->copy()->addDays($terminal->sucursal->dias_vigencia);
+                break;
+            case 'days_number_next_month':
+                $vigencia_facturacion = today()->copy()->addMonth()->setDay($terminal->sucursal->dias_vigencia);
+                break;
+        }
+
+        $tipo_cambio = get_tipo_cambio(null, $terminal->sucursal->cliente_id);
+        if (!$tipo_cambio->id) {
+            $tipo_cambio = TipoCambio::obtenerTipoCambioUrl($terminal->sucursal->cliente_id);
+            if (is_string($tipo_cambio)) {
+                return response()->json(['success' => false, 'error' => $tipo_cambio], 400);
+            }
+        }
         $ticket = Ticket::create([
             'ubicacion' => $decoded['Location'] ?? '',
             'id_transaccion' => $decoded['TransactionId'],
             'fecha_transaccion' => Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'),
+            'vigencia_facturacion' => $vigencia_facturacion->format('Y-m-d'),
             'empleado_id' => $clerk->id,
             'sucursal_id' => $terminal->sucursal_id,
-            'terminal_id' => $terminal->id
+            'terminal_id' => $terminal->id,
+            'comensal_id' => $comensal ? $comensal->id : null,
+            'tipo_cambio' => $tipo_cambio->tasa
         ]);
 
         // Ejemplo de lógica condicional por tipo de ítem
@@ -85,17 +123,18 @@ class HomeController
             }
 
             if ($type === 'Tender') {
+                $forma_pago = DB::table('tb_sucursal_forma_pagos')
+                    ->where('sucursal_id', $terminal->sucursal_id)
+                    ->where('nombre', $item['Name'])
+                    ->get()->first();
                 // Guardar método de pago en tabla pagos
                 $ticket->operaciones()->create([
                     'nombre' => $item['Name'] ?? '',
-                    'monto' => $item['Amount'] ?? 0
+                    'monto' => $item['Amount'] ?? '',
+                    'propina' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? (float)$item['Tip'] : 0,
+                    'empleado_id' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? $clerk->id : null,
+                    'sucursal_forma_pago_id' => optional($forma_pago)->id
                 ]);
-                if ($item['Tip'] != '' && (float)$item['Tip'] > 0) {
-                    $ticket->propinas()->create([
-                        'monto' => (float)$item['Tip'],
-                        'empleado_id' => $clerk->id
-                    ]);
-                }
             }
 
             if ($type === 'Correction') {

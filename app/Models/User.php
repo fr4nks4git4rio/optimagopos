@@ -24,13 +24,13 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 /**
  * Class User
  *
- * @property string nombre
- * @property string apellidos
- * @property string email
- * @property string password
- * @property string avatar
- * @property integer rol_id
- * @property integer cliente_id
+ * @property string $nombre
+ * @property string $apellidos
+ * @property string $email
+ * @property string $password
+ * @property string $avatar
+ * @property integer $rol_id
+ * @property integer $cliente_id
  */
 class User extends Authenticatable implements JWTSubject
 {

@@ -14,7 +14,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models\Administracion
  * @version May 6, 2019, 7:37 pm UTC
  *
- * @property float tasa
+ * @property float $tasa
+ * @property integer $cliente_id
  */
 class TipoCambio extends Model
 {
@@ -23,7 +24,8 @@ class TipoCambio extends Model
     public $table = 'tb_tipo_cambios';
 
     public $fillable = [
-        'tasa'
+        'tasa',
+        'cliente_id'
     ];
 
     /**
@@ -33,7 +35,8 @@ class TipoCambio extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'tasa' => 'float'
+        'tasa' => 'float',
+        'cliente_id' => 'integer'
     ];
 
     /**
@@ -64,41 +67,47 @@ class TipoCambio extends Model
      * @var array
      */
     public static $rules = [
-        'tasa' => 'required'
+        'tasa' => 'required',
+        'cliente_id' => 'required'
     ];
 
     /**
      * @param $date string Fecha formateada con el formato: Y-m-d
      * @return mixed|null
      */
-    public static function getTipoCambioFecha($date)
+    public static function getTipoCambioFecha($date, $cliente_id = null)
     {
-        $tipo_cambio = TipoCambio::whereRaw("DATE(created_at) = '" . $date . "'")->get();
+        $tipo_cambio = TipoCambio::where('cliente_id', $cliente_id ?: user()->cliente_id)
+            ->whereRaw("DATE(created_at) = '" . $date . "'")->get();
 
         return $tipo_cambio->count() > 0 ? $tipo_cambio->last() : new TipoCambio();
     }
 
-    public static function CreateOrUpdate($value)
+    public static function CreateOrUpdate($value, $cliente_id = null)
     {
-        $element = TipoCambio::whereRaw("DATE(created_at) = '" . today()->format('Y-m-d') . "'")->first();
+        $element = TipoCambio::where('cliente_id', $cliente_id ?: user()->cliente_id)
+            ->whereRaw("DATE(created_at) = '" . today()->format('Y-m-d') . "'")->first();
         if ($element)
-            $element->update(['tasa' => $value]);
+            $element->update([
+                'tasa' => $value
+            ]);
         else
             $element = TipoCambio::create([
-                'tasa' => $value
+                'tasa' => $value,
+                'cliente_id' => $cliente_id ?: user()->cliente_id
             ]);
         return $element;
     }
 
-    public static function obtenerTipoCambioUrl()
+    public static function obtenerTipoCambioUrl($cliente_id = null)
     {
         date_default_timezone_set('America/Cancun');
 
-        $tipo_cambio = get_tipo_cambio();
+        $tipo_cambio = get_tipo_cambio(null, $cliente_id);
         if (!$tipo_cambio->id) {
             $hoy = Carbon::today();
-            if ($hoy->isSunday()) $hoy->subDay(2);
-            if ($hoy->isSaturday()) $hoy->subDay(1);
+            if ($hoy->isSunday()) $hoy->subDays(2);
+            if ($hoy->isSaturday()) $hoy->subDay();
 
             $dd = $hoy->format('d');
             $mm = $hoy->format('m');
@@ -117,11 +126,12 @@ class TipoCambio extends Model
                     $tipo_cambio = $coincidencias[0];
                     if ($tipo_cambio && floatval($tipo_cambio)) {
                         $change_type = TipoCambio::create([
-                            'tasa' => $tipo_cambio
+                            'tasa' => $tipo_cambio,
+                            'cliente_id' => $cliente_id ?: user()->cliente_id
                         ]);
                         return $change_type;
                     }
-                }else{
+                } else {
                     return 'Ocurrió un error obteniendo el Tipo de Cambio del DOF. Tipo de Cambio no encontrado.';
                 }
             } catch (\Exception $e) {

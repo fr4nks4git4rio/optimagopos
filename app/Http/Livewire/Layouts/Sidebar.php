@@ -40,7 +40,8 @@ class Sidebar extends Component
 
     public function getFacturacionRoutesActiveProperty()
     {
-        return Request::is('almacen-facturas*')
+        return Request::is('pre-facturas*')
+        || Request::is('almacen-facturas*')
         || Request::is('cabecera-factura*');
     }
     public function getReportesRoutesActiveProperty()

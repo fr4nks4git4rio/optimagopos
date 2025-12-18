@@ -30,9 +30,10 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
-class TimbrarAutoFactura extends Component
+class TimbrarAutoFacturaPorFormaPago extends Component
 {
     public Factura $factura;
+    public $facturas = [];
     public $rfc;
     public $nombre_comercial;
     public $razon_social;
@@ -52,20 +53,54 @@ class TimbrarAutoFactura extends Component
     public $concepto_agrupado = 'CONSUMO DE ALIMENTO Y BEBIDAS';
     public $cfdisModalClass = '';
     public $factura_timbrada = false;
+
+    public $index_factura_active = 0;
     protected $listeners = ['$refresh', 'cambioIncluirPropina'];
 
     public function mount($id)
     {
-        $this->factura = Factura::find(Crypt::decrypt($id));
+        $this->facturas = DB::table('tb_facturas as factura')
+            ->select(
+                'factura.id',
+                'factura.total',
+                'factura.subtotal',
+                'factura.iva',
+                'factura.moneda',
+                'factura.cantidad_letras',
+                'factura.direccion_xml',
+                'factura.cliente_id',
+                'factura.forma_pago_id',
+                'factura.tipo_relacion_factura_id',
+                'factura.propietario_id',
+                'factura.serie_id',
+                DB::raw("serie.descripcion as serie"),
+                DB::raw("CONCAT_WS(' | ', fp.codigo, fp.descripcion) as forma_pago"),
+                DB::raw('0 as incluir_propina'),
+                DB::raw('0 as agrupar_conceptos'),
+                DB::raw("'' as concepto_agrupado"),
+                DB::raw("IF(factura.estado = 'TIMBRADA' || factura.estado = 'COBRADA', 1, 0) as factura_timbrada"),
+                DB::raw("'' as tipo_relacion_factura_id"),
+                DB::raw("'' as cfdis_relacionados"),
+                DB::raw("GROUP_CONCAT(operacion.id) as operaciones"),
+                DB::raw("SUM(operacion.propina) as propina")
+            )
+            ->leftJoin('tb_forma_pagos as fp', 'fp.id', '=', 'factura.forma_pago_id')
+            ->leftJoin('tb_series as serie', 'serie.id', '=', 'factura.serie_id')
+            ->leftJoin('tb_ticket_operaciones as operacion', 'operacion.factura_id', '=', 'factura.id')
+            ->groupBy('factura.id')
+            ->whereIn('factura.id', explode(',', Crypt::decrypt($id)))
+            ->get()->map(function ($element) {
+                $element->cfdis_relacionados = [];
+                return (array)$element;
+            })->toArray();
 
-        $this->factura_timbrada = $this->factura->estado == 'TIMBRADA';
-
-        $this->rfc = $this->factura->cliente->rfc;
-        $this->nombre_comercial = $this->factura->cliente->nombre_comercial ? Crypt::decrypt($this->factura->cliente->nombre_comercial) : '';
-        $this->razon_social = $this->factura->cliente->razon_social ? Crypt::decrypt($this->factura->cliente->razon_social) : '';
-        $this->lugar_expedicion = $this->factura->cliente->direccion_fiscal->codigo_postal;
-        $this->regimen_fiscal_id = $this->factura->cliente->regimen_fiscal_id;
-        $this->cfdi_id = $this->factura->cfdi_id;
+        $factura = $this->facturas[0];
+        $this->rfc = $factura->cliente->rfc;
+        $this->nombre_comercial = $factura->cliente->nombre_comercial ? Crypt::decrypt($factura->cliente->nombre_comercial) : '';
+        $this->razon_social = $factura->cliente->razon_social ? Crypt::decrypt($factura->cliente->razon_social) : '';
+        $this->lugar_expedicion = $factura->cliente->direccion_fiscal->codigo_postal;
+        $this->regimen_fiscal_id = $factura->cliente->regimen_fiscal_id;
+        $this->cfdi_id = $factura->cfdi_id;
 
         $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only(['label', 'value']);
         $this->cfdis = Cfdi::orderBy('codigo')->get()->map->only(['label', 'value']);
@@ -110,44 +145,55 @@ class TimbrarAutoFactura extends Component
 
     public function getPropietarioRfcProperty()
     {
-        return $this->factura->propietario->rfc;
+        return $this->facturas[0]->propietario->rfc;
     }
 
     public function getPropietarioRazonSocialProperty()
     {
-        return Crypt::decrypt($this->factura->propietario->razon_social);
+        return Crypt::decrypt($this->facturas[0]->propietario->razon_social);
     }
 
     public function render()
     {
-        return view('livewire.timbrar-auto-factura');
+        return view('livewire.timbrar-auto-factura-por-forma-pago');
     }
 
-    public function totalFacturar()
+    public function cambioIncluirPropina($index)
     {
-        $monto = $this->factura->total;
-        if ($this->incluir_propina)
-            foreach ($this->factura->tickets()->first()->operaciones as $operacion) {
-                $monto += $operacion->forma_pago->moneda == 'MXN' ? $operacion->propina : round($operacion->propina * $operacion->ticket->tipo_cambio, 2);
-            }
-
-        return number_format($monto, 2);
+        // $factura = $this->facturas[$index];
+        // if ($factura['incluir_propina']) {
+        //     $this->facturas[$index]['total'] += $factura['propina'];
+        // } else {
+        //     $this->facturas[$index]['total'] -= $factura['propina'];
+        // }
+        // $this->facturas[$index]['subtotal'] = round($this->facturas[$index]['total'] / (1 + system_iva() / 100), 2);
+        // $this->facturas[$index]['iva'] = $this->facturas[$index]['total'] - $this->facturas[$index]['subtotal'];
+        // $this->facturas[$index]['cantidad_letras'] = convertir_numero_a_letras($this->facturas[$index]['total'], $this->facturas[$index]['moneda']);
     }
 
-    public function showModalCfdisRelacionados()
+    public function montoFactura($index)
     {
+        $monto = $this->facturas[$index]['total'];
+        if ($this->facturas[$index]['incluir_propina'])
+            $monto += $this->factura[$index]['propina'] ? $this->factura[$index]['propina'] : 0;
+        return $monto;
+    }
+
+    public function showModalCfdisRelacionados($index)
+    {
+        $this->index_factura_active = $index;
         $this->cfdisModalClass = 'show';
     }
 
     public function addCfdiRelacionado()
     {
         $this->validate([
-            "tipo_relacion_factura_id" => ['required', 'exists:tb_tipo_relacion_facturas,id']
+            "facturas.$this->index_factura_active.tipo_relacion_factura_id" => ['required', 'exists:tb_tipo_relacion_facturas,id']
         ], [
-            "tipo_relacion_factura_id.required" => 'Campo requerido!',
-            "tipo_relacion_factura_id.exists" => 'Tipo de relación no reconocida!',
+            "facturas.$this->index_factura_active.tipo_relacion_factura_id.required" => 'Campo requerido!',
+            "facturas.$this->index_factura_active.tipo_relacion_factura_id.exists" => 'Tipo de relación no reconocida!',
         ]);
-        $this->cfdis_relacionados[] = '';
+        $this->facturas[$this->index_factura_active]['cfdis_relacionados'][] = '';
     }
 
     public function removeCfdiRelacionado($index)
@@ -156,7 +202,7 @@ class TimbrarAutoFactura extends Component
         $this->cfdis_relacionados = array_values($this->cfdis_relacionados);
     }
 
-    public function timbrar()
+    public function timbrar($index)
     {
         $data = $this->validate([
             'rfc' => ['required', new RfcRule('ambas')],
@@ -199,36 +245,55 @@ class TimbrarAutoFactura extends Component
                 $receptor->save();
             }
 
-            $cfdis_relacionados = array_filter($this->cfdis_relacionados, function ($cfdi) {
+            $factura = $this->facturas[$index];
+
+            $cfdis_relacionados = array_filter($factura['cfdis_relacionados'], function ($cfdi) {
                 return $cfdi != '';
             });
 
-            $ticket = $this->factura->tickets()->first();
+            $ticket = $factura->ticket_operaciones()->first()->ticket;
 
-            if ($receptor->id != $this->factura->cliente_id) {
-                $this->factura->cliente_id = $receptor->id;
+            if ($receptor->id != $factura['cliente_id']) {
+                $factura['cliente_id'] = $receptor->id;
                 $ticket->comensal_id = $receptor->id;
                 $ticket->saveQuietly();
             }
-            $this->factura->cfdi_id = $this->cfdi_id;
-            if ($this->tipo_relacion_factura_id && count($cfdis_relacionados) > 0) {
-                $this->factura->tipo_relacion_factura_id = $this->tipo_relacion_factura_id;
-                $this->factura->cfdis_relacionados = implode(",", $cfdis_relacionados);
+            $factura['cfdi_id'] = $this->cfdi_id;
+            if (!$factura['tipo_relacion_factura_id'] || count($cfdis_relacionados) == 0) {
+                $factura['tipo_relacion_factura_id'] = null;
+                $factura['cfdis_relacionados'] = '';
             } else {
-                $this->tipo_relacion_factura_id = null;
-                $this->factura->cfdis_relacionados = '';
+                $factura['cfdis_relacionados'] = implode(',', $cfdis_relacionados);
             }
-            $this->factura->saveQuietly();
 
-            $this->factura->factura_conceptos()->delete();
-            if ($this->agrupar_conceptos) {
-                $this->factura->factura_conceptos()->create([
+            DB::table('tb_facturas')
+                ->where('id', $factura['id'])
+                ->update(array_merge(
+                    Arr::except($factura, [
+                        'serie',
+                        'serie_id',
+                        'direccion_xml',
+                        'propietario_id',
+                        'forma_pago',
+                        'incluir_propina',
+                        'agrupar_conceptos',
+                        'concepto_agrupado',
+                        'factura_timbrada',
+                        'operaciones',
+                        'propina'
+                    ]),
+                    Arr::only($data, ['lugar_expedicion', 'cfdi_id'])
+                ));
+
+            if ($factura['agrupar_conceptos']) {
+                DB::table('tb_factura_conceptos')->insert([
                     'cantidad' => 1,
-                    'precio_unitario' => $this->factura->subtotal,
-                    'descripcion' => $this->concepto_agrupado,
+                    'precio_unitario' => $factura['subtotal'],
+                    'descripcion' => $factura['concepto_agrupado'],
                     'clave_prod_serv_id' => 191,
                     'clave_unidad_id' => 2,
-                    'objeto_impuesto_id' => 2
+                    'objeto_impuesto_id' => 2,
+                    'factura_id' => $factura['id']
                 ]);
             } else {
                 $descripcion = '';
@@ -247,46 +312,44 @@ class TimbrarAutoFactura extends Component
                     }
                 }
 
-                $this->factura->factura_conceptos()->create([
+                DB::table('tb_factura_conceptos')->insert([
                     'cantidad' => 1,
-                    'precio_unitario' => $this->factura->subtotal,
+                    'precio_unitario' => $factura['subtotal'],
                     'descripcion' => utf8_decode(Str::replaceLast(" | ", '', $descripcion)),
                     'clave_prod_serv_id' => 191,
                     'clave_unidad_id' => 2,
-                    'objeto_impuesto_id' => 2
+                    'objeto_impuesto_id' => 2,
+                    'factura_id' => $factura['id']
                 ]);
             }
 
-            if ($this->incluir_propina) {
-                $subtotal = 0;
-                $total = 0;
-                $iva = 0;
-                foreach ($ticket->operaciones as $operacion) {
-                    $propina = $operacion->forma_pago->moneda == 'MXN' ? $operacion->propina : (round($operacion->propina * $operacion->tipo_cambio, 2));
-                    $precio_unitario = $propina / (1 + system_iva() / 100);
-                    $subtotal += $precio_unitario;
-                    $total += $propina;
-                    $iva += ($propina - $precio_unitario);
-                    $this->factura->factura_conceptos()->create([
-                        'cantidad' => 1,
-                        'precio_unitario' => $precio_unitario,
-                        'descripcion' => "Propina",
-                        'clave_prod_serv_id' => 191,
-                        'clave_unidad_id' => 2,
-                        'objeto_impuesto_id' => 2
+            if ($factura['incluir_propina'] && $factura['propina'] > 0) {
+                $precio_unitario = round($factura['propina'] / (1 + system_iva() / 100), 2);
+                DB::table('tb_factura_conceptos')->insert([
+                    'cantidad' => 1,
+                    'precio_unitario' => $precio_unitario,
+                    'descripcion' => "Propina",
+                    'clave_prod_serv_id' => 191,
+                    'clave_unidad_id' => 2,
+                    'objeto_impuesto_id' => 2,
+                    'factura_id' => $factura['id']
+                ]);
+
+                DB::table('tb_facturas')
+                    ->where('id', $factura['id'])
+                    ->update([
+                        'subtotal' => $factura['subtotal'] + $precio_unitario,
+                        'iva' => $factura['iva'] + ($factura['propina'] - $precio_unitario),
+                        'total' => $factura['total'] + $factura['propina'],
+                        'cantidad_letras' => convertir_numero_a_letras($factura['total'] + $factura['propina'], $factura['moneda'])
                     ]);
-                }
-                $this->factura->subtotal += $subtotal;
-                $this->factura->iva += $iva;
-                $this->factura->total += $total;
-                $this->factura->saveQuietly();
             }
 
-            $facturador = new Facturador($this->factura->propietario);
-            $folio_interno = $this->factura->serie->descripcion . '-' . Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion() == 1);
-            $res = $facturador->timbrarFactura($this->factura->id, $folio_interno);
+            $facturador = new Facturador(Sucursal::find($factura['propietario_id']));
+            $folio_interno = $factura['serie'] . '-' . Factura::internalSheetGenerator($factura['serie_id'], modo_facturacion() == 1);
+            $res = $facturador->timbrarFactura($factura['id'], $folio_interno);
             if ($res['success']) {
-                $this->factura_timbrada = true;
+                $this->facturas[$index]['factura_timbrada'] = true;
                 $this->emit('show-toast', "Factura timbrada satisfactoriamente.");
             } else {
                 $this->emit('show-toast', pretty_message($res['message'], 'danger'), 'danger');
@@ -299,12 +362,12 @@ class TimbrarAutoFactura extends Component
         }
     }
 
-    public function descargarPDF()
+    public function descargarPDF($index)
     {
-        return response()->download(public_path("/" . Factura::generateFacturaPdf($this->factura->id)));
+        return response()->download(public_path("/" . Factura::generateFacturaPdf($this->facturas[$index]['id'])));
     }
-    public function descargarXML()
+    public function descargarXML($index)
     {
-        return response()->download(Storage::disk('public')->path($this->factura->direccion_xml));
+        return response()->download(Storage::disk('public')->path($this->facturas[$index]['direccion_xml']));
     }
 }

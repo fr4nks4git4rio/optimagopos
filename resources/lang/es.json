@@ -214,5 +214,8 @@
     "active": "Activo",
     "last_authenticated_ip": "IP de última conexión",
     "roles_text": "Roles",
-    "avatar_uri": "URI Foto Perfil"
+    "avatar_uri": "URI Foto Perfil",
+    "last_day_month": "Último día del mes",
+    "days_number_after_emitted": "Cantidad de días a partir de la emisión",
+    "days_number_next_month": "Cantidad de días posteriores al inicio del siguiente mes"
 }

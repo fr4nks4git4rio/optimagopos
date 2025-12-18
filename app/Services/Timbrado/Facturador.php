@@ -86,6 +86,11 @@ class Facturador
 
         ///////////////////////////////////////////////////////////////////////
         // RECEPTOR SECTION
+        if ($factura->cliente->rfc == 'XAXX010101000') {
+            $Builder->setAtributoInformacionGlobal('Periodicidad', $factura->periodicidad ? $factura->periodicidad->clave : '');
+            $Builder->setAtributoInformacionGlobal('Meses', $factura->mes ? $factura->mes->clave : '');
+            $Builder->setAtributoInformacionGlobal('Año', $factura->anio);
+        }
         $usoCfdi = optional($factura->cfdi)->codigo;
         $Builder->setAtributoReceptor('UsoCFDI', $usoCfdi);
         $Builder->setAtributoReceptor('Rfc', $factura->cliente->rfc);
@@ -94,9 +99,9 @@ class Facturador
         $Builder->setAtributoReceptor('DomicilioFiscalReceptor', $factura->cliente->direccion_fiscal->codigo_postal);
 
 
+
         ///////////////////////////////////////////////////////////////////////
         // ITEM SECTION
-
         if ($factura->cfdis_relacionados) {
             $Builder->setTipoRelacionFacturas($factura->tipo_relacion_factura->codigo);
             foreach (explode(',', $factura->cfdis_relacionados) as $fact) {

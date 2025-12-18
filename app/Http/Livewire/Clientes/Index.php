@@ -43,13 +43,14 @@ class Index extends Component
             default => Cliente::withTrashed(),
         };
 
-        $clientes = $query->where('es_comensal', 0)->get()->map->only('id', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at')->toArray();
+        $clientes = $query->where('es_cliente', 1)->get()->map->only('id', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at')->toArray();
         $records_final = collect();
 
         foreach ($clientes as $cliente) {
             $cliente = Cliente::decryptInfo($cliente);
 
-            if (!$this->search
+            if (
+                !$this->search
                 || Str::contains(Str::upper($cliente['nombre_comercial']), Str::upper($this->search))
                 || Str::contains(Str::upper($cliente['rfc']), Str::upper($this->search))
                 || Str::contains(Str::upper($cliente['razon_social']), Str::upper($this->search))

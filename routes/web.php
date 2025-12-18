@@ -14,6 +14,7 @@ use App\Http\Controllers\ObjetoImpuestoController;
 use App\Http\Controllers\SerieController;
 use App\Http\Controllers\SoapController;
 use App\Http\Controllers\TipoComprobanteController;
+use App\Http\Livewire\Facturas\Save as SavePreFacturas;
 use App\Http\Livewire\Home;
 use App\Http\Livewire\Auth\Login;
 use App\Http\Livewire\AutoFacturacion;
@@ -25,8 +26,10 @@ use App\Http\Livewire\Comensales\Index as IndexComensales;
 use App\Http\Livewire\Sucursales\Index as IndexSucursales;
 use App\Http\Livewire\Terminales\Index as IndexTerminales;
 use App\Http\Livewire\Facturas\IndexAlmacen as IndexAlmacenFacturas;
+use App\Http\Livewire\Facturas\IndexPreFacturas;
 use App\Http\Livewire\Reportes\Tickets\Index as IndexReportesTickets;
 use App\Http\Livewire\TimbrarAutoFactura;
+use App\Models\Cliente;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -48,10 +51,10 @@ use Illuminate\Support\Facades\Route;
 //Auth::routes();
 
 Route::domain(config('app.facturacion_url'))->group(function () {
-    Route::get('/', function(){
+    Route::get('/', function () {
         return redirect()->route('auto-facturacion');
     });
-    Route::get('/login', function(){
+    Route::get('/login', function () {
         return redirect()->route('auto-facturacion');
     });
     Route::get('/auto-facturacion', AutoFacturacion::class)->name('auto-facturacion');
@@ -91,13 +94,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/sucursales', IndexSucursales::class)->name('sucursales.index');
         Route::get('/terminales', IndexTerminales::class)->name('terminales.index');
 
+        Route::get('/pre-facturas/save/{id?}', SavePreFacturas::class)->name('pre-facturas.save');
+        Route::get('/pre-facturas', IndexPreFacturas::class)->name('pre-facturas.index')->middleware('hasRole:2');
+
         Route::get('/almacen-facturas', IndexAlmacenFacturas::class)->name('almacen-facturas.index')->middleware('hasRole:2');
 
         Route::get('/cabecera-factura', CabeceraFactura::class)->name('cabecera-factura');
         Route::get('/obtener-timbres-disponibles/{rfc}', [SoapController::class, 'obtenerTimbresDisponibles']);
     });
 
-    Route::middleware(['hasRole:2'])->prefix('reportes')->group(function(){
+    Route::middleware(['hasRole:2'])->prefix('reportes')->group(function () {
 
         Route::get('/tickets', IndexReportesTickets::class)->name('reportes.tickets');
     });

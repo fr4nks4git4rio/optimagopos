@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Validation\Rule;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -17,12 +18,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $id_transaccion
  * @property string $fecha_transaccion
  * @property float $importe
- * @property float $propina
- * @property string $moneda
+ * @property float $tipo_cambio
+ * @property string $vigencia_facturacion
  * @property integer $empleado_id
  * @property integer $sucursal_id
  * @property integer $terminal_id
  * @property integer $factura_id
+ * @property integer $comensal_id
  */
 class Ticket extends Model
 {
@@ -35,12 +37,13 @@ class Ticket extends Model
         'id_transaccion',
         'fecha_transaccion',
         'importe',
-        'propina',
-        'moneda',
+        'tipo_cambio',
+        'vigencia_facturacion',
         'empleado_id',
         'sucursal_id',
         'terminal_id',
         'factura_id',
+        'comensal_id'
     ];
 
     /**
@@ -52,13 +55,14 @@ class Ticket extends Model
         'ubicacion' => 'string',
         'id_transaccion' => 'string',
         'fecha_transaccion' => 'string',
-        'propina' => 'float',
+        'tipo_cambio' => 'float',
         'importe' => 'float',
-        'moneda' => 'string',
+        'vigencia_facturacion' => 'date',
         'empleado_id' => 'integer',
         'sucursal_id' => 'integer',
         'terminal_id' => 'integer',
         'factura_id' => 'integer',
+        'comensal_id' => 'integer',
     ];
 
     /**
@@ -97,10 +101,13 @@ class Ticket extends Model
     {
         return $this->belongsTo(Terminal::class);
     }
-
     public function factura()
     {
         return $this->belongsTo(Factura::class);
+    }
+    public function comensal()
+    {
+        return $this->belongsTo(Cliente::class);
     }
 
     public function operaciones()
@@ -112,13 +119,20 @@ class Ticket extends Model
         return $this->hasMany(TicketImpuesto::class, 'ticket_id');
     }
 
-    public function propinas()
-    {
-        return $this->hasMany(TicketPropina::class, 'ticket_id');
-    }
-
     public function productos()
     {
         return $this->hasMany(TicketProducto::class, 'ticket_id');
+    }
+
+    public function facturas()
+    {
+        return $this->hasManyThrough(
+            Factura::class,
+            TicketOperacion::class,
+            'ticket_id',   // FK en operaciones → tickets
+            'id',          // PK de facturas
+            'id',          // PK de tickets
+            'factura_id'   // FK en operaciones → facturas
+        );
     }
 }

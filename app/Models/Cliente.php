@@ -19,18 +19,19 @@ use Illuminate\Support\Facades\Storage;
  * @package App\Models
  * @version October 6, 2019, 12:01 pm CDT
  *
- * @property string nombre_comercial
- * @property string razon_social
- * @property string rfc
- * @property string correo
- * @property string telefono
- * @property boolean es_comensal
- * @property string comentarios
- * @property string logo
- * @property string portal_pac
- * @property string usuario_integrador_sat
- * @property integer direccion_fiscal_id
- * @property integer regimen_fiscal_id
+ * @property string $nombre_comercial
+ * @property string $razon_social
+ * @property string $rfc
+ * @property string $correo
+ * @property string $telefono
+ * @property boolean $es_comensal
+ * @property boolean $es_cliente
+ * @property string $comentarios
+ * @property string $logo
+ * @property string $portal_pac
+ * @property string $usuario_integrador_sat
+ * @property integer $direccion_fiscal_id
+ * @property integer $regimen_fiscal_id
  */
 class Cliente extends Model
 {
@@ -46,6 +47,7 @@ class Cliente extends Model
         'telefono',
         'prefijo',
         'es_comensal',
+        'es_cliente',
         'comentarios',
         'logo',
         'portal_pac',
@@ -70,6 +72,7 @@ class Cliente extends Model
         'telefono' => 'string',
         'prefijo' => 'string',
         'es_comensal' => 'boolean',
+        'es_cliente' => 'boolean',
         'comentarios' => 'string',
         'portal_pac' => 'string',
         'usuario_integrador_sat' => 'string',

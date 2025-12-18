@@ -38,7 +38,7 @@
         });
     }, 100);
 	$('#{{$id}}.select2').on('change', function(e) {
-	    let elementName = $(this).attr('id');
+	    let elementName = $(this).attr('id').replaceAll('-', '.');
 	    @this.set(elementName, e.target.value);
         @this.emit(elementName+'Changed', e.target.value);
             Livewire.hook('message.processed', (m, component) => {

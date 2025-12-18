@@ -15,7 +15,7 @@ class ClienteController extends Controller
 
         $query = DB::table('tb_clientes')
             ->where('deleted_at', null)
-            ->where('es_comensal', 0)
+            ->where('es_cliente', 1)
             ->select('id', $label);
 
         if($request->term){

@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 class RfcRule implements ValidationRule
 {
     protected $tipo_persona;
+    private $message = "Formato incorrecto.";
 
     /**
      * @param $tipo_persona 'persona_fisica' o 'persona_moral'
@@ -25,40 +26,14 @@ class RfcRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if($this->tipo_persona == 'ambas')
-            $this->tipo_persona = strlen($value) == 12 ? 'persona_moral' : 'persona_fisica';
+        $isFisica = preg_match('/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/i', $value);
+        $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $value);
 
-        if ($this->tipo_persona == 'persona_moral') {
-            if (strlen($value) != 12) {
-                $fail('Debe tener 12 caracteres');
-                return;
-            }
-
-            if (is_numeric($value[0]) || is_numeric($value[1]) || is_numeric($value[2])) {
-                $fail('Formato incorrecto.');
-                return;
-            }
-
-            $string = substr($value, 3, 6);
-        } else {
-            if (strlen($value) != 13) {
-                $fail('Debe tener 13 caracteres');
-                return;
-            }
-
-            if (is_numeric($value[0]) || is_numeric($value[1]) || is_numeric($value[2]) || is_numeric($value[3])) {
-                $fail('Formato incorrecto.');
-                return;
-            }
-
-            $string = substr($value, 4, 6);
-        }
-        if (!is_numeric($string[0])
-            || !is_numeric($string[1])
-            || !is_numeric($string[2])
-            || !is_numeric($string[3])
-            || !is_numeric($string[4])
-            || !is_numeric($string[5]))
-            $fail('Formato incorrecto.');
+        if ($this->tipo_persona == 'persona_fisica' && !$isFisica)
+            $fail($this->message);
+        if ($this->tipo_persona == 'persona_moral' && !$isMoral)
+            $fail($this->message);
+        if (!$isFisica && !$isMoral)
+            $fail($this->message);
     }
 }

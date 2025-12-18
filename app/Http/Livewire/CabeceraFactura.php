@@ -9,6 +9,7 @@ use App\Models\Localidad;
 use App\Models\Municipio;
 use App\Models\Cliente;
 use App\Rules\RfcRule;
+use App\Rules\RfcYRegimenCoherentesRule;
 use App\Rules\RuleUnique;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
@@ -80,20 +81,13 @@ class CabeceraFactura extends Component
         $collection->map(function ($cliente) {
             $cliente = Cliente::decryptInfo($cliente);
         });
-        $tipo_persona = 'ambas';
-        if ($this->owner['regimen_fiscal_id']) {
-            if ($this->owner['regimen_fiscal_id'] == 9)
-                $tipo_persona = 'persona_fisica';
-            else
-                $tipo_persona = 'persona_moral';
-        }
         return [
             'owner.nombre_comercial' => ['required', new RuleUnique($collection, $this->owner['id'])],
             'owner.razon_social' => ['required', new RuleUnique($collection, $this->owner['id'])],
-            'owner.rfc' => ['required', new RuleUnique($collection, $this->owner['id']), new RfcRule($tipo_persona)],
+            'owner.rfc' => ['required', new RuleUnique($collection, $this->owner['id']), new RfcRule('ambas')],
             'owner.correo' => ['required'],
             'owner.telefono' => ['nullable'],
-            'owner.regimen_fiscal_id' => ['nullable'],
+            'owner.regimen_fiscal_id' => ['nullable', new RfcYRegimenCoherentesRule($this->owner->rfc)],
             'owner.portal_pac' => ['required'],
             'owner.usuario_integrador_sat' => ['required'],
             'owner.direccion.codigo_postal' => ['required'],

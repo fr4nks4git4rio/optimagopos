@@ -1,44 +1,39 @@
 <x-modal form-action="save">
     <x-slot:title>
-        {{$sucursal->exists ? 'Editar ' : 'Crear '}}Sucursal
+        {{ $sucursal->exists ? 'Editar ' : 'Crear ' }}Sucursal
     </x-slot:title>
 
     <x-slot:content>
-        @if(user()->is_super_admin)
-        <div class="row mb-3">
-            <x-select2-ajax-component-modals label="Cliente" placeholder="Seleccione..."
-                class="form-control"
-                url="{{route('clientes.load-clientes')}}"
-                model="cliente_id"
-                :dynamic="true" />
-        </div>
+        @if (user()->is_super_admin)
+            <div class="row mb-3">
+                <x-select2-ajax-component-modals label="Cliente" placeholder="Seleccione..." class="form-control"
+                    url="{{ route('clientes.load-clientes') }}" model="cliente_id" :dynamic="true" />
+            </div>
         @endif
         <div class="row">
-            <div x-data="{logo_uploaded:false}" class="col-12 col-md-3 text-center mb-2"
+            <div x-data="{ logo_uploaded: false }" class="col-12 col-md-3 text-center mb-2"
                 x-on:livewire-upload-finish="logo_uploaded=true;$wire.logo_src = URL.createObjectURL(document.getElementById('logo').files[0])">
                 <label for="">Logo</label>
                 <hr>
-                @if(!$this->has_logo)
-                <img src="{{asset('img/no_image.png')}}" alt="" class="img-thumbnail rounded-4"
-                    id="logo_image">
+                @if (!$this->has_logo)
+                    <img src="{{ asset('img/no_image.png') }}" alt="" class="img-thumbnail rounded-4"
+                        id="logo_image">
                 @else
-                <template x-if="logo_uploaded">
-                    <img src="{{$logo_src}}" alt="" class="img-thumbnail rounded-4">
-                </template>
-                <template x-if="!logo_uploaded">
-                    <img src="{{asset($logo_src)}}" alt="" class="img-thumbnail rounded-4">
-                </template>
+                    <template x-if="logo_uploaded">
+                        <img src="{{ $logo_src }}" alt="" class="img-thumbnail rounded-4">
+                    </template>
+                    <template x-if="!logo_uploaded">
+                        <img src="{{ asset($logo_src) }}" alt="" class="img-thumbnail rounded-4">
+                    </template>
                 @endif
 
-                <input type="file" style="display: none" id="logo" wire:model="logo"
-                    accept=".jpg,.jpeg,.png">
+                <input type="file" style="display: none" id="logo" wire:model="logo" accept=".jpg,.jpeg,.png">
                 <button type="button" class="btn btn-site-primary mt-2"
                     onclick="document.getElementById('logo').click()">Subir Logo
                 </button>
-                @if($this->has_logo)
-                <button type="button" class="btn btn-secondary mt-2"
-                    wire:click="removeLogo()">Quitar Logo
-                </button>
+                @if ($this->has_logo)
+                    <button type="button" class="btn btn-secondary mt-2" wire:click="removeLogo()">Quitar Logo
+                    </button>
                 @endif
             </div>
             <div class="col-12 col-md-9">
@@ -61,9 +56,34 @@
                         <x-input label="Teléfono" model="telefono" />
                     </div>
                     <div class="col-sm-4">
-                        <x-select2-component-modals label="Régimen Fiscal" :options="$regimenesFiscales"
-                            model="regimen_fiscal_id" class="form-control" />
+                        <x-select2-component-modals label="Régimen Fiscal" :options="$regimenesFiscales" model="regimen_fiscal_id"
+                            class="form-control" />
                     </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-6">
+                        <div class="mb-1">
+                            <label for="">Vigencia de tickets para facturación:</label>
+                            <select
+                                class="form-control  @error('tipo_vigencia_ticket_facturacion') is-invalid @enderror"
+                                wire:model="tipo_vigencia_ticket_facturacion">
+                                <option value="">Seleccione...</option>
+                                @foreach ($tiposVigenciaTicketFacturacion as $value)
+                                    <option value="{{ $value }}">{{ __($value) }}</option>
+                                @endforeach
+                            </select>
+                            @error('tipo_vigencia_ticket_facturacion')
+                                <span class="invalid-feedback d-block" role="alert">
+                                    {{ $message }}
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    @if (in_array($tipo_vigencia_ticket_facturacion, ['days_number_after_emitted', 'days_number_next_month']))
+                        <div class="col-sm-3">
+                            <x-input model="dias_vigencia" type="number" label="Cantidad de días" />
+                        </div>
+                    @endif
                 </div>
                 <div wire:init="init" class="row">
                     <div class="col-12">
@@ -82,59 +102,59 @@
                                 </button>
                             </li>
                         </ul>
-                        <div class="tab-content" id="myTabContent">
-                            <div wire:ignore.self class="tab-pane fade pt-2 show active" id="direccion-fiscal-tab-pane"
-                                role="tabpanel"
-                                aria-labelledby="direccion-fiscal-tab"
-                                tabindex="2">
-                                <div class="row">
-                                    <div class="col-3">
-                                        <x-input label="Calle" type="text" model="direccion_fiscal.calle" />
+                        <div class="tab-content"
+                                id="myTabContent">
+                                <div wire:ignore.self class="tab-pane fade pt-2 show active"
+                                    id="direccion-fiscal-tab-pane" role="tabpanel"
+                                    aria-labelledby="direccion-fiscal-tab" tabindex="2">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <x-input label="Calle" type="text" model="direccion_fiscal.calle" />
+                                        </div>
+                                        <div class="col-3">
+                                            <x-input label="No. Exterior" type="text"
+                                                model="direccion_fiscal.no_exterior" />
+                                        </div>
+                                        <div class="col-3">
+                                            <x-input label="No. Interior" type="text"
+                                                model="direccion_fiscal.no_interior" />
+                                        </div>
+                                        <div class="col-3">
+                                            <x-input label="Código Postal" type="text"
+                                                model="direccion_fiscal.codigo_postal" />
+                                        </div>
                                     </div>
-                                    <div class="col-3">
-                                        <x-input label="No. Exterior" type="text" model="direccion_fiscal.no_exterior" />
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <x-input label="Colonia" type="text"
+                                                model="direccion_fiscal.colonia" />
+                                        </div>
+                                        <div class="col-3">
+                                            <x-select2-ajax-component-modals label="Estado"
+                                                placeholder="Seleccione..." class="form-control"
+                                                url="{{ route('estados.load-estados') }}"
+                                                model="direccion_fiscal.estado_id" :dynamic="true" />
+                                        </div>
+                                        <div class="col-3">
+                                            <x-select2-ajax-component-modals label="Localidad"
+                                                placeholder="Seleccione..." class="form-control"
+                                                url="{{ route('localidades.load-localidades', ['estado_id' => $direccion_fiscal['estado_id']]) }}"
+                                                model="direccion_fiscal.localidad_id" :dynamic="true" />
+                                        </div>
+                                        <div class="col-3">
+                                            <x-select2-ajax-component-modals label="Municipio"
+                                                placeholder="Seleccione..." class="form-control"
+                                                url="{{ route('municipios.load-municipios', ['estado_id' => $direccion_fiscal['estado_id']]) }}"
+                                                model="direccion_fiscal.municipio_id" :dynamic="true" />
+                                        </div>
                                     </div>
-                                    <div class="col-3">
-                                        <x-input label="No. Interior" type="text" model="direccion_fiscal.no_interior" />
-                                    </div>
-                                    <div class="col-3">
-                                        <x-input label="Código Postal" type="text"
-                                            model="direccion_fiscal.codigo_postal" />
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <x-input label="Referencia" type="text"
+                                                model="direccion_fiscal.referencia" />
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-3">
-                                        <x-input label="Colonia" type="text" model="direccion_fiscal.colonia" />
-                                    </div>
-                                    <div class="col-3">
-                                        <x-select2-ajax-component-modals label="Estado" placeholder="Seleccione..."
-                                            class="form-control"
-                                            url="{{route('estados.load-estados')}}"
-                                            model="direccion_fiscal.estado_id"
-                                            :dynamic="true" />
-                                    </div>
-                                    <div class="col-3">
-                                        <x-select2-ajax-component-modals label="Localidad" placeholder="Seleccione..."
-                                            class="form-control"
-                                            url="{{route('localidades.load-localidades',['estado_id' => $direccion_fiscal['estado_id']])}}"
-                                            model="direccion_fiscal.localidad_id"
-                                            :dynamic="true" />
-                                    </div>
-                                    <div class="col-3">
-                                        <x-select2-ajax-component-modals label="Municipio" placeholder="Seleccione..."
-                                            class="form-control"
-                                            url="{{route('municipios.load-municipios',['estado_id' => $direccion_fiscal['estado_id']])}}"
-                                            model="direccion_fiscal.municipio_id"
-                                            :dynamic="true" />
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <x-input label="Referencia" type="text" model="direccion_fiscal.referencia" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

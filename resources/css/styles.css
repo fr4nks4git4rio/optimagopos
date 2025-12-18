@@ -282,11 +282,15 @@ textarea:not([disabled]).form-control {
     color: red;
 }
 
-.btn:hover {
+.modal > .modal-dialog > .modal-content > .modal-header > .modal-title {
+    font-size: large;
+}
+
+/* .btn:hover {
     color: #fff !important;
     background-color: #ce5124 !important;
     border-color: #ce5724 !important;
-}
+} */
 
 .btn-check:checked + .btn, :not(.btn-check) + .btn:active, .btn:first-child:active, .btn.active, .btn.show {
     color: #fff !important;

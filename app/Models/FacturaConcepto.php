@@ -13,13 +13,13 @@ use Illuminate\Database\Eloquent\Model;
  * @package App\Models\Ventas
  * @version October 6, 2019, 12:01 pm CDT
  *
- * @property float cantidad
- * @property float precio_unitario
- * @property string descripcion
- * @property integer factura_id
- * @property integer clave_prod_serv_id
- * @property integer clave_unidad_id
- * @property integer objeto_impuesto_id
+ * @property float $cantidad
+ * @property float $precio_unitario
+ * @property string $descripcion
+ * @property integer $factura_id
+ * @property integer $clave_prod_serv_id
+ * @property integer $clave_unidad_id
+ * @property integer $objeto_impuesto_id
  */
 class FacturaConcepto extends Model
 {

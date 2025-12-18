@@ -10,6 +10,7 @@ use App\Models\Localidad;
 use App\Models\Municipio;
 use App\Models\Cliente;
 use App\Rules\RfcRule;
+use App\Rules\RfcYRegimenCoherentesRule;
 use App\Rules\RuleUnique;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
@@ -88,21 +89,14 @@ class Save extends Modal
         $collection->map(function ($cliente) {
             $cliente = Cliente::decryptInfo($cliente);
         });
-        $tipo_persona = 'ambas';
-        if ($this->regimen_fiscal_id) {
-            if ($this->regimen_fiscal_id == 9)
-                $tipo_persona = 'persona_fisica';
-            else
-                $tipo_persona = 'persona_moral';
-        }
         return [
             'nombre_comercial' => ['required', new RuleUnique($collection, $this->cliente->id)],
             'razon_social' => ['required', new RuleUnique($collection, $this->cliente->id)],
-            'rfc' => ['required', new RuleUnique($collection, $this->cliente->id), new RfcRule($tipo_persona)],
+            'rfc' => ['required', new RuleUnique($collection, $this->cliente->id), new RfcRule('ambas')],
             'correo' => ['required'],
             'telefono' => ['nullable'],
             'comentarios' => ['nullable'],
-            'regimen_fiscal_id' => ['nullable'],
+            'regimen_fiscal_id' => ['nullable', new RfcYRegimenCoherentesRule($this->rfc)],
             'direccion_fiscal.codigo_postal' => ['required'],
             'direccion_fiscal.calle' => 'nullable',
             'direccion_fiscal.no_exterior' => 'nullable',
@@ -132,7 +126,7 @@ class Save extends Modal
         DB::beginTransaction();
         try {
             $data['rfc'] = strtoupper(str_replace(' ', '', $data['rfc']));
-            $data['es_comensal'] = 0;
+            $data['es_cliente'] = 1;
             $data = Cliente::encryptInfo($data);
 
             $this->cliente->fill(Arr::only($data, [
@@ -141,7 +135,7 @@ class Save extends Modal
                 'rfc',
                 'correo',
                 'telefono',
-                'es_comensal',
+                'es_cliente',
                 'regimen_fiscal_id'
             ]))->save();
 

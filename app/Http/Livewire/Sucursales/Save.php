@@ -11,6 +11,7 @@ use App\Models\Municipio;
 use App\Models\Cliente;
 use App\Models\Sucursal;
 use App\Rules\RfcRule;
+use App\Rules\RfcYRegimenCoherentesRule;
 use App\Rules\RuleUnique;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
@@ -31,6 +32,8 @@ class Save extends Modal
     public $rfc;
     public $correo;
     public $telefono;
+    public $tipo_vigencia_ticket_facturacion;
+    public $dias_vigencia;
     public $cliente_id;
     public $regimen_fiscal_id;
     public $direccion_fiscal;
@@ -39,6 +42,7 @@ class Save extends Modal
 
     public $regimenesFiscales = [];
     public $estados = [];
+    public $tiposVigenciaTicketFacturacion = ['last_day_month', 'days_number_after_emitted', 'days_number_next_month'];
 
     protected $listeners = ['$refresh'];
 
@@ -57,6 +61,8 @@ class Save extends Modal
             $this->rfc = $this->sucursal->rfc;
             $this->correo = $this->sucursal->correo;
             $this->telefono = $this->sucursal->telefono;
+            $this->tipo_vigencia_ticket_facturacion = $this->sucursal->tipo_vigencia_ticket_facturacion;
+            $this->dias_vigencia = $this->sucursal->dias_vigencia;
             $this->regimen_fiscal_id = $this->sucursal->regimen_fiscal_id;
             $this->cliente_id = $this->sucursal->cliente_id;
             $this->logo = $this->sucursal->logo_uri;
@@ -101,21 +107,16 @@ class Save extends Modal
         $collection->map(function ($sucursal) {
             $sucursal = Sucursal::decryptInfo($sucursal);
         });
-        $tipo_persona = 'ambas';
-        if ($this->regimen_fiscal_id) {
-            if ($this->regimen_fiscal_id == 9)
-                $tipo_persona = 'persona_fisica';
-            else
-                $tipo_persona = 'persona_moral';
-        }
-        return [
+
+        $rules = [
             'nombre_comercial' => ['required', new RuleUnique($collection, $this->sucursal->id)],
             'razon_social' => ['required', new RuleUnique($collection, $this->sucursal->id)],
-            'rfc' => ['required', new RuleUnique($collection, $this->sucursal->id), new RfcRule($tipo_persona)],
+            'rfc' => ['required', new RuleUnique($collection, $this->sucursal->id), new RfcRule('ambas')],
             'correo' => ['required'],
             'telefono' => ['nullable'],
+            'tipo_vigencia_ticket_facturacion' => ['required'],
             'cliente_id' => ['required', 'exists:tb_clientes,id'],
-            'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id'],
+            'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id', new RfcYRegimenCoherentesRule($this->rfc)],
             'direccion_fiscal.codigo_postal' => ['required'],
             'direccion_fiscal.calle' => 'nullable',
             'direccion_fiscal.no_exterior' => 'nullable',
@@ -126,6 +127,15 @@ class Save extends Modal
             'direccion_fiscal.estado_id' => 'nullable',
             'direccion_fiscal.referencia' => 'nullable'
         ];
+
+        if (in_array($this->tipo_vigencia_ticket_facturacion, ['days_number_after_emitted', 'days_number_next_month'])) {
+            $rules = array_merge($rules, ['dias_vigencia' => ['required', 'numeric', 'min:1']]);
+        } else {
+            $rules = array_merge($rules, ['dias_vigencia' => ['nullable']]);
+            $this->dias_vigencia = null;
+        }
+
+        return $rules;
     }
 
     public function messages()
@@ -135,6 +145,10 @@ class Save extends Modal
             'razon_social.required' => 'Campo requerido',
             'rfc.required' => 'Campo requerido',
             'correo.required' => 'Campo requerido',
+            'tipo_vigencia_ticket_facturacion.required' => 'Campo requerido',
+            'dias_vigencia.required' => 'Campo requerido',
+            'dias_vigencia.numeric' => 'Campo numérico',
+            'dias_vigencia.min' => 'Entre un valor superior',
             'cliente_id.required' => 'Campo requerido',
             'cliente_id.exists' => 'Cliente no encontrado',
             'regimen_fiscal_id.required' => 'Campo requerido',
@@ -157,6 +171,8 @@ class Save extends Modal
                 'rfc',
                 'correo',
                 'telefono',
+                'tipo_vigencia_ticket_facturacion',
+                'dias_vigencia',
                 'cliente_id',
                 'regimen_fiscal_id'
             ]))->save();

@@ -48,7 +48,6 @@ class Index extends Component
                 's.razon_social as sucursal',
                 'ter.identificador as terminal',
                 'e.nombre as empleado',
-                'f.folio_interno as factura',
                 't.importe',
                 DB::raw("GROUP_CONCAT(CONCAT(p.nombre, ' (', tp.cantidad, ')')) as productos"),
                 DB::raw("GROUP_CONCAT(distinct d.nombre) as departamentos")
@@ -56,8 +55,7 @@ class Index extends Component
             ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id')
             ->leftJoin('tb_terminales as ter', 'ter.id', '=', 't.terminal_id')
             ->leftJoin('tb_empleados as e', 'e.id', '=', 't.empleado_id')
-            ->leftJoin('tb_facturas as f', 'f.id', '=', 't.factura_id')
-            ->leftJoin('tb_clientes as c', 'c.id', '=', 'f.cliente_id')
+            ->leftJoin('tb_clientes as c', 'c.id', '=', 't.comensal_id')
             ->leftJoin('tb_ticket_productos as tp', 'tp.ticket_id', '=', 't.id')
             ->leftJoin('tb_productos as p', 'p.id', '=', 'tp.producto_id')
             ->leftJoin('tb_departamentos as d', 'd.id', '=', 'tp.departamento_id')

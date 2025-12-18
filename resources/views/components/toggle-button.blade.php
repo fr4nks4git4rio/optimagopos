@@ -1,21 +1,18 @@
-@props([
-    'label',
-    'model',
-    'lazy' => false,
-    'inline' => false
-])
+@props(['label', 'model', 'lazy' => false, 'inline' => false, 'onChange' => 'false', 'index' => ''])
 
 @php
-    if ($lazy) $bind = '.lazy';
-    else $bind = '.defer';
+    if ($lazy) {
+        $bind = '.lazy';
+    } else {
+        $bind = '.defer';
+    }
 
-    $attributes = $attributes->class([
-        'checkbox',
-        'is-invalid' => $errors->has($model),
-    ])->merge([
+    $id = \Illuminate\Support\Str::replace('.', '-', $model);
+
+    $attributes = $attributes->class(['checkbox', 'is-invalid' => $errors->has($model)])->merge([
         'type' => 'checkbox',
-        'id' => $model,
-        'wire:model' . $bind =>  $model,
+        'id' => $id,
+        'wire:model' . $bind => $model,
     ]);
 @endphp
 
@@ -29,8 +26,8 @@
     }
 
     .button-cover {
-    /*/ / height: 100 px;*/
-    /*/ / margin: 20 px;*/
+        /*/ / height: 100 px;*/
+        /*/ / margin: 20 px;*/
         background-color: transparent;
         /*box-shadow: 0 10px 20px -8px #c5d6d6;*/
         /*border-radius: 4px;*/
@@ -38,7 +35,7 @@
 
     .button-cover:before {
         counter-increment: button-counter;
-    / / content: counter(button-counter);
+        / / content: counter(button-counter);
         position: absolute;
         right: 0;
         bottom: 0;
@@ -121,17 +118,17 @@
         transition: 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15) all;
     }
 
-    .button-toggle .checkbox:checked + .knobs:before {
+    .button-toggle .checkbox:checked+.knobs:before {
         content: "SI";
         left: 38px;
         background-color: #ce5124;
     }
 
-    .button-toggle .checkbox:disabled + .knobs:before {
+    .button-toggle .checkbox:disabled+.knobs:before {
         opacity: 0.4;
     }
 
-    .button-toggle .checkbox:checked ~ .layer {
+    .button-toggle .checkbox:checked~.layer {
         background-color: #fcebeb;
     }
 
@@ -147,13 +144,18 @@
     <div class="toggle-button-cover">
         <div class="button-cover">
             <div class="button r button-toggle">
-                <input {{ $attributes }} >
+                <input x-data="{}" x-init="() => {
+                    $('#{{ $id }}').on('change', function(e) {
+                        if ('{{ $onChange }}' !== 'false')
+                            @this.emit('{{ $onChange }}', '{{ $index }}');
+                    });
+                }" {{ $attributes }}>
                 <div class="knobs"></div>
                 <div class="layer"></div>
             </div>
         </div>
     </div>
     @error($model)
-    <div class="invalid-feedback">{{ $message }}</div>
+        <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 </div>

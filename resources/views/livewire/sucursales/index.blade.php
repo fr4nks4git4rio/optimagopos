@@ -82,7 +82,11 @@
                             @if(!$sucursal['deleted_at'])
                             <li class="list-inline-item">
                                 <x-action icon="pencil" title="Modificar"
-                                    click="$emit('openModal', 'sucursales.save', {sucursal: {{$sucursal['id']}}})" />
+                                    click="$emit('openModal', 'sucursales.save', {sucursal : {{$sucursal['id']}}})" />
+                            </li>
+                            <li class="list-inline-item">
+                                <x-action icon="card-list" title="Formas de Pago"
+                                    click="$emit('openModal', 'sucursales.formas-pago', {sucursal: {{$sucursal['id']}}})" />
                             </li>
                             <li class="list-inline-item">
                                 <x-action icon="trash" title="Desactivar"

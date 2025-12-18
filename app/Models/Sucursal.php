@@ -19,15 +19,17 @@ use Illuminate\Support\Facades\Storage;
  * @package App\Models
  * @version October 6, 2019, 12:01 pm CDT
  *
- * @property string nombre_comercial
- * @property string razon_social
- * @property string rfc
- * @property string correo
- * @property string telefono
- * @property string logo
- * @property integer cliente_id
- * @property integer direccion_fiscal_id
- * @property integer regimen_fiscal_id
+ * @property string $nombre_comercial
+ * @property string $razon_social
+ * @property string $rfc
+ * @property string $correo
+ * @property string $telefono
+ * @property string $logo
+ * @property string $tipo_vigencia_ticket_facturacion
+ * @property integer $dias_vigencia
+ * @property integer $cliente_id
+ * @property integer $direccion_fiscal_id
+ * @property integer $regimen_fiscal_id
  */
 class Sucursal extends Model
 {
@@ -42,6 +44,8 @@ class Sucursal extends Model
         'correo',
         'telefono',
         'logo',
+        'tipo_vigencia_ticket_facturacion',
+        'dias_vigencia',
         'cliente_id',
         'direccion_fiscal_id',
         'regimen_fiscal_id'
@@ -61,6 +65,7 @@ class Sucursal extends Model
         'rfc' => 'string',
         'correo' => 'string',
         'telefono' => 'string',
+        'dias_vigencia' => 'integer',
         'cliente_id' => 'integer',
         'direccion_fiscal_id' => 'integer',
         'regimen_fiscal_id' => 'integer',
@@ -225,5 +230,10 @@ class Sucursal extends Model
     public function regimen_fiscal()
     {
         return $this->belongsTo(RegimenFiscal::class);
+    }
+
+    public function formas_pago()
+    {
+        return $this->hasMany(SucursalFormaPago::class, 'sucursal_id');
     }
 }

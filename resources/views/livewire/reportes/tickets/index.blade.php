@@ -47,7 +47,6 @@
                     <th>Ubicación</th>
                     <th>Productos</th>
                     <th>Departamentos</th>
-                    <th>Factura</th>
                     <th>Importe</th>
                 </tr>
             </thead>
@@ -63,12 +62,11 @@
                     <td>{{$ticket['ubicacion']}}</td>
                     <td>{{$ticket['productos']}}</td>
                     <td>{{$ticket['departamentos']}}</td>
-                    <td>{{$ticket['factura']}}</td>
                     <td>${{number_format($ticket['importe'], 2)}}</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9">
+                    <td colspan="8">
                         <div class="list-group-item">
                             No se encontraron resultados...
                         </div>

@@ -45,6 +45,7 @@ use Illuminate\Support\Facades\DB;
  * @property float $total
  * @property string $version_cfdi_timbrado
  * @property float $tipo_cambio
+ * @property float $anio
  * @property string $cfdis_relacionados
  * @property integer $cfdi_id
  * @property integer $metodo_pago_id
@@ -55,6 +56,9 @@ use Illuminate\Support\Facades\DB;
  * @property integer $propietario_id
  * @property integer $tipo_relacion_factura_id
  * @property integer $motivo_cancelacion_id
+ * @property integer $periodicidad_id
+ * @property integer $mes_id
+ * @property integer $user_id
  */
 class Factura extends Model
 {
@@ -88,6 +92,7 @@ class Factura extends Model
         'total',
         'version_cfdi_timbrado',
         'tipo_cambio',
+        'anio',
         'cfdis_relacionados',
         'cfdi_id',
         'metodo_pago_id',
@@ -97,7 +102,10 @@ class Factura extends Model
         'tipo_comprobante_id',
         'propietario_id',
         'tipo_relacion_factura_id',
-        'motivo_cancelacion_id'
+        'motivo_cancelacion_id',
+        'periodicidad_id',
+        'mes_id',
+        'user_id'
     ];
 
     protected $appends = [
@@ -154,7 +162,10 @@ class Factura extends Model
         'tipo_comprobante_id' => 'integer',
         'propietario_id' => 'integer',
         'tipo_relacion_factura_id' => 'integer',
-        'motivo_cancelacion_id' => 'integer'
+        'motivo_cancelacion_id' => 'integer',
+        'periodicidad_id' => 'integer',
+        'mes_id' => 'integer',
+        'user_id' => 'integer'
     ];
 
     /**
@@ -268,6 +279,79 @@ class Factura extends Model
         return $this->id;
     }
 
+    public static function parseData($data = [])
+    {
+        foreach ($data as $key => $value) {
+            if (in_array($key, [
+                'cfdi_id',
+                'metodo_pago_id',
+                'forma_pago_id',
+                'cliente_id',
+                'serie_id',
+                'tipo_comprobante_id',
+                'propietario_id',
+                'tipo_relacion_factura_id',
+                'motivo_cancelacion_id',
+                'periodicidad_id',
+                'mes_id',
+                'user_id',
+            ]) && $value) {
+                switch ($key) {
+                    case 'cfdi_id':
+                        $data['cfdi'] = DB::table('tb_cfdis')
+                            ->selectRaw('id, CONCAT(codigo, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'metodo_pago_id':
+                        $data['metodo_pago'] = DB::table('tb_metodo_pagos')
+                            ->selectRaw('id, CONCAT(codigo, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'forma_pago_id':
+                        $data['forma_pago'] = DB::table('tb_forma_pagos')
+                            ->selectRaw('id, CONCAT(codigo, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'cliente_id':
+                        $data['cliente'] = DB::table('tb_clientes')
+                            ->selectRaw('id, razon_social')->where('id', $value)->first()->razon_social;
+                        break;
+                    case 'serie_id':
+                        $data['serie'] = DB::table('tb_series')
+                            ->selectRaw('id, descripcion')->where('id', $value)->first()->descripcion;
+                        break;
+                    case 'tipo_comprobante_id':
+                        $data['tipo_comprobante'] = DB::table('tb_tipo_comprobantes')
+                            ->selectRaw('id, CONCAT(codigo, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'propietario_id':
+                        $data['propietario'] = DB::table('tb_sucursales')
+                            ->selectRaw('id, razon_social')->where('id', $value)->first()->razon_social;
+                        break;
+                    case 'tipo_relacion_factura_id':
+                        $data['tipo_relacion_factura'] = DB::table('tb_tipo_relacion_facturas')
+                            ->selectRaw('id, CONCAT(codigo, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'motivo_cancelacion_id':
+                        $data['motivo_cancelacion'] = DB::table('tb_motivos_cancelacion_factura')
+                            ->selectRaw('id, CONCAT(codigo, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'periodicidad_id':
+                        $data['periodicidad'] = DB::table('tb_periodicidades_factura')
+                            ->selectRaw('id, CONCAT(clave, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'mes_id':
+                        $data['mes'] = DB::table('tb_meses')
+                            ->selectRaw('id, CONCAT(clave, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'user_id':
+                        $data['user'] = DB::table('tb_usuarios')
+                            ->selectRaw('id, CONCAT(nombre, " ", apellidos) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                }
+            }
+        }
+
+        return $data;
+    }
+
     public function cfdi()
     {
         return $this->belongsTo(Cfdi::class);
@@ -302,20 +386,36 @@ class Factura extends Model
     {
         return $this->belongsTo(Sucursal::class, 'propietario_id');
     }
+    public function periodicidad()
+    {
+        return $this->belongsTo(PeriodicidadFactura::class);
+    }
+    public function mes()
+    {
+        return $this->belongsTo(Mes::class);
+    }
 
     public function tipo_relacion_factura()
     {
         return $this->belongsTo(TipoRelacionFactura::class, 'tipo_relacion_factura_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function factura_conceptos()
     {
         return $this->hasMany(FacturaConcepto::class);
     }
-
     public function tickets()
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    public function ticket_operaciones()
+    {
+        return $this->hasMany(TicketOperacion::class, 'factura_id');
     }
 
     public static function generatePdf($invoice_id, $mailing = false)

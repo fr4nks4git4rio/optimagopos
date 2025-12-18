@@ -12,10 +12,12 @@ use App\Models\Localidad;
 use App\Models\Municipio;
 use App\Models\RegimenFiscal;
 use App\Models\Sucursal;
+use App\Models\SucursalFormaPago;
 use App\Models\Terminal;
 use App\Models\Ticket;
 use App\Models\TipoRelacionFactura;
 use App\Rules\RfcRule;
+use App\Rules\RfcYRegimenCoherentesRule;
 use App\Rules\RuleUnique;
 use Exception;
 use Illuminate\Support\Arr;
@@ -32,15 +34,20 @@ class AutoFacturacion extends Component
     public $ticket;
     public $suc;
     public $rfc;
+    public $rfc_filtro;
+    public $sucursal_filtro;
 
     public $terminal = null;
     public $sucursales = [];
     public $regimenesFiscales = [];
+    public $ticketsPendientes = [];
+    public $sucursalesFiltro = [];
 
     public $registrarComensalClass = '';
     public $ticketImageClass = '';
     public $alertaRegistrarComensal = '';
     public $rfc_exists = false;
+    public $facturar_por_forma_pago = false;
 
     public $comensal = [
         'id' => null,
@@ -77,6 +84,15 @@ class AutoFacturacion extends Component
             ->whereNull('c.deleted_at')
             ->get()->map(function ($element) {
                 $element->label = Crypt::decrypt($element->label);
+                return (array)$element;
+            })->toArray();
+        $this->sucursalesFiltro = DB::table('tb_sucursales as s')
+            ->select('s.id as value', 's.nombre_comercial as label', 'c.razon_social as cliente')
+            ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
+            ->whereNull('s.deleted_at')
+            ->whereNull('c.deleted_at')
+            ->get()->map(function ($element) {
+                $element->label = Crypt::decrypt($element->label) . " - " . Crypt::decrypt($element->cliente);
                 return (array)$element;
             })->toArray();
         if ($this->codigo) {
@@ -123,6 +139,15 @@ class AutoFacturacion extends Component
         if ($value) {
             $this->terminal = Terminal::findByIdentificador($value);
         }
+    }
+
+    public function updatedRfcFiltro($value)
+    {
+        $this->loadTicketsPendientes();
+    }
+    public function updatedSucursalFiltro($value)
+    {
+        $this->loadTicketsPendientes();
     }
 
     public function getSucursalProperty()
@@ -192,6 +217,54 @@ class AutoFacturacion extends Component
             $municipio = Municipio::find($this->comensal['direccion_fiscal']['municipio_id']);
             $this->dispatchBrowserEvent("set-data-comensal-direccion_fiscal-municipio_id", ['data' => [$municipio->only('id', 'text')], 'term' => '', 'value' => $municipio->id]);
         }
+        if ($this->rfc)
+            $this->checkRfc($this->rfc);
+    }
+
+    public function loadTicketsPendientes()
+    {
+        $query = DB::table('tb_tickets as ticket')
+            ->select(
+                'ticket.id',
+                'ticket.id_transaccion as numero',
+                DB::raw("DATE_FORMAT(ticket.created_at, '%d/%m/%Y') as fecha"),
+                'sucursal.razon_social as sucursal',
+                'sucursal.id as sucursal_id',
+                'cliente.razon_social as cliente',
+                'terminal.identificador as terminal',
+                'comensal.rfc as rfc'
+            )
+            ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', '=', 'ticket.sucursal_id')
+            ->leftJoin('tb_clientes as cliente', 'cliente.id', '=', 'sucursal.cliente_id')
+            ->leftJoin('tb_terminales as terminal', 'terminal.id', '=', 'ticket.terminal_id')
+            ->leftJoin('tb_clientes as comensal', 'comensal.id', '=', 'ticket.comensal_id');
+
+        if ($this->facturar_por_forma_pago) {
+            $query->leftJoin('tb_ticket_operaciones as operacion', 'operacion.ticket_id', '=', 'ticket.id')
+                ->leftJoin('tb_facturas as factura', 'factura.id', '=', 'operaciones.factura_id');
+        } else {
+            $query->leftJoin('tb_facturas as factura', 'factura.id', '=', 'ticket.factura_id');
+        }
+
+        $query->where(function ($query) {
+            $query->where('factura.id', '=', '')
+                ->orWhere('factura.id', '=', null)
+                ->orWhereIn('factura.estado', ['PRECAPTURADA', 'CAPTURADA', 'CANCELADA']);
+        })
+            ->whereDate('ticket.vigencia_facturacion', '>=', today()->format('Y-m-d'));
+        if ($this->rfc_filtro)
+            $query->where('comensal.rfc', $this->rfc_filtro);
+        else
+            $query->where('ticket.id', 0);
+        if ($this->sucursal_filtro)
+            $query->where('sucursal.id', $this->sucursal_filtro);
+
+        $this->ticketsPendientes = $query->get()
+            ->map(function ($value, $key) {
+                $value->sucursal = Crypt::decrypt($value->sucursal) . " - " . Crypt::decrypt($value->cliente);
+                return (array)$value;
+            })
+            ->toArray();
     }
 
     public function guardarComensal()
@@ -202,21 +275,14 @@ class AutoFacturacion extends Component
         $collection->map(function ($cliente) {
             $cliente = Cliente::decryptInfo($cliente);
         });
-        $tipo_persona = 'ambas';
-        if ($this->comensal['regimen_fiscal_id']) {
-            if ($this->comensal['regimen_fiscal_id'] == 9)
-                $tipo_persona = 'persona_fisica';
-            else
-                $tipo_persona = 'persona_moral';
-        }
         $data = $this->validate([
             'comensal.id' => 'nullable',
-            'comensal.rfc' => ['required', new RuleUnique($collection, $this->comensal['id']), new RfcRule($tipo_persona)],
+            'comensal.rfc' => ['required', new RuleUnique($collection, $this->comensal['id']), new RfcRule('ambas')],
             'comensal.nombre_comercial' => ['required', new RuleUnique($collection, $this->comensal['id'])],
             'comensal.razon_social' => ['required', new RuleUnique($collection, $this->comensal['id'])],
             'comensal.correo' => ['required'],
             'comensal.telefono' => ['nullable'],
-            'comensal.regimen_fiscal_id' => ['nullable'],
+            'comensal.regimen_fiscal_id' => ['nullable', new RfcYRegimenCoherentesRule($this->comensal['rfc'])],
             'comensal.direccion_fiscal.codigo_postal' => ['required'],
             'comensal.direccion_fiscal.calle' => 'nullable',
             'comensal.direccion_fiscal.no_exterior' => 'nullable',
@@ -282,7 +348,6 @@ class AutoFacturacion extends Component
         ]);
         $comensal = DB::table('tb_clientes as c')
             ->select('c.*')
-            ->where('c.es_comensal', 1)
             ->where('rfc', $rfc)
             ->first();
         if (!$comensal) {
@@ -294,6 +359,17 @@ class AutoFacturacion extends Component
         } else {
             $this->rfc_exists = true;
         }
+    }
+
+    public function facturarDesdeTabla($terminal, $ticket, $sucursal)
+    {
+        $this->codigo = $terminal;
+        $this->terminal = Terminal::findByIdentificador($terminal);
+        $this->ticket = $ticket;
+        $this->rfc = $this->rfc_filtro;
+        $this->suc = $sucursal;
+
+        $this->facturar();
     }
 
     public function facturar()
@@ -338,47 +414,138 @@ class AutoFacturacion extends Component
             $this->emit('show-toast', 'Ticket no encontrado.', 'danger');
             return;
         }
-        if ($ticket->factura()->exists() && $ticket->factura->estado == 'TIMBRADA') {
+        if ($ticket->vigencia_facturacion && $ticket->vigencia_facturacion->format('Y-m-d') < today()->format('Y-m-d')) {
+            $this->emit('openModal', 'modal-toast', ['messages' => [['type' => 'danger', 'text' => 'Lo sentimos. La vigencia del Ticket para su facturación ya ha expirado.']]]);
+            return;
+        }
+
+        if ($this->facturar_por_forma_pago) {
+            $ticket_facturado = true;
+            foreach ($ticket->operaciones as $operacion) {
+                if (!$operacion->factura()->exists() || ($operacion->factura->estado != 'TIMBRADA' && $operacion->factura->estado != 'COBRADA')) {
+                    $ticket_facturado = false;
+                    break;
+                }
+            }
+        } else {
+            $ticket_facturado = $ticket->factura()->exists() && ($ticket->factura->estado == 'TIMBRADA' || $ticket->factura->estado == 'COBRADA');
+        }
+        if ($ticket_facturado) {
             $this->emit('openModal', 'modal-toast', ['messages' => [['type' => 'success', 'text' => 'El Ticket ya ha sido facturado previamente.']]]);
             return;
         }
-        if ($ticket->factura()->exists()) {
-            if ($ticket->factura->estado != 'CANCELADA') {
-                $ticket->factura->factura_conceptos()->delete();
-                $ticket->factura->delete();
+
+        if ($this->facturar_por_forma_pago) {
+            foreach ($ticket->operaciones as $operacion) {
+                if ($operacion->factura()->exists()) {
+                    if ($operacion->factura->estado != 'CANCELADA') {
+                        $operacion->factura->factura_conceptos()->delete();
+                        $operacion->factura->delete();
+                    }
+                    $operacion->factura_id = null;
+                    $operacion->save();
+                }
             }
-            $ticket->factura_id = null;
-            $ticket->save();
+        } else {
+            if ($ticket->factura()->exists()) {
+                if ($ticket->factura->estado != 'CANCELADA') {
+                    $ticket->factura->factura_conceptos()->delete();
+                    $ticket->factura->delete();
+                }
+                $ticket->factura_id = null;
+                $ticket->save();
+            }
         }
 
         $propietario = Sucursal::decryptInfo(Sucursal::find($this->suc));
-        $cliente = Cliente::decryptInfo(Cliente::where('rfc', operator: $this->rfc)->first());
+        $comensal = Cliente::decryptInfo(Cliente::where('rfc', $this->rfc)->first());
 
-        $factura = Factura::create([
-            'propietario_id' => $this->suc,
-            'lugar_expedicion' => $propietario->codigo_postal,
-            'cliente_id' => $cliente->id,
-            'fecha_emision' => now(),
-            'moneda' => 'MXN',
-            'estado' => 'CAPTURADA',
-            'modo_prueba_cfdi' => modo_facturacion() != 1,
-            'porciento_iva' => system_iva(),
-            'total' => $ticket->importe,
-            'subtotal' => $ticket->importe / (1 + system_iva() / 100),
-            'iva' => $ticket->importe - $ticket->importe / (1 + system_iva() / 100),
-            'cantidad_letras' => convertir_numero_a_letras($ticket->importe, 'MXN'),
-            'cfdi_id' => 3,
-            'serie_id' => 1,
-            'regimen_fiscal_id' => $cliente->regimen_fiscal_id,
-            'metodo_pago_id' => 1,
-            'forma_pago_id' => 1,
-            'tipo_comprobante_id' => 1
-        ]);
+        if ($this->facturar_por_forma_pago) {
+            $formasPago = DB::table('tb_ticket_operaciones as operacion')
+                ->select(
+                    'operacion.nombre as forma_pago',
+                    DB::raw("SUM(operacion.monto) as monto"),
+                    DB::raw("SUM(operacion.propina) as propina"),
+                    'operacion.sucursal_forma_pago_id',
+                    DB::raw("GROUP_CONCAT(operacion.id) as operaciones")
+                )
+                ->where('operacion.factura_id', null)
+                ->where('operacion.sucursal_forma_pago_id', '!=', null)
+                ->groupBy('operacion.sucursal_forma_pago_id')
+                ->get();
 
-        $ticket->factura_id = $factura->id;
+            $facturas = [];
+            foreach ($formasPago as $fp) {
+                $sfp = DB::table('tb_sucursal_forma_pagos')->where('id', $fp->sucursal_forma_pago_id)->get()->first();
+                $total = $fp->monto;
+                $subtotal = round($total / (1 + system_iva() / 100), 2);
+                $iva = $total - $subtotal;
+                $factura = Factura::create([
+                    'propietario_id' => $this->suc,
+                    'lugar_expedicion' => $propietario->codigo_postal,
+                    'cliente_id' => $comensal->id,
+                    'fecha_emision' => now(),
+                    'moneda' => optional($sfp)->moneda,
+                    'estado' => 'CAPTURADA',
+                    'modo_prueba_cfdi' => modo_facturacion() != 1,
+                    'porciento_iva' => system_iva(),
+                    'total' => $total,
+                    'subtotal' => $subtotal,
+                    'iva' => $iva,
+                    'cantidad_letras' => convertir_numero_a_letras($total, optional($sfp)->moneda),
+                    'cfdi_id' => 3,
+                    'serie_id' => 1,
+                    'regimen_fiscal_id' => $comensal->regimen_fiscal_id,
+                    'metodo_pago_id' => 1,
+                    'forma_pago_id' => optional($sfp)->forma_pago_id,
+                    'tipo_comprobante_id' => 1,
+                    'tipo_cambio' => $ticket->tipo_cambio
+                ]);
+
+                DB::table('tb_ticket_operaciones')
+                    ->whereIn('id', explode(',', $fp->operaciones))
+                    ->update(['factura_id' => $factura->id]);
+                $facturas[] = $factura->id;
+            }
+            $url = "/timbrar-auto-factura-por-forma-pago/" . Crypt::encrypt(implode(",", $facturas));
+        } else {
+            $total = $ticket->importe;
+            $subtotal = round($total / (1 + system_iva() / 100), 2);
+            $iva = $total - $subtotal;
+            $factura = Factura::create([
+                'propietario_id' => $this->suc,
+                'lugar_expedicion' => $propietario->codigo_postal,
+                'cliente_id' => $comensal->id,
+                'fecha_emision' => now(),
+                'moneda' => 'MXN',
+                'estado' => 'CAPTURADA',
+                'modo_prueba_cfdi' => modo_facturacion() != 1,
+                'porciento_iva' => system_iva(),
+                'total' => $total,
+                'subtotal' => $subtotal,
+                'iva' => $iva,
+                'cantidad_letras' => convertir_numero_a_letras($total, 'MXN'),
+                'cfdi_id' => 3,
+                'serie_id' => 1,
+                'regimen_fiscal_id' => $comensal->regimen_fiscal_id,
+                'metodo_pago_id' => 1,
+                'forma_pago_id' => 1,
+                'tipo_comprobante_id' => 1,
+                'tipo_cambio' => $ticket->tipo_cambio
+            ]);
+            DB::table('tb_ticket_operaciones')
+                ->where('ticket_id', $ticket->id)
+                ->update(['factura_id' => $factura->id]);
+            $ticket->factura_id = $factura->id;
+            $url = "/timbrar-auto-factura/" . Crypt::encrypt($factura->id);
+        }
+
+        $ticket->comensal_id = $comensal->id;
         $ticket->save();
 
-        $this->redirect("/timbrar-auto-factura/$factura->id");
+        DB::table('tb_clientes')->where('id', $comensal->id)->update(['es_comensal' => 1]);
+
+        $this->redirect($url);
     }
 
     public function mostrarTicketMuestra()

@@ -48,19 +48,6 @@ if (!function_exists('active_route')) {
     }
 }
 
-if (!function_exists('modulo_activo')) {
-    /**
-     * @param null $modulo
-     * @return string
-     */
-    function modulo_activo($modulo = null)
-    {
-        if ($modulo)
-            session()->put('modulo_activo', $modulo);
-        return session()->get('modulo_activo');
-    }
-}
-
 if (!function_exists('get_mes_es_simple')) {
     /**
      * @param $mes_int
@@ -119,7 +106,7 @@ if (!function_exists('convertir_numero_a_letras')) {
      * @param $currency
      * @return string
      */
-    function convertir_numero_a_letras($number, $currency)
+    function convertir_numero_a_letras($number, $currency = 'MXN')
     {
         $currency = strtoupper($currency) === 'USD' ? 'USD' : 'MXN';
         if (str_contains($number, '.')) {
@@ -165,16 +152,18 @@ if (!function_exists('system_iva')) {
 
 if (!function_exists('get_tipo_cambio')) {
     /**
-     * @param null $date
+     * @param $date | null
      * @return TipoCambio
      */
-    function get_tipo_cambio($date = null)
+    function get_tipo_cambio($date = null, $cliente_id = null)
     {
         if (now()->hour < 8) {
-            return TipoCambio::orderBy('id', 'desc')->first();
+            return TipoCambio::where('cliente_id', $cliente_id ?: user()->cliente_id)
+                ->orderBy('id', 'desc')->first();
         } else {
             $date = $date ?? Carbon::now()->format('Y-m-d');
-            $change = TipoCambio::whereRaw("DATE(created_at) = '$date'")
+            $change = TipoCambio::where('cliente_id', $cliente_id ?: user()->cliente_id)
+                ->whereRaw("DATE(created_at) = '$date'")
                 ->get();
 
             return $change->count() > 0 ? $change->first() : new TipoCambio();
@@ -287,5 +276,15 @@ if (!function_exists('get_dimensiones_opt')) {
             '2.44 x 12.19 x 2.59',
             '2.53 x 16.15 x 2.77'
         ];
+    }
+}
+
+if (!function_exists('pretty_message')) {
+    function pretty_message($message, $type = 'success')
+    {
+        if (config('app.env') === 'production')
+            return $type === 'success' ? 'Acción realizada correctamente!' : 'Lo sentimos. Ha ocurrido un error intentando realizar la acción.';
+
+        return $message;
     }
 }

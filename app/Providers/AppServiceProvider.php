@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Models\Cliente;
+use App\Models\Factura;
 use App\Models\Sucursal;
 use App\Models\Terminal;
 use App\Models\User;
 use App\Observers\ClienteObserver;
+use App\Observers\FacturaObserver;
 use App\Observers\SucursalObserver;
 use App\Observers\TerminalObserver;
 use App\Observers\UserObserver;
@@ -32,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
         Cliente::observe(ClienteObserver::class);
         Sucursal::observe(SucursalObserver::class);
         Terminal::observe(TerminalObserver::class);
+        Factura::observe(FacturaObserver::class);
 
         setlocale(LC_ALL, 'es_MX', 'es', 'ES', 'es_MX.utf8');
         Carbon::setLocale('es_MX.utf8');
