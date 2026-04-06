@@ -8,6 +8,7 @@ use App\Models\API\GlobalSiteValues;
 use App\Models\Cliente;
 use App\Models\Departamento;
 use App\Models\Empleado;
+use App\Models\Log as ModelsLog;
 use App\Models\Producto;
 use App\Models\Terminal;
 use App\Models\Ticket;
@@ -39,19 +40,46 @@ class HomeController
         }
 
         Log::error($decoded);
+        ModelsLog::create([
+            'log' => 'Data recibida.',
+            'data' => $decoded ? json_encode($decoded) : '',
+            'status' => 200
+        ]);
 
         // Paso 3: Verificar si se decodificó correctamente
         if (!$decoded || !isset($decoded['Items'])) {
+            ModelsLog::create([
+                'log' => 'Error. JSON inválido o incompleto',
+                'data' => $decoded ? json_encode($decoded) : '',
+                'status' => 400
+            ]);
             return response()->json(['success' => false, 'error' => 'JSON inválido o incompleto'], 400);
         }
 
         // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
 
         $terminal = Terminal::findByIdentificador($decoded['APIUserName']);
-
         if (!$terminal) {
+            ModelsLog::create([
+                'log' => 'Error. Terminal no encontrada.',
+                'data' => json_encode($decoded),
+                'status' => 400
+            ]);
             return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
         }
+
+        $tipo_cambio = get_tipo_cambio(null, $terminal->sucursal->cliente_id);
+        if (!$tipo_cambio->id) {
+            $tipo_cambio = TipoCambio::obtenerTipoCambioUrl($terminal->sucursal->cliente_id);
+            if (is_string($tipo_cambio)) {
+                ModelsLog::create([
+                'log' => "Error. $tipo_cambio",
+                'status' => 400
+            ]);
+                return response()->json(['success' => false, 'error' => $tipo_cambio], 400);
+            }
+        }
+
         // Paso 4: Acceder a datos generales
         $clerk = Empleado::where('sucursal_id', $terminal->sucursal_id)->where('id_empleado', $decoded['ClerkId'])->first();
         if (!$clerk) {
@@ -90,13 +118,6 @@ class HomeController
                 break;
         }
 
-        $tipo_cambio = get_tipo_cambio(null, $terminal->sucursal->cliente_id);
-        if (!$tipo_cambio->id) {
-            $tipo_cambio = TipoCambio::obtenerTipoCambioUrl($terminal->sucursal->cliente_id);
-            if (is_string($tipo_cambio)) {
-                return response()->json(['success' => false, 'error' => $tipo_cambio], 400);
-            }
-        }
         $ticket = Ticket::create([
             'ubicacion' => $decoded['Location'] ?? '',
             'id_transaccion' => $decoded['TransactionId'],
