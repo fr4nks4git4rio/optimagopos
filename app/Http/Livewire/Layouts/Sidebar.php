@@ -23,11 +23,6 @@ class Sidebar extends Component
     {
         return view('livewire.layouts.sidebar');
     }
-
-    public function moduloActivo($modulo)
-    {
-        modulo_activo($modulo);
-    }
     public function getAdminRoutesActiveProperty()
     {
         return Request::is('usuarios*')
@@ -46,6 +41,7 @@ class Sidebar extends Component
     }
     public function getReportesRoutesActiveProperty()
     {
-        return Request::is('reportes/tickets*');
+        return Request::is('reportes/tickets*')
+        || Request::is('reportes/logs*');
     }
 }
