@@ -28,6 +28,7 @@ use App\Http\Livewire\Terminales\Index as IndexTerminales;
 use App\Http\Livewire\Facturas\IndexAlmacen as IndexAlmacenFacturas;
 use App\Http\Livewire\Facturas\IndexPreFacturas;
 use App\Http\Livewire\Reportes\Tickets\Index as IndexReportesTickets;
+use App\Http\Livewire\Reportes\Logs;
 use App\Http\Livewire\TimbrarAutoFactura;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\DB;
@@ -106,6 +107,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['hasRole:2'])->prefix('reportes')->group(function () {
 
         Route::get('/tickets', IndexReportesTickets::class)->name('reportes.tickets');
+        Route::get('/logs', Logs::class)->name('reportes.logs');
     });
 });
 

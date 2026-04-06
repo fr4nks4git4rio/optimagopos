@@ -129,6 +129,12 @@
                             <i class="bi bi-cart fs-6"></i> <span
                                 class="d-sm-inline px-2">Tickets</span></a>
                     </li>
+                    <li class="w-100 li-item {{ active_route('reportes/logs*') }}">
+                        <a href="{{route('reportes.logs')}}"
+                            class="nav-link submenu">
+                            <i class="bi bi-fingerprint fs-6"></i> <span
+                                class="d-sm-inline px-2">Logs</span></a>
+                    </li>
                 </ul>
             </li>
             @endif
