@@ -47,10 +47,10 @@
             <tbody>
                 @forelse($logs as $log)
                     <tr>
-                        <td>{{ $ticket['fecha'] }}</td>
-                        <td>{{ $ticket['log'] }}</td>
-                        <td>{{ $ticket['data'] }}</td>
-                        <td>{{ $ticket['status'] }}</td>
+                        <td>{{ $log['fecha'] }}</td>
+                        <td>{{ $log['log'] }}</td>
+                        <td>{{ $log['data'] }}</td>
+                        <td>{{ $log['status'] }}</td>
                     </tr>
                 @empty
                     <tr>
