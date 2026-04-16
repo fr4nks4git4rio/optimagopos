@@ -1,6 +1,6 @@
 @section('title', 'Logs')
 
-<div>
+<div wire:pool.1s>
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
