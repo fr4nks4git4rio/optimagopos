@@ -1,12 +1,15 @@
 <x-modal form-action="save">
     <x-slot:title>
-        {{$terminal->exists ? 'Editar ' : 'Crear '}}Sucursal
+        {{ $terminal->exists ? 'Editar ' : 'Crear ' }}Terminal
     </x-slot:title>
 
     <x-slot:content>
-        <x-select2-component-modals label="Sucursal" placeholder="Seleccione..."
-            class="form-control"
-            :options="$sucursales" model="sucursal_id" />
+        @if (user()->is_super_admin)
+            <x-select2-component-modals label="Cliente" placeholder="Seleccione..." class="form-control" :options="$clientes"
+                model="cliente_id" :lazy="true" />
+        @endif
+        <x-select2-component-modals label="Sucursal" placeholder="Seleccione..." class="form-control" :options="$sucursales"
+            model="sucursal_id" :dynamic="true" />
 
         <x-input label="Identificador" disabled type="text" model="identificador" />
 

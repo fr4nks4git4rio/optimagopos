@@ -52,7 +52,7 @@
                             <i class="bi bi-building fs-6"></i> <span
                                 class="d-sm-inline px-2">Sucursales</span></a>
                     </li>
-                    @if (user()->is_admin)
+                    @if (user()->is_super_admin || user()->is_admin)
                     <li class="w-100 li-item {{ active_route('terminales*') }}">
                         <a href="{{route('terminales.index')}}"
                             class="nav-link submenu">
