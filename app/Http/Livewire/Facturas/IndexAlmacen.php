@@ -22,6 +22,7 @@ class IndexAlmacen extends Component
 
     public $perPage = 10;
     public $perPages;
+    public $order;
     public $search;
     public $sort = 'Fecha';
     public $sorts;
@@ -32,22 +33,50 @@ class IndexAlmacen extends Component
     public $estados = ['Todos', 'TIMBRADA', 'CANCELADA'];
     public $folioInterno;
     public $moneda;
-    public $monedas = ['Todos', 'MXN', 'USD'];
+    public $monedas = ['Todas', 'MXN', 'USD'];
     public $importe;
     public $iframeContainerClass = '';
     public $iframeSrc = '';
     //    public $filter = 'Activos';
     //    public $filters;
 
-    protected $queryString = ['search', 'perPage', 'sort', 'fechaInicio', 'fechaFin', 'cliente', 'estado', 'moneda', 'importe'];
+    protected $queryString = [
+        'search' => ['except' => null],
+        'perPage' => ['except' => null],
+        'sort' => ['except' => null],
+        'fechaInicio' => ['except' => null],
+        'fechaFin' => ['except' => null],
+        'cliente' => ['except' => null],
+        'estado' => ['except' => null],
+        'moneda' => ['except' => null],
+        'importe' => ['except' => null],
+        'folioInterno' => ['except' => null]
+    ];
 
     protected $listeners = ['$refresh'];
 
     public function mount()
     {
-        $this->sorts = ['Fecha', 'F. Int.', 'Receptor', 'Estado', 'Moneda', 'Subtotal', 'IVA', 'Ret. IVA', 'Total'];
+        $this->perPage = $this->perPage ?? 10;
+        $this->order = $this->order ?? 'desc';
+        $this->search = $this->search ?? null;
+        $this->sort = $this->sort ?? 'Fecha';
+        $this->fechaInicio = $this->fechaInicio ?? null;
+        $this->fechaFin = $this->fechaFin ?? null;
+        $this->cliente = $this->cliente ?? null;
+        $this->estado = $this->estado ?? 'Todos';
+        $this->folioInterno = $this->folioInterno ?? null;
+        $this->moneda = $this->moneda ?? 'Todas';
+        $this->importe = $this->importe ?? null;
+
+        $this->sorts = ['Fecha', 'F. Int.', 'Receptor', 'Estado', 'Moneda', 'Subtotal', 'IVA', 'Total'];
         $this->perPages = [10, 25, 50, 100];
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
     public function render()
@@ -144,29 +173,56 @@ class IndexAlmacen extends Component
 
         switch ($this->sort) {
             case 'Fecha':
-                $final_records = $final_records->sortByDesc('fecha_certificacion_sort', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $final_records = $final_records->sortBy('fecha_certificacion_sort', SORT_NATURAL)->values();
+                else
+                    $final_records = $final_records->sortByDesc('fecha_certificacion_sort', SORT_NATURAL)->values();
                 break;
             case 'Receptor':
-                $final_records = $final_records->sortBy('receptor', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $final_records = $final_records->sortBy('receptor', SORT_NATURAL)->values();
+                else
+                    $final_records = $final_records->sortByDesc('receptor', SORT_NATURAL)->values();
                 break;
             case 'Estado':
-                $final_records = $final_records->sortBy('estado', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $final_records = $final_records->sortBy('estado', SORT_NATURAL)->values();
+                else
+                    $final_records = $final_records->sortByDesc('estado', SORT_NATURAL)->values();
                 break;
             case 'Moneda':
-                $final_records = $final_records->sortBy('moneda', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $final_records = $final_records->sortBy('moneda', SORT_NATURAL)->values();
+                else
+                    $final_records = $final_records->sortByDesc('moneda', SORT_NATURAL)->values();
                 break;
             case 'Subtotal':
-                $final_records = $final_records->sortBy('subtotal', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $final_records = $final_records->sortBy('subtotal', SORT_NATURAL)->values();
+                else
+                    $final_records = $final_records->sortByDesc('subtotal', SORT_NATURAL)->values();
                 break;
             case 'IVA':
-                $final_records = $final_records->sortBy('iva', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $final_records = $final_records->sortBy('iva', SORT_NATURAL)->values();
+                else
+                    $final_records = $final_records->sortByDesc('iva', SORT_NATURAL)->values();
                 break;
             case 'Total':
-                $final_records = $final_records->sortBy('total', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $final_records = $final_records->sortBy('total', SORT_NATURAL)->values();
+                else
+                    $final_records = $final_records->sortByDesc('total', SORT_NATURAL)->values();
                 break;
         }
 
         return $final_records;
+    }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
     }
 
     public function showPdf($id)

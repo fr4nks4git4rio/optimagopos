@@ -29,18 +29,6 @@
                     <x-dropdown-item label="{{ $perPage }}" click="$set('perPage', '{{ $perPage }}')" />
                 @endforeach
             </x-dropdown>
-
-            <x-dropdown icon="sort-down-alt" :label="__($sort)">
-                @foreach ($sorts as $sort)
-                    <x-dropdown-item :label="__($sort)" click="$set('sort', '{{ $sort }}')" />
-                @endforeach
-            </x-dropdown>
-
-            {{-- <x-dropdown icon="filter" :label="__($filter)"> --}}
-            {{-- @foreach ($filters as $filter) --}}
-            {{-- <x-dropdown-item :label="__($filter)" click="$set('filter', '{{ $filter }}')"/> --}}
-            {{-- @endforeach --}}
-            {{-- </x-dropdown> --}}
         </div>
     </div>
     <div class="row mb-1">
@@ -85,13 +73,16 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>Receptor</th>
-                    <th class="text-center">Estado</th>
-                    <th class="text-center">Moneda</th>
-                    <th class="text-center">Subtotal</th>
-                    <th class="text-center">IVA</th>
-                    <th class="text-center">Total</th>
+                    @foreach ($sorts as $sort)
+                        <th class="text-center cursor-pointer" style="white-space: nowrap !important"
+                            wire:click="changeSort('{{ $sort }}')">
+                            <span>
+                                @if ($this->sort == $sort)
+                                    <i class="{{ $this->class_sort }}"></i>
+                                @endif {{ $sort }}
+                            </span>
+                        </th>
+                    @endforeach
                     <th class="text-center">Acciones</th>
                 </tr>
             </thead>

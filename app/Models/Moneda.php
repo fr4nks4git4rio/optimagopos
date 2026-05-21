@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Validation\Rule;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * Class Cfdi
+ * Class Moneda
  * @package App\Models\Administracion\CodificadoresFacturacion
  * @version January 12, 2021, 7:46 pm CST
  *
@@ -17,18 +18,17 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $descripcion
  * @property boolean $activo
  */
-class Cfdi extends Model
+class Moneda extends Model
 {
-    use LogsActivity;
+    use LogsActivity, SoftDeletes;
 
-    public $table = 'tb_cfdis';
+    public $table = 'tb_monedas';
 
-    protected $appends = ['nombre', 'value', 'label', 'text'];
+    protected $appends = ['value', 'label', 'text'];
 
     public $fillable = [
-        'codigo',
-        'descripcion',
-        'activo'
+        'acronimo',
+        'nombre'
     ];
 
     /**
@@ -38,8 +38,8 @@ class Cfdi extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'codigo' => 'string',
-        'descripcion' => 'string'
+        'acronimo' => 'string',
+        'nombre' => 'string'
     ];
 
     /**
@@ -51,16 +51,16 @@ class Cfdi extends Model
             ->logFillable()
             ->setDescriptionForEvent(function (string $eventName) {
                 return match ($eventName) {
-                    'created' => 'El CFDI ha sido creado.',
-                    'updated' => 'El CFDI ha sido actualizado.',
-                    'deleted' => 'El CFDI ha sido eliminado.',
-                    'restored' => 'El CFDI ha sido restaurado.',
-                    'forceDeleted' => 'El CFDI ha sido eliminado permanentemente.',
+                    'created' => 'La Moneda ha sido creada.',
+                    'updated' => 'La Moneda ha sido actualizada.',
+                    'deleted' => 'La Moneda ha sido eliminada.',
+                    'restored' => 'La Moneda ha sido restaurada.',
+                    'forceDeleted' => 'La Moneda ha sido eliminada permanentemente.',
                     default => $eventName,
                 };
             })
-            ->useLogName('CFDI')
-            ->logExcept(['created_at', 'updated_at'])
+            ->useLogName('Moneda')
+            ->logExcept(['created_at', 'updated_at', 'deleted_at'])
             ->logOnlyDirty(); // Registra solo los campos que han cambiado
     }
 
@@ -72,23 +72,19 @@ class Cfdi extends Model
     public function rules()
     {
         return [
-            'codigo' => ['required', Rule::unique('tb_cfdis')->ignore($this->id)],
-            'descripcion' => 'required'
+            'acronimo' => ['required', Rule::unique('tb_monedas')->ignore($this->id)],
+            'nombre' => ['required', Rule::unique('tb_monedas')->ignore($this->id)]
         ];
     }
 
     public function messages()
     {
         return [
-            'codigo.required' => 'Campo requerido.',
-            'codigo.unique' => 'El código ya existe.',
-            'descripcion.required' => 'Campo requerido'
+            'acronimo.required' => 'Campo obligatorio.',
+            'acronimo.unique' => 'El acrónimo ya existe.',
+            'nombre.required' => 'Campo obligatorio.',
+            'nombre.unique' => 'El nombre ya existe.'
         ];
-    }
-
-    public function getNombreAttribute()
-    {
-        return $this->descripcion . ' (' . $this->codigo . ')';
     }
 
     public function getValueAttribute()
@@ -98,11 +94,11 @@ class Cfdi extends Model
 
     public function getLabelAttribute()
     {
-        return $this->nombre;
+        return $this->acronimo;
     }
 
     public function getTextAttribute()
     {
-        return $this->nombre;
+        return $this->acronimo;
     }
 }

@@ -18,23 +18,31 @@ class Index extends Component
     public $perPage;
     public $perPages;
     public $search;
+    public $order;
     public $sort;
     public $sorts;
     public $filter;
     public $filters;
 
-    protected $queryString = ['search'];
+    protected $queryString = ['search', 'order', 'sort', 'filter', 'perPage'];
 
     protected $listeners = ['$refresh'];
 
     public function mount()
     {
-        $this->sort = 'Identificador';
+        $this->search = $this->search ?? '';
+        $this->order = $this->order ?? 'asc';
+        $this->sort = $this->sort ?? 'Identificador';
         $this->sorts = ['Identificador', 'Sucursal', 'Comentarios'];
-        $this->filter = 'Activos';
+        $this->filter = $this->filter ?? 'Activos';
         $this->filters = ['Activos', 'Inactivos', 'Todos'];
-        $this->perPage = 10;
+        $this->perPage = $this->perPage ?? 10;
         $this->perPages = [10, 25, 50, 100];
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
     public function render()
@@ -68,7 +76,7 @@ class Index extends Component
                 $query->where('t.deleted_at', '!=', null);
                 break;
             default:
-                $query->where('id', '>', 0);
+                $query->where('t.id', '>', 0);
                 break;
         }
 
@@ -92,16 +100,31 @@ class Index extends Component
 
         switch ($this->sort) {
             case 'Identificador':
-                $records_final = $records_final->sortBy('identificador', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('identificador', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('identificador', SORT_NATURAL)->values();
                 break;
             case 'Sucursal':
-                $records_final = $records_final->sortBy('sucursal', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('sucursal', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('sucursal', SORT_NATURAL)->values();
                 break;
             case 'Comentarios':
-                $records_final = $records_final->sortBy('comentarios', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('comentarios', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('comentarios', SORT_NATURAL)->values();
                 break;
         }
 
         return $records_final;
+    }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
     }
 }

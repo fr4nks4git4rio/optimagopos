@@ -31,16 +31,6 @@
                 @endforeach
             </x-dropdown>
 
-            <x-dropdown icon="sort-down-alt" :label="__($sort)">
-                @foreach ($sorts as $sort)
-                    @if ($sort == $this->sort)
-                        <x-dropdown-item :label="__($sort)" class="active" click="$set('sort', '{{ $sort }}')" />
-                    @else
-                        <x-dropdown-item :label="__($sort)" click="$set('sort', '{{ $sort }}')" />
-                    @endif
-                @endforeach
-            </x-dropdown>
-
             <x-dropdown icon="filter" :label="__($filter)">
                 @foreach ($filters as $filter)
                     @if ($this->filter == $filter)
@@ -58,9 +48,16 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th>Identificador</th>
-                    <th>Sucursal</th>
-                    <th>Comentarios</th>
+                    @foreach ($sorts as $sort)
+                        <th class="text-left cursor-pointer" style="white-space: nowrap !important"
+                            wire:click="changeSort('{{ $sort }}')">
+                            <span>
+                                @if ($this->sort == $sort)
+                                    <i class="{{ $this->class_sort }}"></i>
+                                @endif {{ $sort }}
+                            </span>
+                        </th>
+                    @endforeach
                     <th class="text-center">Acciones</th>
                 </tr>
             </thead>

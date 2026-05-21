@@ -123,6 +123,18 @@
                     :class="submenu_absolute"
                     id="submenu_reportes"
                     data-bs-parent="#submenu_reportes">
+                    <li class="w-100 li-item {{ active_route('reportes/ventas-periodo*') }}">
+                        <a href="{{route('reportes.ventas-periodo')}}"
+                            class="nav-link submenu">
+                            <i class="bi bi-cart fs-6"></i> <span
+                                class="d-sm-inline px-2">Ventas por Período</span></a>
+                    </li>
+                    <li class="w-100 li-item {{ active_route('reportes/productos-mas-vendidos*') }}">
+                        <a href="{{route('reportes.productos-mas-vendidos')}}"
+                            class="nav-link submenu">
+                            <i class="bi bi-cart fs-6"></i> <span
+                                class="d-sm-inline px-2">Productos más Vendidos</span></a>
+                    </li>
                     <li class="w-100 li-item {{ active_route('reportes/tickets*') }}">
                         <a href="{{route('reportes.tickets')}}"
                             class="nav-link submenu">

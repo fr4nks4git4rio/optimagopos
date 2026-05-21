@@ -29,7 +29,10 @@
                             <tr>
                                 <td>{{ $forma_pago['nombre'] }}</td>
                                 <td>{{ $forma_pago['forma_pago_sat'] }}</td>
-                                <td class="text-center">{{ $forma_pago['moneda'] }}</td>
+                                <td class="text-center">
+                                    <span
+                                        class="badge bg-primary-subtle text-primary">{{ $forma_pago['moneda'] }}</span>
+                                </td>
                                 <td class="text-center">
                                     @if ($forma_pago['deleted_at'])
                                         <span class="text-danger">NO</span>
@@ -91,33 +94,13 @@
                                 @if ($index_forma_pago_activa !== null)
                                     <x-select2-modals label="Forma Pago SAT" :options="$formasPagoOptions"
                                         model="forma_pago_activa.forma_pago_id" class="form-control" disabled />
-                                    <div class="mb-1">
-                                        <label for="">Moneda:</label>
-                                        <select class="form-control" wire:model="forma_pago_activa.moneda" disabled>
-                                            <option value="">Seleccione</option>
-                                            @foreach ($monedas as $moneda)
-                                                <option value="{{ $moneda }}">{{ $moneda }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('forma_pago_activa.moneda')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                    <x-select2-modals label="Moneda" :options="$monedas"
+                                        model="forma_pago_activa.moneda_id" class="form-control" disabled />
                                 @else
                                     <x-select2-modals label="Forma Pago SAT" :options="$formasPagoOptions"
                                         model="forma_pago_activa.forma_pago_id" class="form-control" />
-                                    <div class="mb-1">
-                                        <label for="">Moneda:</label>
-                                        <select class="form-control" wire:model="forma_pago_activa.moneda">
-                                            <option value="">Seleccione</option>
-                                            @foreach ($monedas as $moneda)
-                                                <option value="{{ $moneda }}">{{ $moneda }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('forma_pago_activa.moneda')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                    <x-select2-modals label="Moneda" :options="$monedas"
+                                        model="forma_pago_activa.moneda_id" class="form-control" />
                                 @endif
                             </div>
                         </div>

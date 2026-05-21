@@ -15,7 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @version January 12, 2021, 7:46 pm CST
  *
  * @property string $nombre
- * @property string $moneda
+ * @property string $moneda_id
  * @property integer $forma_pago_id
  * @property integer $sucursal_id
  */
@@ -27,7 +27,7 @@ class SucursalFormaPago extends Model
 
     public $fillable = [
         'nombre',
-        'moneda',
+        'moneda_id',
         'forma_pago_id',
         'sucursal_id'
     ];
@@ -40,7 +40,7 @@ class SucursalFormaPago extends Model
     protected $casts = [
         'id' => 'integer',
         'nombre' => 'string',
-        'moneda' => 'string',
+        'moneda_id' => 'integer',
         'form_pago_id' => 'integer',
         'sucursal_id' => 'integer'
     ];
@@ -62,7 +62,7 @@ class SucursalFormaPago extends Model
                     default => $eventName,
                 };
             })
-            ->useLogName('Forma de Pago e Sucursal')
+            ->useLogName('Forma de Pago de Sucursal')
             ->logExcept(['created_at', 'updated_at', 'deleted_at'])
             ->logOnlyDirty(); // Registra solo los campos que han cambiado
     }
@@ -76,7 +76,7 @@ class SucursalFormaPago extends Model
     {
         return [
             'nombre' => ['required', Rule::unique('tb_sucursal_form_pagos')->ignore($this->id)],
-            'moneda' => ['required', Rule::in(['MXN', 'USD'])],
+            'moneda_id' => ['required', 'exists:tb_monedas,id'],
             'form_pago_id' => ['required', 'exists:tb_form_pagos,id'],
             'sucursal_id' => ['required', 'exists:tb_sucursales,id']
         ];
@@ -88,7 +88,7 @@ class SucursalFormaPago extends Model
             'nombre.required' => 'Campo requerido.',
             'codigo.unique' => 'El nombre ya está en uso.',
             'moneda.required' => 'Campo requerido.',
-            'moneda.in' => 'Moneda no reconocida.',
+            'moneda_id.exists' => 'Moneda no encontrada.',
             'form_pago_id.required' => 'Campo requerido.',
             'form_pago_id.exists' => 'Forma de Pago no encontrada.',
             'sucursal_id.required' => 'Campo requerido.',
@@ -96,6 +96,10 @@ class SucursalFormaPago extends Model
         ];
     }
 
+    public function moneda()
+    {
+        return $this->belongsTo(Moneda::class);
+    }
     public function forma_pago()
     {
         return $this->belongsTo(FormaPago::class);

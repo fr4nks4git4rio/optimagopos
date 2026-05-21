@@ -38,13 +38,13 @@
             </div>
             <div class="col-12 col-md-9">
                 <div class="row mb-3">
-                    <div class="col-sm-5">
+                    <div class="col-sm-4">
                         <x-input label="Nombre Comercial" type="text" model="nombre_comercial" />
                     </div>
                     <div class="col-sm-5">
                         <x-input label="Razón Social" type="text" model="razon_social" />
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-3">
                         <x-input label="RFC" model="rfc" />
                     </div>
                 </div>

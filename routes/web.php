@@ -28,6 +28,8 @@ use App\Http\Livewire\Terminales\Index as IndexTerminales;
 use App\Http\Livewire\Facturas\IndexAlmacen as IndexAlmacenFacturas;
 use App\Http\Livewire\Facturas\IndexPreFacturas;
 use App\Http\Livewire\Reportes\Tickets\Index as IndexReportesTickets;
+use App\Http\Livewire\Reportes\VentasPeriodo;
+use App\Http\Livewire\Reportes\ProductosMasVendidos;
 use App\Http\Livewire\Reportes\Logs;
 use App\Http\Livewire\TimbrarAutoFactura;
 use App\Models\Cliente;
@@ -106,6 +108,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['hasRole:2'])->prefix('reportes')->group(function () {
 
+        Route::get('/ventas-periodo', VentasPeriodo::class)->name('reportes.ventas-periodo');
+        Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('reportes.productos-mas-vendidos');
         Route::get('/tickets', IndexReportesTickets::class)->name('reportes.tickets');
         Route::get('/logs', Logs::class)->name('reportes.logs');
     });

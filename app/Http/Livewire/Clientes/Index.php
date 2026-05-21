@@ -12,17 +12,32 @@ class Index extends Component
 {
     use WithPagination;
 
-    public $perPage = 10;
+    public $perPage;
     public $perPages = [10, 25, 50, 100];
     public $search;
-    public $sort = 'Nombre Comercial';
+    public $order;
+    public $sort;
     public $sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono'];
-    public $filter = 'Activos';
+    public $filter;
     public $filters = ['Activos', 'Inactivos', 'Todos'];
 
-    protected $queryString = ['search', 'perPage', 'sort', 'filter'];
+    protected $queryString = ['search', 'perPage', 'sort', 'order', 'filter'];
 
     protected $listeners = ['$refresh'];
+
+    public function mount()
+    {
+        $this->perPage = $this->perPage ?? 10;
+        $this->search = $this->search ?? '';
+        $this->order = $this->order ?? 'asc';
+        $this->sort = $this->sort ?? 'Nombre Comercial';
+        $this->filter = $this->filter ?? 'Activos';
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
+    }
 
     public function render()
     {
@@ -43,7 +58,7 @@ class Index extends Component
             default => Cliente::withTrashed(),
         };
 
-        $clientes = $query->where('es_cliente', 1)->get()->map->only('id', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at')->toArray();
+        $clientes = $query->where('es_cliente', 1)->get()->map->only(['id', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at'])->toArray();
         $records_final = collect();
 
         foreach ($clientes as $cliente) {
@@ -62,19 +77,37 @@ class Index extends Component
 
         switch ($this->sort) {
             case 'Nombre Comercial':
-                $records_final = $records_final->sortBy('nombre_comercial', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('nombre_comercial', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('nombre_comercial', SORT_NATURAL)->values();
                 break;
             case 'RFC':
-                $records_final = $records_final->sortBy('rfc', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('rfc', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('rfc', SORT_NATURAL)->values();
                 break;
             case 'Razón Social':
-                $records_final = $records_final->sortBy('razon_social', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('razon_social', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('razon_social', SORT_NATURAL)->values();
                 break;
             case 'Teléfono':
-                $records_final = $records_final->sortBy('telefono', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('telefono', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('telefono', SORT_NATURAL)->values();
                 break;
         }
 
         return $records_final;
+    }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
     }
 }

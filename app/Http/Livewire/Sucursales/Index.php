@@ -14,17 +14,36 @@ class Index extends Component
 {
     use WithPagination;
 
-    public $perPage = 10;
+    public $perPage;
     public $perPages = [10, 25, 50, 100];
     public $search;
-    public $sort = 'Nombre Comercial';
+    public $order;
+    public $sort;
     public $sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono', 'Cliente'];
-    public $filter = 'Activos';
+    public $filter;
     public $filters = ['Activos', 'Inactivos', 'Todos'];
 
     protected $queryString = ['search', 'perPage', 'sort', 'filter'];
 
     protected $listeners = ['$refresh'];
+
+    public function mount()
+    {
+        if (user()->is_super_admin)
+            $this->sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono', 'Cliente'];
+        else
+            $this->sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono'];
+        $this->perPage = $this->perPage ?? 10;
+        $this->search = $this->search ?? '';
+        $this->order = $this->order ?? 'asc';
+        $this->sort = $this->sort ?? 'Nombre Comercial';
+        $this->filter = $this->filter ?? 'Activos';
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
+    }
 
     public function render()
     {
@@ -64,7 +83,7 @@ class Index extends Component
                 $query->where('s.id', '>', 0);
         }
 
-        if (user()->is_admin) {
+        if (!user()->is_super_admin) {
             $query->where('s.cliente_id', user()->cliente_id);
         }
 
@@ -91,22 +110,43 @@ class Index extends Component
 
         switch ($this->sort) {
             case 'Nombre Comercial':
-                $records_final = $records_final->sortBy('nombre_comercial', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('nombre_comercial', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('nombre_comercial', SORT_NATURAL)->values();
                 break;
             case 'RFC':
-                $records_final = $records_final->sortBy('rfc', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('rfc', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('rfc', SORT_NATURAL)->values();
                 break;
             case 'Razón Social':
-                $records_final = $records_final->sortBy('razon_social', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('razon_social', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('razon_social', SORT_NATURAL)->values();
                 break;
             case 'Teléfono':
-                $records_final = $records_final->sortBy('telefono', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('telefono', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('telefono', SORT_NATURAL)->values();
                 break;
             case 'Cliente':
-                $records_final = $records_final->sortBy('cliente', SORT_NATURAL)->values();
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('cliente', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('cliente', SORT_NATURAL)->values();
                 break;
         }
 
         return $records_final;
+    }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
     }
 }
