@@ -35,7 +35,7 @@ class Index extends Component
         $this->search = $this->perPage ?? null;
         $this->perPage = $this->perPage ?? 10;
         $this->order = $this->order ?? 'desc';
-        $this->sort = $this->order ?? 'Fecha';
+        $this->sort = $this->sort ?? 'Fecha';
     }
 
     public function render()
