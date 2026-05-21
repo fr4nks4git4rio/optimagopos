@@ -18,7 +18,7 @@ class Index extends Component
     public $perPages = [10, 25, 50, 100];
     public $search;
     public $order;
-    public $sort = 'No. Ticket';
+    public $sort;
     public $sorts = ['No. Ticket', 'Fecha', 'Cliente', 'Sucursal', 'Terminal', 'Empleado', 'Ubicación', 'Productos', 'Pagos', 'Departamentos', 'Importe'];
 
     protected $queryString = [
