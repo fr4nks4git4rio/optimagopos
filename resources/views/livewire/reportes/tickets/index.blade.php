@@ -46,6 +46,7 @@
                     <th>Empleado</th>
                     <th>Ubicación</th>
                     <th>Productos</th>
+                    <th>Pagos</th>
                     <th>Departamentos</th>
                     <th>Importe</th>
                 </tr>
@@ -61,6 +62,7 @@
                     <td>{{$ticket['empleado']}}</td>
                     <td>{{$ticket['ubicacion']}}</td>
                     <td>{{$ticket['productos']}}</td>
+                    <td>{{$ticket['pagos']}}</td>
                     <td>{{$ticket['departamentos']}}</td>
                     <td>${{number_format($ticket['importe'], 2)}}</td>
                 </tr>
