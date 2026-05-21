@@ -14,15 +14,29 @@ class Index extends Component
 {
     use WithPagination;
 
-    public $perPage = 10;
+    public $perPage;
     public $perPages = [10, 25, 50, 100];
     public $search;
+    public $order;
     public $sort = 'No. Ticket';
-    public $sorts = ['No. Ticket', 'Fecha', 'Cliente', 'Sucursal', 'Terminal', 'Empleado', 'Ubicación', 'Factura', 'Importe'];
+    public $sorts = ['No. Ticket', 'Fecha', 'Cliente', 'Sucursal', 'Terminal', 'Empleado', 'Ubicación', 'Productos', 'Pagos', 'Departamentos', 'Importe'];
 
-    protected $queryString = ['search', 'perPage', 'sort'];
+    protected $queryString = [
+        'search' => ['except' => null],
+        'order' => ['except' => null],
+        'perPage' => ['except' => null],
+        'sort' => ['except' => null]
+    ];
 
     protected $listeners = ['$refresh'];
+
+    public function mount()
+    {
+        $this->search = $this->perPage ?? null;
+        $this->perPage = $this->perPage ?? 10;
+        $this->order = $this->order ?? 'desc';
+        $this->sort = $this->order ?? 'Fecha';
+    }
 
     public function render()
     {
@@ -33,6 +47,11 @@ class Index extends Component
         return view('livewire.reportes.tickets.index', [
             'tickets' => $tickets,
         ]);
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
     public function query()
@@ -86,7 +105,9 @@ class Index extends Component
                 || Str::contains(Str::upper($ticket['sucursal']), Str::upper($this->search))
                 || Str::contains(Str::upper($ticket['empleado']), Str::upper($this->search))
                 || Str::contains(Str::upper($ticket['terminal']), Str::upper($this->search))
-                || Str::contains(Str::upper($ticket['factura']), Str::upper($this->search))
+                || Str::contains(Str::upper($ticket['productos']), Str::upper($this->search))
+                || Str::contains(Str::upper($ticket['pagos']), Str::upper($this->search))
+                || Str::contains(Str::upper($ticket['departamentos']), Str::upper($this->search))
                 || Str::contains(Str::upper($ticket['importe']), Str::upper($this->search))
             ) {
                 $records_final->push($ticket);
@@ -95,34 +116,79 @@ class Index extends Component
 
         switch ($this->sort) {
             case 'No. Ticket':
-                $records_final = $records_final->sortBy('id_transaccion', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('id_transaccion', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('id_transaccion', SORT_NATURAL)->values();
                 break;
             case 'Fecha':
-                $records_final = $records_final->sortBy('fecha_transaccion', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('fecha_transaccion', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('fecha_transaccion', SORT_NATURAL)->values();
                 break;
             case 'Cliente':
-                $records_final = $records_final->sortBy('cliente', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('cliente', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('cliente', SORT_NATURAL)->values();
                 break;
             case 'Sucursal':
-                $records_final = $records_final->sortBy('sucursal', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('sucursal', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('sucursal', SORT_NATURAL)->values();
                 break;
             case 'Terminal':
-                $records_final = $records_final->sortBy('terminal', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('terminal', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('terminal', SORT_NATURAL)->values();
                 break;
             case 'Empleado':
-                $records_final = $records_final->sortBy('empleado', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('empleado', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('empleado', SORT_NATURAL)->values();
                 break;
             case 'Ubicación':
-                $records_final = $records_final->sortBy('ubicacion', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('ubicacion', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortByDesc('ubicacion', SORT_NATURAL)->values();
                 break;
-            case 'Factura':
-                $records_final = $records_final->sortBy('factura', SORT_NATURAL)->values();
+            case 'Productos':
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('productos', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('productos', SORT_NATURAL)->values();
+                break;
+            case 'Pagos':
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('pagos', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('pagos', SORT_NATURAL)->values();
+                break;
+            case 'Departamentos':
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('departamentos', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('departamentos', SORT_NATURAL)->values();
                 break;
             case 'Importe':
-                $records_final = $records_final->sortBy('importe', SORT_NATURAL)->values();
+                if ($this->sort == 'asc')
+                    $records_final = $records_final->sortBy('importe', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('importe', SORT_NATURAL)->values();
                 break;
         }
 
         return $records_final;
+    }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
     }
 }
