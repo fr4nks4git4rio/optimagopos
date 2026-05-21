@@ -69,7 +69,7 @@ class Index extends Component
                 'e.nombre as empleado',
                 't.importe',
                 DB::raw("(SELECT GROUP_CONCAT(CONCAT(p.nombre, ' (', tp.cantidad, ')')) from tb_ticket_productos as tp left join tb_productos as p on p.id = tp.producto_id where tp.ticket_id = t.id) as productos"),
-                DB::raw("(SELECT GROUP_CONCAT(CONCAT(operacion.nombre, ' (', operacion.cantidad, ')')) from tb_ticket_operaciones as operacion where operacion.ticket_id = t.id) as pagos"),
+                DB::raw("(SELECT GROUP_CONCAT(CONCAT(operacion.nombre, ' (', operacion.monto, ')')) from tb_ticket_operaciones as operacion where operacion.ticket_id = t.id) as pagos"),
                 DB::raw("(SELECT GROUP_CONCAT(distinct d.nombre) from tb_ticket_productos as tp left join tb_departamentos as d on d.id = tp.departamento_id where tp.ticket_id = t.id) as departamentos")
             )
             ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id')
