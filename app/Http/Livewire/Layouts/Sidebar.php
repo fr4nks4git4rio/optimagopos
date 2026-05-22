@@ -42,6 +42,8 @@ class Sidebar extends Component
     public function getReportesRoutesActiveProperty()
     {
         return Request::is('reportes/tickets*')
-        || Request::is('reportes/logs*');
+        || Request::is('reportes/logs*')
+        || Request::is('reportes/ventas-periodo*')
+        || Request::is('reportes/productos-mas-vendidos*');
     }
 }
