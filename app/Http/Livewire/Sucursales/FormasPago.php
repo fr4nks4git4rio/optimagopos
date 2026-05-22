@@ -125,17 +125,17 @@ class FormasPago extends Modal
             $this->addError('forma_pago_activa.nombre', 'El nombre ya está en uso.');
             return;
         }
-        if (
-            DB::table('tb_sucursal_forma_pagos')
-            ->where('forma_pago_id', $data['forma_pago_activa']['forma_pago_id'])
-            ->where('moneda_id', $data['forma_pago_activa']['moneda_id'])
-            ->where('id', '!=', $data['forma_pago_activa']['id'])
-            ->count() > 0
-        ) {
-            $this->emit('show-toast', 'Ya existe una Forma de Pago que tiene la Forma de Pago SAT y la Moneda seleccionadas.', 'danger');
-            $this->addError('forma_pago_activa.forma_pago_id', 'Ya existe una Forma de Pago que tiene la Forma de Pago SAT y la Moneda seleccionadas.');
-            return;
-        }
+        // if (
+        //     DB::table('tb_sucursal_forma_pagos')
+        //     ->where('forma_pago_id', $data['forma_pago_activa']['forma_pago_id'])
+        //     ->where('moneda_id', $data['forma_pago_activa']['moneda_id'])
+        //     ->where('id', '!=', $data['forma_pago_activa']['id'])
+        //     ->count() > 0
+        // ) {
+        //     $this->emit('show-toast', 'Ya existe una Forma de Pago que tiene la Forma de Pago SAT y la Moneda seleccionadas.', 'danger');
+        //     $this->addError('forma_pago_activa.forma_pago_id', 'Ya existe una Forma de Pago que tiene la Forma de Pago SAT y la Moneda seleccionadas.');
+        //     return;
+        // }
 
         if ($data['forma_pago_activa']['id'])
             $sfp = SucursalFormaPago::find($data['forma_pago_activa']['id']);

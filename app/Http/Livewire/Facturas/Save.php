@@ -204,6 +204,15 @@ class Save extends Component
             })->toArray();
     }
 
+    public function hydrate()
+    {
+        $this->dispatchBrowserEvent('reApplySelect2');
+    }
+    public function updated()
+    {
+        $this->dispatchBrowserEvent('reApplySelect2');
+    }
+
     public function updatedPropietarioId($value)
     {
         $this->lugar_expedicion = '';
@@ -230,9 +239,10 @@ class Save extends Component
         $this->forma_pago_id = '';
         $this->tipo_cambio = 1;
         if ($value) {
-            $forma_pago = DB::table('tb_sucursal_forma_pagos')
-                ->select('id', 'moneda', 'forma_pago_id')
-                ->where('id', $value)
+            $forma_pago = DB::table('tb_sucursal_forma_pagos as sfp')
+                ->select('sfp.id', 'moneda.acronimo as moneda', 'sfp.forma_pago_id')
+                ->leftJoin('tb_monedas as moneda', 'moneda.id', 'sfp.moneda_id')
+                ->where('sfp.id', $value)
                 ->get()->first();
             $this->moneda = optional($forma_pago)->moneda;
             $this->forma_pago_id = optional($forma_pago)->forma_pago_id;

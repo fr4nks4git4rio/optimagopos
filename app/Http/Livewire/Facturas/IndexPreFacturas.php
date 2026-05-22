@@ -6,6 +6,7 @@ use App\Exports\FacturaEmitidaExport;
 use App\Http\Libraries\Pdf;
 use App\Models\Cliente;
 use App\Models\Factura;
+use App\Models\Moneda;
 use App\Services\Timbrado\Facturador;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -68,7 +69,7 @@ class IndexPreFacturas extends Component
         $this->sorts = ['Fecha', 'Receptor', 'Estado', 'Moneda', 'Subtotal', 'IVA', 'Total'];
         $this->perPages = [10, 25, 50, 100];
         $this->estados = ['Todos', 'PRECAPTURADA', 'CAPTURADA'];
-        $this->monedas = ['Todas', 'MXN', 'USD'];
+        $this->monedas = Moneda::all()->pluck('acronimo')->prepend('Todas');
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
 
@@ -119,7 +120,7 @@ class IndexPreFacturas extends Component
             ->leftJoin('tb_clientes as cliente', 'factura.cliente_id', '=', 'cliente.id')
             ->leftJoin('tb_clientes as propietario', 'factura.propietario_id', '=', 'propietario.id')
             ->distinct('factura.id')
-            ->where('user_id', '>', 0);
+            ->where('factura.user_id', '>', 0);
         if ($this->fechaInicio) {
             $query->where('factura.fecha_certificacion', '>=', $this->fechaInicio);
         }
@@ -134,7 +135,7 @@ class IndexPreFacturas extends Component
         } else {
             $query->whereIn('factura.estado', ['PRECAPTURADA', 'CAPTURADA']);
         }
-        if ($this->moneda && $this->moneda != 'Todos') {
+        if ($this->moneda && $this->moneda != 'Todas') {
             $query->where('factura.moneda', $this->moneda);
         }
         if ($this->importe) {

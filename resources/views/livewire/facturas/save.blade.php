@@ -233,7 +233,7 @@
                                 model="concepto.objeto_impuesto_id" />
                         </td>
                         <td>
-                            <textarea class="form-control" rows="1" wire:model="concepto.descripcion"></textarea>
+                            <textarea class="form-control" rows="1" wire:model="concepto.descripcion" placeholder="Concepto"></textarea>
                         </td>
                         <td>
                             <x-input model="concepto.precio_unitario" type="number" placeholder="Precio Unitario" />

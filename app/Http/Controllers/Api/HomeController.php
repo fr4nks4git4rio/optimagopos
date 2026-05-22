@@ -58,7 +58,7 @@ class HomeController
 
         // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
 
-        $terminal = Terminal::findByIdentificador($decoded['TerminalId']);
+        $terminal = Terminal::findByIdentificador($decoded['MerchantFiscalId']);
         if (!$terminal) {
             ModelsLog::create([
                 'log' => 'Error. Terminal no encontrada.',
@@ -133,6 +133,7 @@ class HomeController
         // Ejemplo de lógica condicional por tipo de ítem
         $correccion = null;
         $importe = 0;
+        $prevItem = null;
         foreach ($items as $item) {
             $type = $item['Type'] ?? 'Product';
 
@@ -162,6 +163,7 @@ class HomeController
                 $correccion = new TicketProductoCorreccion();
                 $correccion->nombre = $item['name'];
                 $correccion->save();
+                if()
             }
 
             if ($type === 'Product') {
@@ -208,6 +210,7 @@ class HomeController
                     $importe += $ticketProducto->precio - $ticketProducto->descuento;
                 }
             }
+            $prevItem = $item;
         }
         $ticket->importe = $importe;
         $ticket->save();

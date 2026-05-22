@@ -480,19 +480,20 @@ class AutoFacturacion extends Component
                 $total = $fp->monto;
                 $subtotal = round($total / (1 + system_iva() / 100), 2);
                 $iva = $total - $subtotal;
+                $moneda = $sfp ? $sfp->moneda->acronimo : '';
                 $factura = Factura::create([
                     'propietario_id' => $this->suc,
                     'lugar_expedicion' => $propietario->codigo_postal,
                     'cliente_id' => $comensal->id,
                     'fecha_emision' => now(),
-                    'moneda' => optional($sfp)->moneda,
+                    'moneda' => $moneda,
                     'estado' => 'CAPTURADA',
                     'modo_prueba_cfdi' => modo_facturacion() != 1,
                     'porciento_iva' => system_iva(),
                     'total' => $total,
                     'subtotal' => $subtotal,
                     'iva' => $iva,
-                    'cantidad_letras' => convertir_numero_a_letras($total, optional($sfp)->moneda),
+                    'cantidad_letras' => convertir_numero_a_letras($total, $moneda),
                     'cfdi_id' => 3,
                     'serie_id' => 1,
                     'regimen_fiscal_id' => $comensal->regimen_fiscal_id,
