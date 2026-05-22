@@ -163,7 +163,6 @@ class HomeController
                 $correccion = new TicketProductoCorreccion();
                 $correccion->nombre = $item['name'];
                 $correccion->save();
-                if()
             }
 
             if ($type === 'Product') {
