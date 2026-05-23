@@ -12,6 +12,7 @@ use App\Models\Log as ModelsLog;
 use App\Models\Producto;
 use App\Models\Terminal;
 use App\Models\Ticket;
+use App\Models\TicketProducto;
 use App\Models\TicketProductoCorreccion;
 use App\Models\TipoCambio;
 use App\Models\User;
@@ -73,9 +74,9 @@ class HomeController
             $tipo_cambio = TipoCambio::obtenerTipoCambioUrl($terminal->sucursal->cliente_id);
             if (is_string($tipo_cambio)) {
                 ModelsLog::create([
-                'log' => "Error. $tipo_cambio",
-                'status' => 400
-            ]);
+                    'log' => "Error. $tipo_cambio",
+                    'status' => 400
+                ]);
                 return response()->json(['success' => false, 'error' => $tipo_cambio], 400);
             }
         }
@@ -133,7 +134,7 @@ class HomeController
         // Ejemplo de lógica condicional por tipo de ítem
         $correccion = null;
         $importe = 0;
-        $prevItem = null;
+        $prevProduct = null;
         foreach ($items as $item) {
             $type = $item['Type'] ?? 'Product';
 
@@ -152,17 +153,11 @@ class HomeController
                 // Guardar método de pago en tabla pagos
                 $ticket->operaciones()->create([
                     'nombre' => $item['Name'] ?? '',
-                    'monto' => $item['Amount'] ?? '',
+                    'monto' => $item['Amount'] ?? 0,
                     'propina' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? (float)$item['Tip'] : 0,
                     'empleado_id' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? $clerk->id : null,
                     'sucursal_forma_pago_id' => optional($forma_pago)->id
                 ]);
-            }
-
-            if ($type === 'Correction') {
-                $correccion = new TicketProductoCorreccion();
-                $correccion->nombre = $item['name'];
-                $correccion->save();
             }
 
             if ($type === 'Product') {
@@ -188,28 +183,42 @@ class HomeController
                     ]);
                 }
 
-                if ($correccion) {
-                    $prod = $ticket->productos()->where('producto_id', $producto->id)
-                        ->where('departamento_id', $departamento->id)
-                        ->first();
-                    $correccion->producto_id = optional($prod)->id;
-                    $correccion->cantidad = abs($item['Qty']);
-                    $correccion->precio = abs($item['Amount']);
-                    $correccion->save();
-                    $correccion = null;
-                    continue;
-                } else {
+                $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
+                $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
+                if ($amount > 0 || $qty > 0) {
+                    $discount = $item['Discount'] ? (float)$item['Discount'] : 0;
                     $ticketProducto = $ticket->productos()->create([
                         'producto_id' => $producto->id,
                         'departamento_id' => $departamento->id,
-                        'precio' => $item['Amount'] ?? 0,
-                        'cantidad' => $item['Qty'] ?? 0,
-                        'descuento' => $item['Discount'] ?? 0,
+                        'precio' => $amount,
+                        'cantidad' => $qty,
+                        'descuento' => $discount,
                     ]);
-                    $importe += $ticketProducto->precio - $ticketProducto->descuento;
+                    $importe += $amount - $discount;
+                } else {
+                    $ticketProducto = TicketProducto::where('ticket_id', $ticket->id)->where('producto_id', $producto->id)->where('departamento_id', $departamento->id)->first();
+                    if ($ticketProducto) {
+                        $ticketProducto->cantidad -= abs($qty);
+                        $ticketProducto->precio -= abs($amount);
+                        $importe -= abs($amount);
+                    }
                 }
+                $prevProduct = $producto;
             }
-            $prevItem = $item;
+
+            if ($type === 'Correction') {
+                $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
+                $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
+                if ($qty < 0 || $amount < 0) {
+                    $correccion = new TicketProductoCorreccion();
+                    $correccion->nombre = $item['name'];
+                    $correccion->producto_id = optional($prevProduct)->id;
+                    $correccion->cantidad = abs($qty);
+                    $correccion->precio = abs($amount);
+                    $correccion->save();
+                }
+                $prevProduct = null;
+            }
         }
         $ticket->importe = $importe;
         $ticket->save();

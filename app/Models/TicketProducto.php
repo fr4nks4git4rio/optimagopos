@@ -13,12 +13,12 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models
  * @version January 12, 2021, 7:55 pm CST
  *
- * @property float precio
- * @property integer cantidad
- * @property float descuento
- * @property integer ticket_id
- * @property integer producto_id
- * @property integer departamento_id
+ * @property float $precio
+ * @property float $cantidad
+ * @property float $descuento
+ * @property integer $ticket_id
+ * @property integer $producto_id
+ * @property integer $departamento_id
  */
 class TicketProducto extends Model
 {

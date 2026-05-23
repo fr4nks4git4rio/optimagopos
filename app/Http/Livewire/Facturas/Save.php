@@ -498,6 +498,7 @@ class Save extends Component
                     group_concat( distinct ticket.created_at ) as fechas')
             ->join('tb_ticket_operaciones as to', 'ticket.id', '=', 'to.ticket_id')
             ->where('to.factura_id', null)
+            ->where('to.monto', '>', 0)
             ->whereRaw($whereFP)
             ->whereDate('ticket.created_at', '<', $this->fecha_inicio)
             ->get();
@@ -521,6 +522,7 @@ class Save extends Component
             ->join('tb_ticket_operaciones as to', 'ticket.id', '=', 'to.ticket_id')
             ->leftJoin('tb_sucursal_forma_pagos as sfp', 'to.sucursal_forma_pago_id', '=', 'sfp.id')
             ->where('to.factura_id', null)
+            ->where('to.monto', '>', 0)
             ->whereRaw($whereFP)
             ->whereBetween('ticket.created_at', [$this->fecha_inicio . ' 00:00:00', $this->fecha_fin . ' 23:59:59'])
             ->groupBy('to.sucursal_forma_pago_id', 'ticket.created_at')
