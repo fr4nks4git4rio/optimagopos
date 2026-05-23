@@ -141,7 +141,7 @@ class VentasPeriodo extends Component
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
             ->leftJoin('tb_sucursal_forma_pagos as forma_pago', 'forma_pago.id', 'operacion.sucursal_forma_pago_id')
             ->leftJoin('tb_monedas as moneda', 'moneda.id', 'forma_pago.moneda_id')
-            ->groupBy('fecha_transaccion');
+            ->groupByRaw('DATE(ticket.fecha_transaccion)');
 
         if ($this->fechaInicio) {
             $query->whereDate('ticket.fecha_transaccion', '>=', $this->fechaInicio);
