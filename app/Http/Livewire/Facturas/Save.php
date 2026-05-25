@@ -131,6 +131,7 @@ class Save extends Component
                 ->join('tb_ticket_operaciones as to', 'ticket.id', '=', 'to.ticket_id')
                 ->leftJoin('tb_sucursal_forma_pagos as sfp', 'to.sucursal_forma_pago_id', '=', 'sfp.id')
                 ->where('to.factura_id', $id)
+                ->where('to.es_cambio', 0)
                 ->groupBy('to.sucursal_forma_pago_id', 'ticket.created_at')
                 ->orderBy('ticket.created_at', 'asc')
                 ->get()
@@ -311,15 +312,11 @@ class Save extends Component
     }
     public function getIvaFacturarProperty()
     {
-        return array_reduce($this->tickets, function ($carry, $item) {
-            return $carry + $item['iva'];
-        }, 0);
+        return $this->subtotal_facturar * system_iva() / 100;
     }
     public function getTotalFacturarProperty()
     {
-        return array_reduce($this->tickets, function ($carry, $item) {
-            return $carry + $item['total'];
-        }, 0);
+        return $this->subtotal_facturar + $this->iva_facturar;
     }
     public function getSubtotalFacturaProperty()
     {

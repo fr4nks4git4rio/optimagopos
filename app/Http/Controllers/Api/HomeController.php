@@ -156,7 +156,8 @@ class HomeController
                     'monto' => $item['Amount'] ?? 0,
                     'propina' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? (float)$item['Tip'] : 0,
                     'empleado_id' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? $clerk->id : null,
-                    'sucursal_forma_pago_id' => optional($forma_pago)->id
+                    'sucursal_forma_pago_id' => optional($forma_pago)->id,
+                    'es_cambio' => $prevProduct != null && $item['Amount'] < 0 ? 1 : 0
                 ]);
             }
 

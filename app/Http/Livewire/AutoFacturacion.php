@@ -76,7 +76,7 @@ class AutoFacturacion extends Component
 
     public function mount()
     {
-        $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only('label', 'value');
+        $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only(['label', 'value']);
         $this->sucursales = DB::table('tb_sucursales as s')
             ->select('s.id as value', 's.nombre_comercial as label')
             ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
