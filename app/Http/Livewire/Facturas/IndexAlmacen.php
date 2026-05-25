@@ -143,7 +143,7 @@ class IndexAlmacen extends Component
         if ($this->folioInterno) {
             $query->where('factura.folio_interno', 'like', "%$this->folioInterno%");
         }
-        if ($this->moneda && $this->moneda != 'Todos') {
+        if ($this->moneda && $this->moneda != 'Todas') {
             $query->where('factura.moneda', $this->moneda);
         }
         if ($this->importe) {
