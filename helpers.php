@@ -6,6 +6,7 @@ use App\Models\TipoCambio;
 use App\Services\Helpers\QuantityToWords;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 
 /**
@@ -282,6 +283,8 @@ if (!function_exists('get_dimensiones_opt')) {
 if (!function_exists('pretty_message')) {
     function pretty_message($message, $type = 'success')
     {
+        if ($type != 'success')
+            Log::error($message);
         if (config('app.env') === 'production')
             return $type === 'success' ? 'Acción realizada correctamente!' : 'Lo sentimos. Ha ocurrido un error intentando realizar la acción.';
 
