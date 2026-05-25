@@ -312,11 +312,11 @@ class Save extends Component
     }
     public function getIvaFacturarProperty()
     {
-        return $this->subtotal_facturar * system_iva() / 100;
+        return round($this->subtotal_facturar * system_iva() / 100, 2);
     }
     public function getTotalFacturarProperty()
     {
-        return $this->subtotal_facturar + $this->iva_facturar;
+        return round($this->subtotal_facturar + $this->iva_facturar, 2);
     }
     public function getSubtotalFacturaProperty()
     {
