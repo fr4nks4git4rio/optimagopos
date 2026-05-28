@@ -15,6 +15,7 @@
         "vite": "^4.5.3"
     },
     "dependencies": {
+        "apexcharts": "^5.13.0",
         "cross-env": "^7.0.3",
         "jquery": "^3.7.0",
         "select2": "^4.1.0-rc.0"

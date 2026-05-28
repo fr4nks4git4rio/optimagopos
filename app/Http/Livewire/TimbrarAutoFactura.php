@@ -128,7 +128,14 @@ class TimbrarAutoFactura extends Component
         $monto = $this->factura->total;
         if ($this->incluir_propina)
             foreach ($this->factura->tickets()->first()->operaciones as $operacion) {
-                $monto += $operacion->forma_pago->moneda == 'MXN' ? $operacion->propina : round($operacion->propina * $operacion->ticket->tipo_cambio, 2);
+                $tasa_cambio = 1;
+                if ($operacion->forma_pago->moneda_id != $operacion->ticket->sucursal->moneda_facturacion_id) {
+                    $tipo_cambio = get_tipo_cambio($operacion->forma_pago->moneda_id, $operacion->ticket->sucursal->moneda_facturacion_id, $operacion->ticket->sucursal->id);
+                    if ($tipo_cambio->id) {
+                        $tasa_cambio = $tipo_cambio->tasa;
+                    }
+                }
+                $monto += round($operacion->propina * $tasa_cambio, 2);
             }
 
         return number_format($monto, 2);
@@ -262,7 +269,14 @@ class TimbrarAutoFactura extends Component
                 $total = 0;
                 $iva = 0;
                 foreach ($ticket->operaciones as $operacion) {
-                    $propina = $operacion->forma_pago->moneda == 'MXN' ? $operacion->propina : (round($operacion->propina * $operacion->tipo_cambio, 2));
+                    $tasa_cambio = 1;
+                    if ($operacion->forma_pago->moneda_id != $operacion->ticket->sucursal->moneda_facturacion_id) {
+                        $tipo_cambio = get_tipo_cambio($operacion->forma_pago->moneda_id, $operacion->ticket->sucursal->moneda_facturacion_id, $operacion->ticket->sucursal->id);
+                        if ($tipo_cambio->id) {
+                            $tasa_cambio = $tipo_cambio->tasa;
+                        }
+                    }
+                    $propina = $operacion->forma_pago->moneda == 'MXN' ? $operacion->propina : (round($operacion->propina * $tasa_cambio, 2));
                     $precio_unitario = $propina / (1 + system_iva() / 100);
                     $subtotal += $precio_unitario;
                     $total += $propina;

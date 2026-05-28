@@ -69,11 +69,6 @@
                     {{-- <i class="bi bi-gear"></i> --}}
                     {{-- </a> --}}
                     {{-- </div> --}}
-                    @if (!user()->is_super_admin)
-                        <div class="nav-item mr-2">
-                            <livewire:layouts.tipo-cambio />
-                        </div>
-                    @endif
                     <div class="nav-item dropdown notifications-dropdown mr-2">
                         <a href="#" class="nav-link dropdown-toggle notifications me-2" data-bs-toggle="dropdown">
                             <i

@@ -17,6 +17,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $precio
  * @property float $cantidad
  * @property integer $producto_id
+ * @property integer $ticket_id
  */
 class TicketProductoCorreccion extends Model
 {
@@ -27,10 +28,15 @@ class TicketProductoCorreccion extends Model
         'precio',
         'cantidad',
         'producto_id',
+        'ticket_id',
     ];
 
     public function producto()
     {
-        return $this->belongsTo(TicketProducto::class, 'producto_id');
+        return $this->belongsTo(Producto::class, 'producto_id');
+    }
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class, 'ticket_id');
     }
 }

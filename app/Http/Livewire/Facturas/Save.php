@@ -6,6 +6,7 @@ use App\Exports\FacturaEmitidaExport;
 use App\Http\Libraries\Pdf;
 use App\Models\Cliente;
 use App\Models\Factura;
+use App\Models\Moneda;
 use App\Models\Sucursal;
 use App\Models\SucursalFormaPago;
 use App\Models\TicketOperacion;
@@ -218,7 +219,9 @@ class Save extends Component
     {
         $this->lugar_expedicion = '';
         $this->formasPagoSucursal = [];
+        $this->forma_pago = '';
         if ($value) {
+            $sucursal = Sucursal::find($value);
             $this->formasPagoSucursal = DB::table('tb_sucursal_forma_pagos as sfp')
                 ->select('sfp.id as value', 'sfp.nombre as label')
                 ->where('sfp.sucursal_id', $value)
@@ -230,24 +233,8 @@ class Save extends Component
                 ->leftJoin('tb_direcciones as direccion', 'direccion.id', '=', 'cliente.direccion_fiscal_id')
                 ->where('cliente.id', $value)
                 ->get()->first()->codigo_postal;
-            $this->dispatchBrowserEvent('reApplySelect2');
-        }
-    }
 
-    public function updatedFormaPago($value)
-    {
-        $this->moneda = '';
-        $this->forma_pago_id = '';
-        $this->tipo_cambio = 1;
-        if ($value) {
-            $forma_pago = DB::table('tb_sucursal_forma_pagos as sfp')
-                ->select('sfp.id', 'moneda.acronimo as moneda', 'sfp.forma_pago_id')
-                ->leftJoin('tb_monedas as moneda', 'moneda.id', 'sfp.moneda_id')
-                ->where('sfp.id', $value)
-                ->get()->first();
-            $this->moneda = optional($forma_pago)->moneda;
-            $this->forma_pago_id = optional($forma_pago)->forma_pago_id;
-            $this->tipo_cambio = get_tipo_cambio()->tasa;
+            $this->dispatchBrowserEvent('reApplySelect2');
         }
     }
 
@@ -363,7 +350,7 @@ class Save extends Component
             'lugar_expedicion' => ['required'],
             'regimen_receptor' => ['required'],
             'moneda' => ['required'],
-            'tipo_cambio' => ['nullable', 'required_if:moneda,USD'],
+            'tipo_cambio' => ['required'],
             'cfdi_id' => ['required', 'exists:tb_cfdis,id'],
             'metodo_pago_id' => ['required', 'exists:tb_metodo_pagos,id'],
             'forma_pago_id' => ['required', 'exists:tb_forma_pagos,id'],
@@ -410,7 +397,7 @@ class Save extends Component
             'forma_pago_id.exists' => 'Forma de pago no encontrado',
             'cfdi_id.required' => 'Campo requerido',
             'cfdi_id.exists' => 'CFDI no encontrado',
-            'tipo_cambio.required_if' => 'Campo requerido',
+            'tipo_cambio.required' => 'Campo requerido',
             'periodicidad_id.required' => 'Campo requerido',
             'periodicidad_id.exists' => 'Periodicidad no encontrada',
             'mes_id.required' => 'Campo requerido',
@@ -486,6 +473,30 @@ class Save extends Component
             'fecha_fin.required' => 'Campo requerido',
             'forma_pago.required' => 'Campo requerido',
         ]);
+
+
+        $this->moneda = '';
+        $this->tipo_cambio = '';
+        $forma_pago = DB::table('tb_sucursal_forma_pagos as sfp')
+            ->select('sfp.id', 'moneda.acronimo as moneda', 'sfp.moneda_id', 'sfp.forma_pago_id')
+            ->leftJoin('tb_monedas as moneda', 'moneda.id', 'sfp.moneda_id')
+            ->where('sfp.id', $this->forma_pago)
+            ->get()->first();
+        $this->moneda = optional($forma_pago)->moneda;
+        $this->forma_pago_id = optional($forma_pago)->forma_pago_id;
+
+        if ($forma_pago) {
+            $sucursal = Sucursal::find($this->propietario_id);
+            $tasa_cambio = 1;
+            if ($forma_pago->moneda_id != $sucursal->moneda_facturacion_id) {
+                $tipo_cambio = get_tipo_cambio($forma_pago->moneda_id, $sucursal->moneda_facturacion_id, $sucursal->id);
+                if ($tipo_cambio->id) {
+                    $tasa_cambio = $tipo_cambio->tasa;
+                }
+            }
+            $this->tipo_cambio = $tasa_cambio;
+        }
+
         $this->validacion_operaciones_pendientes = "";
         $whereFP = " (to.sucursal_forma_pago_id = " . $this->forma_pago . ") ";
 

@@ -12,8 +12,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models\Administracion
  * @version May 6, 2019, 7:37 pm UTC
  *
- * @property string llave
- * @property string valor
+ * @property string $llave
+ * @property string $valor
  */
 class Config extends Model
 {

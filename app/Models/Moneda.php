@@ -101,4 +101,9 @@ class Moneda extends Model
     {
         return $this->acronimo;
     }
+
+    public static function findByAcronimo($acronimo)
+    {
+        return self::where('acronimo', $acronimo)->first();
+    }
 }

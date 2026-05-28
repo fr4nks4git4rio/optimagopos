@@ -217,11 +217,6 @@ class IndexPreFacturas extends Component
 
     public function nuevaFactura()
     {
-        $tipo_cambio = get_tipo_cambio();
-        if (!$tipo_cambio->id) {
-            $this->emit('show-toast', 'Debe definir el tipo de cambio para el día de hoy.', 'danger');
-            return;
-        }
         $cliente_publico_general = DB::table('tb_clientes')->where('rfc', 'XAXX010101000')->get()->first();
         if (!$cliente_publico_general) {
             $this->emit('show-toast', 'Primero debe dar de alta al Cliente: "VENTA A PUBLICO GENERAL" con RFC: "XAXX010101000".', 'danger');

@@ -467,8 +467,10 @@ class AutoFacturacion extends Component
                     DB::raw("SUM(operacion.monto) as monto"),
                     DB::raw("SUM(operacion.propina) as propina"),
                     'operacion.sucursal_forma_pago_id',
+                    'sfp.moneda_id',
                     DB::raw("GROUP_CONCAT(operacion.id) as operaciones")
                 )
+                ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'operacion.sucursal_forma_pago_id')
                 ->where('operacion.factura_id', null)
                 ->where('operacion.sucursal_forma_pago_id', '!=', null)
                 ->groupBy('operacion.sucursal_forma_pago_id')
@@ -481,6 +483,15 @@ class AutoFacturacion extends Component
                 $subtotal = round($total / (1 + system_iva() / 100), 2);
                 $iva = $total - $subtotal;
                 $moneda = $sfp ? $sfp->moneda->acronimo : '';
+
+                $tasa_cambio = 1;
+                if ($fp->moneda_id != $ticket->sucursal->moneda_facturacion_id) {
+                    $tipo_cambio = get_tipo_cambio($fp->moneda_id, $ticket->sucursal->moneda_facturacion_id, $ticket->sucursal->id);
+                    if ($tipo_cambio->id) {
+                        $tasa_cambio = $tipo_cambio->tasa;
+                    }
+                }
+
                 $factura = Factura::create([
                     'propietario_id' => $this->suc,
                     'lugar_expedicion' => $propietario->codigo_postal,
@@ -500,7 +511,7 @@ class AutoFacturacion extends Component
                     'metodo_pago_id' => 1,
                     'forma_pago_id' => optional($sfp)->forma_pago_id,
                     'tipo_comprobante_id' => 1,
-                    'tipo_cambio' => $ticket->tipo_cambio
+                    'tipo_cambio' => $tasa_cambio
                 ]);
 
                 DB::table('tb_ticket_operaciones')
@@ -510,6 +521,13 @@ class AutoFacturacion extends Component
             }
             $url = "/timbrar-auto-factura-por-forma-pago/" . Crypt::encrypt(implode(",", $facturas));
         } else {
+            $tasa_cambio = 1;
+            if ($ticket->sucursal->moneda_base_id != $ticket->sucursal->moneda_facturacion_id) {
+                $tipo_cambio = get_tipo_cambio($ticket->sucursal->moneda_base_id, $ticket->sucursal->moneda_facturacion_id, $ticket->sucursal->id);
+                if ($tipo_cambio->id) {
+                    $tasa_cambio = $tipo_cambio->tasa;
+                }
+            }
             $total = $ticket->importe;
             $subtotal = round($total / (1 + system_iva() / 100), 2);
             $iva = $total - $subtotal;
@@ -532,7 +550,7 @@ class AutoFacturacion extends Component
                 'metodo_pago_id' => 1,
                 'forma_pago_id' => 1,
                 'tipo_comprobante_id' => 1,
-                'tipo_cambio' => $ticket->tipo_cambio
+                'tipo_cambio' => $tasa_cambio
             ]);
             DB::table('tb_ticket_operaciones')
                 ->where('ticket_id', $ticket->id)

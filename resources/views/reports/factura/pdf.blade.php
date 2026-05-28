@@ -112,7 +112,7 @@
                         <small>{{$factura->folio_interno}}</small><br>
                         <small>{{$factura->fecha_emision->format('d M Y, H:i')}}</small><br>
                         <small>{{$factura->uuid}}</small><br>
-                        <small>{{$factura->moneda ." (TC ".($factura->moneda == 'MXN' ? '1.000000' : $factura->tipo_cambio).")"}}</small><br>
+                        <small>{{$factura->moneda ." (TC ".number_format($factura->tipo_cambio, 6).")"}}</small><br>
                         <small>{{$factura->forma_pago->nombre}}</small><br>
                         <small>{{$factura->metodo_pago->nombre}}</small><br>
                         <small>{{$factura->lugar_expedicion}}</small><br>

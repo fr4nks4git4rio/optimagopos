@@ -18,7 +18,6 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $id_transaccion
  * @property string $fecha_transaccion
  * @property float $importe
- * @property float $tipo_cambio
  * @property string $vigencia_facturacion
  * @property integer $empleado_id
  * @property integer $sucursal_id
@@ -37,7 +36,6 @@ class Ticket extends Model
         'id_transaccion',
         'fecha_transaccion',
         'importe',
-        'tipo_cambio',
         'vigencia_facturacion',
         'empleado_id',
         'sucursal_id',
@@ -55,7 +53,6 @@ class Ticket extends Model
         'ubicacion' => 'string',
         'id_transaccion' => 'string',
         'fecha_transaccion' => 'string',
-        'tipo_cambio' => 'float',
         'importe' => 'float',
         'vigencia_facturacion' => 'date',
         'empleado_id' => 'integer',

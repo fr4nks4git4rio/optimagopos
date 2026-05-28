@@ -86,6 +86,10 @@
                                             click="$emit('openModal', 'sucursales.formas-pago', {sucursal: {{ $sucursal['id'] }}})" />
                                     </li>
                                     <li class="list-inline-item">
+                                        <x-action icon="gear" title="Configuraciones"
+                                            click="$emit('openModal', 'sucursales.configuraciones', {sucursal: {{ $sucursal['id'] }}})" />
+                                    </li>
+                                    <li class="list-inline-item">
                                         <x-action icon="trash" title="Desactivar"
                                             click="$emit('openModal', 'sucursales.delete', {sucursal: {{ $sucursal['id'] }}})" />
                                     </li>

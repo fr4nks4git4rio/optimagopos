@@ -16,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $nombre
  * @property float $monto
  * @property float $propina
+ * @property float $tipo_cambio
  * @property boolean $es_cambio
  * @property integer $ticket_id
  * @property integer $sucursal_forma_pago_id
@@ -30,6 +31,7 @@ class TicketOperacion extends Model
         'nombre',
         'monto',
         'propina',
+        'tipo_cambio',
         'es_cambio',
         'ticket_id',
         'sucursal_forma_pago_id',

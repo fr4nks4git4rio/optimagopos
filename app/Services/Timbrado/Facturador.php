@@ -292,7 +292,7 @@ class Facturador
 
         //DATOS PAGO
         $datos_pago = [
-            'TipoCambioP' => $complemento->moneda === 'USD' ? $complemento->tipo_cambio : 1,
+            'TipoCambioP' => $complemento->tipo_cambio,
             'Monto' => round($monto_total, 2),
             'MonedaP' => $complemento->moneda,
             'FormaDePagoP' => $complemento->forma_pago->codigo,

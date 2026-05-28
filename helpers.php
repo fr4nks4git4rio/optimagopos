@@ -2,6 +2,7 @@
 
 use App\Models\Cliente;
 use App\Models\Config;
+use App\Models\Sucursal;
 use App\Models\TipoCambio;
 use App\Services\Helpers\QuantityToWords;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -156,19 +157,10 @@ if (!function_exists('get_tipo_cambio')) {
      * @param $date | null
      * @return TipoCambio
      */
-    function get_tipo_cambio($date = null, $cliente_id = null)
+    function get_tipo_cambio($from_id, $to_id, $sucursal_id = null)
     {
-        if (now()->hour < 8) {
-            return TipoCambio::where('cliente_id', $cliente_id ?: user()->cliente_id)
-                ->orderBy('id', 'desc')->first();
-        } else {
-            $date = $date ?? Carbon::now()->format('Y-m-d');
-            $change = TipoCambio::where('cliente_id', $cliente_id ?: user()->cliente_id)
-                ->whereRaw("DATE(created_at) = '$date'")
-                ->get();
-
-            return $change->count() > 0 ? $change->first() : new TipoCambio();
-        }
+        $tc = TipoCambio::where('from_id', $from_id)->where('to_id', $to_id)->where('sucursal_id', $sucursal_id ?: user()->cliente_id)->get();
+        return $tc->count() > 0 ? $tc->first() : new TipoCambio();
     }
 }
 

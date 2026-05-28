@@ -30,6 +30,8 @@ use Illuminate\Support\Facades\Storage;
  * @property integer $cliente_id
  * @property integer $direccion_fiscal_id
  * @property integer $regimen_fiscal_id
+ * @property integer $moneda_base_id
+ * @property integer $moneda_facturacion_id
  */
 class Sucursal extends Model
 {
@@ -48,7 +50,9 @@ class Sucursal extends Model
         'dias_vigencia',
         'cliente_id',
         'direccion_fiscal_id',
-        'regimen_fiscal_id'
+        'regimen_fiscal_id',
+        'moneda_base_id',
+        'moneda_facturacion_id'
     ];
 
     protected $appends = ['value', 'label', 'direccion_text', 'direccion_plain', 'logo_uri', 'codigo_postal'];
@@ -69,6 +73,8 @@ class Sucursal extends Model
         'cliente_id' => 'integer',
         'direccion_fiscal_id' => 'integer',
         'regimen_fiscal_id' => 'integer',
+        'moneda_base_id' => 'integer',
+        'moneda_facturacion_id' => 'integer',
     ];
 
     /**
@@ -76,15 +82,9 @@ class Sucursal extends Model
      *
      * @var array
      */
-    public function rules()
-    {
+    public function rules() {}
 
-    }
-
-    public function messages()
-    {
-
-    }
+    public function messages() {}
 
     public static function encryptInfo($sucursal)
     {
@@ -139,6 +139,10 @@ class Sucursal extends Model
                     case 'regimen_fiscal_id':
                         $data['regimen_fiscal'] = DB::table('tb_regimen_fiscales')
                             ->selectRaw('id, CONCAT(codigo, " - ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'moneda_base_id':
+                        $data['moneda'] = DB::table('tb_monedas')
+                            ->selectRaw('id, acronimo as nombre')->where('id', $value)->first()->nombre;
                         break;
                 }
             }
@@ -230,6 +234,14 @@ class Sucursal extends Model
     public function regimen_fiscal()
     {
         return $this->belongsTo(RegimenFiscal::class);
+    }
+    public function moneda_base()
+    {
+        return $this->belongsTo(Moneda::class, 'moneda_base_id');
+    }
+    public function moneda_facturacion()
+    {
+        return $this->belongsTo(Moneda::class, 'moneda_facturacion_id');
     }
 
     public function formas_pago()

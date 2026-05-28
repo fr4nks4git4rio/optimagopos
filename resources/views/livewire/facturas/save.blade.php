@@ -32,7 +32,7 @@
                     </div>
                     <div class="col-sm-4">
                         <x-select2 label="Forma de Pago" placeholder="Seleccione..." :options="$formasPagoSucursal"
-                            class="form-control" model="forma_pago" :dynamic="true" />
+                            class="form-control" model="forma_pago" :lazy="false" :dynamic="true" />
                     </div>
                     <div class="col-sm-2" style="padding-top: 23px">
                         <button type="button" class="btn btn-site-primary" wire:click="loadImporteFacturar">
@@ -153,10 +153,6 @@
                 </div>
             </div>
             <div class="col-sm-2 col-xs-12">
-                <x-select2 label="Serie" placeholder="Seleccione..." :options="$series" class="form-control"
-                    model="serie_id" />
-            </div>
-            <div class="col-sm-2 col-xs-12">
                 <div class="mb-1">
                     <label for="">Moneda:</label>
                     <input type="text" class="form-control" value="{{ $this->moneda }}" disabled>
@@ -165,8 +161,21 @@
                     @enderror
                 </div>
             </div>
+            <div class="col-sm-2 col-xs-12">
+                <div class="mb-1">
+                    <label for="">Tipo de Cambio:</label>
+                    <input type="text" class="form-control" value="{{ $this->tipo_cambio }}" disabled>
+                    @error('tipo_cambio')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
         </div>
         <div class="row">
+            <div class="col-sm-2 col-xs-12">
+                <x-select2 label="Serie" placeholder="Seleccione..." :options="$series" class="form-control"
+                    model="serie_id" />
+            </div>
             <div class="col-sm-3 col-xs-12">
                 <x-select2 label="Método de Pago" placeholder="Seleccione..." :options="$metodosPago" class="form-control"
                     model="metodo_pago_id" />
@@ -175,20 +184,9 @@
                 <x-select2 label="Forma de Pago" placeholder="Seleccione..." :options="$formasPago" class="form-control"
                     model="forma_pago_id" :dynamic="true" disabled />
             </div>
-            <div class="col-sm-3 col-xs-12">
+            <div class="col-sm-4 col-xs-12">
                 <x-select2 label="Uso CFDI" placeholder="Seleccione..." :options="$usosCfdi" class="form-control"
                     model="cfdi_id" />
-            </div>
-            <div class="col-sm-3 col-xs-12">
-                @if ($this->moneda == 'USD')
-                    <div class="mb-1">
-                        <label for="">Tipo de Cambio:</label>
-                        <input type="text" class="form-control" value="{{ $this->tipo_cambio }}" disabled>
-                        @error('tipo_cambio')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                        @enderror
-                    </div>
-                @endif
             </div>
         </div>
         <div class="row">

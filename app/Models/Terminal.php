@@ -15,9 +15,10 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * Class Terminal
  *
- * @property string identificador
- * @property string comentarios
- * @property integer sucursal_id
+ * @property integer $id_pos
+ * @property string $identificador
+ * @property string $comentarios
+ * @property integer $sucursal_id
  */
 class Terminal extends Model
 {
@@ -31,6 +32,7 @@ class Terminal extends Model
      * @var array
      */
     protected $fillable = [
+        'id_pos',
         'identificador',
         'comentarios',
         'sucursal_id'
