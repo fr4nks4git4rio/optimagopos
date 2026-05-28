@@ -71,7 +71,7 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->groupBy('to.id')
                     ->get()->map(function ($element) use (&$ventas_totales, &$ventas_netas, &$ventas_netas_operacion, &$importes_devueltos) {
-                        if (!$element->es_cambio) {
+                        if (!$element->es_cambio && $element->moneda_id) {
                             $monto = (float)$element->monto;
 
                             if (isset($ventas_totales[$element->moneda_id])) {
