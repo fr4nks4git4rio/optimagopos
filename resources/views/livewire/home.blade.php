@@ -177,9 +177,15 @@
                             }
                         }" class="card shadow-sm bg-info-subtle">
                             <div class="card-body">
-                                <h5 class="card-title">Venta neta {{ $ventas_neta_moneda['moneda'] }} por operación
+                                <h5 class="card-title">
+                                    Venta neta {{ $ventas_neta_moneda['moneda'] }} por operación
                                 </h5>
-
+                                <template x-if="!chart">
+                                    <div class="text-center py-3 text-muted">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                        Cargando datos...
+                                    </div>
+                                </template>
                                 <div id="contenedor-grafica-{{ $index }}" wire:ignore>
                                     <div id="mi-canvas-grafica-{{ $index }}"></div>
                                 </div>
@@ -277,7 +283,12 @@
                     }" class="card shadow-sm bg-info-subtle">
                         <div class="card-body">
                             <h5 class="card-title">Actividad</h5>
-
+                            <template x-if="!chart">
+                                <div class="text-center py-3 text-muted">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                    Cargando datos...
+                                </div>
+                            </template>
                             <div id="contenedor-grafica-actividad" wire:ignore>
                                 <div id="mi-canvas-grafica-actividad"></div>
                             </div>
