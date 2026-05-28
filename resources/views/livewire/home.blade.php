@@ -106,7 +106,7 @@
             </div>
             <div class="row">
                 @foreach ($resumenData['ventas_netas_operacion'] as $index => $ventas_neta_moneda)
-                    <div class="col-12 col-md-4 mb-3" wire:key="grafica-{{ $index }}">
+                    <div class="col-12 mb-3" wire:key="grafica-{{ $index }}">
                         <div x-data="{
                             datosServidor: @entangle('resumenData.ventas_netas_operacion.' . $index . '.montos'),
                             chart: null,
