@@ -144,7 +144,7 @@
                                                     plotOptions: {
                                                         bar: {
                                                             // Controla el ancho máximo de la barra para que no ocupe toda la pantalla si está sola
-                                                            columnWidth: '50%'
+                                                            columnWidth: '100%'
                                                         }
                                                     }
                                                 };
