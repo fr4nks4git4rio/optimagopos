@@ -144,7 +144,17 @@
                                                     plotOptions: {
                                                         bar: {
                                                             // Controla el ancho máximo de la barra para que no ocupe toda la pantalla si está sola
-                                                            columnWidth: '100%'
+                                                            columnWidth: '90%',
+                                                            dataLabels: { position: 'top' }
+                                                        }
+                                                    },
+                                                    dataLabels: {
+                                                        enabled: true,
+                                                        offsetY: -20,
+                                                        style: { fontSize: '9px', colors: ['#304758'] },
+                                                        // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
+                                                        formatter: function(val) {
+                                                            return val > 0 ? val : '';
                                                         }
                                                     }
                                                 };
