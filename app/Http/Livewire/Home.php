@@ -147,7 +147,7 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->value('cantidad');
                 $this->resumenData['multimoneda'] = DB::table('tb_tickets as ticket')
-                    ->selectRaw("COUNT(DISTINCT ticket.id) as cantidad, COUNT(DISTINCT to.sucursal_forma_pago_id) as cant_fps")
+                    ->selectRaw("COUNT(DISTINCT to.ticket_id) as cantidad, COUNT(DISTINCT to.sucursal_forma_pago_id) as cant_fps")
                     ->leftJoin('tb_ticket_operaciones as to', 'ticket.id', 'to.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
