@@ -353,11 +353,9 @@ class Home extends Component
                     ->get()->pluck('cantidad', 'nombre'); // Cargar datos para gráfica de métodos de pago
                 // 1. Primero obtenemos el total general de operaciones del cliente para usarlo como base
                 $totalOperaciones = DB::table('tb_ticket_operaciones as to')
-                    ->select('to.*')
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->having('sucursal_forma_pago_id', '!=', null)
                     ->count();
 
                 // Evitamos división por cero si el salón es nuevo y no tiene operaciones aún
@@ -373,12 +371,8 @@ class Home extends Component
                     ->join('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->whereNotNull('to.sucursal_forma_pago_id')
                     ->groupBy('sfp.nombre')
                     ->orderByDesc('porciento')
-                    ->having('porciento', '>', 0) // Solo incluimos formas de pago que representen más del 0% para evitar saturar la gráfica con métodos marginales
-                    ->having('nombre', '!=', '') // Solo incluimos formas de pago que representen más del 0% para evitar saturar la gráfica con métodos marginales
-                    ->having('nombre', '!=', null) // Solo incluimos formas de pago que representen más del 0% para evitar saturar la gráfica con métodos marginales
                     ->get()
                     ->pluck('porciento', 'nombre');
                 $this->pagosData['grafica_comportamiento_pagos'] = $graficaFormasPago;
