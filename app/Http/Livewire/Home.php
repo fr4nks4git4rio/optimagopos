@@ -258,7 +258,7 @@ class Home extends Component
                     ->orderByDesc('presencia')
                     ->first()->nombre ?? '';
                 $this->productosData['mayor_ingreso'] = DB::table('tb_ticket_productos as tp')
-                    ->select('p.nombre', DB::raw("ROUND(SUM(tp.precio), 2) as ingreso"))
+                    ->select('p.nombre', DB::raw("SUM(tp.precio) as ingreso"))
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
@@ -286,7 +286,7 @@ class Home extends Component
                     ->limit(5)
                     ->get()->pluck('cantidad', 'nombre');
                 $this->productosData['top_productos_ingreso'] = DB::table('tb_ticket_productos as tp')
-                    ->select('p.nombre', DB::raw("SUM(tp.precio) as ingreso"))
+                    ->select('p.nombre', DB::raw("ROUND(SUM(tp.precio), 2) as ingreso"))
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
