@@ -62,7 +62,20 @@
                                             enabled: true,
                                             easing: 'smooth',
                                             dynamicAnimation: { speed: 500 }
-                                        }
+                                        },
+                                        toolbar: {
+                                            show: true,
+                                            offsetY: -30,
+                                            tools: {
+                                                download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
+                                                selection: false,
+                                                zoom: false, // Quita la lupa de zoom
+                                                zoomin: false, // Quita el botón +
+                                                zoomout: false, // Quita el botón -
+                                                pan: false, // Quita la mano de paneo
+                                                reset: false // Quita el botón de resetear vista
+                                            }
+                                        },
                                     },
                                     series: [{ name: 'Cantidad', data: importesProductos }],
                                     plotOptions: {
@@ -185,7 +198,20 @@
                                             enabled: true,
                                             easing: 'smooth',
                                             dynamicAnimation: { speed: 500 }
-                                        }
+                                        },
+                                        toolbar: {
+                                            show: true,
+                                            offsetY: -30,
+                                            tools: {
+                                                download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
+                                                selection: false,
+                                                zoom: false, // Quita la lupa de zoom
+                                                zoomin: false, // Quita el botón +
+                                                zoomout: false, // Quita el botón -
+                                                pan: false, // Quita la mano de paneo
+                                                reset: false // Quita el botón de resetear vista
+                                            }
+                                        },
                                     },
                                     series: [{ name: 'Importe', data: importesProductos }],
                                     plotOptions: {
