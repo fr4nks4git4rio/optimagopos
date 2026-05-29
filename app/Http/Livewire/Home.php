@@ -214,11 +214,12 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->get()->first()->cantidad ?? 0;
                 $this->operacionesData['multimoneda'] = DB::table('tb_tickets as ticket')
-                    ->selectRaw("COUNT(DISTINCT ticket.id) as cantidad, COUNT(DISTINCT to.sucursal_forma_pago_id) as cant_fps")
+                    ->selectRaw("COUNT(DISTINCT to.ticket_id) as cantidad, COUNT(DISTINCT sfp.moneda_id) as cant_monedas")
                     ->leftJoin('tb_ticket_operaciones as to', 'ticket.id', 'to.ticket_id')
+                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->having('cant_fps', '>', 1)
+                    ->having('cant_monedas', '>', 1)
                     ->value('cantidad');
                 $datos_grafica_ventas_hora = [];
                 $datos_grafica_operaciones_hora = [];
