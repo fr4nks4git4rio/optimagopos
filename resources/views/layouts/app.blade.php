@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,6 +13,13 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+
+    <style>
+        ::root {
+            --color-primary: #065F46;
+            --color-primary-subtle: #c5f7e9;
+        }
+    </style>
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -37,7 +45,8 @@
             width: 10px;
         }
 
-        body::-webkit-scrollbar-button:increment, .contenedor::-webkit-scrollbar-button {
+        body::-webkit-scrollbar-button:increment,
+        .contenedor::-webkit-scrollbar-button {
             display: none;
         }
 
@@ -113,7 +122,7 @@
         }
 
         .loading,
-        .loading > img {
+        .loading>img {
             position: fixed;
             top: 0;
             right: 0;
@@ -138,7 +147,8 @@
                 display: block;
             }
 
-            .notifications-dropdown .nav .nav-item, .nav .nav-item a {
+            .notifications-dropdown .nav .nav-item,
+            .nav .nav-item a {
                 padding-left: 0px;
             }
 
@@ -155,6 +165,7 @@
     <!-- Alpine Core -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
+
 <body x-data="{
     display: 'd-sm-inline',
     sidebar_with: 'sidebar-width',
@@ -165,7 +176,7 @@
     menu_absolute: '',
     submenu_absolute: 'w-100',
     is_mobile_screen: false,
-    toggleClicked(){
+    toggleClicked() {
         this.sidebar_with = !this.sidebar_with ? 'sidebar-width' : '';
         this.display = !this.display ? 'd-sm-inline' : '';
         this.show_title = !this.show_title;
@@ -174,53 +185,54 @@
         this.menu_absolute = !this.menu_absolute ? 'menu-absolute' : '';
         this.submenu_absolute = this.submenu_absolute == 'w-100' ? 'submenu-absolute' : 'w-100';
     },
-    setModeScreen(){
+    setModeScreen() {
         this.is_mobile_screen = window.screen.width < 992;
-        if(this.is_mobile_screen){
+        if (this.is_mobile_screen) {
             this.appbar_user_menu = 'justify-content-between mt-2'
         }
-        $.get('https://6do9tah.localto.net/api/clientes_service', function (data) {
-            $.post('/consumir_clientes_service', {data}, function (data) {
+        $.get('https://6do9tah.localto.net/api/clientes_service', function(data) {
+            $.post('/consumir_clientes_service', { data }, function(data) {
                 console.log(data);
             });
         });
-        $.get('https://6do9tah.localto.net/api/operadores_service', function (data) {
-            $.post('/consumir_operadores_service', {data}, function (data) {
+        $.get('https://6do9tah.localto.net/api/operadores_service', function(data) {
+            $.post('/consumir_operadores_service', { data }, function(data) {
                 console.log(data);
             });
         })
     }
 }" x-init="setModeScreen()">
-<div id="app">
-    <livewire:layouts.toast/>
-    @if(auth()->user())
-        @livewire('layouts.nav')
-    @endif
-    <div class="container-fluid">
-        <div class="row flex-nowrap">
-            @if(auth()->user())
-                @livewire('layouts.sidebar')
-            @endif
-            <main class="py-4 col">
-                {{ $slot }}
-            </main>
+    <div id="app">
+        <livewire:layouts.toast />
+        @if (auth()->user())
+            @livewire('layouts.nav')
+        @endif
+        <div class="container-fluid">
+            <div class="row flex-nowrap">
+                @if (auth()->user())
+                    @livewire('layouts.sidebar')
+                @endif
+                <main class="py-4 col">
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
-    </div>
 
-    @livewireScripts
-</div>
-<script>
-    Livewire.on('flashMessage', () => {
-        $('.alert').css('display', 'block !important').delay(3000).slideUp(600);
-    });
-    Livewire.on('uncheckCheckbox', (param) => {
-        $('#' + param)[0].checked = false;
-    });
-    Livewire.on('checkCheckbox', (param) => {
-        $('#' + param)[0].checked = true;
-    });
-</script>
-@stack('scripts')
-@livewire('livewire-ui-modal')
+        @livewireScripts
+    </div>
+    <script>
+        Livewire.on('flashMessage', () => {
+            $('.alert').css('display', 'block !important').delay(3000).slideUp(600);
+        });
+        Livewire.on('uncheckCheckbox', (param) => {
+            $('#' + param)[0].checked = false;
+        });
+        Livewire.on('checkCheckbox', (param) => {
+            $('#' + param)[0].checked = true;
+        });
+    </script>
+    @stack('scripts')
+    @livewire('livewire-ui-modal')
 </body>
+
 </html>
