@@ -17,10 +17,10 @@ class Home extends Component
 
     public $resumenData = [
         'operaciones' => '',
-        'ventas_netas' => [],
+        'ventas_netas' => '',
         'ventas_netas_operacion' => [],
-        'ventas_totales' => [],
-        'importes_devueltos' => [],
+        'ventas_totales' => '',
+        'importes_devueltos' => '',
         'deletes' => '',
         'cancels' => '',
         'multimoneda' => '',
@@ -87,58 +87,34 @@ class Home extends Component
 
         switch ($this->seccion) {
             case 'resumen':
-                $ventas_netas = [];
-                $ventas_totales = [];
-                $importes_devueltos = [];
+                $ventas_netas = 0;
+                $ventas_totales = 0;
+                $importes_devueltos = 0;
                 $ventas_netas_operacion = [];
 
-                $operaciones = DB::table('tb_ticket_operaciones as to')
-                    ->select('to.*', 'sfp.moneda_id')
-                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                DB::table('tb_ticket_productos as tp')
+                    ->select('tp.*')
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->groupBy('to.id')
+                    ->groupBy('tp.id')
                     ->get()->map(function ($element) use (&$ventas_totales, &$ventas_netas, &$ventas_netas_operacion, &$importes_devueltos) {
-                        if (!$element->es_cambio && $element->moneda_id) {
-                            $monto = (float)$element->monto;
+                        $precio = (float)$element->precio;
 
-                            if (isset($ventas_totales[$element->moneda_id])) {
-                                $ventas_totales[$element->moneda_id]['monto'] += $monto > 0 ? $monto : 0;
-                            } else {
-                                $ventas_totales[$element->moneda_id]['moneda'] = $this->monedas[$element->moneda_id];
-                                $ventas_totales[$element->moneda_id]['monto'] = $monto > 0 ? $monto : 0;
-                            }
+                        $ventas_totales += $precio > 0 ? $precio : 0;
+                        $ventas_netas += $precio;
+                        $importes_devueltos += $precio < 0 ? abs($precio) : 0;
 
-                            if (isset($ventas_netas[$element->moneda_id])) {
-                                $ventas_netas[$element->moneda_id]['monto'] += $monto;
-                            } else {
-                                $ventas_netas[$element->moneda_id]['moneda'] = $this->monedas[$element->moneda_id];
-                                $ventas_netas[$element->moneda_id]['monto'] = $monto;
-                            }
-
-                            if ($monto > 0) {
-                                if (isset($ventas_netas_operacion[$element->moneda_id])) {
-                                    $ventas_netas_operacion[$element->moneda_id]['montos'][] = $monto;
-                                } else {
-                                    $ventas_netas_operacion[$element->moneda_id]['moneda'] = $this->monedas[$element->moneda_id];
-                                    $ventas_netas_operacion[$element->moneda_id]['montos'][] = $monto;
-                                }
-                            }
-
-                            if (isset($importes_devueltos[$element->moneda_id])) {
-                                $importes_devueltos[$element->moneda_id]['monto'] += $monto < 0 ? abs($monto) : 0;
-                            } else {
-                                $importes_devueltos[$element->moneda_id]['moneda'] = $this->monedas[$element->moneda_id];
-                                $importes_devueltos[$element->moneda_id]['monto'] = $monto < 0 ? abs($monto) : 0;
-                            }
-                        }
+                        $ventas_netas_operacion[] = $precio;
                     });
 
-                $this->resumenData['operaciones'] = count($operaciones);
+                $this->resumenData['operaciones'] = DB::table('tb_tickets as ticket')
+                    ->select('ticket.*')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->count();
                 $this->resumenData['ventas_totales'] = $ventas_totales;
                 $this->resumenData['ventas_netas'] = $ventas_netas;
-                $this->resumenData['ventas_netas_operacion'] = $ventas_netas_operacion;
                 $this->resumenData['importes_devueltos'] = $importes_devueltos;
                 $this->resumenData['articulos_vendidos'] = DB::table('tb_ticket_productos as tp')
                     ->selectRaw("SUM(tp.cantidad) as cantidad")
@@ -154,6 +130,7 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->having('cant_monedas', '>', 1)
                     ->value('cantidad');
+                $this->resumenData['ventas_netas_operacion'] = $ventas_netas_operacion;
                 $correcciones = DB::table('tb_ticket_producto_correcciones as tpc')
                     ->selectRaw("SUM(IF(tpc.nombre = 'Delete', 1, 0)) as deletes, SUM(IF(tpc.nombre = 'Cancel', 1, 0)) as cancels")
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')

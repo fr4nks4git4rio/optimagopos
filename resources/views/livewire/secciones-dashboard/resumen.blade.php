@@ -8,19 +8,13 @@
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <span class="fs-5 fw-bold">VENTA NETA</span>
-            @foreach ($resumenData['ventas_netas'] as $venta_neta)
-                <span class="fs-3  text-primary">${{ number_format(max($venta_neta['monto'], 0), 2) }}
-                    {{ $venta_neta['moneda'] }}</span>
-            @endforeach
+            <span class="fs-3  text-primary">${{ number_format(max($resumenData['ventas_netas'], 0), 2) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <span class="fs-5 fw-bold">VENTA TOTAL</span>
-            @foreach ($resumenData['ventas_totales'] as $venta_total)
-                <span class="fs-3 text-primary">${{ number_format(max($venta_total['monto'], 0), 2) }}
-                    {{ $venta_total['moneda'] }}</span>
-            @endforeach
+            <span class="fs-3 text-primary">${{ number_format(max($resumenData['ventas_totales'], 0), 2) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
@@ -37,25 +31,19 @@
     </div>
 </div>
 <div class="grid-cols-3 px-1 mb-3">
-    <div
-        class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">IMPORTE DEVUELTO</p>
-            @foreach ($resumenData['importes_devueltos'] as $importe_devuelto)
-                <p class="fs-3 text-danger">${{ number_format(max($importe_devuelto['monto'], 0), 2) }}
-                    {{ $importe_devuelto['moneda'] }}</p>
-            @endforeach
+            <p class="fs-3 text-danger">${{ number_format(max($resumenData['importes_devueltos'], 0), 2) }}</p>
         </div>
     </div>
-    <div
-        class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">DELETES</p>
             <p class="fs-3 text-danger m-auto">{{ max($resumenData['deletes'], 0) }}</p>
         </div>
     </div>
-    <div
-        class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">CANCELS</p>
             <p class="fs-3 text-danger m-auto">{{ max($resumenData['cancels'], 0) }}</p>
@@ -70,108 +58,106 @@
                 </div> --}}
 </div>
 <div class="row">
-    @foreach ($resumenData['ventas_netas_operacion'] as $index => $ventas_neta_moneda)
-        <div class="col-12 mb-3" wire:key="grafica-{{ $index }}">
-            <div x-data="{
-                datosServidor: @entangle('resumenData.ventas_netas_operacion.' . $index . '.montos'),
-                chart: null,
+    <div class="col-12 mb-3">
+        <div x-data="{
+            datosServidor: @entangle('resumenData.ventas_netas_operacion'),
+            chart: null,
 
-                init() {
-                    // Escuchamos los cambios en los datos que vienen de Livewire
-                    this.$watch('datosServidor', value => {
-                        if (value && value.length > 0) {
+            init() {
+                // Escuchamos los cambios en los datos que vienen de Livewire
+                this.$watch('datosServidor', value => {
+                    if (value && value.length > 0) {
 
-                            let datosFormateados = value.map((num, index) => {
-                                return { x: (index + 1).toString(), y: num };
-                            });
+                        let datosFormateados = value.map((num, index) => {
+                            return { x: (index + 1).toString(), y: num };
+                        });
 
-                            // Buscamos el elemento de forma nativa e inequívoca
-                            let el = document.getElementById('mi-canvas-grafica-{{ $index }}');
+                        // Buscamos el elemento de forma nativa e inequívoca
+                        let el = document.getElementById('mi-canvas-grafica-venta-neta');
 
-                            if (el) {
-                                if (!this.chart) {
-                                    // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
-                                    let options = {
-                                        chart: {
-                                            type: 'bar',
-                                            height: 280,
-                                            animations: {
-                                                enabled: true,
-                                                easing: 'smooth',
-                                                dynamicAnimation: { speed: 500 }
-                                            },
-                                            toolbar: {
-                                                show: true,
-                                                offsetY: -30,
-                                                tools: {
-                                                    download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
-                                                    selection: false,
-                                                    zoom: false, // Quita la lupa de zoom
-                                                    zoomin: false, // Quita el botón +
-                                                    zoomout: false, // Quita el botón -
-                                                    pan: false, // Quita la mano de paneo
-                                                    reset: false // Quita el botón de resetear vista
-                                                }
-                                            },
-                                        },
-                                        series: [{ name: 'Métrica', data: datosFormateados }],
-                                        xaxis: {
-                                            type: 'category',
-                                        },
-                                        colors: ['#065F46'],
-                                        // 2. CONFIGURAR EL COMPORTAMIENTO DE LAS BARRAS
-                                        plotOptions: {
-                                            bar: {
-                                                // Controla el ancho máximo de la barra para que no ocupe toda la pantalla si está sola
-                                                columnWidth: '90%',
-                                                dataLabels: { position: 'top' }
-                                            }
-                                        },
-                                        dataLabels: {
+                        if (el) {
+                            if (!this.chart) {
+                                // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
+                                let options = {
+                                    chart: {
+                                        type: 'bar',
+                                        height: 280,
+                                        animations: {
                                             enabled: true,
-                                            offsetY: -20,
-                                            style: { fontSize: '9px', colors: ['#304758'] },
-                                            // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
-                                            formatter: function(val) {
-                                                return val > 0 ? val : '';
+                                            easing: 'smooth',
+                                            dynamicAnimation: { speed: 500 }
+                                        },
+                                        toolbar: {
+                                            show: true,
+                                            offsetY: -30,
+                                            tools: {
+                                                download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
+                                                selection: false,
+                                                zoom: false, // Quita la lupa de zoom
+                                                zoomin: false, // Quita el botón +
+                                                zoomout: false, // Quita el botón -
+                                                pan: false, // Quita la mano de paneo
+                                                reset: false // Quita el botón de resetear vista
                                             }
+                                        },
+                                    },
+                                    series: [{ name: 'Métrica', data: datosFormateados }],
+                                    xaxis: {
+                                        type: 'category',
+                                    },
+                                    colors: ['#065F46'],
+                                    // 2. CONFIGURAR EL COMPORTAMIENTO DE LAS BARRAS
+                                    plotOptions: {
+                                        bar: {
+                                            // Controla el ancho máximo de la barra para que no ocupe toda la pantalla si está sola
+                                            columnWidth: '90%',
+                                            dataLabels: { position: 'top' }
                                         }
-                                    };
+                                    },
+                                    dataLabels: {
+                                        enabled: true,
+                                        offsetY: -20,
+                                        style: { fontSize: '9px', colors: ['#304758'] },
+                                        // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
+                                        formatter: function(val) {
+                                            return val > 0 ? val : '';
+                                        }
+                                    }
+                                };
 
-                                    this.chart = new ApexCharts(el, options);
-                                    this.chart.render();
-                                } else {
-                                    // 2. Si ya existe, solo actualizamos los datos
-                                    this.chart.updateSeries([{ data: datosFormateados }]);
-                                }
+                                this.chart = new ApexCharts(el, options);
+                                this.chart.render();
+                            } else {
+                                // 2. Si ya existe, solo actualizamos los datos
+                                this.chart.updateSeries([{ data: datosFormateados }]);
                             }
                         }
-                    });
-                },
-
-                destroy() {
-                    if (this.chart) {
-                        this.chart.destroy();
                     }
+                });
+            },
+
+            destroy() {
+                if (this.chart) {
+                    this.chart.destroy();
                 }
-            }" class="card shadow-sm bg-site-primary-subtle">
-                <div class="card-body">
-                    <span class="fs-5 fw-bold">
-                        Venta neta {{ $ventas_neta_moneda['moneda'] }} por operación
-                    </span>
-                    <template x-if="!chart">
-                        <div class="text-center py-3 text-muted">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                            Cargando datos...
-                        </div>
-                    </template>
-                    <div id="contenedor-grafica-{{ $index }}" wire:ignore>
-                        <div id="mi-canvas-grafica-{{ $index }}"></div>
+            }
+        }" class="card shadow-sm bg-site-primary-subtle">
+            <div class="card-body">
+                <span class="fs-5 fw-bold">
+                    Venta neta por operación
+                </span>
+                <template x-if="!chart">
+                    <div class="text-center py-3 text-muted">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        Cargando datos...
                     </div>
+                </template>
+                <div id="contenedor-grafica-venta-neta" wire:ignore>
+                    <div id="mi-canvas-grafica-venta-neta"></div>
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
     <div class="col-12 col-md-4 mb-3">
         <div x-data="{
             datosActividad: @entangle('resumenData.grafica_actividad'),
