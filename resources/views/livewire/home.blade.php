@@ -1,10 +1,10 @@
 @section('title', 'Dashboard')
 <div wire:poll.3000ms="loadData" wire:init="init" class="row">
-    <div wire:loading.delay.longer>
+    {{-- <div wire:loading.delay.longer>
         <div class="loading">
             <img src="{{ asset('img/loading.gif') }}" />
         </div>
-    </div>
+    </div> --}}
 
     <h1 class="fs-1 mb-2">@yield('title')</h1>
     <div class="col-12">
