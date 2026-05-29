@@ -40,7 +40,7 @@
                                 <thead>
                                     <tr>
                                         <th>Moneda Base</th>
-                                        <th>Moneda de Cambio</th>
+                                        <th>Moneda Destino</th>
                                         <th>Tasa de Cambio</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
