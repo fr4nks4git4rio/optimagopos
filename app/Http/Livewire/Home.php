@@ -152,7 +152,6 @@ class Home extends Component
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->having('cant_fps', '>', 1)
-                    ->groupBy('ticket.id')
                     ->value('cantidad');
                 $correcciones = DB::table('tb_ticket_producto_correcciones as tpc')
                     ->selectRaw("SUM(IF(tpc.nombre = 'Delete', 1, 0)) as deletes, SUM(IF(tpc.nombre = 'Cancel', 1, 0)) as cancels")
