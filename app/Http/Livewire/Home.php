@@ -106,9 +106,9 @@ class Home extends Component
                         $importes_devueltos += $precio < 0 ? abs($precio) : 0;
 
                         if (isset($ventas_netas_operacion[$element->ticket_id])) {
-                            $ventas_netas_operacion[$element->ticket_id] += $precio;
+                            $ventas_netas_operacion[$element->ticket_id] += round($precio, 2);
                         } else {
-                            $ventas_netas_operacion[$element->ticket_id] = $precio;
+                            $ventas_netas_operacion[$element->ticket_id] = round($precio, 2);
                         }
                     });
 
