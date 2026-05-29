@@ -236,7 +236,7 @@ class Home extends Component
                     ->select('ticket.id', 'ticket.id_transaccion', 'ticket.importe')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->orderByDesc('ticket.importe')
+                    ->orderByRaw('LENGTH(ticket.importe) desc')->orderByDesc('ticket.importe')
                     ->limit(5)
                     ->get()->pluck('importe', 'id_transaccion');
                 break;
