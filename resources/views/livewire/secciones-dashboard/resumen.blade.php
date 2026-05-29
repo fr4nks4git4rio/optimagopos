@@ -2,7 +2,7 @@
     <div
         class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-4 fw-bold">OPERACIONES</p>
+            <p class="fs-5 fw-bold">OPERACIONES</p>
             <p class="fs-3 text-primary m-auto">{{ max($resumenData['operaciones'], 0) }}</p>
         </div>
     </div>
