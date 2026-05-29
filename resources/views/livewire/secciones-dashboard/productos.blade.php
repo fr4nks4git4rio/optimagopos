@@ -1,27 +1,23 @@
-<div class="row justify-content-start px-3 gap-4 mb-3">
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+<div class="grid-cols-4 px-1 mb-3">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">ARTICULOS VENDIDOS</p>
             <p class="fs-3 text-primary m-auto">{{ max($productosData['articulos_vendidos'], 0) }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">PRODUCTO ESTRELLA</p>
             <p class="fs-3 text-primary m-auto">{{ $productosData['producto_estrella'] }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">MAYOR INGRESO</p>
             <p class="fs-3 text-primary m-auto">{{ $productosData['mayor_ingreso'] }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">MAS VENDIDO</p>
             <p class="fs-3 text-primary m-auto">{{ $productosData['mas_vendido'] }}</p>
@@ -83,7 +79,7 @@
                                             horizontal: true, // Barras de izquierda a derecha 👈 👉
                                             barHeight: '60%', // Grosor elegante para las 5 barras
                                             distributed: true, // ¡Opcional! Hace que cada una de las 5 barras tenga un tono distinto si quieres
-                                            dataLabels: { position: 'right' }
+                                            {{-- dataLabels: { position: 'right' } --}}
                                         }
                                     },
 
@@ -97,7 +93,7 @@
                                             style: { fontSize: '11px' },
                                             formatter: function(val) {
                                                 // Evitamos que intente ponerle signo de pesos a los nombres de los productos
-                                                return typeof val === 'number' ? '$' + val : val;
+                                                return val;
                                             }
                                         }
                                     },
@@ -116,8 +112,8 @@
                                     dataLabels: {
                                         enabled: true,
                                         style: {
-                                            fontSize: '11px',
-                                            colors: ['#2D3142']
+                                            fontSize: '16px',
+                                            colors: ['#C29A6B']
                                         },
                                     },
                                     legend: { show: false } // Ocultamos la leyenda ya que el eje Y dice de quién es cada barra
@@ -132,7 +128,10 @@
                                 this.chart.updateOptions({
                                     // 1. Modificamos el eje Y (vertical) porque es horizontal: true
                                     yaxis: {
-                                        categories: nombresProductos
+                                        categories: nombresProductos,
+                                        labels: {
+                                            style: { fontSize: '12px', fontWeight: 'bold', colors: ['#2D3142'] }
+                                        }
                                     },
                                     // 2. Inyectamos los nuevos datos en la misma llamada para evitar conflictos de hilos
                                     series: [{ name: 'Cantidad', data: importesProductos }]
@@ -219,7 +218,7 @@
                                             horizontal: true, // Barras de izquierda a derecha 👈 👉
                                             barHeight: '60%', // Grosor elegante para las 5 barras
                                             distributed: true, // ¡Opcional! Hace que cada una de las 5 barras tenga un tono distinto si quieres
-                                            dataLabels: { position: 'right' }
+                                            {{-- dataLabels: { position: 'right' } --}}
                                         }
                                     },
 
@@ -233,7 +232,7 @@
                                             style: { fontSize: '11px' },
                                             formatter: function(val) {
                                                 // Evitamos que intente ponerle signo de pesos a los nombres de los productos
-                                                return typeof val === 'number' ? '$' + val : val;
+                                                return '$' + val;
                                             }
                                         }
                                     },
@@ -252,9 +251,13 @@
                                     dataLabels: {
                                         enabled: true,
                                         style: {
-                                            fontSize: '11px',
-                                            colors: ['#2D3142']
+                                            fontSize: '16px',
+                                            colors: ['#C29A6B']
                                         },
+                                        formatter: function(val) {
+                                            // Evitamos que intente ponerle signo de pesos a los nombres de los productos
+                                            return '$' + val;
+                                        }
                                     },
                                     legend: { show: false } // Ocultamos la leyenda ya que el eje Y dice de quién es cada barra
                                 };
@@ -268,7 +271,10 @@
                                 this.chart.updateOptions({
                                     // 1. Modificamos el eje Y (vertical) porque es horizontal: true
                                     yaxis: {
-                                        categories: nombresProductos
+                                        categories: nombresProductos,
+                                        labels: {
+                                            style: { fontSize: '12px', fontWeight: 'bold', colors: ['#2D3142'] }
+                                        }
                                     },
                                     // 2. Inyectamos los nuevos datos en la misma llamada para evitar conflictos de hilos
                                     series: [{ name: 'Importe', data: importesProductos }]

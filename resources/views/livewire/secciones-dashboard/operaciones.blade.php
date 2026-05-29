@@ -1,43 +1,40 @@
-<div class="row justify-content-start px-3 gap-4 mb-3">
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+<div class="grid-cols-5 px-1 mb-3">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">OPERACIONES</p>
             <p class="fs-3 text-primary m-auto">{{ max($operacionesData['operaciones'], 0) }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">TICKET PROMEDIO</p>
             <p class="fs-3 text-primary m-auto">
                 ${{ number_format(max($operacionesData['ticket_promedio'], 0), 2) }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">MAYOR TICKET</p>
             <p class="fs-3 text-primary m-auto">
                 ${{ number_format(max($operacionesData['mayor_ticket'], 0), 2) }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">MENOR TICKET</p>
             <p class="fs-3 text-primary m-auto">
                 ${{ number_format(max($operacionesData['menor_ticket'], 0), 2) }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">MULTIMONEDA</p>
             <p class="fs-3 text-primary m-auto">{{ $operacionesData['multimoneda'] }}</p>
         </div>
     </div>
-    <div class="card col-6 col-md-2 border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
+</div>
+<div class="grid-cols-5 px-1 mb-3">
+    <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">CORRECCIONES</p>
             <p class="fs-3 text-danger m-auto">{{ $operacionesData['correcciones'] }}</p>
@@ -330,7 +327,7 @@
                                         bar: {
                                             horizontal: true, // Barras de izquierda a derecha 👈 👉
                                             barHeight: '60%', // Grosor elegante para las 5 barras
-                                            dataLabels: { position: 'right' }
+                                            {{-- dataLabels: { position: 'right' } --}}
                                         }
                                     },
 
@@ -362,10 +359,9 @@
 
                                     dataLabels: {
                                         enabled: true,
-                                        offsetX: 10,
                                         style: {
-                                            fontSize: '11px',
-                                            colors: ['#2D3142']
+                                            fontSize: '16px',
+                                            colors: ['#C29A6B']
                                         },
                                         // Formateador para que el número flotante se vea como dinero (Ej: $1,250)
                                         formatter: function(val) {
@@ -384,7 +380,10 @@
                                 this.chart.updateOptions({
                                     // 1. Modificamos el eje Y (vertical) porque es horizontal: true
                                     yaxis: {
-                                        categories: nombresTickets
+                                        categories: nombresTickets,
+                                        labels: {
+                                            style: { fontSize: '12px', fontWeight: 'bold', colors: ['#2D3142'] }
+                                        }
                                     },
                                     // 2. Inyectamos los nuevos datos en la misma llamada para evitar conflictos de hilos
                                     series: [{ name: 'Importe', data: importesTickets }]

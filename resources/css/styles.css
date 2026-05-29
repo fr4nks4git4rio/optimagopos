@@ -11,7 +11,9 @@ nav.navbar .nav-link {
     color: #fff !important;
 }
 
-.sidebar-menu .bi:before, .sidebar-menu [class^=bi-]:before, .sidebar-menu [class*=" bi-"]:before {
+.sidebar-menu .bi:before,
+.sidebar-menu [class^=bi-]:before,
+.sidebar-menu [class*=" bi-"]:before {
     vertical-align: 0 !important;
 }
 
@@ -29,7 +31,7 @@ input.form-control.form-control-sm {
     background: #c5f7e9 !important;
 }
 
-.btn-check:focus + .btn,
+.btn-check:focus+.btn,
 .btn:focus,
 button:focus {
     box-shadow: 0 0 0 0.25rem #c5f7e9 !important;
@@ -57,12 +59,12 @@ table.table.table-site-primary thead th {
     vertical-align: middle;
 }
 
-.table-site-primary > tbody > tr:nth-of-type(odd) > * {
+.table-site-primary>tbody>tr:nth-of-type(odd)>* {
     --bs-table-color-type: var(--bs-table-striped-color);
     --bs-table-bg-type: #c5f7e9 !important;
 }
 
-.table.table-site-primary > :not(caption) > * > * {
+.table.table-site-primary> :not(caption)>*>* {
     background-color: #fcefec;
 }
 
@@ -70,7 +72,8 @@ select option:hover {
     background-color: #065F46 !important;
 }
 
-.dropdown-item.active, .dropdown-item:active {
+.dropdown-item.active,
+.dropdown-item:active {
     background-color: #065F46 !important;
 }
 
@@ -125,7 +128,8 @@ table tbody tr td {
     border-color: var(--color-primary) !important;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
     background-color: var(--color-primary) !important;
     border-top: none !important;
 }
@@ -208,28 +212,29 @@ select.form-control.form-control-sm {
     min-height: auto !important;
 }
 
-select.select2.form-control + span.select2 > .selection > .select2-selection,
-select.select2.form-control + span.select2 > .selection > .select2-selection > .select2-selection__arrow {
+select.select2.form-control+span.select2>.selection>.select2-selection,
+select.select2.form-control+span.select2>.selection>.select2-selection>.select2-selection__arrow {
     min-height: 36px !important;
 }
 
-select.select2.form-control + span.select2 > .selection > .select2-selection > .select2-selection__rendered {
+select.select2.form-control+span.select2>.selection>.select2-selection>.select2-selection__rendered {
     line-height: 36px !important;
 }
 
-select.select2.form-control.select2-img + span.select2 > .selection > .select2-selection,
-select.select2.form-control.select2-img + span.select2 > .selection > .select2-selection > .select2-selection__arrow {
+select.select2.form-control.select2-img+span.select2>.selection>.select2-selection,
+select.select2.form-control.select2-img+span.select2>.selection>.select2-selection>.select2-selection__arrow {
     height: 54px !important;
 }
 
-select.select2.form-control.select2-img + span.select2 > .selection > .select2-selection > .select2-selection__rendered {
+select.select2.form-control.select2-img+span.select2>.selection>.select2-selection>.select2-selection__rendered {
     line-height: 52px !important;
 }
 
 input.form-control:not([disabled]),
 select.form-select:not([disabled]),
-select.select2.form-control + span.select2 > .selection > .select2-selection > .select2-selection__rendered,
-select.select2.form-control + span.select2 > .selection > .select2-selection, select.select2.form-control + span.select2 > .selection > .select2-selection > .select2-selection__arrow,
+select.select2.form-control+span.select2>.selection>.select2-selection>.select2-selection__rendered,
+select.select2.form-control+span.select2>.selection>.select2-selection,
+select.select2.form-control+span.select2>.selection>.select2-selection>.select2-selection__arrow,
 select.form-control:not([disabled]),
 textarea:not([disabled]).form-control {
     background-color: var(--color-primary-subtle) !important;
@@ -265,7 +270,7 @@ textarea:not([disabled]).form-control {
     min-width: 300px;
 }
 
-.nav.nav-tabs > .nav-item > .nav-link.active {
+.nav.nav-tabs>.nav-item>.nav-link.active {
     border-top: 2px solid var(--color-primary) !important;
 }
 
@@ -273,7 +278,8 @@ textarea:not([disabled]).form-control {
     color: var(--color-primary) !important;
 }
 
-.page-link.active, .active > .page-link {
+.page-link.active,
+.active>.page-link {
     color: #fff !important;
     background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
@@ -283,11 +289,11 @@ textarea:not([disabled]).form-control {
     cursor: pointer;
 }
 
-.terms-container > ul > li.active {
+.terms-container>ul>li.active {
     color: red;
 }
 
-.modal > .modal-dialog > .modal-content > .modal-header > .modal-title {
+.modal>.modal-dialog>.modal-content>.modal-header>.modal-title {
     font-size: large;
 }
 
@@ -297,7 +303,11 @@ textarea:not([disabled]).form-control {
     border-color: #ce5724 !important;
 } */
 
-.btn-check:checked + .btn, :not(.btn-check) + .btn:active, .btn:first-child:active, .btn.active, .btn.show {
+.btn-check:checked+.btn,
+:not(.btn-check)+.btn:active,
+.btn:first-child:active,
+.btn.active,
+.btn.show {
     color: #fff !important;
     background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
@@ -328,7 +338,23 @@ textarea:not([disabled]).form-control {
     background-color: var(--color-primary-subtle) !important;
 }
 
-li.nav-item.text-danger.fw-bold > button {
+.grid-cols-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+.grid-cols-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+.grid-cols-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+}
+
+li.nav-item.text-danger.fw-bold>button {
     color: red !important;
     font-weight: bold !important;
 }

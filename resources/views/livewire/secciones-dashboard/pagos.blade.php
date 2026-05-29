@@ -1,6 +1,6 @@
-<div class="row justify-content-start px-3 gap-4 mb-3">
+<div class="grid-cols-3 px-1 mb-3">
     <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+        class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <span class="fs-5 fw-bold">VENTA NETA</span>
             @foreach ($pagosData['ventas_netas'] as $venta_neta)
@@ -10,7 +10,7 @@
         </div>
     </div>
     <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+        class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <span class="fs-5 fw-bold">VENTA TOTAL</span>
             @foreach ($pagosData['ventas_totales'] as $venta_total)
@@ -20,7 +20,7 @@
         </div>
     </div>
     <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+        class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <span class="fs-5 fw-bold">MÉTODO DOMINANTE</span>
             <span class="fs-3 text-primary m-auto">{{ $pagosData['metodo_pago_dominante'] }}</span>

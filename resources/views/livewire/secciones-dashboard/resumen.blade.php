@@ -1,13 +1,11 @@
-<div class="row justify-content-start px-3 gap-4 mb-3">
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+<div class="mb-3 grid-cols-5 px-1">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">OPERACIONES</p>
             <p class="fs-3 text-primary m-auto">{{ max($resumenData['operaciones'], 0) }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <span class="fs-5 fw-bold">VENTA NETA</span>
             @foreach ($resumenData['ventas_netas'] as $venta_neta)
@@ -16,8 +14,7 @@
             @endforeach
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <span class="fs-5 fw-bold">VENTA TOTAL</span>
             @foreach ($resumenData['ventas_totales'] as $venta_total)
@@ -26,22 +23,22 @@
             @endforeach
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">MULTIMONEDA</p>
             <p class="fs-3 text-primary m-auto">{{ max($resumenData['multimoneda'], 0) }}</p>
         </div>
     </div>
-    <div
-        class="card col-6 col-md-2 border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
+    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">ARTICULOS VENDIDOS</p>
             <p class="fs-3 text-primary m-auto">{{ max($resumenData['articulos_vendidos'], 0) }}</p>
         </div>
     </div>
+</div>
+<div class="grid-cols-3 px-1 mb-3">
     <div
-        class="card col-6 col-md-2 border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
+        class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">IMPORTE DEVUELTO</p>
             @foreach ($resumenData['importes_devueltos'] as $importe_devuelto)
@@ -51,14 +48,14 @@
         </div>
     </div>
     <div
-        class="card col-6 col-md-2 border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
+        class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">DELETES</p>
             <p class="fs-3 text-danger m-auto">{{ max($resumenData['deletes'], 0) }}</p>
         </div>
     </div>
     <div
-        class="card col-6 col-md-2 border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
+        class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold">CANCELS</p>
             <p class="fs-3 text-danger m-auto">{{ max($resumenData['cancels'], 0) }}</p>
