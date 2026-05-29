@@ -291,10 +291,10 @@
                         let items = Object.entries(value);
 
                         // 2. Extraemos las etiquetas (nombres/folios de los tickets)
-                        let nombresTickets = items.map(([clave, valor]) => clave);
+                        let nombresTickets = items.map(([clave, valor]) => valor.id_transaccion);
 
                         // 3. Extraemos los importes (los números)
-                        let importesTickets = items.map(([clave, valor]) => Number(valor));
+                        let importesTickets = items.map(([clave, valor]) => Number(valor.importe));
 
                         // Buscamos el elemento de forma nativa e inequívoca
                         let el = document.getElementById('mi-canvas-grafica-top-tickets');

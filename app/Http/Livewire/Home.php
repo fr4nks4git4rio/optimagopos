@@ -236,9 +236,9 @@ class Home extends Component
                     ->select('ticket.id', 'ticket.id_transaccion', 'ticket.importe')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->orderByRaw('LENGTH(ticket.importe) desc')->orderByDesc('ticket.importe')
+                    ->orderByDesc('ticket.importe')
                     ->limit(5)
-                    ->get()->pluck('importe', 'id_transaccion');
+                    ->get();
                 break;
             case 'productos':
                 // Similar lógica para cargar datos específicos de la sección de productos
