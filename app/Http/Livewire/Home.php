@@ -147,11 +147,12 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->value('cantidad');
                 $this->resumenData['multimoneda'] = DB::table('tb_tickets as ticket')
-                    ->selectRaw("COUNT(DISTINCT to.ticket_id) as cantidad, COUNT(DISTINCT to.sucursal_forma_pago_id) as cant_fps")
+                    ->selectRaw("COUNT(DISTINCT to.ticket_id) as cantidad, COUNT(DISTINCT sfp.moneda_id) as cant_monedas")
                     ->leftJoin('tb_ticket_operaciones as to', 'ticket.id', 'to.ticket_id')
+                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->having('cant_fps', '>', 1)
+                    ->having('cant_monedas', '>', 1)
                     ->value('cantidad');
                 $correcciones = DB::table('tb_ticket_producto_correcciones as tpc')
                     ->selectRaw("SUM(IF(tpc.nombre = 'Delete', 1, 0)) as deletes, SUM(IF(tpc.nombre = 'Cancel', 1, 0)) as cancels")
