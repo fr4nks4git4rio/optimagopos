@@ -13,14 +13,14 @@
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold">MAYOR INGRESO</p>
-            <p class="fs-3 text-primary m-auto">{{ $productosData['mayor_ingreso'] }}</p>
+            <p class="fs-5 fw-bold">MAS POPULAR</p>
+            <p class="fs-3 text-primary m-auto">{{ $productosData['mas_popular'] }}</p>
         </div>
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold">MAS VENDIDO</p>
-            <p class="fs-3 text-primary m-auto">{{ $productosData['mas_vendido'] }}</p>
+            <p class="fs-5 fw-bold">MAYOR INGRESO</p>
+            <p class="fs-3 text-primary m-auto">{{ $productosData['mayor_ingreso'] }}</p>
         </div>
     </div>
 </div>

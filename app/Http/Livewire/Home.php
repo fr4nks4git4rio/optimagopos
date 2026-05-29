@@ -45,8 +45,8 @@ class Home extends Component
     public $productosData = [
         'articulos_vendidos' => '',
         'producto_estrella' => '',
+        'mas_popular' => '',
         'mayor_ingreso' => '',
-        'mas_vendido' => '',
         'top_productos_cantidad' => [],
         'top_productos_ingreso' => []
     ];
@@ -249,6 +249,15 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->value('cantidad');
                 $this->productosData['producto_estrella'] = DB::table('tb_ticket_productos as tp')
+                    ->select('p.nombre', DB::raw("SUM(tp.cantidad) as cantidad"))
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
+                    ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->groupBy('p.nombre')
+                    ->orderByDesc('cantidad')
+                    ->first()->nombre ?? '';
+                $this->productosData['mas_popular'] = DB::table('tb_ticket_productos as tp')
                     ->select('p.nombre', DB::raw("COUNT(DISTINCT tp.ticket_id) as presencia"))
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
@@ -265,15 +274,6 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->groupBy('p.nombre')
                     ->orderByDesc('ingreso')
-                    ->first()->nombre ?? '';
-                $this->productosData['mas_vendido'] = DB::table('tb_ticket_productos as tp')
-                    ->select('p.nombre', DB::raw("SUM(tp.cantidad) as cantidad"))
-                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
-                    ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
-                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                    ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->groupBy('p.nombre')
-                    ->orderByDesc('cantidad')
                     ->first()->nombre ?? '';
                 $this->productosData['top_productos_cantidad'] = DB::table('tb_ticket_productos as tp')
                     ->select('p.nombre', DB::raw("SUM(tp.cantidad) as cantidad"))
