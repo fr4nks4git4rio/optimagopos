@@ -373,7 +373,7 @@ class Home extends Component
                     ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->where('to.sucursal_forma_pago_id', '!=', null)
+                    ->whereNotNull('to.sucursal_forma_pago_id')
                     ->groupBy('sfp.nombre')
                     ->orderByDesc('porciento')
                     ->get()
