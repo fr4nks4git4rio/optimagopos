@@ -93,7 +93,7 @@ class Home extends Component
                 $ventas_netas_operacion = [];
 
                 DB::table('tb_ticket_productos as tp')
-                    ->select('tp.*')
+                    ->select('tp.*', 'ticket.id as ticket_id')
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
@@ -105,7 +105,11 @@ class Home extends Component
                         $ventas_netas += $precio;
                         $importes_devueltos += $precio < 0 ? abs($precio) : 0;
 
-                        $ventas_netas_operacion[] = $precio;
+                        if (isset($ventas_netas_operacion[$element->ticket_id])) {
+                            $ventas_netas_operacion[$element->ticket_id] += $precio;
+                        } else {
+                            $ventas_netas_operacion[$element->ticket_id] = $precio;
+                        }
                     });
 
                 $this->resumenData['operaciones'] = DB::table('tb_tickets as ticket')
