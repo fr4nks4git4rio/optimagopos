@@ -87,39 +87,29 @@ class Home extends Component
 
         switch ($this->seccion) {
             case 'resumen':
-                $ventas_netas = 0;
-                $ventas_totales = 0;
-                $importes_devueltos = 0;
-                $ventas_netas_operacion = [];
-
-                DB::table('tb_ticket_productos as tp')
-                    ->select('tp.*', 'ticket.id as ticket_id')
+                $resumen1 = DB::table('tb_tickets as ticket')
+                    ->selectRaw("COUNT(ticket.id) as cantidad, SUM(ticket.importe) as total")
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->first();
+                $this->resumenData['operaciones'] = $resumen1->cantidad ?? 0;
+                $ventas_netas = $resumen1->total ?? 0;
+                $importes_devueltos = DB::table('tb_ticket_producto_correcciones as tpc')
+                    ->selectRaw("SUM(tpc.precio) as total")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->where('tpc.nombre', 'Refund')
+                    ->value('total') ?? 0;
+                $this->resumenData['importes_devueltos'] = $importes_devueltos;
+                $this->resumenData['ventas_netas'] = $ventas_netas - $importes_devueltos;
+                $this->resumenData['ventas_totales'] = DB::table('tb_ticket_productos as tp')
+                    ->selectRaw('SUM(tp.precio) as total')
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->groupBy('tp.id')
-                    ->get()->map(function ($element) use (&$ventas_totales, &$ventas_netas, &$ventas_netas_operacion, &$importes_devueltos) {
-                        $precio = (float)$element->precio;
-
-                        $ventas_totales += $precio > 0 ? $precio : 0;
-                        $ventas_netas += $precio;
-                        $importes_devueltos += $precio < 0 ? abs($precio) : 0;
-
-                        if (isset($ventas_netas_operacion[$element->ticket_id])) {
-                            $ventas_netas_operacion[$element->ticket_id] += round($precio, 2);
-                        } else {
-                            $ventas_netas_operacion[$element->ticket_id] = round($precio, 2);
-                        }
-                    });
-
-                $this->resumenData['operaciones'] = DB::table('tb_tickets as ticket')
-                    ->select('ticket.*')
-                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                    ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->count();
-                $this->resumenData['ventas_totales'] = $ventas_totales;
-                $this->resumenData['ventas_netas'] = $ventas_netas;
-                $this->resumenData['importes_devueltos'] = $importes_devueltos;
+                    ->where('tp.precio', '>', 0)
+                    ->value('total');
                 $this->resumenData['articulos_vendidos'] = DB::table('tb_ticket_productos as tp')
                     ->selectRaw("SUM(tp.cantidad) as cantidad")
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
@@ -134,7 +124,17 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->having('cant_monedas', '>', 1)
                     ->value('cantidad');
-                $this->resumenData['ventas_netas_operacion'] = $ventas_netas_operacion;
+                $this->resumenData['ventas_netas_operacion'] = DB::table('tb_ticket_operaciones as to')
+                    ->selectRaw("SUM(to.monto) as total, ticket.id as id")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->groupBy('ticket.id')
+                    ->get()
+                    ->mapWithKeys(function ($item) {
+                        return [$item->id => $item->total];
+                    })->toArray();
                 $correcciones = DB::table('tb_ticket_producto_correcciones as tpc')
                     ->selectRaw("SUM(IF(tpc.nombre = 'Delete', 1, 0)) as deletes, SUM(IF(tpc.nombre = 'Cancel', 1, 0)) as cancels")
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
