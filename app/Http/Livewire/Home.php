@@ -376,6 +376,7 @@ class Home extends Component
                     ->whereNotNull('to.sucursal_forma_pago_id')
                     ->groupBy('sfp.nombre')
                     ->orderByDesc('porciento')
+                    ->having('porciento', '>', 0) // Solo incluimos formas de pago que representen más del 0% para evitar saturar la gráfica con métodos marginales
                     ->get()
                     ->pluck('porciento', 'nombre');
                 $this->pagosData['grafica_comportamiento_pagos'] = $graficaFormasPago;
