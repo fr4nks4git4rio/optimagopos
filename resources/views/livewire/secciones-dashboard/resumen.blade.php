@@ -66,9 +66,9 @@
             init() {
                 // Escuchamos los cambios en los datos que vienen de Livewire
                 this.$watch('datosServidor', value => {
-                    if (value && value.length > 0) {
+                    if (value && Object.keys(value).length > 0) {
 
-                        let datosFormateados = value.map((num, index) => {
+                        let datosFormateados = Object.values(value).map((num, index) => {
                             return { x: (index + 1).toString(), y: num };
                         });
 
