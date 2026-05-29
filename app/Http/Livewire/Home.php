@@ -377,6 +377,8 @@ class Home extends Component
                     ->groupBy('sfp.nombre')
                     ->orderByDesc('porciento')
                     ->having('porciento', '>', 0) // Solo incluimos formas de pago que representen más del 0% para evitar saturar la gráfica con métodos marginales
+                    ->having('nombre', '!=', '') // Solo incluimos formas de pago que representen más del 0% para evitar saturar la gráfica con métodos marginales
+                    ->having('nombre', '!=', null) // Solo incluimos formas de pago que representen más del 0% para evitar saturar la gráfica con métodos marginales
                     ->get()
                     ->pluck('porciento', 'nombre');
                 $this->pagosData['grafica_comportamiento_pagos'] = $graficaFormasPago;
