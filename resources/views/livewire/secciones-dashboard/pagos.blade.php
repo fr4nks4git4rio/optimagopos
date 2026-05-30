@@ -159,4 +159,120 @@
             </div>
         </div>
     </div>
+    <div class="col-12 col-md-6 mb-3">
+        <div x-data="{
+            datosPagosHora: @entangle('pagosData.grafica_comportamiento_pagos_hora'), // Tu objeto de Livewire con los datos
+            chart: null,
+
+            init() {
+                const horasDelDia = Array.from({ length: 24 }, (_, i) => {
+                    return i.toString().padStart(2, '0') + ':00'; // Genera ['00:00', '01:00', ..., '23:00']
+                });
+                // Escuchamos los cambios en los datos que vienen de Livewire
+                this.$watch('datosPagosHora', value => {
+
+                    if (value) {
+                        let serie24Horas = horasDelDia.map((hora, index) => {
+                            let claveSimple = index.toString();
+                            let claveFormateada = hora;
+
+                            if (value[claveFormateada] !== undefined) {
+                                return Number(value[claveFormateada]);
+                            } else if (value[claveSimple] !== undefined) {
+                                return Number(value[claveSimple]);
+                            }
+                            return 0; // Si la hora no viene en tu objeto, va un cero
+                        });
+
+                        // Buscamos el elemento de forma nativa e inequívoca
+                        let el = document.getElementById('mi-canvas-grafica-pagos-hora');
+
+                        if (el) {
+                            if (!this.chart) {
+                                // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
+                                let options = {
+                                    chart: {
+                                        type: 'line',
+                                        height: 280,
+                                        animations: {
+                                            enabled: true,
+                                            easing: 'smooth',
+                                            dynamicAnimation: { speed: 500 }
+                                        },
+                                        toolbar: {
+                                            show: true,
+                                            offsetY: -30,
+                                            tools: {
+                                                download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
+                                                selection: false,
+                                                zoom: false, // Quita la lupa de zoom
+                                                zoomin: false, // Quita el botón +
+                                                zoomout: false, // Quita el botón -
+                                                pan: false, // Quita la mano de paneo
+                                                reset: false // Quita el botón de resetear vista
+                                            }
+                                        },
+                                    },
+                                    series: [{ name: 'Operaciones', data: serie24Horas }],
+                                    colors: ['#065F46'],
+                                    xaxis: {
+                                        type: 'category',
+                                        categories: horasDelDia, // Forzamos a que siempre muestre las 24 marcas
+                                        labels: {
+                                            rotate: -45, // Rota las horas un poco para que no se encimen en pantallas chicas
+                                            style: { fontSize: '10px' }
+                                        }
+                                    },
+                                    yaxis: {
+                                        min: 0,
+                                        forceNiceScale: true
+                                    },
+                                    plotOptions: {
+                                        bar: {
+                                            columnWidth: '75%', // Un ancho cómodo para que quepan 24 barras
+                                            dataLabels: { position: 'top' }
+                                        }
+                                    },
+                                    dataLabels: {
+                                        enabled: true,
+                                        offsetY: -20,
+                                        style: { fontSize: '9px', colors: ['#304758'] },
+                                        // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
+                                        formatter: function(val) {
+                                            return val > 0 ? val : '';
+                                        }
+                                    }
+                                };
+
+                                this.chart = new ApexCharts(el, options);
+                                this.chart.render();
+                            } else {
+                                // 2. Si ya existe, solo actualizamos los datos
+                                this.chart.updateSeries([{ data: serie24Horas }]);
+                            }
+                        }
+                    }
+                });
+            },
+
+            destroy() {
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+            }
+        }" class="card shadow-sm bg-site-primary-subtle">
+            <div class="card-body">
+                <span class="fs-5 fw-bold">Pagos por Hora</span>
+                <template x-if="!chart">
+                    <div class="text-center py-3 text-muted">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        Cargando datos...
+                    </div>
+                </template>
+                <div id="contenedor-grafica-pagos-hora" wire:ignore>
+                    <div id="mi-canvas-grafica-pagos-hora"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

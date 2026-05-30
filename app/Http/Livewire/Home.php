@@ -58,7 +58,8 @@ class Home extends Component
         'cantidad_formas_pago' => [],
         'metodo_pago_dominante' => '',
         'grafica_metodos_pago' => [],
-        'grafica_comportamiento_pagos' => []
+        'grafica_comportamiento_pagos' => [],
+        'grafica_comportamiento_pagos_hora' => []
     ];
 
     public $correccionesData = [
@@ -351,6 +352,19 @@ class Home extends Component
                     ->pluck('porciento', 'nombre');
                 $this->pagosData['grafica_comportamiento_pagos'] = $graficaFormasPago;
                 $this->pagosData['grafica_metodos_pago'] = $graficaFormasPago;
+                $datos_comportamiento_pagos_hora = [];
+                DB::table('tb_ticket_operaciones as to')
+                    ->selectRaw("HOUR(ticket.fecha_transaccion) as hora, COUNT(to.id) as cantidad")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->whereNotNull('to.sucursal_forma_pago_id')
+                    ->groupBy('hora')
+                    ->get()
+                    ->map(function ($value) use (&$datos_comportamiento_pagos_hora) {
+                        $datos_comportamiento_pagos_hora[$value->hora] = $value->cantidad;
+                    });
+                $this->pagosData['grafica_comportamiento_pagos_hora'] = $datos_comportamiento_pagos_hora;
                 break;
             case 'correcciones':
                 // Similar lógica para cargar datos específicos de la sección de correcciones
