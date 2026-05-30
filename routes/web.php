@@ -54,10 +54,6 @@ use Illuminate\Support\Facades\Route;
 
 //Auth::routes();
 
-Route::get('/test', function () {
-    echo Crypt::encrypt("");
-});
-
 Route::domain(config('app.facturacion_url'))->group(function () {
     Route::get('/', function () {
         return redirect()->route('auto-facturacion');
