@@ -135,7 +135,7 @@ class GenerarTickets extends Command
                         if (!$forma_pago) {
                             $this->error("Forma de pago no encontrada: {$item['Name']} - Terminal: {$terminal->id}");
                             DB::rollBack();
-                            continue; // Salta al siguiente log
+                            continue 2; // Salta al siguiente log
                         }
                         $tasa_cambio = 1;
                         if ($forma_pago && $forma_pago->moneda_id != $terminal->sucursal->moneda_base_id) {
