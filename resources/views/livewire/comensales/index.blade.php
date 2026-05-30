@@ -71,16 +71,16 @@
                             @if(!$cliente['deleted_at'])
                                 <li class="list-inline-item">
                                     <x-action icon="pencil" title="Modificar"
-                                              click="$emit('openModal', 'comensales.save', {cliente: {{$cliente['id']}}})"/>
+                                              click="$emit('openModal', 'comensales.save', {comensal: {{$cliente['id']}}})"/>
                                 </li>
                                 <li class="list-inline-item">
                                     <x-action icon="trash" title="Desactivar"
-                                              click="$emit('openModal', 'comensales.delete', {cliente: {{$cliente['id']}}})"/>
+                                              click="$emit('openModal', 'comensales.delete', {comensal: {{$cliente['id']}}})"/>
                                 </li>
                             @else
                                 <li class="list-inline-item">
                                     <x-action icon="check-circle" title="Reactivar"
-                                              click="$emit('openModal', 'comensales.restore', {cliente_id: {{$cliente['id']}}})"/>
+                                              click="$emit('openModal', 'comensales.restore', {comensal_id: {{$cliente['id']}}})"/>
                                 </li>
                             @endif
                         </ul>

@@ -7,7 +7,7 @@ use App\Models\Cliente;
 
 class Restore extends Modal
 {
-    public $cliente_id;
+    public $comensal_id;
 
     public function render()
     {
@@ -16,13 +16,13 @@ class Restore extends Modal
 
     public function restore()
     {
-        $cliente = Cliente::onlyTrashed()->find($this->cliente_id);
-        if(!$cliente){
+        $comensal = Cliente::onlyTrashed()->find($this->comensal_id);
+        if(!$comensal) {
             $this->emit('show-toast', 'Cliente no encontrado.', 'danger');
             $this->emit('closeModal');
             return;
         }
-        $cliente->restore();
+        $comensal->restore();
 
         $this->emit('show-toast', 'Cliente reactivado.');
         $this->emit('$refresh');
