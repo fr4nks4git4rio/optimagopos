@@ -41,13 +41,6 @@ class HomeController
             $decoded = json_decode($decoded, true); // <- ahora sí tenés el array
         }
 
-        Log::error($decoded);
-        ModelsLog::create([
-            'log' => 'Data recibida.',
-            'data' => $decoded ? json_encode($decoded) : '',
-            'status' => 200
-        ]);
-
         // Paso 3: Verificar si se decodificó correctamente
         if (!$decoded || !isset($decoded['Items'])) {
             ModelsLog::create([
@@ -69,6 +62,13 @@ class HomeController
             ]);
             return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
         }
+
+        ModelsLog::create([
+            'log' => 'Data recibida.',
+            'data' => $decoded ? json_encode($decoded) : '',
+            'status' => 200,
+            'sucursal_id' => $terminal->sucursal_id
+        ]);
 
         $terminal->id_pos = $decoded['PosId'];
         $terminal->save();
@@ -144,6 +144,16 @@ class HomeController
                         ->where('sucursal_id', $terminal->sucursal_id)
                         ->where('nombre', $item['Name'])
                         ->get()->first();
+                    if (!$forma_pago) {
+                        ModelsLog::create([
+                            'log' => 'Error. Forma de pago no encontrada.',
+                            'data' => json_encode($decoded),
+                            'status' => 400,
+                            'sucursal_id' => $terminal->sucursal_id
+                        ]);
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'error' => 'Forma de pago no encontrada'], 400);
+                    }
                     $tasa_cambio = 1;
                     if ($forma_pago && $forma_pago->moneda_id != $terminal->sucursal->moneda_base_id) {
                         $tipo_cambio = get_tipo_cambio($forma_pago->moneda_id, $terminal->sucursal->moneda_base_id, $terminal->sucursal->id);
@@ -188,39 +198,39 @@ class HomeController
 
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
                     $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
-                    if ($amount > 0 || $qty > 0) {
-                        $discount = $item['Discount'] ? (float)$item['Discount'] : 0;
-                        $ticketProducto = $ticket->productos()->create([
-                            'producto_id' => $producto->id,
-                            'departamento_id' => $departamento->id,
-                            'precio' => $amount,
-                            'cantidad' => $qty,
-                            'descuento' => $discount,
-                        ]);
-                        $importe += $amount - $discount;
-                    } else {
-                        $ticketProducto = TicketProducto::where('ticket_id', $ticket->id)->where('producto_id', $producto->id)->where('departamento_id', $departamento->id)->first();
-                        if ($ticketProducto) {
-                            $ticketProducto->cantidad -= abs($qty);
-                            $ticketProducto->precio -= abs($amount);
-                            $importe -= abs($amount);
-                        }
+                    $discount = $item['Discount'] ? (float)$item['Discount'] : 0;
+                    $ticketProducto = TicketProducto::where('ticket_id', $ticket->id)->where('producto_id', $producto->id)->where('departamento_id', $departamento->id)->first();
+                    if (!$ticketProducto) {
+                        $ticketProducto = new TicketProducto();
+                        $ticketProducto->ticket_id = $ticket->id;
+                        $ticketProducto->producto_id = $producto->id;
+                        $ticketProducto->departamento_id = $departamento->id;
+                        $ticketProducto->precio = 0;
+                        $ticketProducto->cantidad = 0;
+                        $ticketProducto->descuento = 0;
                     }
+                    $ticketProducto->precio += $amount;
+                    $ticketProducto->cantidad += $qty;
+                    $ticketProducto->descuento += $discount;
+                    $ticketProducto->save();
+
+                    $importe += $amount - $discount;
+
                     $prevProduct = $producto;
                 }
 
                 if ($type === 'Correction') {
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
                     $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
-                    if ($qty < 0 || $amount < 0) {
-                        $correccion = new TicketProductoCorreccion();
-                        $correccion->nombre = $item['name'];
-                        $correccion->producto_id = optional($prevProduct)->id;
-                        $correccion->cantidad = abs($qty);
-                        $correccion->precio = abs($amount);
-                        $correccion->ticket_id = $ticket->id;
-                        $correccion->save();
-                    }
+
+                    $correccion = new TicketProductoCorreccion();
+                    $correccion->nombre = $item['Name'];
+                    $correccion->producto_id = optional($prevProduct)->id;
+                    $correccion->cantidad = $qty;
+                    $correccion->precio = $amount;
+                    $correccion->ticket_id = $ticket->id;
+                    $correccion->save();
+
                     $prevProduct = null;
                 }
             }

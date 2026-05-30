@@ -16,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $log
  * @property string $data
  * @property integer $status
+ * @property integer $sucursal_id
  */
 class Log extends Model
 {
@@ -24,7 +25,8 @@ class Log extends Model
     public $fillable = [
         'log',
         'data',
-        'status'
+        'status',
+        'sucursal_id'
     ];
 
     /**
@@ -36,6 +38,12 @@ class Log extends Model
         'id' => 'integer',
         'log' => 'string',
         'data' => 'string',
-        'status' => 'integer'
+        'status' => 'integer',
+        'sucursal_id' => 'integer'
     ];
+
+    public function sucursal()
+    {
+        return $this->belongsTo(Sucursal::class, 'sucursal_id');
+    }
 }

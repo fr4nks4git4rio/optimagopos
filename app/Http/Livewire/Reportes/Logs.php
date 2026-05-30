@@ -37,33 +37,38 @@ class Logs extends Component
 
     public function query()
     {
-        $query = DB::table('tb_logs')
+        $query = DB::table('tb_logs as log')
             ->select(
-                'id',
-                DB::raw("DATE_FORMAT(created_at, '%d/%m/%Y %H:%i:%s') as fecha"),
-                'log',
-                'data',
-                'status'
+                'log.id',
+                DB::raw("DATE_FORMAT(log.created_at, '%d/%m/%Y %H:%i:%s') as fecha"),
+                'log.log',
+                'log.data',
+                'log.status'
             );
 
+        if(!user()->is_super_admin){
+            $query->join('tb_sucursales as sucursal', 'sucursal.id', 'log.sucursal_id')
+                ->where('sucursal.cliente_id', user()->cliente_id);
+        }
+
         if ($this->search) {
-            $query->where('log', 'like', "%$this->search%")
-                ->orWhereRaw("data like ?", ["%$this->search%"])
-                ->orWhere('status', 'like', "%$this->search%");
+            $query->where('log.log', 'like', "%$this->search%")
+                ->orWhereRaw("log.data like ?", ["%$this->search%"])
+                ->orWhere('log.status', 'like', "%$this->search%");
         }
 
         switch ($this->sort) {
             case 'Fecha':
-                $query->orderBy('created_at', 'desc');
+                $query->orderBy('log.created_at', 'desc');
                 break;
             case 'Log':
-                $query->orderBy('log');
+                $query->orderBy('log.log');
                 break;
             case 'Datos':
-                $query->orderBy('data');
+                $query->orderBy('log.data');
                 break;
             case 'Estado':
-                $query->orderBy('status');
+                $query->orderBy('log.status');
                 break;
         }
 

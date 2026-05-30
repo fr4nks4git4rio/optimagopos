@@ -8,6 +8,7 @@ use App\Models\Administracion\TipoCambio;
 use App\Models\User;
 use App\Notifications\SiteNotification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -52,11 +53,21 @@ class Home extends Component
     ];
 
     public $pagosData = [
-        'ventas_netas' => [],
-        'ventas_totales' => [],
+        'ventas_netas' => '',
+        'ventas_formas_pago' => [],
+        'cantidad_formas_pago' => [],
         'metodo_pago_dominante' => '',
         'grafica_metodos_pago' => [],
         'grafica_comportamiento_pagos' => []
+    ];
+
+    public $correccionesData = [
+        'correcciones' => '',
+        'deletes' => '',
+        'cancels' => '',
+        'influencia_correcciones' => '',
+        'grafica_correcciones_operador' => [],
+        'grafica_correcciones_hora' => []
     ];
 
     public $monedas = [];
@@ -101,8 +112,8 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->where('tpc.nombre', 'Refund')
                     ->value('total') ?? 0;
-                $this->resumenData['importes_devueltos'] = $importes_devueltos;
-                $this->resumenData['ventas_netas'] = $ventas_netas - $importes_devueltos;
+                $this->resumenData['importes_devueltos'] = abs($importes_devueltos);
+                $this->resumenData['ventas_netas'] = $ventas_netas;
                 $this->resumenData['ventas_totales'] = DB::table('tb_ticket_productos as tp')
                     ->selectRaw('SUM(tp.precio) as total')
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
@@ -111,7 +122,7 @@ class Home extends Component
                     ->where('tp.precio', '>', 0)
                     ->value('total');
                 $this->resumenData['articulos_vendidos'] = DB::table('tb_ticket_productos as tp')
-                    ->selectRaw("SUM(tp.cantidad) as cantidad")
+                    ->selectRaw("SUM(ROUND(tp.cantidad)) as cantidad")
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
@@ -226,13 +237,13 @@ class Home extends Component
             case 'productos':
                 // Similar lógica para cargar datos específicos de la sección de productos
                 $this->productosData['articulos_vendidos'] = DB::table('tb_ticket_productos as tp')
-                    ->selectRaw("SUM(tp.cantidad) as cantidad")
+                    ->selectRaw("SUM(ROUND(tp.cantidad)) as cantidad")
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->value('cantidad');
                 $this->productosData['producto_estrella'] = DB::table('tb_ticket_productos as tp')
-                    ->select('p.nombre', DB::raw("SUM(tp.cantidad) as cantidad"))
+                    ->select('p.nombre', DB::raw("SUM(ROUND(tp.cantidad)) as cantidad"))
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
@@ -280,42 +291,31 @@ class Home extends Component
                     ->get()->pluck('ingreso', 'nombre');
                 break;
             case 'pagos':
-                // Similar lógica para cargar datos específicos de la sección de pagos
-                $ventas_netas = [];
-                $ventas_totales = [];
-
-                $operaciones = DB::table('tb_ticket_operaciones as to')
-                    ->select('to.*', 'sfp.moneda_id', 'sfp.forma_pago_id')
-                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                $this->pagosData['ventas_netas'] = DB::table('tb_tickets as ticket')
+                    ->selectRaw("SUM(ticket.importe) as total")
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->groupBy('to.id')
-                    ->get()->map(function ($element) use (&$ventas_totales, &$ventas_netas) {
-                        if (!$element->es_cambio && $element->moneda_id) {
-                            $monto = (float)$element->monto;
-
-                            if (isset($ventas_totales[$element->moneda_id])) {
-                                $ventas_totales[$element->moneda_id]['monto'] += $monto > 0 ? $monto : 0;
-                            } else {
-                                $ventas_totales[$element->moneda_id]['moneda'] = $this->monedas[$element->moneda_id];
-                                $ventas_totales[$element->moneda_id]['monto'] = $monto > 0 ? $monto : 0;
-                            }
-
-                            if (isset($ventas_netas[$element->moneda_id])) {
-                                $ventas_netas[$element->moneda_id]['monto'] += $monto;
-                            } else {
-                                $ventas_netas[$element->moneda_id]['moneda'] = $this->monedas[$element->moneda_id];
-                                $ventas_netas[$element->moneda_id]['monto'] = $monto;
-                            }
-
-                            // Lógica para determinar método de pago dominante y datos de gráficas...
-                        }
-                    });
-
-                // Asignar resultados a propiedades públicas
-                $this->pagosData['ventas_netas'] = $ventas_netas;
-                $this->pagosData['ventas_totales'] = $ventas_totales;
+                    ->value('total');
+                $this->pagosData['ventas_formas_pago'] = DB::table('tb_ticket_operaciones as to')
+                    ->select('sfp.nombre', DB::raw("SUM(ROUND(to.monto, 2)) as total"))
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->whereNotNull('to.sucursal_forma_pago_id')
+                    ->groupBy('sfp.nombre')
+                    ->orderByDesc('total')
+                    ->get()->pluck('total', 'nombre');
+                $this->pagosData['cantidad_formas_pago'] = DB::table('tb_ticket_operaciones as to')
+                    ->select('sfp.nombre', DB::raw("COUNT(to.sucursal_forma_pago_id) as cantidad"))
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->whereNotNull('to.sucursal_forma_pago_id')
+                    ->groupBy('sfp.nombre')
+                    ->orderByDesc('cantidad')
+                    ->get()->pluck('cantidad', 'nombre');
                 $this->pagosData['metodo_pago_dominante'] = DB::table('tb_ticket_operaciones as to')
                     ->select('sfp.nombre', DB::raw("COUNT(DISTINCT to.ticket_id) as presencia"))
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
@@ -325,21 +325,11 @@ class Home extends Component
                     ->groupBy('sfp.nombre')
                     ->orderByDesc('presencia')
                     ->first()->nombre ?? '';
-                $this->pagosData['grafica_metodos_pago'] = DB::table('tb_ticket_operaciones as to')
-                    ->select('sfp.nombre', DB::raw("COUNT(to.sucursal_forma_pago_id) as cantidad"))
-                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
-                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
-                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                    ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->whereNotNull('to.sucursal_forma_pago_id')
-                    ->groupBy('sfp.nombre')
-                    ->orderByDesc('cantidad')
-                    ->get()->pluck('cantidad', 'nombre'); // Cargar datos para gráfica de métodos de pago
-                // 1. Primero obtenemos el total general de operaciones del cliente para usarlo como base
                 $totalOperaciones = DB::table('tb_ticket_operaciones as to')
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->whereNotNull('to.sucursal_forma_pago_id')
                     ->count();
 
                 // Evitamos división por cero si el salón es nuevo y no tiene operaciones aún
@@ -355,11 +345,76 @@ class Home extends Component
                     ->join('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->whereNotNull('to.sucursal_forma_pago_id')
                     ->groupBy('sfp.nombre')
                     ->orderByDesc('porciento')
                     ->get()
                     ->pluck('porciento', 'nombre');
                 $this->pagosData['grafica_comportamiento_pagos'] = $graficaFormasPago;
+                $this->pagosData['grafica_metodos_pago'] = $graficaFormasPago;
+                break;
+            case 'correcciones':
+                // Similar lógica para cargar datos específicos de la sección de correcciones
+                $correcciones = DB::table('tb_ticket_producto_correcciones as tpc')
+                    ->selectRaw("COUNT(tpc.id) as cantidad, SUM(tpc.precio) as monto")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->get()->first();
+                $this->correccionesData['correcciones'] = $correcciones ? ($correcciones->cantidad . ' -> $' . number_format(abs($correcciones->monto), 2)) : '';
+                $deletes = DB::table('tb_ticket_producto_correcciones as tpc')
+                    ->selectRaw("COUNT(tpc.id) as deletes, SUM(tpc.precio) as monto")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->where('tpc.nombre', 'Delete')
+                    ->get()->first();
+                $this->correccionesData['deletes'] = $deletes ? ($deletes->deletes . ' -> $' . number_format(abs($deletes->monto), 2)) : '';
+                $cancels = DB::table('tb_ticket_producto_correcciones as tpc')
+                    ->selectRaw("COUNT(tpc.id) as cancels, SUM(tpc.precio) as monto")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->where('tpc.nombre', 'Cancel')
+                    ->get()->first();
+                $this->correccionesData['cancels'] = $cancels ? ($cancels->cancels . ' -> $' . number_format(abs($cancels->monto), 2)) : '';
+                $totalVentas = DB::table('tb_ticket_productos as tp')
+                    ->selectRaw("SUM(tp.precio) as total")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->value('total') ?? 0;
+                $totalCorrecciones = DB::table('tb_ticket_producto_correcciones as tpc')
+                    ->selectRaw("SUM(tpc.precio) as total")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->value('total') ?? 0;
+                $this->correccionesData['influencia_correcciones'] = $totalVentas > 0 ? round((abs($totalCorrecciones) / $totalVentas) * 100, 2) : 0;
+                $datos_grafica_correcciones_operador = [];
+                DB::table('tb_ticket_producto_correcciones as tpc')
+                    ->select('empleado.nombre', DB::raw("COUNT(tpc.id) as cantidad"))
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
+                    ->leftJoin('tb_empleados as empleado', 'empleado.id', 'ticket.empleado_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->groupBy('empleado.nombre')
+                    ->orderByDesc('cantidad')
+                    ->get()->map(function ($value) use (&$datos_grafica_correcciones_operador) {
+                        $datos_grafica_correcciones_operador[Crypt::decrypt($value->nombre)] = $value->cantidad;
+                    });
+                $this->correccionesData['grafica_correcciones_operador'] = $datos_grafica_correcciones_operador;
+                $datos_grafica_correcciones_hora = [];
+                DB::table('tb_ticket_producto_correcciones as tpc')
+                    ->selectRaw("HOUR(ticket.fecha_transaccion) as hora, COUNT(tpc.id) as cantidad")
+                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
+                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->groupBy('hora')
+                    ->get()->map(function ($value) use (&$datos_grafica_correcciones_hora) {
+                        $datos_grafica_correcciones_hora[$value->hora] = $value->cantidad;
+                    });
+                $this->correccionesData['grafica_correcciones_hora'] = $datos_grafica_correcciones_hora;
                 break;
         }
     }
