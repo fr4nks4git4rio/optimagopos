@@ -1,6 +1,6 @@
 <x-modal form-action="save">
     <x-slot:title>
-        {{$cliente->exists ? 'Editar ' : 'Crear '}}Cliente
+        {{$comensal->exists ? 'Editar ' : 'Crear '}}Cliente
     </x-slot:title>
 
     <x-slot:content>
