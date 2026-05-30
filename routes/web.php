@@ -33,6 +33,7 @@ use App\Http\Livewire\Reportes\ProductosMasVendidos;
 use App\Http\Livewire\Reportes\Logs;
 use App\Http\Livewire\TimbrarAutoFactura;
 use App\Models\Cliente;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 //Auth::routes();
+
+Route::get('/test', function () {
+    echo Crypt::encrypt("");
+});
 
 Route::domain(config('app.facturacion_url'))->group(function () {
     Route::get('/', function () {

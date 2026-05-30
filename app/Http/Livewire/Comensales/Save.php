@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 class Save extends Modal
 {
     public $scope = null;
-    public Cliente $cliente;
+    public Cliente $comensal;
     public $nombre_comercial;
     public $razon_social;
     public $rfc;
@@ -39,18 +39,18 @@ class Save extends Modal
     {
         $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only('label', 'value');
 
-        if (!isset($this->cliente)) {
-            $this->cliente = new Cliente();
+        if (!isset($this->comensal)) {
+            $this->comensal = new Cliente();
         } else {
-            $this->cliente = Cliente::decryptInfo($this->cliente);
-            $this->nombre_comercial = $this->cliente->nombre_comercial;
-            $this->razon_social = $this->cliente->razon_social;
-            $this->rfc = $this->cliente->rfc;
-            $this->correo = $this->cliente->correo;
-            $this->telefono = $this->cliente->telefono;
-            $this->regimen_fiscal_id = $this->cliente->regimen_fiscal_id;
+            $this->comensal = Cliente::decryptInfo($this->comensal);
+            $this->nombre_comercial = $this->comensal->nombre_comercial;
+            $this->razon_social = $this->comensal->razon_social;
+            $this->rfc = $this->comensal->rfc;
+            $this->correo = $this->comensal->correo;
+            $this->telefono = $this->comensal->telefono;
+            $this->regimen_fiscal_id = $this->comensal->regimen_fiscal_id;
         }
-        $this->direccion_fiscal = $this->cliente->direccion_fiscal->toArray();
+        $this->direccion_fiscal = $this->comensal->direccion_fiscal->toArray();
         $this->estados = get_estados_mexico();
     }
 
@@ -86,13 +86,13 @@ class Save extends Modal
         $collection = DB::table('tb_clientes')
             ->select('id', 'nombre_comercial', 'razon_social', 'rfc', DB::raw('0 as decrypted'))
             ->get();
-        $collection->map(function ($cliente) {
-            $cliente = Cliente::decryptInfo($cliente);
+        $collection->map(function ($comensal) {
+            $comensal = Cliente::decryptInfo($comensal);
         });
         return [
-            'nombre_comercial' => ['required', new RuleUnique($collection, $this->cliente->id)],
-            'razon_social' => ['required', new RuleUnique($collection, $this->cliente->id)],
-            'rfc' => ['required', new RuleUnique($collection, $this->cliente->id), new RfcRule('ambas')],
+            'nombre_comercial' => ['required', new RuleUnique($collection, $this->comensal->id)],
+            'razon_social' => ['required', new RuleUnique($collection, $this->comensal->id)],
+            'rfc' => ['required', new RuleUnique($collection, $this->comensal->id), new RfcRule('ambas')],
             'correo' => ['required'],
             'telefono' => ['nullable'],
             'comentarios' => ['nullable'],
@@ -129,7 +129,7 @@ class Save extends Modal
             $data['es_comensal'] = 1;
             $data = Cliente::encryptInfo($data);
 
-            $this->cliente->fill(Arr::only($data, [
+            $this->comensal->fill(Arr::only($data, [
                 'nombre_comercial',
                 'razon_social',
                 'rfc',
@@ -139,8 +139,8 @@ class Save extends Modal
                 'regimen_fiscal_id'
             ]))->save();
 
-            if ($this->cliente->direccion_fiscal()->exists()) {
-                $this->cliente->direccion_fiscal->fill([
+            if ($this->comensal->direccion_fiscal()->exists()) {
+                $this->comensal->direccion_fiscal->fill([
                     'calle' => $data['direccion_fiscal']['calle'],
                     'no_exterior' => $data['direccion_fiscal']['no_exterior'],
                     'no_interior' => $data['direccion_fiscal']['no_interior'],
@@ -151,15 +151,15 @@ class Save extends Modal
                     'estado_id' => $data['direccion_fiscal']['estado_id'] ? $data['direccion_fiscal']['estado_id'] : null,
                     'referencia' => $data['direccion_fiscal']['referencia'],
                 ]);
-                if (count($this->cliente->direccion_fiscal->getDirty()) > 0) {
-                    $attributes = Arr::except($this->cliente->direccion_fiscal->getDirty(), ['created_at', 'updated_at']);
+                if (count($this->comensal->direccion_fiscal->getDirty()) > 0) {
+                    $attributes = Arr::except($this->comensal->direccion_fiscal->getDirty(), ['created_at', 'updated_at']);
                     activity('Dirección Fiscal de Comensal Actualizada')
-                        ->on($this->cliente->direccion_fiscal)
+                        ->on($this->comensal->direccion_fiscal)
                         ->event('updated')
                         ->withProperty('attributes', Direccion::parseData($attributes))
-                        ->withProperty('old', Direccion::parseData(Arr::only($this->cliente->direccion_fiscal->getOriginal(), array_keys($attributes))))
-                        ->log('La Dirección Fiscal del Comensal con RFC:' . $this->cliente->rfc . ' ha sido actualizada.');
-                    $this->cliente->direccion_fiscal->save();
+                        ->withProperty('old', Direccion::parseData(Arr::only($this->comensal->direccion_fiscal->getOriginal(), array_keys($attributes))))
+                        ->log('La Dirección Fiscal del Comensal con RFC:' . $this->comensal->rfc . ' ha sido actualizada.');
+                    $this->comensal->direccion_fiscal->save();
                 }
             } else {
                 $dir = Direccion::create([
@@ -173,22 +173,22 @@ class Save extends Modal
                     'estado_id' => $data['direccion_fiscal']['estado_id'] ? $data['direccion_fiscal']['estado_id'] : null,
                     'referencia' => $data['direccion_fiscal']['referencia'],
                 ]);
-                $this->cliente->direccion_fiscal_id = $dir->id;
-                $this->cliente->save();
+                $this->comensal->direccion_fiscal_id = $dir->id;
+                $this->comensal->save();
 
                 activity("Dirección Fiscal de Comensal Creada")
                     ->on($dir)
                     ->event('created')
                     ->withProperties(Direccion::parseData(Arr::except($dir->toArray(), ['updated_at'])))
-                    ->log('La Dirección Fiscal del Comensal con RFC: ' . $this->cliente->rfc . ' ha sido creada.');
+                    ->log('La Dirección Fiscal del Comensal con RFC: ' . $this->comensal->rfc . ' ha sido creada.');
             }
 
             $this->emit('show-toast', 'Cliente guardado.');
             if ($this->scope) {
-                if ($this->cliente->wasRecentlyCreated) {
-                    $this->emitTo($this->scope, 'cliente-created', $this->cliente->id);
+                if ($this->comensal->wasRecentlyCreated) {
+                    $this->emitTo($this->scope, 'cliente-created', $this->comensal->id);
                 } else {
-                    $this->emitTo($this->scope, 'cliente-updated', $this->cliente->id);
+                    $this->emitTo($this->scope, 'cliente-updated', $this->comensal->id);
                 }
             } else {
                 $this->emit('$refresh');
