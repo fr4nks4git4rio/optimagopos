@@ -128,14 +128,16 @@ class Home extends Component
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->value('cantidad');
-                $this->resumenData['multimoneda'] = DB::table('tb_tickets as ticket')
-                    ->selectRaw("COUNT(DISTINCT to.ticket_id) as cantidad, COUNT(DISTINCT sfp.moneda_id) as cant_monedas")
-                    ->leftJoin('tb_ticket_operaciones as to', 'ticket.id', 'to.ticket_id')
-                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
-                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                $this->resumenData['multimoneda'] = DB::table('tb_ticket_operaciones as to')
+                    ->join('tb_sucursal_forma_pagos as sfp', 'sfp.id', '=', 'to.sucursal_forma_pago_id')
+                    ->join('tb_tickets as ticket', 'ticket.id', '=', 'to.ticket_id')
+                    ->join('tb_sucursales as sucursal', 'sucursal.id', '=', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->having('cant_monedas', '>', 1)
-                    ->value('cantidad');
+                    ->select('to.ticket_id')
+                    ->groupBy('to.ticket_id')
+                    ->havingRaw('COUNT(DISTINCT sfp.moneda_id) >= 2')
+                    ->get()
+                    ->count();
                 $this->resumenData['ventas_netas_operacion'] = DB::table('tb_tickets as ticket')
                     ->selectRaw("ticket.importe, ticket.id as id")
                     ->leftJoin('tb_ticket_operaciones as to', 'ticket.id', 'to.ticket_id')
@@ -205,14 +207,16 @@ class Home extends Component
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->get()->first()->cantidad ?? 0;
-                $this->operacionesData['multimoneda'] = DB::table('tb_tickets as ticket')
-                    ->selectRaw("COUNT(DISTINCT to.ticket_id) as cantidad, COUNT(DISTINCT sfp.moneda_id) as cant_monedas")
-                    ->leftJoin('tb_ticket_operaciones as to', 'ticket.id', 'to.ticket_id')
-                    ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
-                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                $this->operacionesData['multimoneda'] = DB::table('tb_ticket_operaciones as to')
+                    ->join('tb_sucursal_forma_pagos as sfp', 'sfp.id', '=', 'to.sucursal_forma_pago_id')
+                    ->join('tb_tickets as ticket', 'ticket.id', '=', 'to.ticket_id')
+                    ->join('tb_sucursales as sucursal', 'sucursal.id', '=', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->having('cant_monedas', '>', 1)
-                    ->value('cantidad');
+                    ->select('to.ticket_id')
+                    ->groupBy('to.ticket_id')
+                    ->havingRaw('COUNT(DISTINCT sfp.moneda_id) >= 2')
+                    ->get()
+                    ->count();
                 $datos_grafica_ventas_hora = [];
                 $datos_grafica_operaciones_hora = [];
                 DB::table('tb_tickets as ticket')
