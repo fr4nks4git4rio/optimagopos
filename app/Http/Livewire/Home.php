@@ -139,11 +139,12 @@ class Home extends Component
                     ->get()
                     ->count();
                 $this->resumenData['ventas_netas_operacion'] = DB::table('tb_tickets as ticket')
-                    ->selectRaw("ticket.importe, ticket.id as id")
+                    ->selectRaw("ticket.importe, ticket.id as id, HOUR(ticket.fecha_transaccion) as hora")
                     ->leftJoin('tb_ticket_operaciones as to', 'ticket.id', 'to.ticket_id')
                     ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->whereRaw("HOUR(ticket.fecha_transaccion) = ?", [now()->hour])
                     ->get()
                     ->mapWithKeys(function ($item) {
                         return [$item->id => $item->importe];
