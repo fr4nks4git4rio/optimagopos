@@ -146,7 +146,7 @@ class Home extends Component
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->orderByRaw("HOUR(ticket.fecha_transaccion) asc")
                     ->where('ticket.importe', '>', 0)
-                    ->take(20)
+                    ->take(15)
                     ->get()
                     ->mapWithKeys(function ($item) {
                         return [$item->id => $item->importe];
