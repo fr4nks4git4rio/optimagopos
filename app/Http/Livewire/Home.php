@@ -147,10 +147,7 @@ class Home extends Component
                     ->orderByRaw("HOUR(ticket.fecha_transaccion) asc")
                     ->where('ticket.importe', '>', 0)
                     ->take(15)
-                    ->get()
-                    ->mapWithKeys(function ($item) {
-                        return [$item->id => $item->importe];
-                    })->toArray();
+                    ->get()->pluck('importe');
                 $correcciones = DB::table('tb_ticket_producto_correcciones as tpc')
                     ->selectRaw("SUM(IF(tpc.nombre = 'Delete', 1, 0)) as deletes, SUM(IF(tpc.nombre = 'Cancel', 1, 0)) as cancels")
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
