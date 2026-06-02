@@ -145,6 +145,7 @@ class Home extends Component
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
                     ->orderByRaw("HOUR(ticket.fecha_transaccion) asc")
+                    ->where('ticket.importe', '>', 0)
                     ->take(20)
                     ->get()
                     ->mapWithKeys(function ($item) {
