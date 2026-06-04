@@ -84,6 +84,8 @@ class Home extends Component
     }
     public function render()
     {
+        if (user()->is_super_admin)
+            return view('livewire.home-admin');
         return view('livewire.home');
     }
 

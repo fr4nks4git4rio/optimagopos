@@ -107,11 +107,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/obtener-timbres-disponibles/{rfc}', [SoapController::class, 'obtenerTimbresDisponibles']);
     });
 
-    Route::middleware(['hasRole:2'])->prefix('reportes')->group(function () {
+    Route::middleware(['hasRole:1|2'])->prefix('reportes')->group(function () {
 
-        Route::get('/ventas-periodo', VentasPeriodo::class)->name('reportes.ventas-periodo');
-        Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('reportes.productos-mas-vendidos');
-        Route::get('/tickets', IndexReportesTickets::class)->name('reportes.tickets');
+        Route::get('/ventas-periodo', VentasPeriodo::class)->name('reportes.ventas-periodo')->middleware('hasRole:2');
+        Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('reportes.productos-mas-vendidos')->middleware('hasRole:2');
+        Route::get('/tickets', IndexReportesTickets::class)->name('reportes.tickets')->middleware('hasRole:2');
         Route::get('/logs', Logs::class)->name('reportes.logs');
     });
 });
