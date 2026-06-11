@@ -38,18 +38,19 @@ class Index extends Component
     public function query()
     {
         $query = match ($this->filter) {
-            'Activos' => Cliente::withoutTrashed(),
-            'Inactivos' => Cliente::onlyTrashed(),
-            default => Cliente::withTrashed(),
+            'Activos' => user()->cliente->comensales()->withoutTrashed(),
+            'Inactivos' => user()->cliente->comensales()->onlyTrashed(),
+            default => user()->cliente->comensales()->withTrashed(),
         };
 
-        $clientes = $query->where('es_comensal', 1)->get()->map->only('id', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at')->toArray();
+        $clientes = $query->where('es_comensal', 1)->get()->map->only(['id', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at'])->toArray();
         $records_final = collect();
 
         foreach ($clientes as $cliente) {
             $cliente = Cliente::decryptInfo($cliente);
 
-            if (!$this->search
+            if (
+                !$this->search
                 || Str::contains(Str::upper($cliente['nombre_comercial']), Str::upper($this->search))
                 || Str::contains(Str::upper($cliente['rfc']), Str::upper($this->search))
                 || Str::contains(Str::upper($cliente['razon_social']), Str::upper($this->search))

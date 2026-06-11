@@ -14,9 +14,9 @@
         }
 
         .nav.nav-tabs .nav-link.active {
-            border-top: 2px solid #ce5724 !important;
+            border-top: 2px solid var(--color-primary) !important;
             font-weight: bold;
-            color: #ce5724;
+            color: var(--color-primary);
         }
     </style>
 @endpush
@@ -91,11 +91,7 @@
                                 </div>
                             </div>
                             <div class="mb-1">
-                                <label for="">RFC:</label>
-                                <input type="text" class="form-control" wire:model.lazy="rfc">
-                                @error('rfc')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
+                                <x-input :label="'RFC'" :lazy="true" model="rfc" />
                             </div>
                             @if ($rfc_exists)
                                 <div class="mb-1">

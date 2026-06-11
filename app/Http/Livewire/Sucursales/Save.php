@@ -42,13 +42,15 @@ class Save extends Modal
 
     public $regimenesFiscales = [];
     public $estados = [];
+    public $tomar_datos_fiscales_de_empresa_matriz = false;
+    public $con_facturacion;
     public $tiposVigenciaTicketFacturacion = ['last_day_month', 'days_number_after_emitted', 'days_number_next_month'];
 
     protected $listeners = ['$refresh'];
 
     public function mount()
     {
-        $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only('label', 'value');
+        $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only(['label', 'value']);
 
         if (!isset($this->sucursal)) {
             $this->sucursal = new Sucursal();
@@ -70,6 +72,20 @@ class Save extends Modal
         }
         $this->direccion_fiscal = $this->sucursal->direccion_fiscal->toArray();
         $this->estados = get_estados_mexico();
+
+        if ($this->cliente_id) {
+            $cliente = Cliente::decryptInfo(Cliente::find($this->cliente_id));
+
+            $this->tomar_datos_fiscales_de_empresa_matriz = $this->rfc &&
+                $this->rfc === $cliente->rfc &&
+                $this->nombre_comercial &&
+                $this->nombre_comercial === $cliente->nombre_comercial &&
+                $this->razon_social &&
+                $this->razon_social === $cliente->razon_social &&
+                $this->regimen_fiscal_id &&
+                $this->regimen_fiscal_id === $cliente->regimen_fiscal_id;
+            $this->con_facturacion = $cliente->con_facturacion;
+        }
     }
 
     public static function modalMaxWidthClass(): string
@@ -99,6 +115,36 @@ class Save extends Modal
         $this->init();
     }
 
+    public function updatedClienteId($value)
+    {
+        $this->tomar_datos_fiscales_de_empresa_matriz = false;
+        $this->con_facturacion = false;
+        if ($value) {
+            $cliente = Cliente::decryptInfo(Cliente::find($value));
+
+            $this->tomar_datos_fiscales_de_empresa_matriz = $this->rfc &&
+                $this->rfc === $cliente->rfc &&
+                $this->nombre_comercial &&
+                $this->nombre_comercial === $cliente->nombre_comercial &&
+                $this->razon_social &&
+                $this->razon_social === $cliente->razon_social &&
+                $this->regimen_fiscal_id &&
+                $this->regimen_fiscal_id === $cliente->regimen_fiscal_id;
+            $this->con_facturacion = $cliente->con_facturacion;
+        }
+    }
+
+    public function updatedTomarDatosFiscalesDeEmpresaMatriz($value)
+    {
+        if ($value) {
+            $empresa = Cliente::decryptInfo(Cliente::find($this->cliente_id));
+            $this->nombre_comercial = $empresa->nombre_comercial;
+            $this->razon_social = $empresa->razon_social;
+            $this->rfc = $empresa->rfc;
+            $this->regimen_fiscal_id = $empresa->regimen_fiscal_id;
+        }
+    }
+
     public function rules()
     {
         $collection = DB::table('tb_sucursales')
@@ -108,16 +154,18 @@ class Save extends Modal
             $sucursal = Sucursal::decryptInfo($sucursal);
         });
 
+
         $rules = [
             'nombre_comercial' => ['required', new RuleUnique($collection, $this->sucursal->id)],
-            'razon_social' => ['required', new RuleUnique($collection, $this->sucursal->id)],
-            'rfc' => ['required', new RuleUnique($collection, $this->sucursal->id), new RfcRule('ambas')],
+            'con_facturacion' => ['nullable', 'boolean'],
+            'razon_social' => ['required_if:con_facturacion,true', new RuleUnique($collection, $this->sucursal->id)],
+            'rfc' => ['required_if:con_facturacion,true', new RuleUnique($collection, $this->sucursal->id), new RfcRule('ambas')],
             'correo' => ['required'],
             'telefono' => ['nullable'],
-            'tipo_vigencia_ticket_facturacion' => ['required'],
+            'tipo_vigencia_ticket_facturacion' => ['nullable', 'required_if:con_facturacion,true'],
             'cliente_id' => ['required', 'exists:tb_clientes,id'],
-            'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id', new RfcYRegimenCoherentesRule($this->rfc)],
-            'direccion_fiscal.codigo_postal' => ['required'],
+            'regimen_fiscal_id' => ['nullable', 'required_if:con_facturacion,true', 'exists:tb_regimen_fiscales,id', new RfcYRegimenCoherentesRule($this->rfc)],
+            'direccion_fiscal.codigo_postal' => ['nullable', 'required_if:con_facturacion,true'],
             'direccion_fiscal.calle' => 'nullable',
             'direccion_fiscal.no_exterior' => 'nullable',
             'direccion_fiscal.no_interior' => 'nullable',
@@ -142,18 +190,18 @@ class Save extends Modal
     {
         return [
             'nombre_comercial.required' => 'Campo requerido',
-            'razon_social.required' => 'Campo requerido',
-            'rfc.required' => 'Campo requerido',
+            'razon_social.required_if' => 'Campo requerido',
+            'rfc.required_if' => 'Campo requerido',
             'correo.required' => 'Campo requerido',
-            'tipo_vigencia_ticket_facturacion.required' => 'Campo requerido',
+            'tipo_vigencia_ticket_facturacion.required_if' => 'Campo requerido',
             'dias_vigencia.required' => 'Campo requerido',
             'dias_vigencia.numeric' => 'Campo numérico',
             'dias_vigencia.min' => 'Entre un valor superior',
             'cliente_id.required' => 'Campo requerido',
             'cliente_id.exists' => 'Cliente no encontrado',
-            'regimen_fiscal_id.required' => 'Campo requerido',
+            'regimen_fiscal_id.required_if' => 'Campo requerido',
             'regimen_fiscal_id.exists' => 'Régimen Fiscal no encontrado',
-            'direccion_fiscal.codigo_postal.required' => 'Campo requerido.'
+            'direccion_fiscal.codigo_postal.required_if' => 'Campo requerido.'
         ];
     }
 

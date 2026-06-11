@@ -323,6 +323,9 @@ class AutoFacturacion extends Component
             ]);
             $newComensal->direccion_fiscal_id = $dir->id;
             $newComensal->saveQuietly();
+
+            Sucursal::find($this->suc)->cliente->comensales()->attach($newComensal->id);
+
             activity("Dirección Fiscal de Cliente Creada")
                 ->on($dir)
                 ->event('created')
@@ -339,13 +342,22 @@ class AutoFacturacion extends Component
     public function checkRfc($rfc = '')
     {
         $rfc = $rfc ?: $this->rfc;
-        $this->validate([
-            'suc' => ['required'],
-            'rfc' => ['required', new RfcRule('ambas')]
-        ], [
-            'suc.required' => 'Campo requerido!',
-            'rfc.required' => 'Campo requerido!',
-        ]);
+
+        if (!$rfc) {
+            $this->addError('rfc', 'Campo requerido!');
+            return;
+        }
+        if (!$this->suc) {
+            $this->addError('suc', 'Campo requerido!');
+            return;
+        }
+        $isFisica = preg_match('/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/i', $rfc);
+        $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $rfc);
+
+        if (!$isFisica && !$isMoral) {
+            $this->addError('rfc', 'Formato incorrecto.');
+            return;
+        }
         $comensal = DB::table('tb_clientes as c')
             ->select('c.*')
             ->where('rfc', $rfc)
@@ -564,7 +576,7 @@ class AutoFacturacion extends Component
 
         DB::table('tb_clientes')->where('id', $comensal->id)->update(['es_comensal' => 1]);
 
-        $this->redirect($url);
+        // return redirect()->to($url)->with('status', 'Operación exitosa');
     }
 
     public function mostrarTicketMuestra()

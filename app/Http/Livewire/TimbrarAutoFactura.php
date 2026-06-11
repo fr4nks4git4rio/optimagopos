@@ -300,6 +300,7 @@ class TimbrarAutoFactura extends Component
             $folio_interno = $this->factura->serie->descripcion . '-' . Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion() == 1);
             $res = $facturador->timbrarFactura($this->factura->id, $folio_interno);
             if ($res['success']) {
+                $this->factura->propietario->comensales()->syncWithoutDetaching($this->factura->cliente_id);
                 $this->factura_timbrada = true;
                 $this->emit('show-toast', "Factura timbrada satisfactoriamente.");
             } else {

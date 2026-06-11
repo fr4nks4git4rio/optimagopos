@@ -54,7 +54,7 @@
                     </ul>
                 </li>
             @endif
-            @if (user()->is_admin)
+            @if (user()->is_admin && user()->cliente?->con_facturacion)
                 <li class="w-100 pb-2" :class="menu_absolute">
                     <a href="#submenu_facturacion" data-bs-toggle="collapse" class="nav-link align-middle"
                         @if ($this->facturacion_routes_active) aria-expanded="true" @endif>

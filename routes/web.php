@@ -98,13 +98,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/sucursales', IndexSucursales::class)->name('sucursales.index');
         Route::get('/terminales', IndexTerminales::class)->name('terminales.index');
 
-        Route::get('/pre-facturas/save/{id?}', SavePreFacturas::class)->name('pre-facturas.save');
-        Route::get('/pre-facturas', IndexPreFacturas::class)->name('pre-facturas.index')->middleware('hasRole:2');
+        Route::middleware('conFacturacion')->group(function () {
+            Route::get('/pre-facturas/save/{id?}', SavePreFacturas::class)->name('pre-facturas.save');
+            Route::get('/pre-facturas', IndexPreFacturas::class)->name('pre-facturas.index')->middleware('hasRole:2');
 
-        Route::get('/almacen-facturas', IndexAlmacenFacturas::class)->name('almacen-facturas.index')->middleware('hasRole:2');
+            Route::get('/almacen-facturas', IndexAlmacenFacturas::class)->name('almacen-facturas.index')->middleware('hasRole:2');
 
-        Route::get('/cabecera-factura', CabeceraFactura::class)->name('cabecera-factura');
-        Route::get('/obtener-timbres-disponibles/{rfc}', [SoapController::class, 'obtenerTimbresDisponibles']);
+            Route::get('/cabecera-factura', CabeceraFactura::class)->name('cabecera-factura');
+            Route::get('/obtener-timbres-disponibles/{rfc}', [SoapController::class, 'obtenerTimbresDisponibles']);
+        });
     });
 
     Route::middleware(['hasRole:1|2'])->prefix('reportes')->group(function () {

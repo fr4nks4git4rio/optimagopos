@@ -13,29 +13,27 @@ class ClienteController extends Controller
     {
         $label = $request->label ?: 'nombre_comercial';
 
+        if (!user()->is_super_admin)
+            return response()->json(['success' => true, 'items' => []]);
+
         $query = DB::table('tb_clientes')
             ->where('deleted_at', null)
             ->where('es_cliente', 1)
             ->select('id', $label);
 
-        if($request->term){
-            $clientes = [];
-            $query->get()->map(function ($cliente) use($request, &$clientes, $label) {
-                $cliente->text = Crypt::decrypt($cliente->{$label});
-                if(str_contains(strtoupper($cliente->text), strtoupper($request->term))){
-                    $clientes[] = $cliente;
-                }
-            });
-        }else{
-            $clientes = [];
-        }
+        $clientes = [];
+        $query->get()->map(function ($cliente) use ($request, &$clientes, $label) {
+            $cliente->text = Crypt::decrypt($cliente->{$label});
+            if (str_contains(strtoupper($cliente->text), strtoupper($request->term))) {
+                $clientes[] = $cliente;
+            }
+        });
 
-        if($request->filtro){
+        if ($request->filtro) {
             $clientes = Arr::prepend($clientes, ['id' => -1, 'text' => 'Todos']);
         }
 
         return response()->json(['success' => true, 'items' => $clientes]);
-
     }
 
     public function loadComensales(Request $request)
@@ -47,23 +45,22 @@ class ClienteController extends Controller
             ->where('es_comensal', 1)
             ->select('id', $label);
 
-        if($request->term){
+        if ($request->term) {
             $clientes = [];
-            $query->get()->map(function ($cliente) use($request, &$clientes, $label) {
+            $query->get()->map(function ($cliente) use ($request, &$clientes, $label) {
                 $cliente->text = Crypt::decrypt($cliente->{$label});
-                if(str_contains(strtoupper($cliente->text), strtoupper($request->term))){
+                if (str_contains(strtoupper($cliente->text), strtoupper($request->term))) {
                     $clientes[] = $cliente;
                 }
             });
-        }else{
+        } else {
             $clientes = [];
         }
 
-        if($request->filtro){
+        if ($request->filtro) {
             $clientes = Arr::prepend($clientes, ['id' => -1, 'text' => 'Todos']);
         }
 
         return response()->json(['success' => true, 'items' => $clientes]);
-
     }
 }

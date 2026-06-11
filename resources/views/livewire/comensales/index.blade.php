@@ -55,6 +55,7 @@
             <thead>
             <tr>
                 <th>Nombre Comercial</th>
+                <th>RFC</th>
                 <th>Razón Social</th>
                 <th>Teléfono</th>
                 <th class="text-center">Acciones</th>
@@ -64,6 +65,7 @@
             @forelse($clientes as $cliente)
                 <tr>
                     <td>{{$cliente['nombre_comercial']}}</td>
+                    <td>{{$cliente['rfc']}}</td>
                     <td>{{$cliente['razon_social']}}</td>
                     <td>{{$cliente['telefono']}}</td>
                     <td class="text-center">
@@ -88,7 +90,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">
+                    <td colspan="5">
                         <div class="list-group-item">
                             No se encontraron resultados...
                         </div>

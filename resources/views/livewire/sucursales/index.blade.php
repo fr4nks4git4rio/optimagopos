@@ -104,7 +104,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ user()->is_super_admin ? 6 : 5 }}">
+                        <td colspan="{{ user()->is_super_admin ? 7 : 6 }}">
                             <div class="list-group-item">
                                 No se encontraron resultados...
                             </div>

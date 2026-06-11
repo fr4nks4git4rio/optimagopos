@@ -69,6 +69,7 @@ class Save extends Modal
         if (user()->is_super_admin)
             $this->clientes = DB::table('tb_clientes')
                 ->select('id as value', 'nombre_comercial as label')
+                ->where('es_cliente', 1)
                 ->where('deleted_at', null)
                 ->get()->map(function ($element) {
                     $element->label = Crypt::decrypt($element->label);

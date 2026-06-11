@@ -26,14 +26,16 @@ class RfcRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $isFisica = preg_match('/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/i', $value);
-        $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $value);
+        if ($value) {
+            $isFisica = preg_match('/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/i', $value);
+            $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $value);
 
-        if ($this->tipo_persona == 'persona_fisica' && !$isFisica)
-            $fail($this->message);
-        if ($this->tipo_persona == 'persona_moral' && !$isMoral)
-            $fail($this->message);
-        if (!$isFisica && !$isMoral)
-            $fail($this->message);
+            if ($this->tipo_persona == 'persona_fisica' && !$isFisica)
+                $fail($this->message);
+            if ($this->tipo_persona == 'persona_moral' && !$isMoral)
+                $fail($this->message);
+            if (!$isFisica && !$isMoral)
+                $fail($this->message);
+        }
     }
 }

@@ -68,6 +68,10 @@ class Index extends Component
             )
             ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id');
 
+        if (!user()->is_super_admin) {
+            $query->where('s.cliente_id', user()->cliente_id);
+        }
+
         switch ($this->filter) {
             case 'Activos':
                 $query->where('t.deleted_at', null);

@@ -97,6 +97,7 @@ class HomeController
                     $comensal->es_comensal = 1;
                     $comensal->save();
                 }
+                $terminal->sucursal->cliente->comensales()->attach($comensal->id);
             }
 
             $items = $decoded['Items'] ?? [];

@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
  * @property boolean $es_comensal
  * @property boolean $es_cliente
  * @property string $comentarios
+ * @property boolean $con_facturacion
  * @property string $logo
  * @property string $portal_pac
  * @property string $usuario_integrador_sat
@@ -49,6 +50,7 @@ class Cliente extends Model
         'es_comensal',
         'es_cliente',
         'comentarios',
+        'con_facturacion',
         'logo',
         'portal_pac',
         'usuario_integrador_sat',
@@ -74,6 +76,7 @@ class Cliente extends Model
         'es_comensal' => 'boolean',
         'es_cliente' => 'boolean',
         'comentarios' => 'string',
+        'con_facturacion' => 'boolean',
         'portal_pac' => 'string',
         'usuario_integrador_sat' => 'string',
         'direccion_fiscal_id' => 'integer',
@@ -85,15 +88,9 @@ class Cliente extends Model
      *
      * @var array
      */
-    public function rules()
-    {
+    public function rules() {}
 
-    }
-
-    public function messages()
-    {
-
-    }
+    public function messages() {}
 
     public static function encryptInfo($cliente)
     {
@@ -234,5 +231,10 @@ class Cliente extends Model
     public function regimen_fiscal()
     {
         return $this->belongsTo(RegimenFiscal::class);
+    }
+
+    public function comensales()
+    {
+        return $this->belongsToMany(Cliente::class, 'tb_clientes_comensales', 'cliente_id', 'comensal_id');
     }
 }

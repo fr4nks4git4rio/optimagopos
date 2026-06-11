@@ -7,6 +7,9 @@
         $bind = '.defer';
     }
 
+    if($label)
+        $label .= ':';
+
     $id = \Illuminate\Support\Str::replace('.', '-', $model);
 
     $attributes = $attributes->class(['checkbox', 'is-invalid' => $errors->has($model)])->merge([
@@ -121,7 +124,7 @@
     .button-toggle .checkbox:checked+.knobs:before {
         content: "SI";
         left: 38px;
-        background-color: #ce5124;
+        background-color: var(--color-primary);
     }
 
     .button-toggle .checkbox:disabled+.knobs:before {

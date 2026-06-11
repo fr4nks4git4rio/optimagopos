@@ -50,23 +50,25 @@ class RfcYRegimenCoherentesRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $regimen = DB::table('tb_regimen_fiscales')
-            ->select('codigo')
-            ->where('id', $value)
-            ->get()->first();
-        $value = $regimen ? $regimen->codigo : '';
-        $isFisica = preg_match('/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/i', $this->rfc);
-        $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $this->rfc);
+        if ($this->rfc) {
+            $regimen = DB::table('tb_regimen_fiscales')
+                ->select('codigo')
+                ->where('id', $value)
+                ->get()->first();
+            $value = $regimen ? $regimen->codigo : '';
+            $isFisica = preg_match('/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/i', $this->rfc);
+            $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $this->rfc);
 
-        if (!$isFisica && !$isMoral)
-            $fail($this->message);
+            if (!$isFisica && !$isMoral)
+                $fail($this->message);
 
-        if ($isFisica && !in_array($value, self::REGIMENES_FISICAS)) {
-            $fail($this->message);
-        }
+            if ($isFisica && !in_array($value, self::REGIMENES_FISICAS)) {
+                $fail($this->message);
+            }
 
-        if ($isMoral && !in_array($value, self::REGIMENES_MORALES)) {
-            $fail($this->message);
+            if ($isMoral && !in_array($value, self::REGIMENES_MORALES)) {
+                $fail($this->message);
+            }
         }
     }
 }

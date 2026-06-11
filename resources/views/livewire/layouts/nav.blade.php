@@ -138,6 +138,11 @@
                             <x-dropdown-item label="Cambiar Contraseña"
                                 click="$emit('openModal', 'auth.change-password')" />
 
+                            @if (user()->is_admin)
+                                <x-dropdown-item label="Mi Empresa"
+                                    click="$emit('openModal', 'auth.my-company', {company: {{ user()->cliente_id }}})" />
+                            @endif
+
                             <x-dropdown-item :label="__('Logout')" click="logout" />
                         </div>
                     </div>

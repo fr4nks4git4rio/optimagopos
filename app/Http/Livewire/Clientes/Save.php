@@ -27,6 +27,7 @@ class Save extends Modal
     public $correo;
     public $telefono;
     public $comentarios;
+    public $con_facturacion;
     public $regimen_fiscal_id;
     public $direccion_fiscal;
 
@@ -48,6 +49,8 @@ class Save extends Modal
             $this->rfc = $this->cliente->rfc;
             $this->correo = $this->cliente->correo;
             $this->telefono = $this->cliente->telefono;
+            $this->comentarios = $this->cliente->comentarios;
+            $this->con_facturacion = $this->cliente->con_facturacion;
             $this->regimen_fiscal_id = $this->cliente->regimen_fiscal_id;
         }
         $this->direccion_fiscal = $this->cliente->direccion_fiscal->toArray();
@@ -91,13 +94,14 @@ class Save extends Modal
         });
         return [
             'nombre_comercial' => ['required', new RuleUnique($collection, $this->cliente->id)],
-            'razon_social' => ['required', new RuleUnique($collection, $this->cliente->id)],
-            'rfc' => ['required', new RuleUnique($collection, $this->cliente->id), new RfcRule('ambas')],
+            'con_facturacion' => ['nullable', 'boolean'],
+            'razon_social' => ['required_if:con_facturacion,true', new RuleUnique($collection, $this->cliente->id)],
+            'rfc' => ['required_if:con_facturacion,true', new RuleUnique($collection, $this->cliente->id), new RfcRule('ambas')],
             'correo' => ['required'],
             'telefono' => ['nullable'],
             'comentarios' => ['nullable'],
-            'regimen_fiscal_id' => ['nullable', new RfcYRegimenCoherentesRule($this->rfc)],
-            'direccion_fiscal.codigo_postal' => ['required'],
+            'regimen_fiscal_id' => ['required_if:con_facturacion,true', new RfcYRegimenCoherentesRule($this->rfc)],
+            'direccion_fiscal.codigo_postal' => ['required_if:con_facturacion,true'],
             'direccion_fiscal.calle' => 'nullable',
             'direccion_fiscal.no_exterior' => 'nullable',
             'direccion_fiscal.no_interior' => 'nullable',
@@ -113,10 +117,11 @@ class Save extends Modal
     {
         return [
             'nombre_comercial.required' => 'Campo requerido',
-            'razon_social.required' => 'Campo requerido',
-            'rfc.required' => 'Campo requerido',
+            'razon_social.required_if' => 'Campo requerido',
+            'rfc.required_if' => 'Campo requerido',
             'correo.required' => 'Campo requerido',
-            'direccion_fiscal.codigo_postal.required' => 'Campo requerido.'
+            'regimen_fiscal_id.required_if' => 'Campo requerido',
+            'direccion_fiscal.codigo_postal.required_if' => 'Campo requerido.'
         ];
     }
 
@@ -136,6 +141,8 @@ class Save extends Modal
                 'correo',
                 'telefono',
                 'es_cliente',
+                'comentarios',
+                'con_facturacion',
                 'regimen_fiscal_id'
             ]))->save();
 
@@ -153,12 +160,13 @@ class Save extends Modal
                 ]);
                 if (count($this->cliente->direccion_fiscal->getDirty()) > 0) {
                     $attributes = Arr::except($this->cliente->direccion_fiscal->getDirty(), ['created_at', 'updated_at']);
+                    $log = $this->cliente->rfc ? "La Dirección Fiscal del Cliente con RFC: {$this->cliente->rfc}, ha sido actualizada." : "La Dirección Fiscal del Cliente con nombre comercial: {$this->cliente->nombre_comercial}, ha sido actualizada.";
                     activity('Dirección Fiscal de Cliente Actualizada')
                         ->on($this->cliente->direccion_fiscal)
                         ->event('updated')
                         ->withProperty('attributes', Direccion::parseData($attributes))
                         ->withProperty('old', Direccion::parseData(Arr::only($this->cliente->direccion_fiscal->getOriginal(), array_keys($attributes))))
-                        ->log('La Dirección Fiscal del Cliente con RFC:' . $this->cliente->rfc . ' ha sido actualizada.');
+                        ->log($log);
                     $this->cliente->direccion_fiscal->save();
                 }
             } else {
@@ -176,11 +184,13 @@ class Save extends Modal
                 $this->cliente->direccion_fiscal_id = $dir->id;
                 $this->cliente->save();
 
+                $log = $this->cliente->rfc ? "La Dirección Fiscal del Cliente con RFC: {$this->cliente->rfc}, ha sido creada." : "La Dirección Fiscal del Cliente con nombre comercial: {$this->cliente->nombre_comercial}, ha sido creada.";
+
                 activity("Dirección Fiscal de Cliente Creada")
                     ->on($dir)
                     ->event('created')
                     ->withProperties(Direccion::parseData(Arr::except($dir->toArray(), ['updated_at'])))
-                    ->log('La Dirección Fiscal del Cliente con RFC: ' . $this->cliente->rfc . ' ha sido creada.');
+                    ->log($log);
             }
 
             $this->emit('show-toast', 'Cliente guardado.');
