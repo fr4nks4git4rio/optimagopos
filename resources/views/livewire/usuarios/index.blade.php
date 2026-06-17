@@ -86,6 +86,7 @@
                                                 click="$emit('openModal', 'usuarios.restore', {usuario: {{ $usuario['id'] }}})" />
                                         </li>
                                     @endcan
+                                @endif
                             </ul>
                         </td>
                     </tr>
