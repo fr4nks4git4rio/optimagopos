@@ -237,4 +237,8 @@ class Cliente extends Model
     {
         return $this->belongsToMany(Cliente::class, 'tb_clientes_comensales', 'cliente_id', 'comensal_id');
     }
+    public function sucursales()
+    {
+        return $this->hasMany(Sucursal::class, 'cliente_id');
+    }
 }

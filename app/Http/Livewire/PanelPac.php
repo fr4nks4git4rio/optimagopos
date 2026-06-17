@@ -3,13 +3,14 @@
 namespace App\Http\Livewire;
 
 use App\Http\Livewire\Layouts\Modal;
+use App\Models\Sucursal;
+use Illuminate\Support\Arr;
 
 class PanelPac extends Modal
 {
-    public $cfdi_timbrado_productivo;
-    public $owner;
+    public $sucursales =  [];
 
-    protected $listeners = ['$refresh'];
+    protected $listeners = ['$refresh', 'changeTimbrado'];
 
     public static function modalMaxWidthClass(): string
     {
@@ -18,8 +19,12 @@ class PanelPac extends Modal
 
     public function mount()
     {
-        $this->owner = get_owner()->toArray();
-        $this->cfdi_timbrado_productivo = system_config('cfdi_timbrado_productivo');
+        $owner = get_owner();
+
+        foreach ($owner->sucursales as $sucursal) {
+            $sucursalArr = Sucursal::decryptInfo(Arr::only($sucursal->toArray(), ['id', 'nombre_comercial', 'razon_social', 'rfc', 'cfdi_timbrado_productivo', 'portal_pac']));
+            $this->sucursales[] = $sucursalArr;
+        }
     }
 
     public function render()
@@ -27,9 +32,9 @@ class PanelPac extends Modal
         return view('livewire.panel-pac');
     }
 
-    public function changeTimbrado()
+    public function changeTimbrado($index)
     {
-        system_config('cfdi_timbrado_productivo', $this->cfdi_timbrado_productivo);
+        Sucursal::where('id', $this->sucursales[$index]['id'])->update(['cfdi_timbrado_productivo' => $this->sucursales[$index]['cfdi_timbrado_productivo']]);
         $this->emit('show-toast', 'Modo de Timbrado cambiado.');
         $this->emit('$refresh');
     }

@@ -117,7 +117,7 @@
                                 @if ($factura->estado == 'PRECAPTURADA' || $factura->estado == 'CAPTURADA')
                                     <li class="list-inline-item mb-1">
                                         <x-action icon="pencil" title="Editar"
-                                            href="{{ route('pre-facturas.save', $factura->id) }}" />
+                                            href="{{ route('cliente.pre-facturas.save', $factura->id) }}" />
                                     </li>
                                 @endif
                                 <li class="list-inline-item mb-1">

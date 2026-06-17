@@ -14,10 +14,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use App\Models\Sucursal;
 
 class SoapController extends BaseSoapController
 {
-    private $service;
+    protected $service;
+    protected $sucursal;
 
     /**
      * SoapController constructor.
@@ -29,7 +31,7 @@ class SoapController extends BaseSoapController
 
     private function establecer_modo()
     {
-        $modo_productivo = system_config('cfdi_timbrado_productivo');
+        $modo_productivo = $this->sucursal->cfdi_timbrado_productivo;
 
         if ($modo_productivo == 1) {
             self::modo_productivo();
@@ -41,6 +43,7 @@ class SoapController extends BaseSoapController
     }
     public function obtenerTimbresDisponibles($rfc)
     {
+        $this->sucursal = Sucursal::where('rfc', $rfc)->first();
         $this->setRfcEmisor($rfc);
         $this->establecer_modo();
         if (is_array($this->service)) {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
@@ -40,9 +41,10 @@ class ClienteController extends Controller
     {
         $label = $request->label ?: 'nombre_comercial';
 
-        $query = DB::table('tb_clientes')
-            ->where('deleted_at', null)
-            ->where('es_comensal', 1)
+        $cliente = Cliente::find(user()->cliente_id);
+        $query = $cliente->comensales()->newQuery();
+
+        $query->where('deleted_at', null)
             ->select('id', $label);
 
         if ($request->term) {

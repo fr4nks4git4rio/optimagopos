@@ -13,7 +13,6 @@ class FormasPago extends Modal
 {
     public Sucursal $sucursal;
     public $formas_pago = [];
-    public $formasPagoOptions = [];
     public $monedas= [];
 
     public $index_forma_pago_activa = null;
@@ -21,7 +20,6 @@ class FormasPago extends Modal
     public $forma_pago_activa = [
         'id' => null,
         'nombre' => '',
-        'forma_pago_id' => null,
         'moneda_id' => null
     ];
 
@@ -31,12 +29,6 @@ class FormasPago extends Modal
 
     public function mount()
     {
-        $this->formasPagoOptions = DB::table('tb_forma_pagos')
-            ->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))
-            ->get()
-            ->map(function ($value, $key) {
-                return (array)$value;
-            })->toArray();
         $this->monedas = DB::table('tb_monedas')
             ->select('id as value', 'acronimo as label')
             ->get()
@@ -68,11 +60,8 @@ class FormasPago extends Modal
                 'sfp.nombre',
                 'moneda.acronimo as moneda',
                 'sfp.moneda_id',
-                'sfp.forma_pago_id',
-                DB::raw("CONCAT_WS(' | ', fp.codigo, fp.descripcion) as forma_pago_sat"),
                 'sfp.deleted_at'
             )
-            ->leftJoin('tb_forma_pagos as fp', 'fp.id', '=', 'sfp.forma_pago_id')
             ->leftJoin('tb_monedas as moneda', 'moneda.id', '=', 'sfp.moneda_id')
             ->where('sucursal_id', $this->sucursal->id)
             ->get()->map(function ($value, $key) {
@@ -87,14 +76,12 @@ class FormasPago extends Modal
             $this->forma_pago_activa = [
                 'id' => $this->formas_pago[$index]['id'],
                 'nombre' => $this->formas_pago[$index]['nombre'],
-                'forma_pago_id' => $this->formas_pago[$index]['forma_pago_id'],
                 'moneda_id' => $this->formas_pago[$index]['moneda_id']
             ];
         } else {
             $this->forma_pago_activa = [
                 'id' => null,
                 'nombre' => '',
-                'forma_pago_id' => null,
                 'moneda_id' => null
             ];
         }
@@ -106,12 +93,9 @@ class FormasPago extends Modal
         $data = $this->validate([
             'forma_pago_activa.id' => 'nullable',
             'forma_pago_activa.nombre' => ['required'],
-            'forma_pago_activa.forma_pago_id' => ['required', 'exists:tb_forma_pagos,id'],
             'forma_pago_activa.moneda_id' => ['required', 'exists:tb_monedas,id']
         ], [
             'forma_pago_activa.nombre.required' => 'Campo requerido.',
-            'forma_pago_activa.forma_pago_id.required' => 'Campo requerido.',
-            'forma_pago_activa.forma_pago_id.exists' => 'Forma de Pago no encontrada.',
             'forma_pago_activa.moneda.required' => 'Campo requerido.',
             'forma_pago_activa.moneda.exists' => 'Moneda no encontrada.',
         ]);
@@ -125,17 +109,6 @@ class FormasPago extends Modal
             $this->addError('forma_pago_activa.nombre', 'El nombre ya está en uso.');
             return;
         }
-        // if (
-        //     DB::table('tb_sucursal_forma_pagos')
-        //     ->where('forma_pago_id', $data['forma_pago_activa']['forma_pago_id'])
-        //     ->where('moneda_id', $data['forma_pago_activa']['moneda_id'])
-        //     ->where('id', '!=', $data['forma_pago_activa']['id'])
-        //     ->count() > 0
-        // ) {
-        //     $this->emit('show-toast', 'Ya existe una Forma de Pago que tiene la Forma de Pago SAT y la Moneda seleccionadas.', 'danger');
-        //     $this->addError('forma_pago_activa.forma_pago_id', 'Ya existe una Forma de Pago que tiene la Forma de Pago SAT y la Moneda seleccionadas.');
-        //     return;
-        // }
 
         if ($data['forma_pago_activa']['id'])
             $sfp = SucursalFormaPago::find($data['forma_pago_activa']['id']);
@@ -148,7 +121,6 @@ class FormasPago extends Modal
         $this->forma_pago_activa = [
             'id' => null,
             'nombre' => '',
-            'forma_pago_id' => null,
             'moneda_id' => null
         ];
         $this->modalFormaPagoSaveClass = '';

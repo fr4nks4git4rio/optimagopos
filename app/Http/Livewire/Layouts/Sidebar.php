@@ -25,25 +25,27 @@ class Sidebar extends Component
     }
     public function getAdminRoutesActiveProperty()
     {
-        return Request::is('usuarios*')
-        || Request::is('clientes*')
-        || Request::is('comensales*')
-        || Request::is('sucursales*')
-        || Request::is('terminales*')
-        || Request::is('trazas*');
+        $prefix = user()->is_super_admin ? 'admin' : 'cliente';
+        return Request::is("$prefix/usuarios*")
+            || Request::is("$prefix/clientes*")
+            || Request::is("$prefix/comensales*")
+            || Request::is("$prefix/sucursales*")
+            || Request::is("$prefix/terminales*")
+            || Request::is("$prefix/trazas*");
     }
 
     public function getFacturacionRoutesActiveProperty()
     {
-        return Request::is('pre-facturas*')
-        || Request::is('almacen-facturas*')
-        || Request::is('cabecera-factura*');
+        return Request::is('cliente/pre-facturas*')
+            || Request::is('cliente/almacen-facturas*')
+            || Request::is('cliente/cabecera-factura*');
     }
     public function getReportesRoutesActiveProperty()
     {
-        return Request::is('reportes/tickets*')
-        || Request::is('reportes/logs*')
-        || Request::is('reportes/ventas-periodo*')
-        || Request::is('reportes/productos-mas-vendidos*');
+        $prefix = user()->is_super_admin ? 'admin' : 'cliente';
+        return Request::is($prefix . '/reportes/tickets*')
+            || Request::is($prefix . '/reportes/logs*')
+            || Request::is($prefix . '/reportes/ventas-periodo*')
+            || Request::is($prefix . '/reportes/productos-mas-vendidos*');
     }
 }

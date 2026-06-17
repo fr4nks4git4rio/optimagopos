@@ -73,8 +73,6 @@
                     <div class="card-body">
                         <x-select2-component-modals class="form-control" label="Moneda de Sucursal"
                             model="moneda_sucursal" :options="$monedas" />
-                        <x-select2-component-modals class="form-control" label="Moneda de Facturación"
-                            model="moneda_facturacion" :options="$monedas" />
                     </div>
                 </div>
             </div>

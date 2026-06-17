@@ -10,7 +10,7 @@
         {{-- </a> --}}
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100"
             id="menu_principal">
-            @if (user()->is_super_admin || user()->is_admin)
+            @if (user()->is_super_admin)
                 <li class="w-100 pb-2" :class="menu_absolute">
                     <a href="#submenu_admin" data-bs-toggle="collapse" class="nav-link align-middle"
                         @if ($this->admin_routes_active) aria-expanded="true" @endif>
@@ -20,41 +20,83 @@
                     </a>
                     <ul class="collapse nav flex-column ms-1 @if ($this->admin_routes_active) show @endif"
                         :class="submenu_absolute" id="submenu_admin" data-bs-parent="#submenu_admin">
-                        <li class="w-100 li-item {{ active_route('usuarios*') }}">
-                            <a href="{{ route('usuarios.index') }}" class="nav-link submenu">
-                                <i class="bi bi-person fs-6"></i> <span class="d-sm-inline px-2">Usuarios</span></a>
-                        </li>
-                        @if (user()->is_super_admin)
-                            <li class="w-100 li-item {{ active_route('clientes*') }}">
-                                <a href="{{ route('clientes.index') }}" class="nav-link submenu">
+                        @can('viewAny', [App\Models\User::class])
+                            <li class="w-100 li-item {{ active_route('admin/usuarios*') }}">
+                                <a href="{{ route('admin.usuarios.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-person fs-6"></i> <span class="d-sm-inline px-2">Usuarios</span></a>
+                            </li>
+                        @endcan
+                        @can('viewAnyCliente', [App\Models\Cliente::class])
+                            <li class="w-100 li-item {{ active_route('admin/clientes*') }}">
+                                <a href="{{ route('admin.clientes.index') }}" class="nav-link submenu">
                                     <i class="bi bi-people fs-6"></i> <span class="d-sm-inline px-2">Clientes</span></a>
                             </li>
-                        @endif
-                        @if (user()->is_admin)
-                            <li class="w-100 li-item {{ active_route('comensales*') }}">
-                                <a href="{{ route('comensales.index') }}" class="nav-link submenu">
-                                    <i class="bi bi-people fs-6"></i> <span class="d-sm-inline px-2">Clientes</span></a>
+                        @endcan
+                        @can('viewAny', [App\Models\Sucursal::class])
+                            <li class="w-100 li-item {{ active_route('admin/sucursales*') }}">
+                                <a href="{{ route('admin.sucursales.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-building fs-6"></i> <span class="d-sm-inline px-2">Sucursales</span></a>
                             </li>
-                        @endif
-                        <li class="w-100 li-item {{ active_route('sucursales*') }}">
-                            <a href="{{ route('sucursales.index') }}" class="nav-link submenu">
-                                <i class="bi bi-building fs-6"></i> <span class="d-sm-inline px-2">Sucursales</span></a>
-                        </li>
-                        @if (user()->is_super_admin || user()->is_admin)
-                            <li class="w-100 li-item {{ active_route('terminales*') }}">
-                                <a href="{{ route('terminales.index') }}" class="nav-link submenu">
+                        @endcan
+                        @can('viewAny', [App\Models\Terminal::class])
+                            <li class="w-100 li-item {{ active_route('admin/terminales*') }}">
+                                <a href="{{ route('admin.terminales.index') }}" class="nav-link submenu">
                                     <i class="bi bi-pc-display-horizontal fs-6"></i> <span
                                         class="d-sm-inline px-2">Terminales</span></a>
                             </li>
-                        @endif
-                        <li class="w-100 li-item {{ active_route('trazas*') }}">
-                            <a href="{{ route('trazas.index') }}" class="nav-link submenu">
+                        @endcan
+                        <li class="w-100 li-item {{ active_route('admin/trazas*') }}">
+                            <a href="{{ route('admin.trazas.index') }}" class="nav-link submenu">
                                 <i class="bi bi-fingerprint fs-6"></i> <span class="d-sm-inline px-2">Trazas</span></a>
                         </li>
                     </ul>
                 </li>
+            @else
+                <li class="w-100 pb-2" :class="menu_absolute">
+                    <a href="#submenu_admin" data-bs-toggle="collapse" class="nav-link align-middle"
+                        @if ($this->admin_routes_active) aria-expanded="true" @endif>
+                        <i class="bi bi-gear fs-6 float-end border border-2 border-dark" title="Administración"></i>
+                        <span class="ms-1 d-none text-uppercase fw-semibold fs-6" :class="display"> Administración
+                        </span>
+                    </a>
+                    <ul class="collapse nav flex-column ms-1 @if ($this->admin_routes_active) show @endif"
+                        :class="submenu_absolute" id="submenu_admin" data-bs-parent="#submenu_admin">
+                        @can('viewAny', [App\Models\User::class])
+                            <li class="w-100 li-item {{ active_route('cliente/usuarios*') }}">
+                                <a href="{{ route('cliente.usuarios.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-person fs-6"></i> <span class="d-sm-inline px-2">Usuarios</span></a>
+                            </li>
+                        @endcan
+                        @can('viewAnyComensal', [App\Models\Cliente::class])
+                            <li class="w-100 li-item {{ active_route('cliente/comensales*') }}">
+                                <a href="{{ route('cliente.comensales.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-people fs-6"></i> <span class="d-sm-inline px-2">Clientes</span></a>
+                            </li>
+                        @endcan
+                        @can('viewAny', [App\Models\Sucursal::class])
+                            <li class="w-100 li-item {{ active_route('cliente/sucursales*') }}">
+                                <a href="{{ route('cliente.sucursales.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-building fs-6"></i> <span class="d-sm-inline px-2">Sucursales</span></a>
+                            </li>
+                        @endcan
+                        @can('viewAny', [App\Models\Terminal::class])
+                            <li class="w-100 li-item {{ active_route('cliente/terminales*') }}">
+                                <a href="{{ route('cliente.terminales.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-pc-display-horizontal fs-6"></i> <span
+                                        class="d-sm-inline px-2">Terminales</span></a>
+                            </li>
+                        @endcan
+                        @if (user()->is_admin)
+                            <li class="w-100 li-item {{ active_route('cliente/trazas*') }}">
+                                <a href="{{ route('cliente.trazas.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-fingerprint fs-6"></i> <span
+                                        class="d-sm-inline px-2">Trazas</span></a>
+                            </li>
+                        @endif
+                    </ul>
+                </li>
             @endif
-            @if (user()->is_admin && user()->cliente?->con_facturacion)
+            @if (user()->cliente?->con_facturacion)
                 <li class="w-100 pb-2" :class="menu_absolute">
                     <a href="#submenu_facturacion" data-bs-toggle="collapse" class="nav-link align-middle"
                         @if ($this->facturacion_routes_active) aria-expanded="true" @endif>
@@ -65,29 +107,35 @@
                     </a>
                     <ul class="collapse nav flex-column ms-1 @if ($this->facturacion_routes_active) show @endif"
                         :class="submenu_absolute" id="submenu_facturacion" data-bs-parent="#submenu_facturacion">
-                        <li class="w-100 li-item">
-                            <a href="javascript:void(0)" wire:click="$emit('openModal', 'panel-pac')"
-                                class="nav-link submenu">
-                                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Panel PAC</span></a>
-                        </li>
-                        <li class="w-100 li-item {{ active_route('cabecera-factura*') }}">
-                            <a href="{{ route('cabecera-factura') }}" class="nav-link submenu">
-                                <i class="bi bi-gear fs-6"></i> <span class="d-sm-inline px-2">Cabecera de
-                                    Facturas</span></a>
-                        </li>
-                        <li class="w-100 li-item {{ active_route('pre-facturas*') }}">
-                            <a href="{{ route('pre-facturas.index') }}" class="nav-link submenu">
-                                <i class="bi bi-database fs-6"></i> <span class="d-sm-inline px-2">Facturas</span></a>
-                        </li>
-                        <li class="w-100 li-item {{ active_route('almacen-facturas*') }}">
-                            <a href="{{ route('almacen-facturas.index') }}" class="nav-link submenu">
-                                <i class="bi bi-database-check fs-6"></i> <span class="d-sm-inline px-2">Almacén de
-                                    Facturas</span></a>
-                        </li>
+                        @can('viewPanelPac', [App\Models\Factura::class])
+                            <li class="w-100 li-item">
+                                <a href="javascript:void(0)" wire:click="$emit('openModal', 'panel-pac')"
+                                    class="nav-link submenu">
+                                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Panel PAC</span></a>
+                            </li>
+                        @endcan
+                        @can('viewCabeceraFactura', [App\Models\Factura::class])
+                            <li class="w-100 li-item {{ active_route('cliente/cabecera-factura*') }}">
+                                <a href="{{ route('cliente.cabecera-factura') }}" class="nav-link submenu">
+                                    <i class="bi bi-gear fs-6"></i> <span class="d-sm-inline px-2">Cabecera de
+                                        Facturas</span></a>
+                            </li>
+                        @endcan
+                        @can('viewAny', [App\Models\Factura::class])
+                            <li class="w-100 li-item {{ active_route('cliente/pre-facturas*') }}">
+                                <a href="{{ route('cliente.pre-facturas.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-database fs-6"></i> <span class="d-sm-inline px-2">Facturas</span></a>
+                            </li>
+                            <li class="w-100 li-item {{ active_route('cliente/almacen-facturas*') }}">
+                                <a href="{{ route('cliente.almacen-facturas.index') }}" class="nav-link submenu">
+                                    <i class="bi bi-database-check fs-6"></i> <span class="d-sm-inline px-2">Almacén de
+                                        Facturas</span></a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
             @endif
-            @if (user()->is_super_admin || user()->is_admin)
+            @if (user()->is_super_admin)
                 <li class="w-100 pb-2" :class="menu_absolute">
                     <a href="#submenu_reportes" data-bs-toggle="collapse" class="nav-link align-middle"
                         @if ($this->reportes_routes_active) aria-expanded="true" @endif>
@@ -98,24 +146,40 @@
                     </a>
                     <ul class="collapse nav flex-column ms-1 @if ($this->reportes_routes_active) show @endif"
                         :class="submenu_absolute" id="submenu_reportes" data-bs-parent="#submenu_reportes">
-                        @if (user()->is_admin)
-                            <li class="w-100 li-item {{ active_route('reportes/ventas-periodo*') }}">
-                                <a href="{{ route('reportes.ventas-periodo') }}" class="nav-link submenu">
-                                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Ventas por
-                                        Período</span></a>
-                            </li>
-                            <li class="w-100 li-item {{ active_route('reportes/productos-mas-vendidos*') }}">
-                                <a href="{{ route('reportes.productos-mas-vendidos') }}" class="nav-link submenu">
-                                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Productos más
-                                        Vendidos</span></a>
-                            </li>
-                            <li class="w-100 li-item {{ active_route('reportes/tickets*') }}">
-                                <a href="{{ route('reportes.tickets') }}" class="nav-link submenu">
-                                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Tickets</span></a>
-                            </li>
-                        @endif
-                        <li class="w-100 li-item {{ active_route('reportes/logs*') }}">
-                            <a href="{{ route('reportes.logs') }}" class="nav-link submenu">
+                        <li class="w-100 li-item {{ active_route('admin/reportes/logs*') }}">
+                            <a href="{{ route('admin.reportes.logs') }}" class="nav-link submenu">
+                                <i class="bi bi-fingerprint fs-6"></i> <span class="d-sm-inline px-2">Logs</span></a>
+                        </li>
+                    </ul>
+                </li>
+            @else
+                <li class="w-100 pb-2" :class="menu_absolute">
+                    <a href="#submenu_reportes" data-bs-toggle="collapse" class="nav-link align-middle"
+                        @if ($this->reportes_routes_active) aria-expanded="true" @endif>
+                        <i class="bi bi-file-earmark-code fs-6 float-end border border-2 border-dark"
+                            title="Reportes"></i>
+                        <span class="ms-1 d-none text-uppercase fw-semibold fs-6" :class="display"> Reportes
+                        </span>
+                    </a>
+                    <ul class="collapse nav flex-column ms-1 @if ($this->reportes_routes_active) show @endif"
+                        :class="submenu_absolute" id="submenu_reportes" data-bs-parent="#submenu_reportes">
+                        <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-periodo*') }}">
+                            <a href="{{ route('cliente.reportes.ventas-periodo') }}" class="nav-link submenu">
+                                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Ventas por
+                                    Período</span></a>
+                        </li>
+                        <li class="w-100 li-item {{ active_route('cliente/reportes/productos-mas-vendidos*') }}">
+                            <a href="{{ route('cliente.reportes.productos-mas-vendidos') }}"
+                                class="nav-link submenu">
+                                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Productos más
+                                    Vendidos</span></a>
+                        </li>
+                        <li class="w-100 li-item {{ active_route('cliente/reportes/tickets*') }}">
+                            <a href="{{ route('cliente.reportes.tickets') }}" class="nav-link submenu">
+                                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Tickets</span></a>
+                        </li>
+                        <li class="w-100 li-item {{ active_route('cliente/reportes/logs*') }}">
+                            <a href="{{ route('cliente.reportes.logs') }}" class="nav-link submenu">
                                 <i class="bi bi-fingerprint fs-6"></i> <span class="d-sm-inline px-2">Logs</span></a>
                         </li>
                     </ul>

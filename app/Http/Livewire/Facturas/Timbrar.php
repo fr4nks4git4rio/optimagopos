@@ -6,6 +6,7 @@ use App\Http\Livewire\Layouts\Modal;
 use App\Models\MotivoCancelacionFactura;
 use App\Models\Facturador;
 use App\Models\Factura;
+use App\Services\Timbrado\Facturador as TimbradoFacturador;
 
 class Timbrar extends Modal
 {
@@ -18,7 +19,7 @@ class Timbrar extends Modal
     public function mount()
     {
         $this->type = 'Factura';
-        $this->folio = $this->factura->serie->descripcion . '-' . Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion() == 1);
+        $this->folio = $this->factura->serie->descripcion . '-' . Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion($this->factura->propietario_id) == 1);
     }
 
     public static function modalMaxWidthClass(): string
@@ -28,7 +29,7 @@ class Timbrar extends Modal
 
     public function getModoProperty()
     {
-        return system_config('cfdi_timbrado_productivo') ? 'PRODUCCION' : 'PRUEBA';
+        return $this->factura->propietario->cfdi_timbrado_productivo ? 'PRODUCCION' : 'PRUEBA';
     }
 
     public function getTextAlertProperty()
@@ -43,7 +44,7 @@ class Timbrar extends Modal
 
     public function timbrar()
     {
-        $facturador = new Facturador($this->factura->propietario);
+        $facturador = new TimbradoFacturador($this->factura->propietario);
         $res = $facturador->timbrarFactura($this->factura->id, $this->folio);
         // $this->date = now()->format('Y-m-d H:i:s');
         $this->emit('show-toast', $res['message'], $res['success'] ? 'success' : 'danger');

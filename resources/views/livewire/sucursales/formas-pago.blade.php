@@ -18,7 +18,6 @@
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                            <th>Forma de Pago SAT</th>
                             <th class="text-center">Moneda</th>
                             <th class="text-center">Activa</th>
                             <th class="text-center">Acciones</th>
@@ -28,7 +27,6 @@
                         @forelse($formas_pago as $key => $forma_pago)
                             <tr>
                                 <td>{{ $forma_pago['nombre'] }}</td>
-                                <td>{{ $forma_pago['forma_pago_sat'] }}</td>
                                 <td class="text-center">
                                     <span
                                         class="badge bg-primary-subtle text-primary">{{ $forma_pago['moneda'] }}</span>
@@ -62,7 +60,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td class="text-center" colspan="5">
+                                <td class="text-center" colspan="4">
                                     Sin datos que mostrar
                                 </td>
                             </tr>
@@ -92,13 +90,9 @@
                                 @endif
                                 <x-input label="Nombre" model="forma_pago_activa.nombre" />
                                 @if ($index_forma_pago_activa !== null)
-                                    <x-select2-modals label="Forma Pago SAT" :options="$formasPagoOptions"
-                                        model="forma_pago_activa.forma_pago_id" class="form-control" disabled />
                                     <x-select2-modals label="Moneda" :options="$monedas"
                                         model="forma_pago_activa.moneda_id" class="form-control" disabled />
                                 @else
-                                    <x-select2-modals label="Forma Pago SAT" :options="$formasPagoOptions"
-                                        model="forma_pago_activa.forma_pago_id" class="form-control" />
                                     <x-select2-modals label="Moneda" :options="$monedas"
                                         model="forma_pago_activa.moneda_id" class="form-control" />
                                 @endif

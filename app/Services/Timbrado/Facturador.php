@@ -22,7 +22,7 @@ class Facturador
     public function __construct(Sucursal $propietario)
     {
         $this->emisor = $propietario;
-        $this->modo_productivo = modo_facturacion() == 1;
+        $this->modo_productivo = modo_facturacion($propietario->id) == 1;
     }
 
 

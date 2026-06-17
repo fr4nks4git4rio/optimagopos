@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Storage;
  * @property string $logo
  * @property string $tipo_vigencia_ticket_facturacion
  * @property integer $dias_vigencia
+ * @property string $portal_pac
+ * @property string $usuario_integrador_sat
  * @property integer $cliente_id
  * @property integer $direccion_fiscal_id
  * @property integer $regimen_fiscal_id
@@ -48,6 +50,8 @@ class Sucursal extends Model
         'logo',
         'tipo_vigencia_ticket_facturacion',
         'dias_vigencia',
+        'portal_pac',
+        'usuario_integrador_sat',
         'cliente_id',
         'direccion_fiscal_id',
         'regimen_fiscal_id',
@@ -141,6 +145,7 @@ class Sucursal extends Model
                             ->selectRaw('id, CONCAT(codigo, " - ", descripcion) as nombre')->where('id', $value)->first()->nombre;
                         break;
                     case 'moneda_base_id':
+                    case 'moneda_facturacion_id':
                         $data['moneda'] = DB::table('tb_monedas')
                             ->selectRaw('id, acronimo as nombre')->where('id', $value)->first()->nombre;
                         break;

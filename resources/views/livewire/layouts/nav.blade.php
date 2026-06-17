@@ -158,14 +158,14 @@
             <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100"
                 id="menu_principal">
                 {{-- //TODO implementar menu lateral --}}
-                <li class="w-100 li-item {{ active_route('usuarios*') }}">
+                {{-- <li class="w-100 li-item {{ active_route('usuarios*') }}">
                     <a href="{{ route('usuarios.index') }}" class="nav-link submenu">
                         <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Usuarios</span></a>
                 </li>
                 <li class="w-100 li-item {{ active_route('trazas*') }}">
                     <a href="{{ route('trazas.index') }}" class="nav-link submenu">
                         <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Trazas</span></a>
-                </li>
+                </li> --}}
             </ul>
         </div>
     </div>

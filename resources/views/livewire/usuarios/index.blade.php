@@ -1,21 +1,24 @@
 @section('title', 'Usuarios')
 
-<div>
+<div wire:init="init">
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
         <div class="col-lg-auto mb-3">
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Usuarios" class="form-control" wire:model.debounce.500ms="search">
+                <input type="search" placeholder="Buscar Usuarios" class="form-control"
+                    wire:model.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
-            <button type="button" class="btn btn-site-primary btn-outline-warning"
-                wire:click="$emit('openModal', 'usuarios.save')">
-                <x-icon name="plus-lg" />
-                Crear
-            </button>
+            @can('create', [App\Models\User::class])
+                <button type="button" class="btn btn-site-primary btn-outline-warning"
+                    wire:click="$emit('openModal', 'usuarios.save')">
+                    <x-icon name="plus-lg" />
+                    Crear
+                </button>
+            @endcan
 
             <x-dropdown icon="eye" :label="__($perPage)">
                 @foreach ($perPages as $perPage)
@@ -64,22 +67,25 @@
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$usuario['deleted_at'])
-                                    <li class="list-inline-item">
-                                        <x-action icon="pencil" title="Modificar"
-                                            click="$emit('openModal', 'usuarios.save', {user: {{ $usuario['id'] }}})" />
-                                    </li>
-                                    @if ((user()->is_super_admin && user()->id != $usuario['id']) || (user()->is_admin && user()->id != $usuario['id']))
+                                    @can('update', App\Models\User::find($usuario['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="pencil" title="Modificar"
+                                                click="$emit('openModal', 'usuarios.save', {user: {{ $usuario['id'] }}})" />
+                                        </li>
+                                    @endcan
+                                    @can('delete', App\Models\User::find($usuario['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="Desactivar"
                                                 click="$emit('openModal', 'usuarios.delete', {usuario: {{ $usuario['id'] }}})" />
                                         </li>
-                                    @endif
+                                    @endcan
                                 @else
-                                    <li class="list-inline-item">
-                                        <x-action icon="check-circle" title="Reactivar"
-                                            click="$emit('openModal', 'usuarios.restore', {usuario: {{ $usuario['id'] }}})" />
-                                    </li>
-                                @endif
+                                    @can('restore', App\Models\User::withTrashed()->find($usuario['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="check-circle" title="Reactivar"
+                                                click="$emit('openModal', 'usuarios.restore', {usuario: {{ $usuario['id'] }}})" />
+                                        </li>
+                                    @endcan
                             </ul>
                         </td>
                     </tr>

@@ -20,7 +20,6 @@ class Configuraciones extends Modal
         'to_id' => null
     ];
     public $moneda_sucursal;
-    public $moneda_facturacion;
     public $tipos_cambio = [];
     public $monedas = [];
 
@@ -33,7 +32,6 @@ class Configuraciones extends Modal
     public function mount()
     {
         $this->moneda_sucursal = $this->sucursal->moneda_base_id;
-        $this->moneda_facturacion = $this->sucursal->moneda_facturacion_id;
         $this->monedas = DB::table('tb_monedas')
             ->select('id as value', 'acronimo as label')
             ->get()
@@ -93,15 +91,6 @@ class Configuraciones extends Modal
                 return;
             }
             DB::table('tb_sucursales')->where('id', $this->sucursal->id)->update(['moneda_base_id' => $this->{$key}]);
-        }
-        if ($key == 'moneda_facturacion') {
-            if (!$this->{$key}) {
-                $this->emit('show-toast', 'Hay errores en el formulario.', 'danger');
-                $this->addError($key, 'Campo obligatorio.');
-                $this->{$key} = $this->sucursal->moneda_facturacion_id;
-                return;
-            }
-            DB::table('tb_sucursales')->where('id', $this->sucursal->id)->update(['moneda_facturacion_id' => $this->{$key}]);
         }
 
         $this->emit('show-toast', 'Configuración actualizada!');

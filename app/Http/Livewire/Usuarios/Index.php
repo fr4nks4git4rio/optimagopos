@@ -58,6 +58,14 @@ class Index extends Component
         ]);
     }
 
+    public function init()
+    {
+        if (user()->cannot('viewAny', [User::class])) {
+            $this->emit('show-toast', 'No tiene permisos para acceder a estos registros.', 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function query()
     {
         $query = DB::table('tb_usuarios as u')
@@ -67,9 +75,14 @@ class Index extends Component
                 DB::raw("CONCAT_WS(' ', u.nombre, u.apellidos) as nombre"),
                 'u.email',
                 'c.nombre_comercial as cliente',
+                'u.cliente_id',
                 'u.deleted_at'
             )
             ->leftJoin('tb_clientes as c', 'c.id', '=', 'u.cliente_id');
+
+        if (!user()->is_super_admin)
+            $query->where('cliente_id', user()->cliente_id);
+
         switch ($this->filter) {
             case 'Activos':
                 $query->where('u.deleted_at', null);

@@ -199,13 +199,9 @@ if (!function_exists('fmod_positive_only')) {
 }
 
 if (!function_exists('modo_facturacion')) {
-    function modo_facturacion()
+    function modo_facturacion($sucursal_id)
     {
-        return Config::firstOrCreate([
-            'llave' => 'cfdi_timbrado_productivo'
-        ], [
-            'valor' => 0
-        ])->valor;
+        return Sucursal::find($sucursal_id)?->cfdi_timbrado_productivo;
     }
 }
 
