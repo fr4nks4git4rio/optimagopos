@@ -93,7 +93,7 @@ class AutoFacturacion extends Component
             ->whereNull('c.deleted_at')
             ->get()->map(function ($element) {
                 $label = Crypt::decrypt($element->label);
-                if($element->razon_social)
+                if ($element->razon_social)
                     $label .= Crypt::decrypt($element->cliente);
                 $element->label = $label;
                 return (array)$element;
