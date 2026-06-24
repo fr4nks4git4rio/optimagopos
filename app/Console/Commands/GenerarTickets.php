@@ -38,21 +38,29 @@ class GenerarTickets extends Command
      */
     public function handle()
     {
-        $logs = Log::where('status', 200)->get();
+        $logs = Log::all();
 
         foreach ($logs as $log) {
             $decoded = json_decode($log->data, true);
 
-            $this->info("Procesando: {$decoded['TransactionId']}");
+            $terminalId = $decoded['terminalId'] ?? $decoded['MerchantFiscalId'];
 
-            $terminal = Terminal::findByIdentificador($decoded['TerminalId']);
+            $terminal = Terminal::findByIdentificador($terminalId);
 
             if (!$terminal) {
-                $terminal = Terminal::findByIdentificador($decoded['APIUserName']);
+                $terminalId = $decoded['APIUserName'];
+                $terminal = Terminal::findByIdentificador($terminalId);
             }
 
+            $this->info("Procesando: Transaccion ({$decoded['TransactionId']}) | Terminal ($terminalId)");
+
             if (!$terminal) {
-                $this->error("Terminal no encontrada: {$decoded['TerminalId']}");
+                $this->error("Terminal no encontrada: {$terminalId}");
+                continue;
+            }
+
+            if (DB::table('tb_tickets')->where('terminal_id', $terminal->id)->where('id_transaccion', $decoded['TransactionId'])->count() > 0) {
+                $this->info("Ticket existente!");
                 continue;
             }
 
