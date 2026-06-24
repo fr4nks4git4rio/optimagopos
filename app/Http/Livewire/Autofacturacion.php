@@ -80,7 +80,6 @@ class AutoFacturacion extends Component
         $this->sucursales = DB::table('tb_sucursales as s')
             ->select('s.id as value', 's.nombre_comercial as label')
             ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
-            ->where('c.con_facturacion', 1)
             ->whereNull('s.deleted_at')
             ->whereNull('c.deleted_at')
             ->get()->map(function ($element) {
@@ -93,14 +92,10 @@ class AutoFacturacion extends Component
         $this->sucursalesFiltro = DB::table('tb_sucursales as s')
             ->select('s.id as value', 's.nombre_comercial as label', 'c.razon_social as cliente')
             ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
-            ->where('c.con_facturacion', 1)
             ->whereNull('s.deleted_at')
             ->whereNull('c.deleted_at')
             ->get()->map(function ($element) {
-                $label = Crypt::decrypt($element->label);
-                if ($element->razon_social)
-                    $label .= Crypt::decrypt($element->cliente);
-                $element->label = $label;
+                $element->label = Crypt::decrypt($element->label) . " - " . Crypt::decrypt($element->cliente);
                 return (array)$element;
             })->toArray();
         if ($this->codigo) {
