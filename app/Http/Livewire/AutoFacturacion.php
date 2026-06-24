@@ -78,21 +78,29 @@ class AutoFacturacion extends Component
     {
         $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only(['label', 'value']);
         $this->sucursales = DB::table('tb_sucursales as s')
-            ->select('s.id as value', 's.nombre_comercial as label')
+            ->select('s.id as value', 's.nombre_comercial as label', 's.razon_social as razon_social')
             ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
+            ->where('c.con_facturacion', 1)
             ->whereNull('s.deleted_at')
             ->whereNull('c.deleted_at')
             ->get()->map(function ($element) {
-                $element->label = Crypt::decrypt($element->label);
+                $label = Crypt::decrypt($element->label);
+                if ($element->razon_social)
+                    $label .= ' - ' . Crypt::decrypt($element->razon_social);
+                $element->label = $label;
                 return (array)$element;
             })->toArray();
         $this->sucursalesFiltro = DB::table('tb_sucursales as s')
-            ->select('s.id as value', 's.nombre_comercial as label', 'c.razon_social as cliente')
+            ->select('s.id as value', 's.nombre_comercial as label', 's.razon_social as razon_social')
             ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
+            ->where('c.con_facturacion', 1)
             ->whereNull('s.deleted_at')
             ->whereNull('c.deleted_at')
             ->get()->map(function ($element) {
-                $element->label = Crypt::decrypt($element->label) . " - " . Crypt::decrypt($element->cliente);
+                $label = Crypt::decrypt($element->label);
+                if ($element->razon_social)
+                    $label .= ' - ' . Crypt::decrypt($element->razon_social);
+                $element->label = $label;
                 return (array)$element;
             })->toArray();
         if ($this->codigo) {
