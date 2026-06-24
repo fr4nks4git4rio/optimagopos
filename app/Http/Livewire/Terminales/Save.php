@@ -113,6 +113,15 @@ class Save extends Modal
         return view('livewire.terminales.save');
     }
 
+    public function init()
+    {
+        if (user()->cannot($this->terminal->exists() ? 'update' : 'create', $this->terminal->exists() ? $this->terminal : [Terminal::class])) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+    }
+
     public function save()
     {
         $rules = $this->terminal->rules();

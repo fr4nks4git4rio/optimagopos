@@ -53,7 +53,7 @@ class HomeController
 
         // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
 
-        $terminal = Terminal::findByIdentificador($decoded['MerchantFiscalId']);
+        $terminal = Terminal::findByIdentificador($decoded['TerminalId']);
         if (!$terminal) {
             ModelsLog::create([
                 'log' => 'Error. Terminal no encontrada.',

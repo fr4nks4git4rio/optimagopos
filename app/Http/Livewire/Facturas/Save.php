@@ -329,6 +329,15 @@ class Save extends Component
         return view('livewire.facturas.save');
     }
 
+    public function init()
+    {
+        if (user()->cannot($this->factura->exists() ? 'update' : 'create', $this->factura->exists() ? $this->factura : [Factura::class])) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+    }
+
     public function guardar()
     {
         $this->subtotal = $this->subtotal_factura;

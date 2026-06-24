@@ -50,6 +50,13 @@ class Index extends Component
         ]);
     }
 
+    public function init(){
+        if (user()->cannot('viewAnyCliente', [Cliente::class])) {
+            $this->emit('show-toast', 'No tiene permisos para acceder a estos registros.', 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function query()
     {
         $query = match ($this->filter) {

@@ -19,7 +19,6 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class Nav extends Component
 {
-    protected $listeners = ['$refresh', 'newNotification' => 'loadNotifications', 'profileChanged' => 'changeProfile', 'markNotificationAsRead', 'markNotificationsAllAsRead'];
     public $class_logo;
     public $show_title;
     public $notifications;
@@ -31,7 +30,16 @@ class Nav extends Component
     public $is_admin;
     public $is_staff;
     public $is_guest;
+    public $langs = ['es' => 'ES', 'en' => 'EN'];
     protected $profile = '';
+    protected $listeners = [
+        '$refresh',
+        'newNotification' => 'loadNotifications',
+        'profileChanged' => 'changeProfile',
+        'markNotificationAsRead',
+        'markNotificationsAllAsRead',
+        'changeLang'
+    ];
 
     public function mount()
     {
@@ -54,7 +62,7 @@ class Nav extends Component
             ->event('login')
             ->withProperties(User::parseData(Arr::except(
                 $user->toArray(),
-                ['password','created_at', 'updated_at', 'deleted_at']
+                ['password', 'created_at', 'updated_at', 'deleted_at']
             )))
             ->log("El usuario con email $user->email se ha desconectado.");
 
@@ -112,5 +120,16 @@ class Nav extends Component
     public function getHasNotificationsProperty(): bool
     {
         return $this->notifications->count() > 0;
+    }
+
+    public function changeLang($lang)
+    {
+        $user = User::find(user()->id);
+        $user->lang = $lang;
+        $user->save();
+
+        app()->setLocale($lang);
+
+        $this->emit('$refresh');
     }
 }

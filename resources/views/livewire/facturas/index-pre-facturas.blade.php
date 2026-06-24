@@ -1,6 +1,6 @@
 @section('title', 'Facturas')
 
-<div>
+<div wire:init="init">
     <div wire:loading.delay.longer>
         <div class="loading">
             <img src="{{ asset('img/loading.gif') }}" />
@@ -9,7 +9,7 @@
 
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
-    <div class="row justify-content-end" wire:init="init()">
+    <div class="row justify-content-end">
         {{-- <div class="col-lg-auto mb-3"> --}}
         {{-- <div class="input-group"> --}}
         {{-- <span class="input-group-text"><x-icon name="search"/></span> --}}
@@ -18,9 +18,11 @@
         {{-- </div> --}}
         {{-- </div> --}}
         <div class="col-lg-auto mb-3">
-            <button type="button" class="btn btn-site-primary mr-1" wire:click="nuevaFactura">
-                Nueva Factura
-            </button>
+            @can('create', [App\Models\Factura::class])
+                <button type="button" class="btn btn-site-primary mr-1" wire:click="nuevaFactura">
+                    Nueva Factura
+                </button>
+            @endcan
             <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirFacturas()">
                 Imprimir
             </button>
@@ -115,10 +117,12 @@
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if ($factura->estado == 'PRECAPTURADA' || $factura->estado == 'CAPTURADA')
-                                    <li class="list-inline-item mb-1">
-                                        <x-action icon="pencil" title="Editar"
-                                            href="{{ route('cliente.pre-facturas.save', $factura->id) }}" />
-                                    </li>
+                                    @can('update', App\Models\Factura::find($factura->id))
+                                        <li class="list-inline-item mb-1">
+                                            <x-action icon="pencil" title="Editar"
+                                                href="{{ route('cliente.pre-facturas.save', $factura->id) }}" />
+                                        </li>
+                                    @endcan
                                 @endif
                                 <li class="list-inline-item mb-1">
                                     <x-action icon="file-pdf" title="Mostrar PDF"
@@ -130,10 +134,12 @@
                                             click="timbrar('{{ $factura->id }}')" />
                                     </li>
                                 @endif
-                                <li class="list-inline-item mb-1">
-                                    <x-action icon="trash" title="Eliminar"
-                                        click="$emit('openModal', 'facturas.delete', {factura: '{{ $factura->id }}', scope: 'facturas.index-almacen'})" />
-                                </li>
+                                @can('delete', App\Models\Factura::find($factura->id))
+                                    <li class="list-inline-item mb-1">
+                                        <x-action icon="trash" title="Eliminar"
+                                            click="$emit('openModal', 'facturas.delete', {factura: '{{ $factura->id }}', scope: 'facturas.index-almacen'})" />
+                                    </li>
+                                @endcan
                             </ul>
                         </td>
                     </tr>

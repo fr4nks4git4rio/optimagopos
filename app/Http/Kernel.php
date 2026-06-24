@@ -4,6 +4,7 @@ namespace App\Http;
 
 use App\Http\Middleware\ConFacturacion;
 use App\Http\Middleware\HasRole;
+use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TwoFactorAuthenticated;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -69,6 +70,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         '2fa' => TwoFactorAuthenticated::class,
         'hasRole' => HasRole::class,
-        'conFacturacion' => ConFacturacion::class
+        'conFacturacion' => ConFacturacion::class,
+        'set.locale' => SetLocale::class
     ];
 }

@@ -1,6 +1,6 @@
 @section('title', 'Sucursales')
 
-<div>
+<div wire:init="init">
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
@@ -12,11 +12,13 @@
             </div>
         </div>
         <div class="col-lg-auto mb-3">
-            <button type="button" class="btn btn-site-primary btn-outline-warning"
-                wire:click="$emit('openModal', 'sucursales.save')">
-                <x-icon name="plus-lg" />
-                Crear
-            </button>
+            @can('create', [App\Models\Sucursal::class])
+                <button type="button" class="btn btn-site-primary btn-outline-warning"
+                    wire:click="$emit('openModal', 'sucursales.save')">
+                    <x-icon name="plus-lg" />
+                    Crear
+                </button>
+            @endcan
 
             <x-dropdown icon="eye" :label="__($perPage)">
                 @foreach ($perPages as $perPage)
@@ -77,27 +79,37 @@
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$sucursal['deleted_at'])
-                                    <li class="list-inline-item">
-                                        <x-action icon="pencil" title="Modificar"
-                                            click="$emit('openModal', 'sucursales.save', {sucursal : {{ $sucursal['id'] }}})" />
-                                    </li>
-                                    <li class="list-inline-item">
-                                        <x-action icon="card-list" title="Formas de Pago"
-                                            click="$emit('openModal', 'sucursales.formas-pago', {sucursal: {{ $sucursal['id'] }}})" />
-                                    </li>
-                                    <li class="list-inline-item">
-                                        <x-action icon="gear" title="Configuraciones"
-                                            click="$emit('openModal', 'sucursales.configuraciones', {sucursal: {{ $sucursal['id'] }}})" />
-                                    </li>
-                                    <li class="list-inline-item">
-                                        <x-action icon="trash" title="Desactivar"
-                                            click="$emit('openModal', 'sucursales.delete', {sucursal: {{ $sucursal['id'] }}})" />
-                                    </li>
+                                    @can('update', App\Models\Sucursal::find($sucursal['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="pencil" title="Modificar"
+                                                click="$emit('openModal', 'sucursales.save', {sucursal : {{ $sucursal['id'] }}})" />
+                                        </li>
+                                    @endcan
+                                    @can('setPaymentForms', App\Models\Sucursal::find($sucursal['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="card-list" title="Formas de Pago"
+                                                click="$emit('openModal', 'sucursales.formas-pago', {sucursal: {{ $sucursal['id'] }}})" />
+                                        </li>
+                                    @endcan
+                                    @can('setConfigs', App\Models\Sucursal::find($sucursal['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="gear" title="Configuraciones"
+                                                click="$emit('openModal', 'sucursales.configuraciones', {sucursal: {{ $sucursal['id'] }}})" />
+                                        </li>
+                                    @endcan
+                                    @can('delete', App\Models\Sucursal::find($sucursal['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="trash" title="Desactivar"
+                                                click="$emit('openModal', 'sucursales.delete', {sucursal: {{ $sucursal['id'] }}})" />
+                                        </li>
+                                    @endcan
                                 @else
-                                    <li class="list-inline-item">
-                                        <x-action icon="check-circle" title="Reactivar"
-                                            click="$emit('openModal', 'sucursales.restore', {sucursal_id: {{ $sucursal['id'] }}})" />
-                                    </li>
+                                    @can('restore', App\Models\Sucursal::withTrashed()->find($sucursal['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="check-circle" title="Reactivar"
+                                                click="$emit('openModal', 'sucursales.restore', {sucursal_id: {{ $sucursal['id'] }}})" />
+                                        </li>
+                                    @endcan
                                 @endif
                             </ul>
                         </td>

@@ -4,7 +4,7 @@
     </x-slot:title>
 
     <x-slot:content>
-        <div class="row">
+        <div wire:init="init" class="row">
             <div x-data="{ logo_uploaded: false }" class="col-12 col-md-3 text-center mb-2"
                 x-on:livewire-upload-finish="logo_uploaded=true;$wire.logo_src = URL.createObjectURL(document.getElementById('logo').files[0])">
                 <label for="">Logo</label>
@@ -109,7 +109,7 @@
                         </div>
                     @endif
                 </div>
-                <div wire:init="init" class="row">
+                <div class="row">
                     <div class="col-12">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item @error('direccion_fiscal.codigo_postal') text-danger fw-bold @endif"

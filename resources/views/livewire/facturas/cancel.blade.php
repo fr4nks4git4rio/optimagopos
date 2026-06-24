@@ -9,7 +9,7 @@
     </x-slot:title>
 
     <x-slot:content>
-        <div class="row">
+        <div wire:init="init" class="row">
             <div class="col-sm-12">
                 <x-alert icon="exclamation-octagon" alert="danger">
                     {{$this->text_alert}} en <strong>MODO: {{$this->modo}}</strong>

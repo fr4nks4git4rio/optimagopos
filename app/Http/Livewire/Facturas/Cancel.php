@@ -59,6 +59,15 @@ class Cancel extends Modal
         return view('livewire.facturas.cancel');
     }
 
+    public function init()
+    {
+        if (user()->cannot('cancel', $this->factura)) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+    }
+
     public function cancel()
     {
         $data = $this->validate([

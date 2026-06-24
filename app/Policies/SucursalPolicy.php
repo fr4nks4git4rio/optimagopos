@@ -30,7 +30,7 @@ class SucursalPolicy
         if ($user->is_super_admin)
             return true;
 
-        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')))
+        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
             return true;
 
         return false;
@@ -55,7 +55,7 @@ class SucursalPolicy
         if ($user->is_super_admin)
             return true;
 
-        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')))
+        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
             return true;
 
         return false;
@@ -69,7 +69,7 @@ class SucursalPolicy
         if ($user->is_super_admin)
             return true;
 
-        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')))
+        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
             return true;
 
         return false;
@@ -83,7 +83,7 @@ class SucursalPolicy
         if ($user->is_super_admin)
             return true;
 
-        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')))
+        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
             return true;
 
         return false;
@@ -94,6 +94,27 @@ class SucursalPolicy
      */
     public function forceDelete(User $user, Sucursal $sucursal): bool
     {
+        return false;
+    }
+
+    public function setConfigs(User $user, Sucursal $sucursal): bool
+    {
+        if ($user->is_super_admin)
+            return true;
+
+        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
+            return true;
+
+        return false;
+    }
+    public function setPaymentForms(User $user, Sucursal $sucursal): bool
+    {
+        if ($user->is_super_admin)
+            return true;
+
+        if ($user->is_admin && in_array($sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
+            return true;
+
         return false;
     }
 }

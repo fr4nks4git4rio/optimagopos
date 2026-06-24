@@ -80,14 +80,22 @@ class FacturaPolicy
         return false;
     }
 
-    public function viewPanelPac(User $user)
+    public function cancel(User $user, Factura $factura): bool
+    {
+        if ($user->is_admin && $user->cliente_id ==  $factura->propietario_id)
+            return true;
+
+        return false;
+    }
+
+    public function setPanelPac(User $user)
     {
         if ($user->is_admin)
             return true;
 
         return false;
     }
-    public function viewCabeceraFactura(User $user)
+    public function setCabeceraFactura(User $user)
     {
         if ($user->is_admin)
             return true;

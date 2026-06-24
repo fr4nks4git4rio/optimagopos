@@ -92,6 +92,11 @@ class IndexAlmacen extends Component
 
     public function init()
     {
+        if (user()->cannot('viewAny', [Factura::class])) {
+            $this->emit('show-toast', 'No tiene permisos para visualizar los registros.', 'danger');
+            return redirect()->to('/');
+        }
+
         if ($this->cliente) {
             $cliente = Cliente::find($this->cliente);
             $cliente = Cliente::decryptInfo($cliente);

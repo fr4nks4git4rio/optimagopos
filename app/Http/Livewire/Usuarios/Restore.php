@@ -15,8 +15,9 @@ class Restore extends Modal
         return view('livewire.administracion.usuarios.restore');
     }
 
-    public function init(){
-        if (user()->cannot('restore', User::withoutTrashed()->find($this->usuario))) {
+    public function init()
+    {
+        if (user()->cannot('restore', User::withTrashed()->find($this->usuario))) {
             $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
             $this->emit('closeModal');
             return;

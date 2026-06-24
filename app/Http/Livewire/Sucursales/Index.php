@@ -56,6 +56,14 @@ class Index extends Component
         ]);
     }
 
+    public function init()
+    {
+        if (user()->cannot('viewAny', [Sucursal::class])) {
+            $this->emit('show-toast', 'No tiene permisos para acceder los registros.', 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function query()
     {
         $query = DB::table('tb_sucursales as s')

@@ -14,6 +14,15 @@ class Delete extends Modal
         return view('livewire.clientes.delete');
     }
 
+    public function init()
+    {
+        if (user()->cannot('deleteCliente', $this->cliente)) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+    }
+
     public function delete()
     {
         $this->cliente->delete();

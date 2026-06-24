@@ -1,6 +1,6 @@
 @section('title', 'Terminales')
 
-<div>
+<div wire:init="init">
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
@@ -12,13 +12,13 @@
             </div>
         </div>
         <div class="col-lg-auto mb-3">
-            @if (user()->is_super_admin)
+            @can('create', [App\Models\Terminal::class])
                 <button type="button" class="btn btn-site-primary btn-outline-warning"
                     wire:click="$emit('openModal', 'terminales.save')">
                     <x-icon name="plus-lg" />
                     Crear
                 </button>
-            @endif
+            @endcan
 
             <x-dropdown icon="eye" :label="__($perPage)">
                 @foreach ($perPages as $perPage)
@@ -70,19 +70,25 @@
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$terminal['deleted_at'])
-                                    <li class="list-inline-item">
-                                        <x-action icon="pencil" title="Modificar"
-                                            click="$emit('openModal', 'terminales.save', {terminal: {{ $terminal['id'] }}})" />
-                                    </li>
-                                    <li class="list-inline-item">
-                                        <x-action icon="trash" title="Desactivar"
-                                            click="$emit('openModal', 'terminales.delete', {terminal: {{ $terminal['id'] }}})" />
-                                    </li>
+                                    @can('update', App\Models\Terminal::find($terminal['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="pencil" title="Modificar"
+                                                click="$emit('openModal', 'terminales.save', {terminal: {{ $terminal['id'] }}})" />
+                                        </li>
+                                    @endcan
+                                    @can('delete', App\Models\Terminal::find($terminal['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="trash" title="Desactivar"
+                                                click="$emit('openModal', 'terminales.delete', {terminal: {{ $terminal['id'] }}})" />
+                                        </li>
+                                    @endcan
                                 @else
-                                    <li class="list-inline-item">
-                                        <x-action icon="check-circle" title="Reactivar"
-                                            click="$emit('openModal', 'terminales.restore', {terminal: {{ $terminal['id'] }}})" />
-                                    </li>
+                                    @can('restore', App\Models\Terminal::withTrashed()->find($terminal['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="check-circle" title="Reactivar"
+                                                click="$emit('openModal', 'terminales.restore', {terminal: {{ $terminal['id'] }}})" />
+                                        </li>
+                                    @endcan
                                 @endif
                             </ul>
                         </td>

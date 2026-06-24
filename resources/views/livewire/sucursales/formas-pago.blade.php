@@ -4,7 +4,7 @@
     </x-slot:title>
 
     <x-slot:content>
-        <div wire:init="init()" class="row">
+        <div wire:init="init" class="row">
             <div class="col-sm-12 mb-3">
                 <div class="mb-1">
                     <label for="">Sucursal:</label>

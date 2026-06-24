@@ -303,6 +303,12 @@ class Save extends Modal
 
     public function init()
     {
+        if (user()->cannot($this->sucursal->exists() ? 'update' : 'create', $this->sucursal->exists() ? $this->sucursal : [Sucursal::class])) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+
         if ($this->cliente_id) {
             $cliente = Cliente::find($this->cliente_id);
             $nombre = Crypt::decrypt($cliente->nombre_comercial);

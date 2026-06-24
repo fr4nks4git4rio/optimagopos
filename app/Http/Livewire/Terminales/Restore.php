@@ -15,6 +15,15 @@ class Restore extends Modal
         return view('livewire.terminales.restore');
     }
 
+    public function init()
+    {
+        if (user()->cannot('restore', Terminal::withTrashed()->find($this->terminal))) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+    }
+
     public function restore()
     {
         $this->terminal = Terminal::onlyTrashed()->find($this->terminal);

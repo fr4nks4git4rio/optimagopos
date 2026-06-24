@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Http\Livewire\Layouts\Modal;
+use App\Models\Factura;
 use App\Models\Sucursal;
 use Illuminate\Support\Arr;
 
@@ -30,6 +31,14 @@ class PanelPac extends Modal
     public function render()
     {
         return view('livewire.panel-pac');
+    }
+
+    public function init()
+    {
+        if (user()->cannot('setPanelPac', [Factura::class])) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            return redirect()->to('/');
+        }
     }
 
     public function changeTimbrado($index)

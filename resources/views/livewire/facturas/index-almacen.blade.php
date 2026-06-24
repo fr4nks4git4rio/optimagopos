@@ -1,6 +1,6 @@
 @section('title', 'Almacén de Facturas')
 
-<div>
+<div wire:init="init">
     <div wire:loading.delay.longer>
         <div class="loading">
             <img src="{{ asset('img/loading.gif') }}" />
@@ -9,7 +9,7 @@
 
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
-    <div class="row justify-content-end" wire:init="init()">
+    <div class="row justify-content-end">
         {{-- <div class="col-lg-auto mb-3"> --}}
         {{-- <div class="input-group"> --}}
         {{-- <span class="input-group-text"><x-icon name="search"/></span> --}}
@@ -129,16 +129,20 @@
                                         click="descargarXml({{ $factura->id }})" />
                                 </li>
                                 @if ($factura->estado == 'TIMBRADA')
-                                    <li class="list-inline-item mb-1">
-                                        <x-action icon="x-octagon" title="Cancelar"
-                                            click="$emit('openModal', 'facturas.cancel', {factura: '{{ $factura->id }}', scope: 'facturas.index-almacen'})" />
-                                    </li>
+                                    @can('cancel', App\Models\Factura::find($factura->id))
+                                        <li class="list-inline-item mb-1">
+                                            <x-action icon="x-octagon" title="Cancelar"
+                                                click="$emit('openModal', 'facturas.cancel', {factura: '{{ $factura->id }}', scope: 'facturas.index-almacen'})" />
+                                        </li>
+                                    @endcan
                                 @endif
                                 @if ($factura->estado == 'CANCELADA')
-                                    <li class="list-inline-item mb-1">
-                                        <x-action icon="trash" title="Eliminar"
-                                            click="$emit('openModal', 'facturas.delete', {factura: '{{ $factura->id }}', scope: 'facturas.index-almacen'})" />
-                                    </li>
+                                    @can('delete', App\Models\Factura::find($factura->id))
+                                        <li class="list-inline-item mb-1">
+                                            <x-action icon="trash" title="Eliminar"
+                                                click="$emit('openModal', 'facturas.delete', {factura: '{{ $factura->id }}', scope: 'facturas.index-almacen'})" />
+                                        </li>
+                                    @endcan
                                 @endif
                             </ul>
                         </td>

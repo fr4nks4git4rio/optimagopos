@@ -45,14 +45,14 @@ class GenerarTickets extends Command
 
             $this->info("Procesando: {$decoded['TransactionId']}");
 
-            $terminal = Terminal::findByIdentificador($decoded['MerchantFiscalId']);
+            $terminal = Terminal::findByIdentificador($decoded['TerminalId']);
 
             if (!$terminal) {
                 $terminal = Terminal::findByIdentificador($decoded['APIUserName']);
             }
 
             if (!$terminal) {
-                $this->error("Terminal no encontrada: {$decoded['MerchantFiscalId']}");
+                $this->error("Terminal no encontrada: {$decoded['TerminalId']}");
                 continue;
             }
 

@@ -106,7 +106,7 @@ class ClientePolicy
      */
     public function viewComensal(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')))
+        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')->toArray()))
             return true;
 
         return false;
@@ -127,7 +127,7 @@ class ClientePolicy
      */
     public function update(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')))
+        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')->toArray()))
             return true;
 
         return false;
@@ -138,7 +138,7 @@ class ClientePolicy
      */
     public function delete(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')))
+        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')->toArray()))
             return true;
 
         return false;
@@ -149,7 +149,7 @@ class ClientePolicy
      */
     public function restore(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')))
+        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')->toArray()))
             return true;
 
         return false;

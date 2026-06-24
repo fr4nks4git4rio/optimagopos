@@ -29,6 +29,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $email
  * @property string $password
  * @property string $avatar
+ * @property string $lang
  * @property integer $rol_id
  * @property integer $cliente_id
  */
@@ -50,6 +51,7 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'avatar',
+        'lang',
         'rol_id',
         'cliente_id',
         // 'two_factor_authentication_enabled',
@@ -75,9 +77,7 @@ class User extends Authenticatable implements JWTSubject
             'apellidos' => ['nullable'],
             'rol_id' => ['required'],
             'cliente_id' => ['nullable', 'required_if:rol_id,2', 'exists:tb_clientes,id'],
-            'password' => [Rule::requiredIf(function () {
-                return $this->id == null;
-            }), 'confirmed']
+            'password' => [Rule::requiredIf(fn() => $this->id == null), 'confirmed']
         ];
     }
 

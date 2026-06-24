@@ -8,6 +8,7 @@ use App\Models\Estado;
 use App\Models\Localidad;
 use App\Models\Municipio;
 use App\Models\Cliente;
+use App\Models\Factura;
 use App\Models\Moneda;
 use App\Models\Sucursal;
 use App\Rules\RfcRule;
@@ -85,6 +86,10 @@ class CabeceraFactura extends Component
 
     public function init()
     {
+        if (user()->cannot('setCabeceraFactura', [Factura::class])) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            return redirect()->to('/');
+        }
         foreach ($this->sucursales as $index => $sucursal) {
             if ($sucursal['direccion']['estado_id']) {
                 $estado = Estado::find($sucursal['direccion']['estado_id']);

@@ -4,7 +4,7 @@
     </x-slot:title>
 
     <x-slot:content>
-        <div class="row">
+        <div wire:init="init" class="row">
             <ul class="nav nav-tabs" id="myTabPanelPac" role="tablist">
                 @foreach ($sucursales as $index => $sucursal)
                     <li class="nav-item" role="presentation">

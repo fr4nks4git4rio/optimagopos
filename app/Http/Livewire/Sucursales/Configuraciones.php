@@ -69,6 +69,15 @@ class Configuraciones extends Modal
         return view('livewire.sucursales.configuraciones');
     }
 
+    public function init()
+    {
+        if (user()->cannot('setConfigs', $this->sucursal)) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+    }
+
     public function loadTiposCambio()
     {
         $this->tipos_cambio = DB::table('tb_tipo_cambios as tc')

@@ -1,6 +1,6 @@
 @section('title', ($factura->exists ? 'Editar ' : 'Nueva ') . 'Factura')
 
-<div>
+<div wire:init="init">
     <div wire:loading.delay>
         <div class="loading">
             <img src="{{ asset('img/loading.gif') }}" />

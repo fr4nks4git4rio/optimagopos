@@ -214,6 +214,12 @@ class Save extends Modal
 
     public function init()
     {
+        if (user()->cannot($this->cliente->exists() ? 'updateCliente' : 'createCliente', $this->cliente->exists() ? $this->cliente : [Cliente::class])) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+
         if ($this->direccion_fiscal['estado_id']) {
             $estado = Estado::find($this->direccion_fiscal['estado_id']);
             $this->dispatchBrowserEvent("set-data-direccion_fiscal-estado_id", ['data' => [$estado->only('id', 'text')], 'term' => '', 'value' => $estado->id]);

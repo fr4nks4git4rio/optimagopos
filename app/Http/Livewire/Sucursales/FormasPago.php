@@ -13,7 +13,7 @@ class FormasPago extends Modal
 {
     public Sucursal $sucursal;
     public $formas_pago = [];
-    public $monedas= [];
+    public $monedas = [];
 
     public $index_forma_pago_activa = null;
 
@@ -49,6 +49,11 @@ class FormasPago extends Modal
 
     public function init()
     {
+        if (user()->cannot('setPaymentForms', $this->sucursal)) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
         $this->loadFormasPago();
     }
 

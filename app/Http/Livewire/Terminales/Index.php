@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Terminales;
 
 use App\Models\Sucursal;
+use App\Models\Terminal;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
@@ -54,6 +55,14 @@ class Index extends Component
         return view('livewire.terminales.index', [
             'terminales' => $terminales,
         ]);
+    }
+
+    public function init()
+    {
+        if (user()->cannot('viewAny', [Terminal::class])) {
+            $this->emit('show-toast', 'No tiene permisos para visualizar los registros.', 'danger');
+            return redirect()->to('/');
+        }
     }
 
     public function query()

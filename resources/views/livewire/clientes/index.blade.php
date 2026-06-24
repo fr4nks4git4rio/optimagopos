@@ -1,21 +1,24 @@
 @section('title', 'Clientes')
 
-<div>
+<div wire:init="init">
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
         <div class="col-lg-auto mb-3">
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Clientes" class="form-control" wire:model.debounce.500ms="search">
+                <input type="search" placeholder="Buscar Clientes" class="form-control"
+                    wire:model.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
-            <button type="button" class="btn btn-site-primary btn-outline-warning"
-                wire:click="$emit('openModal', 'clientes.save')">
-                <x-icon name="plus-lg" />
-                Crear
-            </button>
+            @can('createCliente', [App\Models\Cliente::class])
+                <button type="button" class="btn btn-site-primary btn-outline-warning"
+                    wire:click="$emit('openModal', 'clientes.save')">
+                    <x-icon name="plus-lg" />
+                    Crear
+                </button>
+            @endcan
 
             <x-dropdown icon="eye" :label="__($perPage)">
                 @foreach ($perPages as $perPage)
@@ -68,19 +71,25 @@
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$cliente['deleted_at'])
-                                    <li class="list-inline-item">
-                                        <x-action icon="pencil" title="Modificar"
-                                            click="$emit('openModal', 'clientes.save', {cliente: {{ $cliente['id'] }}})" />
-                                    </li>
-                                    <li class="list-inline-item">
-                                        <x-action icon="trash" title="Desactivar"
-                                            click="$emit('openModal', 'clientes.delete', {cliente: {{ $cliente['id'] }}})" />
-                                    </li>
+                                    @can('updateCliente', App\Models\Cliente::find($cliente['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="pencil" title="Modificar"
+                                                click="$emit('openModal', 'clientes.save', {cliente: {{ $cliente['id'] }}})" />
+                                        </li>
+                                    @endcan
+                                    @can('deleteCliente', App\Models\Cliente::find($cliente['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="trash" title="Desactivar"
+                                                click="$emit('openModal', 'clientes.delete', {cliente: {{ $cliente['id'] }}})" />
+                                        </li>
+                                    @endcan
                                 @else
-                                    <li class="list-inline-item">
-                                        <x-action icon="check-circle" title="Reactivar"
-                                            click="$emit('openModal', 'clientes.restore', {cliente_id: {{ $cliente['id'] }}})" />
-                                    </li>
+                                    @can('restoreCliente', App\Models\Cliente::withTrashed()->find($cliente['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="check-circle" title="Reactivar"
+                                                click="$emit('openModal', 'clientes.restore', {cliente_id: {{ $cliente['id'] }}})" />
+                                        </li>
+                                    @endcan
                                 @endif
                             </ul>
                         </td>

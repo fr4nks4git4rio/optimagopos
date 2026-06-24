@@ -25,6 +25,15 @@ class Delete extends Modal
         return view('livewire.facturas.delete');
     }
 
+    public function init()
+    {
+        if (user()->cannot('delete', $this->factura)) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+    }
+
     public function delete()
     {
         $tipo = 'Factura';

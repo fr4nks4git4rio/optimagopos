@@ -14,10 +14,19 @@ class Restore extends Modal
         return view('livewire.clientes.restore');
     }
 
+    public function init()
+    {
+        if (user()->cannot('restoreCliente', Cliente::withTrashed()->find($this->cliente_id))) {
+            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('closeModal');
+            return;
+        }
+    }
+
     public function restore()
     {
         $cliente = Cliente::onlyTrashed()->find($this->cliente_id);
-        if(!$cliente){
+        if (!$cliente) {
             $this->emit('show-toast', 'Cliente no encontrado.', 'danger');
             $this->emit('closeModal');
             return;

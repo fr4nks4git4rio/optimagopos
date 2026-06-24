@@ -74,7 +74,7 @@ Route::get('/load-estados', [EstadoController::class, 'loadEstados'])->name('est
 Route::get('/load-municipios', [MunicipioController::class, 'loadMunicipios'])->name('municipios.load-municipios');
 Route::get('/load-localidades', [LocalidadController::class, 'loadLocalidades'])->name('localidades.load-localidades');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'set.locale'])->group(function () {
 
     Route::get('/home', Home::class)->name('home');
 

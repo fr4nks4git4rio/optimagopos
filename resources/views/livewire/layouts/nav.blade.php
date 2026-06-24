@@ -2,44 +2,15 @@
     <div class="container-fluid">
         <a href="{{ url('/') }}" class="">
             <!-- LOGO -->
-            {{-- {{$class_logo}} --}}
             <div class="topbar-left hidden-xs " :class="class_logo">
                 <div class="text-center">
                     <a href="{{ url('/') }}" class="logo">
-                        <h1 class="fs-3" x-show="show_title">Optima Go Pos</h1>
-                        <h1 class="fs-2" x-show="!show_title">OGP</h1>
-                        <!-- <img x-show="show_title" src="{{ asset('images/bretail.png') }}" alt="">
-                        <img x-show="!show_title" src="{{ asset('images/bretail-sm.png') }}" alt=""> -->
+                        <h1 class="fs-3">OGP</h1>
                     </a>
                 </div>
             </div>
-            <div class="topbar-left hidden-lg">
-                <div class="text-center">
-                    <a href="{{ url('/') }}" class="logo">
-                        {{-- <img x-show="show_title" src="images/bretail.png" alt=""> --}}
-                        <h1 class="fs-2">KB</h1>
-                        <!-- <img src="{{ asset('images/bretail-sm.png') }}" alt=""> -->
-                    </a>
-                </div>
-            </div>
-            {{-- <div class="topbar-left" --}}
-            {{-- style="background-image: linear-gradient(to right, #ffad3b , #ffeed6 ,  #ffeed6, #ffad3b );"> --}}
-            {{-- <img src="{{ asset('images/pm_logo_2.png') }}?v={{ config('app.version') }}" --}}
-            {{-- alt="{{ config('app.name') }}" height="40"> --}}
-            {{-- <strong>{{config('app.name')}}</strong> --}}
-            {{-- </div> --}}
         </a>
         <!-- Mobile Menu Toggle Button -->
-        {{-- <button class="navbar-toggler d-block m-sm-2" @click="toggleClicked()" --}}
-        {{-- type="button" data-bs-toggle="" style="z-index: 9999991" --}}
-        {{-- data-bs-target="#sidebar-menu" aria-controls="sidebar-menu"> --}}
-        {{-- --}}{{-- <span class="navbar-toggler-icon"></span> --}}
-        {{-- <span class="fa fa-bars text-white"></span> --}}
-        {{-- @if ($this->profile_exist) --}}
-        {{-- <span class="text-white">&nbsp;{{$this->profile_role}}</span> --}}
-        {{-- @endif --}}
-        {{-- </button> --}}
-
         <button @click="toggleClicked()" class="navbar-toggler d-block" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false"
             aria-label="Toggle navigation" style="margin-left: 7px">
@@ -83,9 +54,9 @@
                                 <li class="head text-light bg-site-primary">
                                     <div class="row">
                                         <div class="col-lg-12 col-sm-12 col-12">
-                                            <span>Notificaciones {{ count($notifications) }}</span>
+                                            <span>{{ __('nav.notifications') }} {{ count($notifications) }}</span>
                                             <a href="javascript:void(0)" wire:click="$emit('markNotificationsAllAsRead')"
-                                                class="float-end text-light">Marcar como leidas</a>
+                                                class="float-end text-light">{{ __('nav.mark-as-read') }}</a>
                                         </div>
                                     </div>
                                 </li>
@@ -114,7 +85,7 @@
                                                 <a href="javascript:void(0)" class="float-end mr-3"
                                                     style="text-decoration: none"
                                                     wire:click="$emit('markNotificationAsRead', '{{ $notification->id }}')"><small
-                                                        class="text-danger">Marcar como leída</small></a>
+                                                        class="text-danger">{{ __('nav.mark-as-read') }}</small></a>
                                             </div>
                                         </div>
                                     </li>
@@ -128,18 +99,28 @@
 
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle fs-5" data-bs-toggle="dropdown">
+                            <span class="text-uppercase">{{ user()->lang ?? config('app.locale') }}</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            @foreach ($langs as $index => $lang)
+                                <x-dropdown-item label="{{ $lang }}" click="changeLang('{{ $index }}')" />
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle fs-5" data-bs-toggle="dropdown">
                             <img src="{{ user()->avatar_uri ? asset(user()->avatar_uri) : '/img/avatars/no_avatar.png' }}"
                                 class="user-image" style="object-fit: cover" alt="User Image"><span
                                 class="hidden-xs">{{ user()->nombre_completo }}</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <x-dropdown-item label="Modificar Perfil" click="$emit('openModal', 'auth.update-profile')" />
+                            <x-dropdown-item label="{{ __('nav.update-profile') }}" click="$emit('openModal', 'auth.update-profile')" />
 
-                            <x-dropdown-item label="Cambiar Contraseña"
+                            <x-dropdown-item label="{{ __('nav.change-password') }}"
                                 click="$emit('openModal', 'auth.change-password')" />
 
                             @if (user()->is_admin)
-                                <x-dropdown-item label="Mi Empresa"
+                                <x-dropdown-item label="{{ __('nav.my-company') }}"
                                     click="$emit('openModal', 'auth.my-company', {company: {{ user()->cliente_id }}})" />
                             @endif
 
