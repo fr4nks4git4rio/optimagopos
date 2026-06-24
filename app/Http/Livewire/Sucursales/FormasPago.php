@@ -106,9 +106,11 @@ class FormasPago extends Modal
         ]);
 
         if (
-            DB::table('tb_sucursal_forma_pagos')
-            ->where('nombre', $data['forma_pago_activa']['nombre'])
-            ->where('id', '!=', $data['forma_pago_activa']['id'])
+            DB::table('tb_sucursal_forma_pagos as sfp')
+            ->leftJoin('tb_sucursales as s', 's.id', 'sfp.sucursal_id')
+            ->where('sfp.nombre', $data['forma_pago_activa']['nombre'])
+            ->where('sfp.id', '!=', $data['forma_pago_activa']['id'])
+            ->where('s.cliente_id', $this->sucursal->cliente_id)
             ->count() > 0
         ) {
             $this->addError('forma_pago_activa.nombre', 'El nombre ya está en uso.');
