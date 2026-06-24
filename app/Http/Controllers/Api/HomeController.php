@@ -127,7 +127,7 @@ class HomeController
                 'ubicacion' => $decoded['Location'] ?? '',
                 'id_transaccion' => $decoded['TransactionId'],
                 'fecha_transaccion' => Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'),
-                'vigencia_facturacion' => $vigencia_facturacion ? $vigencia_facturacion->format('Y-m-d') : '',
+                'vigencia_facturacion' => $vigencia_facturacion ? $vigencia_facturacion->format('Y-m-d') : null,
                 'empleado_id' => $clerk->id,
                 'sucursal_id' => $terminal->sucursal_id,
                 'terminal_id' => $terminal->id,
