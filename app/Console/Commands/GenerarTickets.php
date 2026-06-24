@@ -72,7 +72,7 @@ class GenerarTickets extends Command
             try {
                 // Paso 4: Acceder a datos generales
                 $clerk = Empleado::where('sucursal_id', $terminal->sucursal_id)->where('id_empleado', $decoded['ClerkId'])->first();
-                if (!$clerk) {
+                if (!$clerk && $decoded['ClerkId']) {
                     $clerk = Empleado::create([
                         'id_empleado' => $decoded['ClerkId'],
                         'nombre' => $decoded['ClerkName'] ? Crypt::encrypt($decoded['ClerkName']) : '',
@@ -114,7 +114,7 @@ class GenerarTickets extends Command
                     'id_transaccion' => $decoded['TransactionId'],
                     'fecha_transaccion' => Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'),
                     'vigencia_facturacion' => $vigencia_facturacion ? $vigencia_facturacion->format('Y-m-d') : null,
-                    'empleado_id' => $clerk->id,
+                    'empleado_id' => optional($clerk)->id,
                     'sucursal_id' => $terminal->sucursal_id,
                     'terminal_id' => $terminal->id,
                     'comensal_id' => $comensal ? $comensal->id : null
@@ -158,7 +158,7 @@ class GenerarTickets extends Command
                             'nombre' => $item['Name'] ?? '',
                             'monto' => $item['Amount'] ?? 0,
                             'propina' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? (float)$item['Tip'] : 0,
-                            'empleado_id' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? $clerk->id : null,
+                            'empleado_id' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? optional($clerk)->id : null,
                             'sucursal_forma_pago_id' => optional($forma_pago)->id,
                             'es_cambio' => $prevProduct != null && $item['Amount'] < 0 ? 1 : 0,
                             'tipo_cambio' => $tasa_cambio
