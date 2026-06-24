@@ -57,7 +57,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8">
+                        <td colspan="11">
                             <div class="list-group-item">
                                 No se encontraron resultados...
                             </div>
