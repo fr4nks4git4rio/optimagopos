@@ -53,7 +53,7 @@ class HomeController
 
         // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
 
-        $terminalId = $decoded['terminalId'] ?? $decoded['MerchantFiscalId'];
+        $terminalId = $decoded['TerminalId'] ?? $decoded['MerchantFiscalId'];
 
         $terminal = Terminal::findByIdentificador($terminalId);
 

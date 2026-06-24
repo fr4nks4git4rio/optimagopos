@@ -43,7 +43,7 @@ class GenerarTickets extends Command
         foreach ($logs as $log) {
             $decoded = json_decode($log->data, true);
 
-            $terminalId = $decoded['terminalId'] ?? $decoded['MerchantFiscalId'];
+            $terminalId = $decoded['TerminalId'] ?? $decoded['MerchantFiscalId'];
 
             $terminal = Terminal::findByIdentificador($terminalId);
 
