@@ -37,7 +37,7 @@ class ClientePolicy
     /**
      * Determine whether the user can create models.
      */
-    public function createClente(User $user): bool
+    public function createCliente(User $user): bool
     {
         if ($user->is_super_admin)
             return true;
