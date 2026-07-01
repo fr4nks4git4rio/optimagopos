@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Paquetes;
 
 use App\Http\Livewire\Layouts\Modal;
+use App\Models\Config;
 use App\Models\Modulo;
 use App\Models\Paquete;
 use Illuminate\Support\Arr;
@@ -19,6 +20,8 @@ class Save extends Modal
     public $cant_usuarios;
     public $modulos = [];
 
+    public $globalSettings = [];
+
     public function mount()
     {
         if (isset($this->paquete)) {
@@ -33,6 +36,8 @@ class Save extends Modal
             $this->paquete = new Paquete();
             $this->modulos = Modulo::whereIn('id', [1, 2])->pluck('id')->toArray();
         }
+
+        $this->globalSettings = Config::all()->pluck('valor', 'llave')->toArray();
     }
 
     // Reglas de validación

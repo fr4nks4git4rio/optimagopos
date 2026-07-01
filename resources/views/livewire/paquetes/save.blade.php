@@ -154,7 +154,13 @@
                                 {{ $descripcion ?: 'El resumen de tu paquete aparecerá aquí...' }}</p>
 
                             @php
+                                $precio_sucursal_adicional = $globalSettings['precio_sucursal_adicional'] ?? 0;
+                                $precio_terminal_adicional = $globalSettings['precio_terminal_adicional'] ?? 0;
+                                $precio_usuario_adicional = $globalSettings['precio_usuario_adicional'] ?? 0;
                                 $sumBaseCost = $availableModules->whereIn('id', $modulos)->sum('costo_base');
+                                $sumBaseCost += max($cant_sucursales, 0) * $precio_sucursal_adicional;
+                                $sumBaseCost += max($cant_terminales, 0) * $precio_terminal_adicional;
+                                $sumBaseCost += max($cant_usuarios, 0) * $precio_usuario_adicional;
                                 $saving = $sumBaseCost - (float) $precio;
                             @endphp
 
