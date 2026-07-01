@@ -49,7 +49,7 @@ class GestionSuscripciones extends Component
             'paquete_id' => 'nullable',
             'fecha_inicio_operaciones' => 'required|date',
             'fecha_inicio_pagos' => 'required|date',
-            'periodicidad_pagos' => 'required|in:MENSUAL,SEMESTRAL,ANUAL',
+            'periodicidad_pagos' => 'required|in:MENSUAL,BIMESTRAL,TRIMESTRAL,SEMESTRAL,ANUAL',
         ];
     }
 
@@ -88,12 +88,11 @@ class GestionSuscripciones extends Component
         $this->calculatePricing();
     }
 
-    public function getModulosPaqueteProperty()
+    public function hydrate()
     {
-        return $this->paquete_id ? Paquete::find($this->paquete_id)->modulos()->pluck('id')->toArray() : [];
+        $this->dispatchBrowserEvent('reApplySelect2');
     }
 
-    // Oyente universal de Livewire: Cada vez que una propiedad cambie, recalculamos precios
     public function updated($propertyName, $value)
     {
         // Si el usuario cambia manualmente un límite o módulo, rompemos el enlace al paquete base
@@ -117,7 +116,12 @@ class GestionSuscripciones extends Component
             }
         }
 
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
+    }
+    public function getModulosPaqueteProperty()
+    {
+        return $this->paquete_id ? Paquete::find($this->paquete_id)->modulos()->pluck('id')->toArray() : [];
     }
 
     public function calculatePricing()

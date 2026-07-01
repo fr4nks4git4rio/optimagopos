@@ -1,21 +1,80 @@
 @section('title', 'Gestión de Subscripción de Cliente')
 
-<div>
-    <h1 class="fs-1 mb-2">@yield('title')</h1>
+<div class="container-fluid py-3">
+    <style>
+        /* Pequeños tweaks CSS complementarios para clavar la estética de la imagen */
+        .fw-black {
+            font-weight: 900;
+        }
 
-    <div class="card shadow-sm border-0 mb-4 bg-dark text-white">
-        <div class="card-body p-4 d-flex align-items-center justify-content-between">
+        .fs-7 {
+            font-size: 0.85rem !important;
+        }
+
+        .fs-8 {
+            font-size: 0.72rem !important;
+        }
+
+        .tracking-wider {
+            letter-spacing: 1px;
+        }
+
+        .tracking-wide {
+            letter-spacing: 0.5px;
+        }
+
+        .transition-all {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .transition-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08) !important;
+        }
+
+        .border-dashed {
+            border-style: dashed !important;
+        }
+
+        .check-modulo-custom {
+            width: 2.2em !important;
+            height: 1.1em !important;
+            cursor: pointer;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .text-truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .fs-9 {
+            font-size: 0.65rem !important;
+        }
+    </style>
+    <div class="card shadow-sm border-0 mb-4 bg-dark text-white rounded-3 overflow-hidden">
+        <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
             <div>
-                <span class="badge bg-primary mb-2">Asignación Contractual de Recursos</span>
-                <h3 class="mb-1 fw-bold">
-                    {{ $cliente ? Illuminate\Support\Facades\Crypt::decrypt($cliente->nombre_comercial) : '' }}</h3>
+                <span
+                    class="badge bg-primary-subtle text-primary text-uppercase px-2 py-1 mb-2 tracking-wider small fw-bold">Asignación
+                    Contractual de Recursos</span>
+                <h2 class="mb-1 fw-black text-white h3">
+                    {{ $cliente ? Illuminate\Support\Facades\Crypt::decrypt($cliente->nombre_comercial) : 'Seleccione un Cliente' }}
+                </h2>
                 @if ($cliente)
-                    <p class="mb-0 text-info small">
-                        <i class="bi bi-building me-1"></i> Identificador Cliente #{{ $cliente->id }}
+                    <p class="mb-0 text-white-50 small">
+                        <i class="bi bi-building me-1"></i> Identificador Cliente <span
+                            class="text-info fw-bold">#{{ $cliente->id }}</span>
                     </p>
                 @endif
             </div>
-            <div class="text-end">
+            <div
+                class="text-md-end d-flex flex-row flex-md-column gap-2 justify-content-start align-items-center align-items-md-end">
                 @php
                     $classEstado = 'dark';
                     switch ($estado) {
@@ -33,11 +92,9 @@
                             break;
                     }
                 @endphp
-                <span
-                    class="badge bg-{{ $classEstado }} }} fs-6">
-                    {{ $estado }}
-                </span><br>
-                <span class="badge {{ $paquete_id ? 'bg-success' : 'bg-warning text-dark' }} fs-6 mt-1 shadow-sm">
+                <span class="badge bg-{{ $classEstado }} px-3 py-1.5 fs-6 shadow-sm">{{ $estado }}</span>
+                <span class="badge bg-white text-dark border fs-7 py-1.5 shadow-sm">
+                    <i class="bi bi-box-seam me-1 text-primary"></i>
                     {{ $paquete_id ? 'Suscripción por Paquete' : 'Suscripción Personalizada' }}
                 </span>
             </div>
@@ -47,203 +104,264 @@
     <form wire:submit.prevent="submit">
         <div class="row g-4">
 
-            <div class="col-md-7">
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white border-bottom py-3">
-                        <h5 class="mb-0 text-dark fw-bold"><i class="bi bi-sliders me-2 text-primary"></i>Configuración
-                            de la Subscripción</h5>
-                    </div>
+            <div class="col-lg-7">
+
+                <div class="card shadow-sm border-0 mb-4 rounded-3">
                     <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+                            <div class="bg-primary-subtle text-primary rounded p-2 me-3"><i
+                                    class="bi bi-sliders fs-5"></i></div>
+                            <h5 class="mb-0 text-dark fw-bold">Configuración de la Suscripción</h5>
+                        </div>
 
                         @if (!$suscripcion || !$suscripcion->id)
-                            <div class="mb-4 p-3 bg-light rounded border">
+                            <div class="mb-4 p-3 bg-light rounded-3 border">
                                 <label class="form-label fw-bold text-secondary small">Seleccione el Cliente:</label>
                                 <x-select2 :dynamic="true" :lazy="true" model="cliente_id" :options="$clientes"
                                     class="form-control" />
-                                <span class="text-muted small"><i class="bi bi-info-circle"> Solo se mostrarán los
-                                        clientes que no tengan suscripciones <strong>pendientes</strong> o
-                                        <strong>activas</strong> y que tengan todos sus datos fiscales al día.</i> </span>
+                                <div class="text-muted fs-7 mt-2">
+                                    <i class="bi bi-info-circle-fill text-warning me-1"></i> Solo clientes sin
+                                    suscripciones activas/pendientes y con datos fiscales validados.
+                                </div>
                             </div>
                         @endif
 
-                        <div class="mb-4 p-3 bg-light rounded border">
-                            <label class="form-label fw-bold text-secondary small">Vincular a un Paquete
-                                Base:</label>
-                            <select class="form-select bg-white" wire:model="paquete_id">
-                                <option value="">-- Ninguno / Crear Plan Custom desde cero --</option>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary small mb-3">
+                                <i class="bi bi-box-seam me-1"></i> Seleccione un Plan o Paquete Base:
+                            </label>
+
+                            <div class="row g-3 row-cols-1 row-cols-md-2 row-cols-xl-3">
+
+                                <div class="col">
+                                    <div wire:click="$set('paquete_id', '')"
+                                        class="card h-100 border transition-all rounded-3 position-relative cursor-pointer {{ $paquete_id == '' ? 'border-primary shadow bg-primary-subtle bg-opacity-10' : 'border-secondary-subtle bg-white' }}">
+                                        <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span
+                                                        class="badge {{ $paquete_id == '' ? 'bg-primary' : 'bg-secondary' }} text-uppercase tracking-wider fs-8 px-2 py-1">Custom</span>
+                                                    @if ($paquete_id == '')
+                                                        <i class="bi bi-check-circle-fill text-primary fs-5"></i>
+                                                    @endif
+                                                </div>
+                                                <h6 class="fw-bold text-dark mb-2">Plan a la Medida</h6>
+                                                <p class="text-muted fs-7 mb-3">Diseña la estructura ideal desde cero
+                                                    activando manualmente los módulos y capacidades que requiera el
+                                                    cliente.</p>
+                                            </div>
+                                            <div class="border-top pt-2 mt-2 text-center">
+                                                <span class="fs-7 text-muted">Precio Base:</span>
+                                                <span class="fw-black text-dark d-block fs-5">$0.00 <small
+                                                        class="fs-8 text-uppercase">{{ $globalSettings['moneda_sistema'] }}</small></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 @foreach ($paquetes as $pkg)
-                                    <option value="{{ $pkg->id }}">{{ $pkg->nombre }}
-                                        (${{ number_format($pkg->precio, 2) }}
-                                        {{ $globalSettings['moneda_sistema'] }})
-                                    </option>
+                                    <div class="col">
+                                        <div wire:click="$set('paquete_id', {{ $pkg->id }})"
+                                            class="card h-100 border transition-all rounded-3 position-relative cursor-pointer {{ $paquete_id == $pkg->id ? 'border-primary shadow bg-primary-subtle bg-opacity-10' : 'border-secondary-subtle bg-white' }}">
+
+                                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <span
+                                                            class="badge {{ $paquete_id == $pkg->id ? 'bg-primary' : 'bg-dark-subtle text-dark' }} text-uppercase tracking-wider fs-8 px-2 py-1">
+                                                            Paquete
+                                                        </span>
+                                                        @if ($paquete_id == $pkg->id)
+                                                            <i class="bi bi-check-circle-fill text-primary fs-5"></i>
+                                                        @endif
+                                                    </div>
+
+                                                    <h6 class="fw-bold text-dark mb-1">{{ $pkg->nombre }}</h6>
+
+                                                    <p class="text-muted fs-7 mb-2 text-truncate-2">
+                                                        {{ $pkg->descripcion ?? 'Ideal para operaciones estándar y escalabilidad controlada.' }}
+                                                    </p>
+
+                                                    <div class="bg-light rounded-2 p-2 mb-2 fs-8 text-secondary">
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <span><i class="bi bi-building me-1"></i> Sucursales
+                                                                base:</span>
+                                                            <span
+                                                                class="fw-bold text-dark">{{ $pkg->cant_sucursales }}</span>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <span><i class="bi bi-display me-1"></i> Terminales
+                                                                base:</span>
+                                                            <span
+                                                                class="fw-bold text-dark">{{ $pkg->cant_terminales }}</span>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between">
+                                                            <span><i class="bi bi-person me-1"></i> Usuarios
+                                                                base:</span>
+                                                            <span
+                                                                class="fw-bold text-dark">{{ $pkg->cant_usuarios }}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    @if (isset($pkg->modulos) && count($pkg->modulos) > 0)
+                                                        <div class="mb-2">
+                                                            <span
+                                                                class="text-uppercase text-muted fw-bold tracking-wide fs-9 d-block mb-1">Módulos
+                                                                Incluidos:</span>
+                                                            <div class="d-flex flex-wrap gap-1">
+                                                                @foreach ($pkg->modulos as $modPkg)
+                                                                    <span
+                                                                        class="badge rounded-3 border bg-white text-dark p-1 fs-8 d-inline-flex align-items-center"
+                                                                        title="{{ $modPkg->nombre }}">
+                                                                        <i class="bi {{ $modPkg->icono }} me-1"
+                                                                            style="color: {{ $modPkg->icono_color }}"></i>
+                                                                        <span class="text-truncate"
+                                                                            style="max-width: 70px;">{{ $modPkg->nombre }}</span>
+                                                                    </span>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                <div class="border-top pt-2 mt-2 text-center">
+                                                    <span class="fs-7 text-muted">Precio Mensual Base:</span>
+                                                    <span class="fw-black text-primary d-block fs-5">
+                                                        ${{ number_format($pkg->precio, 2) }}
+                                                        <small
+                                                            class="fs-8 text-uppercase text-muted">{{ $globalSettings['moneda_sistema'] }}</small>
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endforeach
-                            </select>
-                        </div>
 
-                        <h6 class="text-uppercase text-muted fw-bold mb-3"
-                            style="font-size: 0.75rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-calendar-check me-1"></i> Vigencias y Ciclo de Cobro
-                        </h6>
-                        <div class="row g-3 mb-4 p-3 bg-light rounded border mx-0 text-dark">
-                            <div class="col-md-6 mt-0">
-                                <label class="form-label fw-bold small text-primary-dark"><i
-                                        class="bi bi-play-circle me-1"></i>Inicio de Operaciones *</label>
-                                <input type="date"
-                                    class="form-control @error('fecha_inicio_operaciones') is-invalid @enderror"
-                                    wire:model="fecha_inicio_operaciones">
-                                @error('fecha_inicio_operaciones')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mt-0">
-                                <label class="form-label fw-bold small text-primary-dark"><i
-                                        class="bi bi-credit-card-2-front me-1"></i>Próxima Fecha de Cobro *</label>
-                                <input type="date"
-                                    class="form-control @error('fecha_inicio_pagos') is-invalid @enderror"
-                                    wire:model="fecha_inicio_pagos">
-                                @error('fecha_inicio_pagos')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-12 mt-3">
-                                <label class="form-label fw-bold small text-primary-dark"><i
-                                        class="bi bi-arrow-repeat me-1"></i>Periodicidad del Cobro *</label>
-                                <select class="form-select @error('periodicidad_pagos') is-invalid @enderror"
-                                    wire:model="periodicidad_pagos">
-                                    <option value="MENSUAL">Mensual</option>
-                                    <option value="SEMESTRAL">Semestral</option>
-                                    <option value="ANUAL">Anual</option>
-                                </select>
-                                @error('periodicidad_pagos')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
                             </div>
                         </div>
 
-                        <h6 class="text-uppercase text-muted fw-bold mb-3"
-                            style="font-size: 0.75rem; letter-spacing: 0.5px;">
-                            <i class="bi bi-cpu"></i> Capacidades de Infraestructura
-                        </h6>
-                        <div class="row g-3 mb-4 p-3 bg-light rounded border mx-0 text-dark">
-                            <div class="col-md-4 mt-0">
-                                <label class="form-label fw-bold small">Sucursales</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white"><i class="bi bi-building"></i></span>
-                                    <input type="number"
-                                        class="form-control
-                                    @error('cant_sucursales') is-invalid @enderror"
-                                        @if ($paquete_id) disabled @endif wire:model="cant_sucursales"
-                                        min="1">
-                                    @if ($paquete_id)
-                                        <span wire:click="incrementSucursales"
-                                            class="input-group-text bg-success text-white cursor-pointer">
-                                            <i class="bi bi-plus-circle"></i></span>
-                                        <span wire:click="resetSucursales"
-                                            class="input-group-text bg-warning text-black cursor-pointer">
-                                            <i class="bi bi-arrow-clockwise"></i></span>
-                                        <span wire:click="decrementSucursales"
-                                            class="input-group-text bg-danger text-white cursor-pointer">
-                                            <i class="bi bi-dash-circle"></i></span>
-                                    @endif
+                        <div class="mb-4">
+                            <h6 class="text-uppercase text-muted fw-bold mb-3 tracking-wide fs-7">
+                                <i class="bi bi-calendar3 me-1 text-primary"></i> Vigencias y Ciclo de Cobro
+                            </h6>
+                            <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small">Inicio de Operaciones *</label>
+                                    <input type="date"
+                                        class="form-control border-secondary-subtle @error('fecha_inicio_operaciones') is-invalid @enderror"
+                                        wire:model="fecha_inicio_operaciones">
+                                    @error('fecha_inicio_operaciones')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                @error('cant_sucursales')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
 
-                            <div class="col-md-4 mt-0">
-                                <label class="form-label fw-bold small">Terminales</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white"><i class="bi bi-display"></i></span>
-                                    <input type="number"
-                                        class="form-control @error('cant_terminales') is-invalid @enderror"
-                                        @if ($paquete_id) disabled @endif wire:model="cant_terminales"
-                                        min="1">
-                                    @if ($paquete_id)
-                                        <span wire:click="incrementTerminales"
-                                            class="input-group-text bg-success text-white cursor-pointer">
-                                            <i class="bi bi-plus-circle"></i></span>
-                                        <span wire:click="resetTerminales"
-                                            class="input-group-text bg-warning text-black cursor-pointer">
-                                            <i class="bi bi-arrow-clockwise"></i></span>
-                                        <span wire:click="decrementTerminales"
-                                            class="input-group-text bg-danger text-white cursor-pointer">
-                                            <i class="bi bi-dash-circle"></i></span>
-                                    @endif
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark small">Próxima Fecha de Cobro *</label>
+                                    <input type="date"
+                                        class="form-control border-secondary-subtle @error('fecha_inicio_pagos') is-invalid @enderror"
+                                        wire:model="fecha_inicio_pagos">
+                                    @error('fecha_inicio_pagos')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                @error('cant_terminales')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
 
-                            <div class="col-md-4 mt-0">
-                                <label class="form-label fw-bold small">Usuarios</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white"><i class="bi bi-people"></i></span>
-                                    <input type="number"
-                                        class="form-control @error('cant_usuarios') is-invalid @enderror"
-                                        @if ($paquete_id) disabled @endif wire:model="cant_usuarios"
-                                        min="1">
-                                    @if ($paquete_id)
-                                        <span wire:click="incrementUsuarios"
-                                            class="input-group-text bg-success text-white cursor-pointer">
-                                            <i class="bi bi-plus-circle"></i></span>
-                                        <span wire:click="resetUsuarios"
-                                            class="input-group-text bg-warning text-black cursor-pointer">
-                                            <i class="bi bi-arrow-clockwise"></i></span>
-                                        <span wire:click="decrementUsuarios"
-                                            class="input-group-text bg-danger text-white cursor-pointer">
-                                            <i class="bi bi-dash-circle"></i></span>
-                                    @endif
+                                <div class="col-12 mt-3">
+                                    <label class="form-label fw-bold text-dark small">Periodicidad del Cobro *</label>
+                                    <select
+                                        class="form-select border-secondary-subtle @error('periodicidad_pagos') is-invalid @enderror"
+                                        wire:model="periodicidad_pagos">
+                                        <option value="MENSUAL">Mensual</option>
+                                        <option value="BIMESTRAL">Bimestral</option>
+                                        <option value="TRIMESTRAL">Trimestral</option>
+                                        <option value="SEMESTRAL">Semestral</option>
+                                        <option value="ANUAL">Anual</option>
+                                    </select>
+                                    @error('periodicidad_pagos')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                @error('cant_usuarios')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6 class="text-uppercase text-muted fw-bold mb-3 tracking-wide fs-7">
+                                <i class="bi bi-cpu-fill me-1 text-primary"></i> Capacidades de Infraestructura
+                            </h6>
+                            <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
+                                @foreach ([['label' => 'Sucursales', 'model' => 'cant_sucursales', 'icon' => 'bi-building', 'inc' => 'incrementSucursales', 'dec' => 'decrementSucursales', 'res' => 'resetSucursales'], ['label' => 'Terminales (APOS)', 'model' => 'cant_terminales', 'icon' => 'bi-display', 'inc' => 'incrementTerminales', 'dec' => 'decrementTerminales', 'res' => 'resetTerminales'], ['label' => 'Usuarios Cloud', 'model' => 'cant_usuarios', 'icon' => 'bi-people', 'inc' => 'incrementUsuarios', 'dec' => 'decrementUsuarios', 'res' => 'resetUsuarios']] as $infra)
+                                    <div class="col-md-4">
+                                        <label
+                                            class="form-label fw-bold text-dark small">{{ $infra['label'] }}</label>
+                                        <div class="input-group input-group-sm shadow-sm rounded">
+                                            <span
+                                                class="input-group-text bg-white border-secondary-subtle text-muted"><i
+                                                    class="{{ $infra['icon'] }}"></i></span>
+                                            <input type="number"
+                                                class="form-control text-center bg-white border-secondary-subtle fw-bold @error($infra['model']) is-invalid @enderror"
+                                                @if ($paquete_id) disabled @endif
+                                                wire:model="{{ $infra['model'] }}" min="1">
+                                            @if ($paquete_id)
+                                                <button type="button" wire:click="{{ $infra['inc'] }}"
+                                                    class="btn btn-success border-success text-white px-2"><i
+                                                        class="bi bi-plus"></i></button>
+                                                <button type="button" wire:click="{{ $infra['res'] }}"
+                                                    class="btn btn-light border-secondary-subtle text-dark px-1.5"><i
+                                                        class="bi bi-arrow-clockwise"></i></button>
+                                                <button type="button" wire:click="{{ $infra['dec'] }}"
+                                                    class="btn btn-danger border-danger text-white px-2"><i
+                                                        class="bi bi-dash"></i></button>
+                                            @endif
+                                        </div>
+                                        @error($infra['model'])
+                                            <div class="invalid-feedback d-block fs-7">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
 
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 rounded-3">
                     <div
                         class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-dark fw-bold"><i
-                                class="bi bi-layers me-2 text-primary"></i>Aprovisionamiento de Módulos</h5>
-                        <span class="badge bg-dark">{{ count($modulos) }} Seleccionados</span>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary-subtle text-primary rounded p-2 me-3"><i
+                                    class="bi bi-grid-3x3-gap-fill fs-5"></i></div>
+                            <h5 class="mb-0 text-dark fw-bold">Aprovisionamiento de Módulos</h5>
+                        </div>
+                        <span class="badge bg-primary px-3 py-1.5 rounded-pill fw-bold">{{ count($modulos) }} Módulos
+                            Activos</span>
                     </div>
                     <div class="card-body p-4">
-                        <div class="row g-2" style="max-height: 320px; overflow-y: auto;">
+                        <div class="row g-3" style="max-height: 400px; overflow-y: auto; padding-right: 4px;">
                             @foreach ($modulosDisponibles as $module)
-                                <div class="col-12">
+                                <div class="col-md-6 col-12">
                                     <label
-                                        class="card border p-3 h-100 {{ in_array($module->id, $modulos) ? 'border-primary bg-light-subtle' : '' }}"
-                                        style="cursor: pointer;">
-                                        <div class="d-flex align-items-center">
-                                            <div class="form-check form-switch me-3">
-                                                <input class="form-check-input" type="checkbox" role="switch"
-                                                    value="{{ $module->id }}" wire:model="modulos"
+                                        class="card h-100 transition-all border p-3 rounded-3 position-relative {{ in_array($module->id, $modulos) ? 'border-primary shadow-sm bg-primary-subtle bg-opacity-10' : 'border-secondary-subtle bg-white' }}"
+                                        style="cursor: pointer; min-height: 82px;">
+                                        <div class="d-flex align-items-start">
+                                            <div class="form-check form-switch me-2 pt-1">
+                                                <input class="form-check-input check-modulo-custom" type="checkbox"
+                                                    role="switch" value="{{ $module->id }}" wire:model="modulos"
                                                     @if ($paquete_id && in_array($module->id, $this->modulos_paquete)) disabled @endif
                                                     id="mod-{{ $module->id }}">
                                             </div>
 
-                                            <div class="rounded p-2 text-center me-3"
-                                                style="background-color: {{ $module->icono_color }}; width: 40px; height: 40px;">
-                                                <i class="bi {{ $module->icono }}"
-                                                    style="color: #fff; font-size: 1.1rem;"></i>
+                                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center me-3 shadow-sm flex-shrink-0"
+                                                style="background-color: {{ $module->icono_color }}; width: 42px; height: 42px;">
+                                                <i class="bi {{ $module->icono }} text-white fs-5"></i>
                                             </div>
 
-                                            <div class="flex-grow-1 text-truncate">
-                                                <h6 class="mb-0 fw-bold text-dark text-truncate">
-                                                    {{ $module->nombre }}</h6>
-                                                <small class="text-muted d-block text-truncate"
-                                                    style="font-size: 0.75rem;">
-                                                    Costo Base Individual:
-                                                    ${{ number_format($module->costo_base, 2) }}
-                                                    {{ $globalSettings['moneda_sistema'] }}
-                                                </small>
+                                            <div class="flex-grow-1 text-truncate" style="line-height: 1.2;">
+                                                <h6 class="mb-1 fw-bold text-dark text-truncate small"
+                                                    title="{{ $module->nombre }}">{{ $module->nombre }}</h6>
+                                                <span class="text-muted fw-medium fs-7 d-block">
+                                                    +${{ number_format($module->costo_base, 2) }} <span
+                                                        class="fs-8 text-uppercase opacity-70">{{ $globalSettings['moneda_sistema'] }}</span>
+                                                </span>
                                             </div>
                                         </div>
                                     </label>
@@ -254,54 +372,62 @@
                 </div>
             </div>
 
-            <div class="col-md-5">
-                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
-                    <div class="card-header bg-secondary text-white py-3">
-                        <h6 class="mb-0 text-uppercase fw-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-                            Resumen Económico y Plazo</h6>
+            <div class="col-lg-5">
+                <div class="card shadow-sm border-0 rounded-3 sticky-top"
+                    style="top: 24px; border-top: 4px solid var(--bs-primary) !important;">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 text-uppercase fw-black text-secondary tracking-wide fs-7">
+                            <i class="bi bi-receipt me-2 text-primary"></i> Estructura de Precios Mensual
+                        </h6>
                     </div>
                     <div class="card-body p-4">
 
-                        <div class="text-center mb-4 bg-light rounded p-3 border">
-                            <span class="text-muted small d-block text-uppercase fw-bold"
-                                style="font-size: 0.65rem;">Costo Recurrente {{ $periodicidad_pagos }}</span>
-                            <h2 class="fw-bold text-primary my-1">${{ number_format($precio_total, 2) }}</h2>
+                        <div class="text-center mb-4 bg-light border rounded-3 p-4">
+                            <span class="text-uppercase text-muted fw-bold tracking-wider fs-8 d-block mb-1">Costo
+                                Estimado Recurrente ({{ $periodicidad_pagos }})</span>
+                            <h2 class="fw-black text-primary display-6 mb-1">${{ number_format($precio_total, 2) }}
+                            </h2>
                             <span
-                                class="badge bg-secondary-subtle text-secondary border text-uppercase">{{ $globalSettings['moneda_sistema'] }}</span>
+                                class="badge bg-dark-subtle text-dark px-3 py-1 text-uppercase font-monospace tracking-wide fs-8">{{ $globalSettings['moneda_sistema'] }}
+                                / Neto</span>
                         </div>
 
-                        <div class="alert alert-light border small py-2 mb-4">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span class="text-muted">Ciclo actual:</span>
-                                <span class="fw-bold text-dark">{{ $periodicidad_pagos }}</span>
+                        <div class="p-3 bg-light rounded-3 border border-dashed mb-4 fs-7">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted"><i class="bi bi-arrow-repeat me-1"></i> Ciclo de
+                                    facturación:</span>
+                                <span
+                                    class="fw-bold text-dark text-uppercase tracking-wide">{{ $periodicidad_pagos }}</span>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted">Próximo Cobro:</span>
+                                <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> Próximo
+                                    cobro:</span>
                                 <span
-                                    class="fw-bold text-dark">{{ $fecha_inicio_pagos ? date('d/m/Y', strtotime($fecha_inicio_pagos)) : '--/--/----' }}</span>
+                                    class="fw-bold text-primary">{{ $fecha_inicio_pagos ? date('d/m/Y', strtotime($fecha_inicio_pagos)) : '— / — / —' }}</span>
                             </div>
                         </div>
 
-                        <ul class="list-group list-group-flush mb-4" style="font-size: 0.9rem;">
-                            <li
-                                class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
-                                <span class="text-muted">Monto Base Paquete:</span>
+                        <h6 class="text-uppercase text-muted fw-bold tracking-wider fs-8 mb-2">Detalle de Cargos</h6>
+                        <div class="list-group list-group-flush border-bottom mb-4">
+                            <div
+                                class="list-group-item d-flex justify-content-between align-items-center px-0 py-2.5 bg-transparent fs-7">
+                                <div class="text-dark"><i class="bi bi-box me-2 text-secondary"></i>Base Cloud (Plan
+                                    Seleccionado)</div>
                                 <span class="fw-bold text-dark">${{ number_format($precio_paquete, 2) }}</span>
-                            </li>
-                            <li
-                                class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
-                                <div>
-                                    <span class="text-muted d-block">Cargos Extra / Custom:</span>
-                                </div>
-                                <span class="fw-bold text-danger">+
-                                    ${{ number_format($precio_extra, 2) }}</span>
-                            </li>
-                        </ul>
+                            </div>
+                            <div
+                                class="list-group-item d-flex justify-content-between align-items-center px-0 py-2.5 bg-transparent fs-7">
+                                <div class="text-dark"><i class="bi bi-plus-circle me-2 text-danger"></i>Módulos Extra
+                                    / Custom</div>
+                                <span class="fw-bold text-danger">+ ${{ number_format($precio_extra, 2) }}</span>
+                            </div>
+                        </div>
 
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
-                            <span wire:loading wire:target="submit"
-                                class="spinner-border spinner-border-sm me-2"></span>
-                            <i class="bi bi-cloud-arrow-up-fill me-1" wire:loading.remove wire:target="submit"></i>
+                        <button type="submit"
+                            class="btn btn-primary btn-lg w-100 py-3 fw-bold rounded-3 shadow-sm text-uppercase tracking-wide fs-7">
+                            <span wire:loading wire:target="submit" class="spinner-border spinner-border-sm me-2"
+                                role="status"></span>
+                            <i class="bi bi-cloud-arrow-up-fill me-2" wire:loading.remove wire:target="submit"></i>
                             Guardar Contrato de Suscripción
                         </button>
 
