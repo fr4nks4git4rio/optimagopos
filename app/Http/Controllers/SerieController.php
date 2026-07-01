@@ -13,13 +13,9 @@ class SerieController extends Controller
             ->where('activo', 1)
             ->select('id', 'descripcion as text');
 
-        if($request->term){
-            $series = $query->where('descripcion', 'like', '%'.$request->term.'%')->get()->toArray();
-        }else{
-            $series = [];
-        }
+        $term = $request->term;
+        $series = $query->whereRaw('descripcion like ?', ["%{$term}%"])->get()->toArray();
 
         return response()->json(['success' => true, 'items' => $series]);
-
     }
 }

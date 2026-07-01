@@ -18,7 +18,7 @@ class PdfFacturacion extends Pdf
     protected $invoice = null;
     protected $owner = null;
 
-    public function __construct(Sucursal $owner, Factura $invoice, $orientation = 'P', $unit = 'mm', $size = 'A4')
+    public function __construct(Sucursal|Cliente $owner, Factura $invoice, $orientation = 'P', $unit = 'mm', $size = 'A4')
     {
         $this->invoice = $invoice;
         $this->owner = $owner;

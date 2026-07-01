@@ -18,11 +18,11 @@
         {{-- </div> --}}
         {{-- </div> --}}
         <div class="col-lg-auto mb-3">
-            @can('create', [App\Models\Factura::class])
+            @if (user()->can('create', [App\Models\Factura::class]))
                 <button type="button" class="btn btn-site-primary mr-1" wire:click="nuevaFactura">
                     Nueva Factura
                 </button>
-            @endcan
+            @endif
             <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirFacturas()">
                 Imprimir
             </button>
@@ -137,7 +137,7 @@
                                 @can('delete', App\Models\Factura::find($factura->id))
                                     <li class="list-inline-item mb-1">
                                         <x-action icon="trash" title="Eliminar"
-                                            click="$emit('openModal', 'facturas.delete', {factura: '{{ $factura->id }}', scope: 'facturas.index-almacen'})" />
+                                            click="$emit('openModal', 'facturas.delete', {factura: '{{ $factura->id }}', scope: 'facturas.index-pre-facturas'})" />
                                     </li>
                                 @endcan
                             </ul>

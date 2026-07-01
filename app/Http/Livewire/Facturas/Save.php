@@ -331,10 +331,9 @@ class Save extends Component
 
     public function init()
     {
-        if (user()->cannot($this->factura->exists() ? 'update' : 'create', $this->factura->exists() ? $this->factura : [Factura::class])) {
+        if (user()->cannot($this->factura->id ? 'update' : 'create', $this->factura->id ? $this->factura : [Factura::class])) {
             $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
-            $this->emit('closeModal');
-            return;
+            return redirect()->to('/');
         }
     }
 

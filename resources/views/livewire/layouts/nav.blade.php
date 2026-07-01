@@ -40,6 +40,11 @@
                     {{-- <i class="bi bi-gear"></i> --}}
                     {{-- </a> --}}
                     {{-- </div> --}}
+                    @if (!user()->cliente_id)
+                        <div class="nav-item mr-2">
+                            <livewire:layouts.tipo-cambio-sistema />
+                        </div>
+                    @endif
                     <div class="nav-item dropdown notifications-dropdown mr-2">
                         <a href="#" class="nav-link dropdown-toggle notifications me-2" data-bs-toggle="dropdown">
                             <i
@@ -114,7 +119,8 @@
                                 class="hidden-xs">{{ user()->nombre_completo }}</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <x-dropdown-item label="{{ __('nav.update-profile') }}" click="$emit('openModal', 'auth.update-profile')" />
+                            <x-dropdown-item label="{{ __('nav.update-profile') }}"
+                                click="$emit('openModal', 'auth.update-profile')" />
 
                             <x-dropdown-item label="{{ __('nav.change-password') }}"
                                 click="$emit('openModal', 'auth.change-password')" />

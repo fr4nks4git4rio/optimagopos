@@ -6,6 +6,7 @@ use App\Http\Controllers\ClaveProdServController;
 use App\Http\Controllers\ClaveUnidadController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\EstadoController;
+use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\FormaPagoController;
 use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\MetodoPagoController;
@@ -14,23 +15,36 @@ use App\Http\Controllers\ObjetoImpuestoController;
 use App\Http\Controllers\SerieController;
 use App\Http\Controllers\SoapController;
 use App\Http\Controllers\TipoComprobanteController;
-use App\Http\Livewire\Facturas\Save as SavePreFacturas;
 use App\Http\Livewire\Home;
 use App\Http\Livewire\Auth\Login;
 use App\Http\Livewire\AutoFacturacion;
 use App\Http\Livewire\CabeceraFactura;
 use App\Http\Livewire\Trazas\Index as IndexTrazas;
 use App\Http\Livewire\Usuarios\Index as IndexUsuarios;
+use App\Http\Livewire\GestionConfiguracionesComponent as IndexConfiguraciones;
+use App\Http\Livewire\Modulos\Index as IndexModulos;
+use App\Http\Livewire\Paquetes\Index as IndexPaquetes;
 use App\Http\Livewire\Clientes\Index as IndexClients;
+use App\Http\Livewire\Clientes\GestionSuscripciones;
 use App\Http\Livewire\Comensales\Index as IndexComensales;
 use App\Http\Livewire\Sucursales\Index as IndexSucursales;
 use App\Http\Livewire\Terminales\Index as IndexTerminales;
+use App\Http\Livewire\Suscripciones\Index as IndexSuscripciones;
 use App\Http\Livewire\Facturas\IndexAlmacen as IndexAlmacenFacturas;
 use App\Http\Livewire\Facturas\IndexPreFacturas;
+use App\Http\Livewire\Facturas\Save as SavePreFacturas;
+use App\Http\Livewire\FacturasSistema\IndexAlmacen as IndexAlmacenFacturasSistema;
+use App\Http\Livewire\CuentasCobrar\Index as IndexCuentasCobrarSistema;
+use App\Http\Livewire\FacturasSistema\IndexPreFacturas as IndexPreFacturasSistema;
+use App\Http\Livewire\FacturasSistema\Save as SavePreFacturasSistema;
+use App\Http\Livewire\FacturasSistema\SaveComplemento as SaveComplementoSistema;
+use App\Http\Livewire\FacturasSistema\SaveNotaCredito as SaveNotaCreditoSistema;
+use App\Http\Livewire\FacturasSistema\CabeceraFactura as CabeceraFacturaSistema;
 use App\Http\Livewire\Reportes\Tickets\Index as IndexReportesTickets;
 use App\Http\Livewire\Reportes\VentasPeriodo;
 use App\Http\Livewire\Reportes\ProductosMasVendidos;
 use App\Http\Livewire\Reportes\Logs;
+use App\Http\Livewire\Reportes\Ingresos as ReporteIngresos;
 use App\Http\Livewire\TimbrarAutoFactura;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Crypt;
@@ -89,15 +103,34 @@ Route::middleware(['auth', 'set.locale'])->group(function () {
     Route::get('/load-tipos-comprobantes', [TipoComprobanteController::class, 'loadTiposComprobantes'])->name('tipos-comprobantes.load-tipos-comprobantes');
     Route::get('/load-series', [SerieController::class, 'loadSeries'])->name('series.load-series');
 
-    Route::middleware(['hasRole:1'])->prefix('admin')->group(function () {
-        Route::get('/usuarios', IndexUsuarios::class)->name('admin.usuarios.index');
-        Route::get('/trazas', IndexTrazas::class)->name('admin.trazas.index');
+    Route::middleware(['hasRole:1|3'])->prefix('admin')->group(function () {
+
+        Route::get('/modulos', IndexModulos::class)->name('admin.modulos.index')->middleware('hasRole:1');
+        Route::get('/paquetes', IndexPaquetes::class)->name('admin.paquetes.index')->middleware('hasRole:1');
+        Route::get('/usuarios', IndexUsuarios::class)->name('admin.usuarios.index')->middleware('hasRole:1');
+        Route::get('/configuraciones', IndexConfiguraciones::class)->name('admin.configuraciones.index')->middleware('hasRole:1');
+        Route::get('/trazas', IndexTrazas::class)->name('admin.trazas.index')->middleware('hasRole:1');
 
         Route::get('/clientes', IndexClients::class)->name('admin.clientes.index');
+        Route::get('/clientes/gestion-suscripcion/{clienteId?}', GestionSuscripciones::class)->name('admin.clientes.suscripcion')->middleware('hasRole:1');
         Route::get('/sucursales', IndexSucursales::class)->name('admin.sucursales.index');
-        Route::get('/terminales', IndexTerminales::class)->name('admin.terminales.index');
+        Route::get('/terminales', IndexTerminales::class)->name('admin.terminales.index')->middleware('hasRole:1');
+        Route::get('/suscripciones', IndexSuscripciones::class)->name('admin.suscripciones.index');
+
+        Route::get('/pre-facturas/save/{id?}', SavePreFacturasSistema::class)->name('admin.pre-facturas.save');
+        Route::get('/complementos/save/{id?}', SaveComplementoSistema::class)->name('admin.complementos.save');
+        Route::get('/notas-credito/save/{id?}', SaveNotaCreditoSistema::class)->name('admin.notas-credito.save');
+        Route::get('/pre-facturas', IndexPreFacturasSistema::class)->name('admin.pre-facturas.index');
+        Route::get('/almacen-facturas', IndexAlmacenFacturasSistema::class)->name('admin.almacen-facturas.index');
+        Route::get('/cuentas-cobrar', IndexCuentasCobrarSistema::class)->name('admin.cuentas-cobrar.index');
+        Route::get('/cabecera-factura', CabeceraFacturaSistema::class)->name('admin.cabecera-factura');
+        Route::get('/obtener-timbres-disponibles/{rfc}', [SoapController::class, 'obtenerTimbresDisponibles']);
+
+        Route::get('/load-cuentas-cobrar', [FacturaController::class, 'loadCuentasCobrar'])->name('admin.cuentas-cobrar.load');
+        Route::get('/print-listado-cuentas-cobrar', [FacturaController::class, 'imprimirListadoCuentasCobrar'])->name('admin.cuentas-cobrar.print-listado');
 
         Route::prefix('reportes')->group(function () {
+            Route::get('/ingresos', ReporteIngresos::class)->name('admin.reportes.ingresos');
             Route::get('/logs', Logs::class)->name('admin.reportes.logs');
         });
     });

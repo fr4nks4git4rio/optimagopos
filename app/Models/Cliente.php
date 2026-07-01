@@ -24,8 +24,13 @@ use Illuminate\Support\Facades\Storage;
  * @property string $rfc
  * @property string $correo
  * @property string $telefono
+ * @property string $contacto_nombre
+ * @property string $contacto_correo
+ * @property string $contacto_telefono
+ * @property string $contacto_cargo
  * @property boolean $es_comensal
  * @property boolean $es_cliente
+ * @property boolean $es_propietario
  * @property string $comentarios
  * @property boolean $con_facturacion
  * @property string $logo
@@ -46,9 +51,14 @@ class Cliente extends Model
         'rfc',
         'correo',
         'telefono',
+        'contacto_nombre',
+        'contacto_correo',
+        'contacto_telefono',
+        'contacto_cargo',
         'prefijo',
         'es_comensal',
         'es_cliente',
+        'es_propietario',
         'comentarios',
         'con_facturacion',
         'logo',
@@ -58,7 +68,7 @@ class Cliente extends Model
         'regimen_fiscal_id'
     ];
 
-    protected $appends = ['value', 'label', 'direccion_text', 'direccion_plain', 'logo_uri', 'codigo_postal'];
+    protected $appends = ['value', 'label', 'text', 'direccion_text', 'direccion_plain', 'logo_uri', 'codigo_postal'];
 
     /**
      * The attributes that should be casted to native types.
@@ -99,6 +109,10 @@ class Cliente extends Model
             $cliente['razon_social'] = isset($cliente['razon_social']) && $cliente['razon_social'] ? Crypt::encrypt($cliente['razon_social']) : '';
             $cliente['correo'] = isset($cliente['correo']) && $cliente['correo'] ? Crypt::encrypt($cliente['correo']) : '';
             $cliente['telefono'] = isset($cliente['telefono']) && $cliente['telefono'] ? Crypt::encrypt($cliente['telefono']) : '';
+            $cliente['contacto_nombre'] = isset($cliente['contacto_nombre']) && $cliente['contacto_nombre'] ? Crypt::encrypt($cliente['contacto_nombre']) : '';
+            $cliente['contacto_correo'] = isset($cliente['contacto_correo']) && $cliente['contacto_correo'] ? Crypt::encrypt($cliente['contacto_correo']) : '';
+            $cliente['contacto_telefono'] = isset($cliente['contacto_telefono']) && $cliente['contacto_telefono'] ? Crypt::encrypt($cliente['contacto_telefono']) : '';
+            $cliente['contacto_cargo'] = isset($cliente['contacto_cargo']) && $cliente['contacto_cargo'] ? Crypt::encrypt($cliente['contacto_cargo']) : '';
 
             return $cliente;
         }
@@ -108,6 +122,10 @@ class Cliente extends Model
             $cliente->razon_social = isset($cliente->razon_social) && $cliente->razon_social ? Crypt::encrypt($cliente->razon_social) : '';
             $cliente->correo = isset($cliente->correo) && $cliente->correo ? Crypt::encrypt($cliente->correo) : '';
             $cliente->telefono = isset($cliente->telefono) && $cliente->telefono ? Crypt::encrypt($cliente->telefono) : '';
+            $cliente->contacto_nombre = isset($cliente->contacto_nombre) && $cliente->contacto_nombre ? Crypt::encrypt($cliente->contacto_nombre) : '';
+            $cliente->contacto_correo = isset($cliente->contacto_correo) && $cliente->contacto_correo ? Crypt::encrypt($cliente->contacto_correo) : '';
+            $cliente->contacto_telefono = isset($cliente->contacto_telefono) && $cliente->contacto_telefono ? Crypt::encrypt($cliente->contacto_telefono) : '';
+            $cliente->contacto_cargo = isset($cliente->contacto_cargo) && $cliente->contacto_cargo ? Crypt::encrypt($cliente->contacto_cargo) : '';
         }
 
         return $cliente;
@@ -121,6 +139,10 @@ class Cliente extends Model
                 $cliente['razon_social'] = isset($cliente['razon_social']) && $cliente['razon_social'] ? Crypt::decrypt($cliente['razon_social']) : '';
                 $cliente['correo'] = isset($cliente['correo']) && $cliente['correo'] ? Crypt::decrypt($cliente['correo']) : '';
                 $cliente['telefono'] = isset($cliente['telefono']) && $cliente['telefono'] ? Crypt::decrypt($cliente['telefono']) : '';
+                $cliente['contacto_nombre'] = isset($cliente['contacto_nombre']) && $cliente['contacto_nombre'] ? Crypt::decrypt($cliente['contacto_nombre']) : '';
+                $cliente['contacto_correo'] = isset($cliente['contacto_correo']) && $cliente['contacto_correo'] ? Crypt::decrypt($cliente['contacto_correo']) : '';
+                $cliente['contacto_telefono'] = isset($cliente['contacto_telefono']) && $cliente['contacto_telefono'] ? Crypt::decrypt($cliente['contacto_telefono']) : '';
+                $cliente['contacto_cargo'] = isset($cliente['contacto_cargo']) && $cliente['contacto_cargo'] ? Crypt::decrypt($cliente['contacto_cargo']) : '';
                 $cliente['decrypted'] = true;
             }
             return $cliente;
@@ -131,6 +153,10 @@ class Cliente extends Model
             $cliente->razon_social = isset($cliente->razon_social) && $cliente->razon_social ? Crypt::decrypt($cliente->razon_social) : '';
             $cliente->correo = isset($cliente->correo) && $cliente->correo ? Crypt::decrypt($cliente->correo) : '';
             $cliente->telefono = isset($cliente->telefono) && $cliente->telefono ? Crypt::decrypt($cliente->telefono) : '';
+            $cliente->contacto_nombre = isset($cliente->contacto_nombre) && $cliente->contacto_nombre ? Crypt::decrypt($cliente->contacto_nombre) : '';
+            $cliente->contacto_correo = isset($cliente->contacto_correo) && $cliente->contacto_correo ? Crypt::decrypt($cliente->contacto_correo) : '';
+            $cliente->contacto_telefono = isset($cliente->contacto_telefono) && $cliente->contacto_telefono ? Crypt::decrypt($cliente->contacto_telefono) : '';
+            $cliente->contacto_cargo = isset($cliente->contacto_cargo) && $cliente->contacto_cargo ? Crypt::decrypt($cliente->contacto_cargo) : '';
             $cliente->decrypted = true;
         }
 
@@ -159,6 +185,10 @@ class Cliente extends Model
     }
 
     public function getLabelAttribute()
+    {
+        return $this->nombre_comercial;
+    }
+    public function getTextAttribute()
     {
         return $this->nombre_comercial;
     }
@@ -231,6 +261,19 @@ class Cliente extends Model
     public function regimen_fiscal()
     {
         return $this->belongsTo(RegimenFiscal::class);
+    }
+
+    public function suscripciones()
+    {
+        return $this->hasOne(Suscripcion::class, 'cliente_id');
+    }
+    public function suscripcion_activa()
+    {
+        return $this->hasOne(Suscripcion::class, 'cliente_id')->where('estado', 'ACTIVA');
+    }
+    public function suscripcion_pendiente()
+    {
+        return $this->hasOne(Suscripcion::class, 'cliente_id')->where('estado', 'PENDIENTE');
     }
 
     public function comensales()

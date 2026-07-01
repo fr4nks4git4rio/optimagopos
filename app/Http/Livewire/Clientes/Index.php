@@ -4,6 +4,8 @@ namespace App\Http\Livewire\Clientes;
 
 use App\Models\Cliente;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -50,7 +52,8 @@ class Index extends Component
         ]);
     }
 
-    public function init(){
+    public function init()
+    {
         if (user()->cannot('viewAnyCliente', [Cliente::class])) {
             $this->emit('show-toast', 'No tiene permisos para acceder a estos registros.', 'danger');
             return redirect()->to('/');
@@ -110,6 +113,50 @@ class Index extends Component
         }
 
         return $records_final;
+    }
+
+    public function gestionarSuscripcion($id)
+    {
+        $cliente = Cliente::with('direccion_fiscal')->find($id);
+        if (!$cliente->es_cliente) {
+            $this->emit('show-toast', 'Cliente no encontrado!', 'danger');
+            return;
+        }
+
+        $cliente =  Cliente::decryptInfo($cliente);
+        $validator = Validator::make($cliente->toArray(), [
+            'razon_social' => 'required',
+            'rfc' => 'required',
+            'contacto_nombre' => 'required',
+            'contacto_correo' =>  'required|email',
+            'contacto_telefono' => 'required',
+            'direccion_fiscal'  => 'required',
+            'direccion_fiscal.codigo_postal'  => 'required',
+            'regimen_fiscal_id' => 'required|exists:tb_regimen_fiscales,id'
+        ], [
+            'razon_social.required' => 'Entre la Razón Social.',
+            'rfc.required' => 'Entre el RFC.',
+            'contacto_nombre.required' => 'Entre el nombre del contacto.',
+            'contacto_correo.required' => 'Entre el correo del contacto.',
+            'contacto_telefono.required' => 'Entre el teléfono del contacto.',
+            'direccion_fiscal.required' => 'Defina la dirección fiscal del cliente.',
+            'direccion_fiscal.codigo_postal.required' => 'Entre el código postal.',
+            'regimen_fiscal_id.required' => 'Entre el régimen fiscal.',
+            'regimen_fiscal_id.exists' => 'El régimen fiscal del cliente no es correcto.'
+        ]);
+
+        if ($validator->fails()) {
+            $messages = Arr::map(Arr::flatten($validator->messages()->messages()), function ($value) {
+                return [
+                    'type' => 'danger',
+                    'text' => $value
+                ];
+            });
+            $this->emit('openModal', 'modal-toast', ['messages' => $messages]);
+            return;
+        }
+
+        return redirect()->route('admin.clientes.suscripcion', $id);
     }
 
     public function changeSort($sort)

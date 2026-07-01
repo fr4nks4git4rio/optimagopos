@@ -128,10 +128,11 @@ class IndexAlmacen extends Component
                 'mc.descripcion as motivo_cancelacion'
             )
             ->leftJoin('tb_clientes as cliente', 'factura.cliente_id', '=', 'cliente.id')
-            ->leftJoin('tb_clientes as propietario', 'factura.propietario_id', '=', 'propietario.id')
+            ->leftJoin('tb_sucursales as propietario', 'factura.propietario_id', '=', 'propietario.id')
             ->leftJoin('tb_motivos_cancelacion_factura as mc', 'factura.motivo_cancelacion_id', 'mc.id')
             ->whereIn('factura.estado', ['TIMBRADA', 'CANCELADA'])
-            ->distinct('factura.id');
+            ->distinct('factura.id')
+            ->where('del_sistema', 0);
 
         if ($this->fechaInicio) {
             $query->where('factura.fecha_certificacion', '>=', $this->fechaInicio);

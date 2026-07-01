@@ -25,26 +25,36 @@ class Sidebar extends Component
     }
     public function getAdminRoutesActiveProperty()
     {
-        $prefix = user()->is_super_admin ? 'admin' : 'cliente';
+        $prefix = user()->cliente_id ? 'cliente' : 'admin';
         return Request::is("$prefix/usuarios*")
+            || Request::is("$prefix/modulos*")
+            || Request::is("$prefix/paquetes*")
             || Request::is("$prefix/clientes*")
             || Request::is("$prefix/comensales*")
             || Request::is("$prefix/sucursales*")
             || Request::is("$prefix/terminales*")
+            || Request::is("$prefix/suscripciones*")
+            || Request::is("$prefix/configuraciones*")
             || Request::is("$prefix/trazas*");
     }
 
     public function getFacturacionRoutesActiveProperty()
     {
-        return Request::is('cliente/pre-facturas*')
-            || Request::is('cliente/almacen-facturas*')
-            || Request::is('cliente/cabecera-factura*');
+        $prefix = user()->cliente_id ? 'cliente' : 'admin';
+        return Request::is("$prefix/pre-facturas*")
+            || Request::is("$prefix/almacen-facturas*")
+            || Request::is("$prefix/cabecera-factura*")
+            || Request::is("$prefix/pre-facturas*")
+            || Request::is("$prefix/complementos*")
+            || Request::is("$prefix/notas-credito*")
+            || Request::is("$prefix/cuentas-cobrar*");
     }
     public function getReportesRoutesActiveProperty()
     {
-        $prefix = user()->is_super_admin ? 'admin' : 'cliente';
+        $prefix = user()->cliente_id ? 'cliente' : 'admin';
         return Request::is($prefix . '/reportes/tickets*')
             || Request::is($prefix . '/reportes/logs*')
+            || Request::is($prefix . '/reportes/ingresos*')
             || Request::is($prefix . '/reportes/ventas-periodo*')
             || Request::is($prefix . '/reportes/productos-mas-vendidos*');
     }

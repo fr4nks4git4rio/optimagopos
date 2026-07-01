@@ -77,6 +77,12 @@
                                                 click="$emit('openModal', 'clientes.save', {cliente: {{ $cliente['id'] }}})" />
                                         </li>
                                     @endcan
+                                    @can('manageClientSuscripcion', App\Models\Cliente::find($cliente['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="bag-check" title="Subscripción"
+                                                click="gestionarSuscripcion({{ $cliente['id'] }})" />
+                                        </li>
+                                    @endcan
                                     @can('deleteCliente', App\Models\Cliente::find($cliente['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="Desactivar"

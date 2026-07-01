@@ -48,6 +48,14 @@
                     </li>
                     <li class="nav-item"
                         role="presentation">
+                        <button wire:ignore.self class="nav-link" id="contacto-tab" data-bs-toggle="tab"
+                            data-bs-target="#contacto-tab-pane" type="button" role="tab"
+                            aria-controls="contacto-tab-pane" aria-selected="false">
+                            Datos Contacto
+                        </button>
+                    </li>
+                    <li class="nav-item"
+                        role="presentation">
                         <button wire:ignore.self class="nav-link" id="comentario-tab" data-bs-toggle="tab"
                             data-bs-target="#comentario-tab-pane" type="button" role="tab"
                             aria-controls="comentario-tab-pane" aria-selected="false">
@@ -97,6 +105,25 @@
                         <div class="row">
                             <div class="col-12">
                                 <x-input label="Referencia" type="text" model="direccion_fiscal.referencia" />
+                            </div>
+                        </div>
+                    </div>
+                    <div wire:ignore.self class="tab-pane fade pt-2" id="contacto-tab-pane"
+                        role="tabpanel" aria-labelledby="contacto-tab" tabindex="2">
+                        <div class="row">
+                            <div class="col-6">
+                                <x-input label="Nombre Completo" type="text" model="contacto_nombre" />
+                            </div>
+                            <div class="col-6">
+                                <x-input label="Correo" type="email" model="contacto_correo" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <x-input label="Teléfono" type="text" model="contacto_telefono" />
+                            </div>
+                            <div class="col-6">
+                                <x-input label="Cargo" type="text" model="contacto_cargo" />
                             </div>
                         </div>
                     </div>

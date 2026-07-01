@@ -35,7 +35,7 @@ class CfdiConstructor
 
     private $es_nota_credito = false;
 
-    function __construct(Sucursal $propietario)
+    function __construct(Sucursal|Cliente $propietario)
     {
         $this->emisor = $propietario;
         $this->xml = new \DOMdocument("1.0", "UTF-8");
@@ -228,7 +228,8 @@ class CfdiConstructor
         return preg_replace("/[^A-Za-z0-9?![:space:]]/", " ", trim($cadena));
     }
 
-    public function setEsNotaCredito(){
+    public function setEsNotaCredito()
+    {
         $this->es_nota_credito = true;
         return $this;
     }
@@ -336,7 +337,7 @@ class CfdiConstructor
                 $xml_con_traslados->appendChild($xml_con_traslado);
                 $xml_con_impuestos->appendChild($xml_con_traslados);
 
-                if($this->es_nota_credito && $concepto['RET_IVA'] != ''){
+                if ($this->es_nota_credito && $concepto['RET_IVA'] != '') {
                     $xml_con_retenciones = $xml->createElement("cfdi:Retenciones");
                     $xml_con_retencion = $xml->createElement("cfdi:Retencion");
                     // var_dump($elem);
@@ -350,7 +351,7 @@ class CfdiConstructor
 
                     $xml_con_retenciones->appendChild($xml_con_retencion);
                     $xml_con_impuestos->appendChild($xml_con_retenciones);
-                }else{
+                } else {
                     if ($concepto['RET_IVA'] != '') {
                         $xml_con_retenciones = $xml->createElement("cfdi:Retenciones");
                         $xml_con_retencion = $xml->createElement("cfdi:Retencion");

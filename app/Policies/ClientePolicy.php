@@ -14,7 +14,10 @@ class ClientePolicy
      */
     public function viewAnyCliente(User $user): bool
     {
-        if ($user->is_super_admin)
+        if ($user->cliente_id)
+            return false;
+
+        if ($user->is_super_admin ||  $user->is_contabilidad)
             return true;
 
         return false;
@@ -25,11 +28,12 @@ class ClientePolicy
      */
     public function viewCliente(User $user, Cliente $cliente): bool
     {
-        if ($user->is_super_admin)
-            return true;
-
         if ($user->is_admin &&  $cliente->id == $user->cliente_id)
             return true;
+
+        if ($user->is_super_admin || $user->is_contabilidad)
+            return true;
+
 
         return false;
     }
@@ -39,7 +43,10 @@ class ClientePolicy
      */
     public function createCliente(User $user): bool
     {
-        if ($user->is_super_admin)
+        if ($user->cliente_id)
+            return false;
+
+        if ($user->is_super_admin || $user->is_contabilidad)
             return true;
 
         return false;
@@ -50,7 +57,21 @@ class ClientePolicy
      */
     public function updateCliente(User $user, Cliente $cliente): bool
     {
-        if ($user->is_super_admin)
+        if ($user->cliente_id)
+            return false;
+
+        if ($user->is_super_admin || $user->is_contabilidad)
+            return true;
+
+        return false;
+    }
+
+    public function manageClientSuscripcion(User $user, Cliente $cliente): bool
+    {
+        if ($user->cliente_id)
+            return false;
+
+        if ($user->is_super_admin || $user->is_contabilidad)
             return true;
 
         return false;
@@ -61,7 +82,10 @@ class ClientePolicy
      */
     public function deleteCliente(User $user, Cliente $cliente): bool
     {
-        if ($user->is_super_admin)
+        if ($user->cliente_id)
+            return false;
+
+        if ($user->is_super_admin || $user->is_contabilidad)
             return true;
 
         return false;
@@ -72,7 +96,10 @@ class ClientePolicy
      */
     public function restoreCliente(User $user, Cliente $cliente): bool
     {
-        if ($user->is_super_admin)
+        if ($user->cliente_id)
+            return false;
+
+        if ($user->is_super_admin || $user->is_contabilidad)
             return true;
 
         return false;

@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class Factura
@@ -22,8 +23,9 @@ use Illuminate\Support\Facades\DB;
  * @property string $id
  * @property string $folio_interno
  * @property string $lugar_expedicion
- * @property string $fecha_emision
- * @property string $fecha_certificacion
+ * @property datetime $fecha_pago
+ * @property datetime $fecha_emision
+ * @property datetime $fecha_certificacion
  * @property string $comentarios
  * @property string $cantidad_letras
  * @property string $estado
@@ -47,6 +49,7 @@ use Illuminate\Support\Facades\DB;
  * @property float $tipo_cambio
  * @property float $anio
  * @property string $cfdis_relacionados
+ * @property boolean $del_sistema
  * @property integer $cfdi_id
  * @property integer $metodo_pago_id
  * @property integer $forma_pago_id
@@ -59,6 +62,7 @@ use Illuminate\Support\Facades\DB;
  * @property integer $periodicidad_id
  * @property integer $mes_id
  * @property integer $user_id
+ * @property integer $suscripcion_id
  */
 class Factura extends Model
 {
@@ -69,6 +73,7 @@ class Factura extends Model
     public $fillable = [
         'folio_interno',
         'lugar_expedicion',
+        'fecha_pago',
         'fecha_emision',
         'fecha_certificacion',
         'comentarios',
@@ -94,6 +99,7 @@ class Factura extends Model
         'tipo_cambio',
         'anio',
         'cfdis_relacionados',
+        'del_sistema',
         'cfdi_id',
         'metodo_pago_id',
         'forma_pago_id',
@@ -105,7 +111,8 @@ class Factura extends Model
         'motivo_cancelacion_id',
         'periodicidad_id',
         'mes_id',
-        'user_id'
+        'user_id',
+        'suscripcion_id'
     ];
 
     protected $appends = [
@@ -130,7 +137,8 @@ class Factura extends Model
         'folio_interno' => 'string',
         'lugar_expedicion' => 'string',
         'fecha_emision' => 'datetime',
-        'fecha_certificacion' => 'date',
+        'fecha_pago' => 'datetime',
+        'fecha_certificacion' => 'datetime',
         'comentarios' => 'string',
         'cantidad_letras' => 'string',
         'estado' => 'string',
@@ -165,7 +173,8 @@ class Factura extends Model
         'motivo_cancelacion_id' => 'integer',
         'periodicidad_id' => 'integer',
         'mes_id' => 'integer',
-        'user_id' => 'integer'
+        'user_id' => 'integer',
+        'suscripcion_id' => 'integer'
     ];
 
     /**
@@ -279,7 +288,40 @@ class Factura extends Model
         return $this->id;
     }
 
-    public static function parseData($data = [])
+    public static function loadPreviousAndPaidInvoiceInformation(Factura $invoice)
+    {
+        $complementos = DB::table('tb_facturas_complementos as f_c')
+            ->select('f_c.importe_pagado', 'f_c.balance_previo', 'f_c.no_parcialidad')
+            ->join('tb_facturas as c', 'f_c.complemento_id', '=', 'c.id')
+            ->where('factura_id', $invoice->id)
+            ->whereNotIn('c.estado', ['CANCELADA', 'PROCESO CANCELACION'])
+            ->get();
+        if ($complementos->count() > 0) {
+            $last_complement = $complementos->last();
+            $previous_balance = $last_complement->balance_previo - $last_complement->importe_pagado;
+            $invoice->balance_previo = round($previous_balance, 2);
+            $invoice->no_parcialidad = $last_complement->no_parcialidad + 1;
+            $invoice->can_be_removed = true;
+        } else {
+            $invoice->can_be_removed = true;
+            $invoice->balance_previo = round($invoice->total, 2);
+            $invoice->no_parcialidad = 1;
+        }
+
+        $ingresos_nota_credito = DB::table('tb_ingresos_facturas as ingreso')
+            ->leftJoin('tb_facturas as nota_credito', 'nota_credito.id', 'ingreso.nota_credito_id')
+            ->where('ingreso.factura_id', $invoice->id)
+            ->sum('nota_credito.total');
+
+        $invoice->balance_previo -= max($ingresos_nota_credito,   0);
+
+        $invoice->balance_previo_temp = $invoice->balance_previo;
+        $invoice->importe_pagado = 0;
+
+        return $invoice;
+    }
+
+    public static function parseData($data = [], $del_sistema = false)
     {
         foreach ($data as $key => $value) {
             if (in_array($key, [
@@ -295,6 +337,7 @@ class Factura extends Model
                 'periodicidad_id',
                 'mes_id',
                 'user_id',
+                'suscripcion_id'
             ]) && $value) {
                 switch ($key) {
                     case 'cfdi_id':
@@ -322,8 +365,12 @@ class Factura extends Model
                             ->selectRaw('id, CONCAT(codigo, " | ", descripcion) as nombre')->where('id', $value)->first()->nombre;
                         break;
                     case 'propietario_id':
-                        $data['propietario'] = DB::table('tb_sucursales')
-                            ->selectRaw('id, razon_social')->where('id', $value)->first()->razon_social;
+                        if ($del_sistema)
+                            $data['propietario'] = DB::table('tb_clientes')
+                                ->selectRaw('id, razon_social')->where('id', $value)->first()->razon_social;
+                        else
+                            $data['propietario'] = DB::table('tb_sucursales')
+                                ->selectRaw('id, razon_social')->where('id', $value)->first()->razon_social;
                         break;
                     case 'tipo_relacion_factura_id':
                         $data['tipo_relacion_factura'] = DB::table('tb_tipo_relacion_facturas')
@@ -344,6 +391,12 @@ class Factura extends Model
                     case 'user_id':
                         $data['user'] = DB::table('tb_usuarios')
                             ->selectRaw('id, CONCAT(nombre, " ", apellidos) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'suscripcion_id':
+                        $data['suscripcion'] = DB::table('tb_suscripciones as sub')
+                            ->selectRaw('sub.id, CONCAT("Suscripción ", paquete.nombre) as nombre')
+                            ->leftJoin('tb_paquetes as paquete', 'sub.paquete_id', '=', 'paquete.id')
+                            ->where('sub.id', $value)->first()->nombre;
                         break;
                 }
             }
@@ -384,6 +437,8 @@ class Factura extends Model
 
     public function propietario()
     {
+        if ($this->del_sistema)
+            return $this->belongsTo(Cliente::class, 'propietario_id');
         return $this->belongsTo(Sucursal::class, 'propietario_id');
     }
     public function periodicidad()
@@ -416,6 +471,35 @@ class Factura extends Model
     public function ticket_operaciones()
     {
         return $this->hasMany(TicketOperacion::class, 'factura_id');
+    }
+
+    public function complementos()
+    {
+        return $this->belongsToMany(Factura::class, 'tb_facturas_complementos', 'factura_id', 'complemento_id')
+            ->withPivot('no_parcialidad', 'balance_previo', 'importe_pagado');
+    }
+
+    public function facturas()
+    {
+        return $this->belongsToMany(Factura::class, 'tb_facturas_complementos', 'complemento_id', 'factura_id')
+            ->withPivot('no_parcialidad', 'balance_previo', 'importe_pagado');
+    }
+
+    public function facturas_relacionadas()
+    {
+        return $this->belongsToMany(Factura::class, 'tb_factura_facturas_relacionadas', 'factura_id', 'factura_relacionada_id');
+    }
+
+    public function ingresos()
+    {
+        return $this->belongsToMany(Ingreso::class, 'tb_ingresos_facturas', 'factura_id', 'ingreso_id')
+            ->withPivot(['nota_credito_id', 'monto', 'monto_moneda_original', 'moneda']);
+    }
+
+    public function nota_credito_ingresos()
+    {
+        return $this->belongsToMany(Ingreso::class, 'tb_ingresos_facturas', 'nota_credito_id', 'ingreso_id')
+            ->withPivot(['factura_id', 'monto']);
     }
 
     public static function generatePdf($invoice_id, $mailing = false)
@@ -658,11 +742,183 @@ class Factura extends Model
         return $name;
     }
 
+    public static function generateComplementoPdf($complemento_id, $mailing = false)
+    {
+        $propietario = get_system_owner();
+        $complemento = Factura::find($complemento_id);
+
+        $pdf = new PdfFacturacion($propietario, $complemento);
+        $pdf->AddPage('P');
+        $pdf->SetMargins(5, 10, 5);
+        $pdf->SetFont('Arial', 'B', 8);
+
+        $pdf->Ln(2);
+        $pdf->WriteHTML('<b>Receptor: </b> ' . utf8_decode($complemento->cliente->razon_social) . ' <b>RFC: </b>' . $complemento->cliente->rfc, 5, '', 1);
+        $pdf->Ln(5);
+        $pdf->WriteHTML('<b>Domicilio Fiscal: </b>' . utf8_decode($complemento->cliente->direccion_fiscal->direccion_formateada), 5, '', 1);
+        $pdf->Ln(5);
+        $pdf->WriteHTML('<b>Uso del CFDI: </b>' . utf8_decode($complemento->cfdi_id ? $complemento->cfdi->nombre : ''), 5, '', 1);
+        $pdf->Ln(10);
+
+        $pdf->Ln(6);
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->Cell(0, 6, 'Datos del Pago', 1, 1, 'L', 1);
+        $pdf->SetTextColor(0, 0, 0);
+        $width = $pdf->GetPageWidth() - 10;
+        if ($complemento->forma_pago_id !== 1) {
+            $col = $width / 4;
+            $pdf->SetFont('Arial', 'B', 8);
+            $pdf->Cell($col, 6, 'RFC Banco Emisor', 1, 0, 'L');
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell($col, 6, $complemento->cuenta_origen ? $complemento->cuenta_origen->banco->rfc : '', 1, 0, 'L');
+
+            $pdf->SetFont('Arial', 'B', 8);
+            $pdf->Cell($col, 6, 'RFC Banco Receptor', 1, 0, 'L');
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell($col, 6, $complemento->cuenta_destino ? $complemento->cuenta_destino->banco->rfc : '', 1, 1, 'L');
+
+            $pdf->SetFont('Arial', 'B', 8);
+            $pdf->Cell($col, 6, 'Cuenta Banco Emisor', 1, 0, 'L');
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell($col, 6, $complemento->cuenta_origen ? $complemento->cuenta_origen->cuenta : '', 1, 0, 'L');
+
+            $pdf->SetFont('Arial', 'B', 8);
+            $pdf->Cell($col, 6, 'Cuenta Banco Receptor', 1, 0, 'L');
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Cell($col, 6, $complemento->cuenta_destino ? $complemento->cuenta_destino->cuenta : '', 1, 1, 'L');
+        }
+        $col = $width / 4;
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell($col, 6, 'Moneda', 1, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell($col, 6, $complemento->moneda === 'MXN' ? 'MXN Peso Mexicano' : 'USD Dolar Estadounidense', 1, 0, 'L');
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell($col, 6, 'Fecha y hora del pago', 1, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell($col, 6, $complemento->fecha_pago->format('Y-m-d') . 'T' . $complemento->fecha_pago->format('H:i:s'), 1, 1, 'L');
+
+        $col = $width / 2;
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->Cell($col, 6, 'Forma de Pago', 1, 0, 'L');
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->Cell($col, 6, utf8_decode($complemento->forma_pago->nombre), 1, 1, 'L');
+
+        $pdf->Ln(10);
+
+        $pdf->SetFont('Arial', 'B', 10);
+        $pdf->Cell(0, 8, 'Facturas Relacionadas', 0, 1);
+        $pdf->Ln(2);
+
+        $col_1 = $width * 27 / 100;
+        $col_2 = $width * 10 / 100;
+        $col_3 = $width * 6 / 100;
+        $col_4 = $width * 7 / 100;
+        $col_5 = $width * 18 / 100;
+
+        $pdf->SetFont('Arial', 'B', 8);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->Cell($col_1, 6, 'UUID', 1, 0, 'C', 1);
+        $pdf->Cell($col_4, 6, 'Folio', 1, 0, 'C', 1);
+        $pdf->Cell($col_3, 6, 'No Par.', 1, 0, 'C', 1);
+        $pdf->Cell($col_3, 6, 'Moneda', 1, 0, 'C', 1);
+        $pdf->Cell($col_5, 6, 'Objeto Impuesto', 1, 0, 'C', 1);
+        $pdf->Cell($col_3, 6, utf8_decode('M. Pago'), 1, 0, 'C', 1);
+        $pdf->Cell($col_2, 6, 'Saldo Ant.', 1, 0, 'C', 1);
+        $pdf->Cell($col_2, 6, 'Saldo Pend.', 1, 0, 'C', 1);
+        $pdf->Cell($col_2, 6, 'Imp. Pagado', 1, 1, 'C', 1);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('Arial', '', 8);
+        foreach ($complemento->facturas as $factura) {
+            $objImpuesto = $factura->iva > 0 ? '02 | Si Objeto de Impuesto' : '01 | No Objeto de Impuesto';
+            $pdf->Cell($col_1, 6, $factura->uuid, 1, 0, 'C');
+            $pdf->Cell($col_4, 6, $factura->folio_interno, 1, 0, 'C');
+            $pdf->Cell($col_3, 6, $factura->pivot->no_parcialidad, 1, 0, 'C');
+            $pdf->Cell($col_3, 6, $factura->moneda, 1, 0, 'C');
+            $pdf->Cell($col_5, 6, $objImpuesto, 1, 0, 'C');
+            $pdf->Cell($col_3, 6, $factura->metodo_pago->codigo, 1, 0, 'C');
+
+            $importe_pagado = $factura->pivot->importe_pagado;
+            if ($factura->moneda != $complemento->moneda) {
+                if ($complemento->moneda == 'USD')
+                    $importe_pagado = round($importe_pagado * $complemento->tipo_cambio, 2);
+                else
+                    $importe_pagado = round($importe_pagado / $complemento->tipo_cambio, 2);
+            }
+
+            $saldo = $factura->pivot->balance_previo - $importe_pagado;
+            $saldo = $saldo <= 0.1 && $saldo >= -0.1 ? 0 : $saldo;
+
+            $pdf->Cell($col_2, 6, '$' . number_format($factura->pivot->balance_previo, 2), 1, 0, 'C');
+            $pdf->Cell($col_2, 6, '$' . number_format($saldo, 2), 1, 0, 'C');
+            $pdf->Cell($col_2, 6, '$' . number_format($factura->pivot->importe_pagado, 2), 1, 1, 'C');
+        }
+
+        $pdf->Ln(2);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell($width - 20, 6, 'TOTAL PAGADO: ', 0, 0, 'R');
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Cell(0, 6, '$' . number_format($complemento->total, 2), 0, 1, 'C');
+
+        $pdf->Ln(2);
+
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(0, 6, 'CANTIDAD CON LETRA', 0, 1);
+        $pdf->SetFont('Arial', '', 9);
+        $pdf->Ln(1);
+        //    $pdf->Cell(0, 12, Helper::convertirNUmerosALetras($complemento->total), 1, 1, 'L', 1);
+        $pdf->SetTextColor(255, 255, 255);
+        $cantidad_letras = convertir_numero_a_letras(round($complemento->total, 2), strtoupper($complemento->moneda));
+        $pdf->Cell(0, 12, utf8_decode($cantidad_letras), 1, 1, 'L', 1);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Ln(1);
+        $pdf->SetFont('Arial', 'B', 9);
+        $pdf->Cell(30, 6, 'Observaciones: ', 0, 0);
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->MultiCell(0, 6, $complemento->observaciones);
+
+        $pdf->Ln(5);
+        $col_1 = $width * 25 / 100;
+        $col_2 = $width * 75 / 100;
+        $pos_inicial = $pdf->GetY();
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->SetX($col_1);
+        $pdf->Cell($col_2, 4, 'SELLO DIGITAL DEL CFDI', 0, 1);
+        $pdf->SetX($col_1);
+        $pdf->SetFont('Arial', '', 5);
+        $pdf->MultiCell($col_2, 4, $complemento->sello_digital_cfdi);
+        $pdf->SetX($col_1);
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell($col_2, 4, 'SELLO DIGITAL DEL SAT', 0, 1);
+        $pdf->SetX($col_1);
+        $pdf->SetFont('Arial', '', 5);
+        $pdf->MultiCell($col_2, 4, $complemento->sello_digital_sat);
+        $pdf->SetX($col_1);
+        $pdf->SetFont('Arial', 'B', 7);
+        $pdf->Cell($col_2, 4, utf8_decode('CADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACIÓN DIGITAL DEL SAT'), 0, 1);
+        $pdf->SetX($col_1);
+        $pdf->SetFont('Arial', '', 5);
+        $pdf->MultiCell($col_2, 4, $complemento->cadena_original);
+        $pos_final = $pdf->GetY();
+        $pdf->SetY($pos_inicial);
+        if ($complemento->direccion_codigo_qr && Storage::disk('public')->exists($complemento->direccion_codigo_qr)) {
+            $pdf->Image(Storage::disk('public')->url($complemento->direccion_codigo_qr), 5, $pos_inicial, $col_1 - 5);
+        }
+
+        $complemento->save();
+        if ($mailing) {
+            $name = utf8_decode('Complemento') . $complemento->folio_interno . '.pdf';
+            $pdf->Output('F', $name);
+            return $name;
+        }
+        $pdf->Output('I');
+    }
+
+
     /**
-     * @param boolean $is_complement - default -> false
-     * @param bool $is_nota_credito
-     * @param bool $is_nomina
-     * @param bool $is_nota_venta
+     * @param integer $serie_id
      * @param boolean $modo_productivo
      * @return int
      */

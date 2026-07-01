@@ -30,7 +30,7 @@ class  CfdiTimbrador
 
     // Define los datos de control
 
-    function __construct(Sucursal $propietario)
+    function __construct(Sucursal|Cliente $propietario)
     {
         $this->emisor = $propietario;
         $this->modo_pruebas();

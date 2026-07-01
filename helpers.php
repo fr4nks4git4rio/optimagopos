@@ -4,6 +4,7 @@ use App\Models\Cliente;
 use App\Models\Config;
 use App\Models\Sucursal;
 use App\Models\TipoCambio;
+use App\Models\TipoCambioSistema;
 use App\Services\Helpers\QuantityToWords;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
@@ -33,18 +34,36 @@ if (!function_exists('get_owner')) {
      */
     function get_owner()
     {
-        return user() ? user()->owner : null;
+        if (!user())
+            return null;
+        return user()->cliente_id ? user()->owner : Cliente::where('es_propietario', 1)->first();
+    }
+}
+
+if (!function_exists('get_system_owner')) {
+    /**
+     * @return Cliente|null
+     */
+    function get_system_owner()
+    {
+        return Cliente::where('es_propietario', 1)->first();
     }
 }
 
 if (!function_exists('active_route')) {
     /**
      * @param $route
-     * @param string $output
+     * @param string|array $output
      * @return mixed
      */
-    function active_route($route, string $output = 'active')
+    function active_route($route, $output = 'active')
     {
+        if (is_array($route)) {
+            foreach ($route as $r) {
+                if (Request::is($r))
+                    return $output;
+            }
+        }
         if (Request::is($route))
             return $output;
     }
@@ -164,6 +183,21 @@ if (!function_exists('get_tipo_cambio')) {
     }
 }
 
+if (!function_exists('get_tipo_cambio_sistema')) {
+    /**
+     * @param null $date
+     * @return TipoCambioSistema
+     */
+    function get_tipo_cambio_sistema($date = null)
+    {
+        $date = $date ?? Carbon::now()->format('Y-m-d');
+        $change = TipoCambioSistema::whereRaw("DATE(created_at) = '$date'")
+            ->get();
+
+        return $change->count() > 0 ? $change->first() : new TipoCambioSistema();
+    }
+}
+
 if (!function_exists('flash_message')) {
     /**
      * @param $type
@@ -202,6 +236,13 @@ if (!function_exists('modo_facturacion')) {
     function modo_facturacion($sucursal_id)
     {
         return Sucursal::find($sucursal_id)?->cfdi_timbrado_productivo;
+    }
+}
+
+if (!function_exists('modo_facturacion_sistema')) {
+    function modo_facturacion_sistema()
+    {
+        return system_config('cfdi_timbrado_productivo');
     }
 }
 

@@ -14,6 +14,7 @@ use App\Observers\TerminalObserver;
 use App\Observers\UserObserver;
 use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +36,15 @@ class AppServiceProvider extends ServiceProvider
         Sucursal::observe(SucursalObserver::class);
         Terminal::observe(TerminalObserver::class);
         Factura::observe(FacturaObserver::class);
+
+        Password::defaults(function () {
+            return Password::min(8)
+                ->max(64)
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+                ->uncompromised();
+        });
 
         setlocale(LC_ALL, 'es_MX', 'es', 'ES', 'es_MX.utf8');
         Carbon::setLocale('es_MX.utf8');

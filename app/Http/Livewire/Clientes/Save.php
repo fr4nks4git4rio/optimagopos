@@ -26,6 +26,10 @@ class Save extends Modal
     public $rfc;
     public $correo;
     public $telefono;
+    public $contacto_nombre;
+    public $contacto_correo;
+    public $contacto_telefono;
+    public $contacto_cargo;
     public $comentarios;
     public $con_facturacion;
     public $regimen_fiscal_id;
@@ -49,6 +53,10 @@ class Save extends Modal
             $this->rfc = $this->cliente->rfc;
             $this->correo = $this->cliente->correo;
             $this->telefono = $this->cliente->telefono;
+            $this->contacto_nombre = $this->cliente->contacto_nombre;
+            $this->contacto_correo = $this->cliente->contacto_correo;
+            $this->contacto_telefono = $this->cliente->contacto_telefono;
+            $this->contacto_cargo = $this->cliente->contacto_cargo;
             $this->comentarios = $this->cliente->comentarios;
             $this->con_facturacion = $this->cliente->con_facturacion;
             $this->regimen_fiscal_id = $this->cliente->regimen_fiscal_id;
@@ -97,8 +105,12 @@ class Save extends Modal
             'con_facturacion' => ['nullable', 'boolean'],
             'razon_social' => ['required_if:con_facturacion,true', new RuleUnique($collection, $this->cliente->id)],
             'rfc' => ['required_if:con_facturacion,true', new RuleUnique($collection, $this->cliente->id), new RfcRule('ambas')],
-            'correo' => ['required'],
+            'correo' => ['required', 'email'],
             'telefono' => ['nullable'],
+            'contacto_nombre' => ['nullable'],
+            'contacto_correo' => ['nullable', 'email'],
+            'contacto_telefono' => ['nullable'],
+            'contacto_cargo' => ['nullable'],
             'comentarios' => ['nullable'],
             'regimen_fiscal_id' => ['required_if:con_facturacion,true', new RfcYRegimenCoherentesRule($this->rfc)],
             'direccion_fiscal.codigo_postal' => ['required_if:con_facturacion,true'],
@@ -120,6 +132,8 @@ class Save extends Modal
             'razon_social.required_if' => 'Campo requerido',
             'rfc.required_if' => 'Campo requerido',
             'correo.required' => 'Campo requerido',
+            'correo.email' => 'Formato incorrecto',
+            'contacto_correo.email' => 'Formato incorrecto',
             'regimen_fiscal_id.required_if' => 'Campo requerido',
             'direccion_fiscal.codigo_postal.required_if' => 'Campo requerido.'
         ];
@@ -134,12 +148,17 @@ class Save extends Modal
             $data['es_cliente'] = 1;
             $data = Cliente::encryptInfo($data);
 
+            $data['regimen_fiscal_id'] = $data['regimen_fiscal_id'] ?: null;
             $this->cliente->fill(Arr::only($data, [
                 'nombre_comercial',
                 'razon_social',
                 'rfc',
                 'correo',
                 'telefono',
+                'contacto_nombre',
+                'contacto_correo',
+                'contacto_telefono',
+                'contacto_cargo',
                 'es_cliente',
                 'comentarios',
                 'con_facturacion',

@@ -31,7 +31,7 @@ class Logs extends Component
         $records = $logs->forPage($this->page, $this->perPage);
         $logs = new LengthAwarePaginator($records, $total, $this->perPage, $this->page);
         return view('livewire.reportes.logs', [
-            'logs' => $this->query()->paginate($this->perPage),
+            'logs' => $logs,
         ]);
     }
 

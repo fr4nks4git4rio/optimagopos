@@ -13,9 +13,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models\Administracion\CodificadoresFacturacion
  * @version January 12, 2021, 7:50 pm CST
  *
- * @property string codigo
- * @property string descripcion
- * @property boolean activo
+ * @property string $codigo
+ * @property string $descripcion
+ * @property boolean $activo
  */
 class ClaveUnidad extends Model
 {

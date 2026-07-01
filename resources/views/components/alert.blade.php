@@ -1,12 +1,10 @@
 @props([
     'alert' => 'info',
-    'icon' => null
+    'icon' => null,
 ])
-<div>
-    <div class="alert alert-{{$alert}}">
-        @if($icon)
-            <x-icon class="fs-4 align-middle" name="{{$icon}}"></x-icon> &nbsp;
-        @endif
-        {{ $slot }}
-    </div>
+<div class="p-2 alert alert-{{ $alert }}">
+    @if ($icon)
+        <x-icon class="fs-4 align-middle" name="{{ $icon }}"></x-icon> &nbsp;
+    @endif
+    {{ $slot }}
 </div>

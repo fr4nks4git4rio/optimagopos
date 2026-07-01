@@ -19,7 +19,7 @@ class Facturador
     private $emisor;
     public bool $modo_productivo;
 
-    public function __construct(Sucursal $propietario)
+    public function __construct(Sucursal|Cliente $propietario)
     {
         $this->emisor = $propietario;
         $this->modo_productivo = modo_facturacion($propietario->id) == 1;

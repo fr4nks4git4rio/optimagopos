@@ -12,4 +12,12 @@ return [
     'invoice-header' => 'Cabecera de Facturas',
     'invoices' => 'Facturas',
     'invoice-storage' => 'Almacén de Facturas',
+    'modules' => 'Módulos',
+    'packages' => 'Paquetes',
+    'configs' => 'Configuraciones',
+    'subscriptions' => 'Suscripciones',
+    'accounts-receivable' => 'Cuentas por Cobrar',
+    'reports' => 'Reportes',
+    'sales-period' => 'Ventas por Periodo',
+    'most-sold-products' => 'Productos más vendidos',
 ];

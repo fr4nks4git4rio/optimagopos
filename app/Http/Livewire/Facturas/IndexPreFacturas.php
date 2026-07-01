@@ -123,9 +123,10 @@ class IndexPreFacturas extends Component
                 ') FROM tb_factura_conceptos as fc WHERE fc.factura_id = factura.id) as conceptos")
             )
             ->leftJoin('tb_clientes as cliente', 'factura.cliente_id', '=', 'cliente.id')
-            ->leftJoin('tb_clientes as propietario', 'factura.propietario_id', '=', 'propietario.id')
+            ->leftJoin('tb_sucursales as propietario', 'factura.propietario_id', '=', 'propietario.id')
             ->distinct('factura.id')
-            ->where('factura.user_id', '>', 0);
+            ->where('factura.user_id', '>', 0)
+            ->where('del_sistema', 0);
         if ($this->fechaInicio) {
             $query->where('factura.fecha_certificacion', '>=', $this->fechaInicio);
         }
@@ -227,7 +228,7 @@ class IndexPreFacturas extends Component
             $this->emit('show-toast', 'Primero debe dar de alta al Cliente: "VENTA A PUBLICO GENERAL" con RFC: "XAXX010101000".', 'danger');
             return;
         }
-        return redirect()->route('pre-facturas.save');
+        return redirect()->route('cliente.pre-facturas.save');
     }
 
     public function timbrar($id)

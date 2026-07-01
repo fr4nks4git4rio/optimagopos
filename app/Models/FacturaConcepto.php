@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer $clave_prod_serv_id
  * @property integer $clave_unidad_id
  * @property integer $objeto_impuesto_id
+ * @property integer $suscripcion_id
  */
 class FacturaConcepto extends Model
 {
@@ -34,7 +35,8 @@ class FacturaConcepto extends Model
         'factura_id',
         'clave_prod_serv_id',
         'clave_unidad_id',
-        'objeto_impuesto_id'
+        'objeto_impuesto_id',
+        'suscripcion_id'
     ];
 
     /**
@@ -49,7 +51,8 @@ class FacturaConcepto extends Model
         'descripcion' => 'string',
         'factura_id' => 'integer',
         'clave_prod_serv_id' => 'integer',
-        'clave_unidad_id' => 'integer'
+        'clave_unidad_id' => 'integer',
+        'suscripcion_id' => 'integer'
     ];
 
     /**
@@ -93,5 +96,9 @@ class FacturaConcepto extends Model
     public function objeto_impuesto()
     {
         return $this->belongsTo(ObjetoImpuesto::class);
+    }
+    public function suscripcion()
+    {
+        return $this->belongsTo(Suscripcion::class);
     }
 }

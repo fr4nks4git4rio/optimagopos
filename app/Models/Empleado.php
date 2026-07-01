@@ -14,9 +14,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models
  * @version January 12, 2021, 7:46 pm CST
  *
- * @property integer id_empleado
- * @property string nombre
- * @property integer sucursal_id
+ * @property integer $id_empleado
+ * @property string  $nombre
+ * @property integer $sucursal_id
  */
 class Empleado extends Model
 {

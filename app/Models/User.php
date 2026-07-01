@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\CausesActivity;
@@ -67,7 +68,7 @@ class User extends Authenticatable implements JWTSubject
         // 'two_factor_authentication_enabled'
     ];
 
-    protected $appends = ['nombre_completo', 'is_super_admin', 'is_admin'];
+    protected $appends = ['nombre_completo', 'is_super_admin', 'is_contabilidad', 'is_admin'];
 
     public function rules()
     {
@@ -77,7 +78,7 @@ class User extends Authenticatable implements JWTSubject
             'apellidos' => ['nullable'],
             'rol_id' => ['required'],
             'cliente_id' => ['nullable', 'required_if:rol_id,2', 'exists:tb_clientes,id'],
-            'password' => [Rule::requiredIf(fn() => $this->id == null), 'confirmed']
+            'password' => [Rule::requiredIf(fn() => $this->id == null), 'confirmed', Password::default()]
         ];
     }
 
@@ -125,6 +126,10 @@ class User extends Authenticatable implements JWTSubject
     public function getIsAdminAttribute()
     {
         return $this->rol_id == 2;
+    }
+    public function getIsContabilidadAttribute()
+    {
+        return $this->rol_id == 3;
     }
 
     public function getJWTIdentifier()

@@ -36,7 +36,7 @@ class FacturaObserver
             ->withProperties(Factura::parseData(Arr::except(
                 $factura->toArray(),
                 $this->attr_except
-            )))
+            ), $factura->del_sistema))
             ->log("$label con ID: $factura->id ha sido creada.");
     }
 
@@ -56,7 +56,7 @@ class FacturaObserver
         activity("$label Actualizada")
             ->on($factura)
             ->event('updated')
-            ->withProperty('attributes', Factura::parseData($attributes))
+            ->withProperty('attributes', Factura::parseData($attributes, $factura->del_sistema))
             ->withProperty('old', Factura::parseData(Arr::only($factura->getOriginal(), array_keys($attributes))))
             ->log("$label con ID: $factura->id ha sido actualizado.");
     }
@@ -76,7 +76,7 @@ class FacturaObserver
             ->withProperties(Factura::parseData(Arr::except(
                 $factura->toArray(),
                 $this->attr_except
-            )))
+            ), $factura->del_sistema))
             ->log("$label con ID: $factura->id ha sido eliminada.");
     }
 }
