@@ -199,7 +199,12 @@ return [
     */
 
     'attributes' => [
-        'password' => 'contraseña'
+        'password' => 'contraseña',
+        'cliente_id' => 'cliente',
+        'paquete_id' => 'paquete',
+        'fecha_inicio_operaciones' => 'fecha de inicio de operaciones',
+        'fecha_inicio_pagos' => 'fecha de próximo cobro',
+        'periodicidad_pagos' => 'período de cobro',
     ],
 
 ];

@@ -10,7 +10,7 @@ return [
     'billing' => 'Billing',
     'panel-pac' => 'Panel PAC',
     'invoice-header' => 'Invoice Header',
-    'invoices' => 'Facturas',
+    'invoices' => 'Invoices',
     'invoice-storage' => 'Invoice Storage',
     'modules' => 'Modules',
     'packages' => 'Packages',
@@ -20,4 +20,6 @@ return [
     'reports' => 'Reports',
     'sales-period' => 'Sales by Period',
     'most-sold-products' => 'Most Sold Products',
+    'incomes' => 'Incomes',
+    'logs' => 'Logs',
 ];

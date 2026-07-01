@@ -130,6 +130,6 @@ class Nav extends Component
 
         app()->setLocale($lang);
 
-        $this->emit('$refresh');
+        $this->redirect(request()->header('referer'));
     }
 }

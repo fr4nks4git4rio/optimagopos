@@ -53,13 +53,13 @@ class GestionSuscripciones extends Component
         ];
     }
 
-    protected $messages = [
-        'cliente_id.required' => 'Seleccione el Cliente.',
-        'cliente_id.exists' => 'Cliente no encontrado.',
-        'fecha_inicio_operaciones.required' => 'La fecha de inicio de operaciones es obligatoria.',
-        'fecha_inicio_pagos.required' => 'La fecha de próximo cobro es obligatoria.',
-        'periodicidad_pagos.in' => 'Período no encontrado'
-    ];
+    // protected $messages = [
+    //     'cliente_id.required' => 'Seleccione el Cliente.',
+    //     'cliente_id.exists' => 'Cliente no encontrado.',
+    //     'fecha_inicio_operaciones.required' => 'La fecha de inicio de operaciones es obligatoria.',
+    //     'fecha_inicio_pagos.required' => 'La fecha de próximo cobro es obligatoria.',
+    //     'periodicidad_pagos.in' => 'Período no encontrado'
+    // ];
 
     public function mount($clienteId = null)
     {

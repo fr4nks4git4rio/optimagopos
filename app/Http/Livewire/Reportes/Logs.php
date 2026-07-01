@@ -26,7 +26,7 @@ class Logs extends Component
 
     public function render()
     {
-        $logs = $this->query();
+        $logs = $this->query()->get();
         $total = $logs->count();
         $records = $logs->forPage($this->page, $this->perPage);
         $logs = new LengthAwarePaginator($records, $total, $this->perPage, $this->page);

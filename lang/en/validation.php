@@ -195,6 +195,13 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'password' => 'password',
+        'cliente_id' => 'client',
+        'paquete_id' => 'package',
+        'fecha_inicio_operaciones' => 'start date of operations',
+        'fecha_inicio_pagos' => 'next payment date',
+        'periodicidad_pagos' => 'payment period',
+    ],
 
 ];

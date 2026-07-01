@@ -119,19 +119,19 @@
     <a href="#submenu_reportes" data-bs-toggle="collapse" class="nav-link align-middle"
         @if ($this->reportes_routes_active) aria-expanded="true" @endif>
         <i class="bi bi-file-earmark-code fs-6 float-end border border-2 border-dark" title="Reportes"></i>
-        <span class="ms-1 d-none text-uppercase fw-semibold fs-6" :class="display"> Reportes
+        <span class="ms-1 d-none text-uppercase fw-semibold fs-6" :class="display"> {{__('sidebar.reports')}}
         </span>
     </a>
     <ul class="collapse nav flex-column ms-1 @if ($this->reportes_routes_active) show @endif" :class="submenu_absolute"
         id="submenu_reportes" data-bs-parent="#submenu_reportes">
         <li class="w-100 li-item {{ active_route('admin/reportes/ingresos*') }}">
             <a href="{{ route('admin.reportes.ingresos') }}" class="nav-link submenu">
-                <i class="bi bi-graph-up fs-6"></i> <span class="d-sm-inline px-2">Ingresos</span></a>
+                <i class="bi bi-graph-up fs-6"></i> <span class="d-sm-inline px-2">{{ __('sidebar.incomes') }}</span></a>
         </li>
         @if (user()->is_super_admin)
             <li class="w-100 li-item {{ active_route('admin/reportes/logs*') }}">
                 <a href="{{ route('admin.reportes.logs') }}" class="nav-link submenu">
-                    <i class="bi bi-fingerprint fs-6"></i> <span class="d-sm-inline px-2">Logs</span></a>
+                    <i class="bi bi-fingerprint fs-6"></i> <span class="d-sm-inline px-2">{{ __('sidebar.logs') }}</span></a>
             </li>
         @endif
     </ul>

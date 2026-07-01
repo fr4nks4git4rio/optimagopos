@@ -19,5 +19,7 @@ return [
     'accounts-receivable' => 'Cuentas por Cobrar',
     'reports' => 'Reportes',
     'sales-period' => 'Ventas por Periodo',
-    'most-sold-products' => 'Productos más vendidos',
+    'most-sold-products' => 'Productos más Vendidos',
+    'incomes' => 'Ingresos',
+    'logs' => 'Trazas',
 ];
