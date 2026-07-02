@@ -112,20 +112,26 @@
                         </td>
                         <td class="text-center">
                             @php
-                            $classTipo = 'bg-success';
-                            switch ($factura->tipo) {
-                                case 'COMP.':
-                                    $classTipo = 'bg-primary';
-                                    break;
-                                case 'NOT.CRE.':
-                                    $classTipo = 'bg-warning text-dark';
-                                    break;
-                                default:
-                                    $classTipo = 'bg-success';
-                                    break;
-                            }
+                                $classTipo = 'bg-success';
+                                switch ($factura->tipo) {
+                                    case 'COMP.':
+                                        $classTipo = 'bg-primary';
+                                        break;
+                                    case 'NOT.CRE.':
+                                        $classTipo = 'bg-warning text-dark';
+                                        break;
+                                    default:
+                                        $classTipo = 'bg-success';
+                                        break;
+                                }
                             @endphp
                             <span class="badge {{ $classTipo }}">{{ $factura->tipo }}</span>
+                            @if ($factura->paquete)
+                                <br>
+                                <span class="badge bg-primary-subtle border-primary text-primary">
+                                    {{ $factura->paquete }}
+                                </span>
+                            @endif
                         </td>
                         <td>{{ $factura->receptor }}</td>
                         <td class="text-center">

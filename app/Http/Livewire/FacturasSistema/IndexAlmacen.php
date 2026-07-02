@@ -124,6 +124,7 @@ class IndexAlmacen extends Component
                 'factura.subtotal',
                 'factura.iva',
                 'factura.total',
+                DB::raw("IF(factura.suscripcion_id IS NOT NULL, IF(paquete.nombre IS NOT NULL, paquete.nombre, 'CUSTOM'), '') as paquete"),
                 DB::raw("(SELECT GROUP_CONCAT(fc.descripcion SEPARATOR '
                 ') FROM tb_factura_conceptos as fc WHERE fc.factura_id = factura.id) as conceptos"),
                 'mc.descripcion as motivo_cancelacion'
@@ -131,6 +132,8 @@ class IndexAlmacen extends Component
             ->leftJoin('tb_clientes as cliente', 'factura.cliente_id', '=', 'cliente.id')
             ->leftJoin('tb_clientes as propietario', 'factura.propietario_id', '=', 'propietario.id')
             ->leftJoin('tb_motivos_cancelacion_factura as mc', 'factura.motivo_cancelacion_id', 'mc.id')
+            ->leftJoin('tb_suscripciones as suscripcion', 'factura.suscripcion_id', '=', 'suscripcion.id')
+            ->leftJoin('tb_paquetes as paquete', 'suscripcion.paquete_id', '=', 'paquete.id')
             ->whereIn('factura.estado', ['TIMBRADA', 'CANCELADA'])
             ->distinct('factura.id')
             ->where('del_sistema', 1);
