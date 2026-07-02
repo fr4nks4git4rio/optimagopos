@@ -95,15 +95,18 @@ class FormasPago extends Modal
 
     public function guardarFormPago()
     {
-        $data = $this->validate([
-            'forma_pago_activa.id' => 'nullable',
-            'forma_pago_activa.nombre' => ['required'],
-            'forma_pago_activa.moneda_id' => ['required', 'exists:tb_monedas,id']
-        ], [
-            'forma_pago_activa.nombre.required' => 'Campo requerido.',
-            'forma_pago_activa.moneda.required' => 'Campo requerido.',
-            'forma_pago_activa.moneda.exists' => 'Moneda no encontrada.',
-        ]);
+        $data = $this->validate(
+            [
+                'forma_pago_activa.id' => 'nullable',
+                'forma_pago_activa.nombre' => ['required'],
+                'forma_pago_activa.moneda_id' => ['required', 'exists:tb_monedas,id']
+            ],
+            //  [
+            //     'forma_pago_activa.nombre.required' => 'Campo requerido.',
+            //     'forma_pago_activa.moneda.required' => 'Campo requerido.',
+            //     'forma_pago_activa.moneda.exists' => 'Moneda no encontrada.',
+            // ]
+        );
 
         if (
             DB::table('tb_sucursal_forma_pagos as sfp')

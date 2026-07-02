@@ -47,7 +47,10 @@ class Login extends Component
 
     public function login()
     {
-        $data = $this->validate($this->rules(), $this->messages());
+        $data = $this->validate(
+            $this->rules(),
+            // $this->messages()
+        );
 
         $throttleKey = Str::lower($this->email) . '|' . request()->ip();
 

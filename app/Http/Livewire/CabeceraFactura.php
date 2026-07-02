@@ -212,7 +212,10 @@ class CabeceraFactura extends Component
 
     public function saveDatosGenerales($index)
     {
-        $data = $this->validate($this->rulesDatosGenerales($index), $this->messagesDatosGenerales($index));
+        $data = $this->validate(
+            $this->rulesDatosGenerales($index),
+            // $this->messagesDatosGenerales($index)
+        );
         $dataSucursal = $data['sucursales'][$index];
         $nombre_comercial = $dataSucursal['nombre_comercial'] ? Crypt::encrypt($dataSucursal['nombre_comercial']) : '';
         $razon_social = $dataSucursal['razon_social'] ? Crypt::encrypt($dataSucursal['razon_social']) : '';
@@ -243,7 +246,10 @@ class CabeceraFactura extends Component
 
     public function saveDireccion($index)
     {
-        $data = $this->validate($this->rulesDireccion($index), $this->messagesDireccion($index));
+        $data = $this->validate(
+            $this->rulesDireccion($index),
+            // $this->messagesDireccion($index)
+        );
         $dataSucursal = $data['sucursales'][$index];
         $sucursal = Sucursal::find($dataSucursal['id']);
 

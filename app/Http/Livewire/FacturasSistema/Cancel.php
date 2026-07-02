@@ -73,12 +73,14 @@ class Cancel extends Modal
         $data = $this->validate([
             'motivo' => ['required', 'exists:tb_motivos_cancelacion_factura,id'],
             'factura_sustituta' => ['required_if:motivo,1'],
-        ], [
-            'motivo.required' => 'Campo requerido!',
-            'motivo.exists' => 'Motivo no encontrado!',
-            'factura_sustituta.exists' => 'Factura no encontrada!',
-            'factura_sustituta.required_if' => 'Campo requerido!'
-        ]);
+        ],
+        // [
+        //     'motivo.required' => 'Campo requerido!',
+        //     'motivo.exists' => 'Motivo no encontrado!',
+        //     'factura_sustituta.exists' => 'Factura no encontrada!',
+        //     'factura_sustituta.required_if' => 'Campo requerido!'
+        // ]
+        );
 
         $facturador = new Facturador($this->factura->propietario);
         $res = $facturador->cancelar($this->factura->id, $data['motivo'], $data['factura_sustituta']);

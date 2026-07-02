@@ -82,7 +82,10 @@ class Save extends Modal
     {
         $rules = $this->user->rules();
         $messages = $this->user->messages();
-        $data = $this->validate($rules, $messages);
+        $data = $this->validate(
+            $rules,
+            // $messages
+        );
         if ($data['password'] && trim($data['password']) != "") {
             $data['password'] = Hash::make($data['password']);
         } else {

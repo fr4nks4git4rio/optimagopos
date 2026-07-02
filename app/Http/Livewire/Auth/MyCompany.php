@@ -122,7 +122,10 @@ class MyCompany extends Modal
 
     public function save()
     {
-        $data = $this->validate($this->rules(), $this->messages());
+        $data = $this->validate(
+            $this->rules(),
+            // $this->messages()
+        );
         DB::beginTransaction();
         try {
             $data['rfc'] = strtoupper(str_replace(' ', '', $data['rfc']));

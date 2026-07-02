@@ -162,7 +162,10 @@ class Ingresar extends Modal
             $messages["facturas.$index.monto.min"] = "Entre un valor mayor!";
         }
 
-        $data = $this->validate($rules, $messages);
+        $data = $this->validate(
+            $rules,
+            // $messages
+        );
 
         DB::beginTransaction();
 

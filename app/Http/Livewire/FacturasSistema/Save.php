@@ -488,7 +488,10 @@ class Save extends Component
             'factura_conceptos.*.clave_unidad_id.exists' => 'Clave no encontrada.',
         ];
 
-        $data = $this->validate($rules, $messages);
+        $data = $this->validate(
+            $rules,
+            // $messages
+        );
         $data['subtotal'] = $this->subtotal;
         $data['iva'] = $this->iva;
         $data['total'] = $this->total;

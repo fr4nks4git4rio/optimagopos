@@ -126,7 +126,10 @@ class Save extends Modal
     {
         $rules = $this->terminal->rules();
         $messages = $this->terminal->messages();
-        $data = $this->validate($rules, $messages);
+        $data = $this->validate(
+            $rules,
+            // $messages
+        );
 
         if (!$this->terminal->exists())
             while (DB::table(table: 'tb_terminales')->where('identificador', $data['identificador'])->count() > 0) {

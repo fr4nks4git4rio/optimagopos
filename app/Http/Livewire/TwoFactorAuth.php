@@ -40,12 +40,15 @@ class TwoFactorAuth extends Modal
 
     public function verifyCode()
     {
-        $this->validate([
-            'code' => 'required|size:6',
-        ], [
-            'code.required' => 'Por favor introduzca el código de verificación',
-            'code.size' => 'El código de verificación debe tener 6 dígitos',
-        ]);
+        $this->validate(
+            [
+                'code' => 'required|size:6',
+            ],
+            // [
+            //     'code.required' => 'Por favor introduzca el código de verificación',
+            //     'code.size' => 'El código de verificación debe tener 6 dígitos',
+            // ]
+        );
 
         if ($this->code == user()->two_factor_code) {
             $user = User::find(user()->id);

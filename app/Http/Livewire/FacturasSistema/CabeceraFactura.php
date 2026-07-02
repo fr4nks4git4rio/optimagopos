@@ -149,7 +149,10 @@ class CabeceraFactura extends Component
 
     public function saveDatosGenerales()
     {
-        $data = $this->validate($this->rulesDatosGenerales(), $this->messagesDatosGenerales());
+        $data = $this->validate(
+            $this->rulesDatosGenerales(),
+            // $this->messagesDatosGenerales()
+        );
         $nombre_comercial = $data['nombre_comercial'] ? Crypt::encrypt($data['nombre_comercial']) : '';
         $razon_social = $data['razon_social'] ? Crypt::encrypt($data['razon_social']) : '';
         $telefono = $data['telefono'] ? Crypt::encrypt($data['telefono']) : '';
@@ -176,7 +179,10 @@ class CabeceraFactura extends Component
 
     public function saveDireccion()
     {
-        $data = $this->validate($this->rulesDireccion(), $this->messagesDireccion());
+        $data = $this->validate(
+            $this->rulesDireccion(),
+            // $this->messagesDireccion()
+        );
 
         $owner = Cliente::where('es_propietario', 1)->first();
 

@@ -112,15 +112,17 @@ class Configuraciones extends Modal
             'tipo_cambio.tasa' => ['required', 'numeric', 'min:0.0001'],
             'tipo_cambio.from_id' => ['required', 'exists:tb_monedas,id'],
             'tipo_cambio.to_id' => ['required', 'exists:tb_monedas,id']
-        ], [
-            'tipo_cambio.tasa.required' => 'Campo obligatorio.',
-            'tipo_cambio.tasa.numeric' => 'El valor debe ser un número.',
-            'tipo_cambio.tasa.min' => 'El valor debe ser al menos :min.',
-            'tipo_cambio.from_id.required' => 'Campo obligatorio.',
-            'tipo_cambio.from_id.exists' => 'La moneda base seleccionada no es válida.',
-            'tipo_cambio.to_id.required' => 'Campo obligatorio.',
-            'tipo_cambio.to_id.exists' => 'La moneda destino seleccionada no es válida.'
-        ]);
+        ],
+        // [
+        //     'tipo_cambio.tasa.required' => 'Campo obligatorio.',
+        //     'tipo_cambio.tasa.numeric' => 'El valor debe ser un número.',
+        //     'tipo_cambio.tasa.min' => 'El valor debe ser al menos :min.',
+        //     'tipo_cambio.from_id.required' => 'Campo obligatorio.',
+        //     'tipo_cambio.from_id.exists' => 'La moneda base seleccionada no es válida.',
+        //     'tipo_cambio.to_id.required' => 'Campo obligatorio.',
+        //     'tipo_cambio.to_id.exists' => 'La moneda destino seleccionada no es válida.'
+        // ]
+        );
 
         TipoCambio::updateOrCreate(
             [

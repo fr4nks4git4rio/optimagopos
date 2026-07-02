@@ -92,26 +92,29 @@ class SaveFacturaConcepto extends Component
 
     public function guardar()
     {
-        $data = $this->validate([
-            'cantidad' => ['required', 'numeric', 'min:1'],
-            'precio_unitario' => ['required', 'numeric', 'min:0.01'],
-            'clave_unidad_id' => ['required', 'exists:tb_clave_unidades,id'],
-            'clave_prod_serv_id' => ['required', 'exists:tb_clave_prod_servs,id'],
-            'objeto_impuesto_id' => ['required', 'exists:tb_objetos_impuesto,id'],
-            'descripcion' => ['required'],
-        ], [
-            'cantidad.min' => 'La cantidad debe ser mayor o igual a 1.',
-            'cantidad.required' => 'Campo requerido.',
-            'precio_unitario.required' => 'Campo requerido.',
-            'precio_unitario.min' => 'El precio debe ser mayor o igual a 1.',
-            'clave_unidad_id.required' => 'Campo requerido.',
-            'clave_unidad_id.exists' => 'Clave no encontrada.',
-            'clave_prod_serv_id.required' => 'Campo requerido.',
-            'clave_prod_serv_id.exists' => 'Clave no encontrada.',
-            'objeto_impuesto_id.required' => 'Campo requerido.',
-            'objeto_impuesto_id.exists' => 'Objeto no encontrado.',
-            'descripcion.required' => 'Campo requerido.',
-        ]);
+        $data = $this->validate(
+            [
+                'cantidad' => ['required', 'numeric', 'min:1'],
+                'precio_unitario' => ['required', 'numeric', 'min:0.01'],
+                'clave_unidad_id' => ['required', 'exists:tb_clave_unidades,id'],
+                'clave_prod_serv_id' => ['required', 'exists:tb_clave_prod_servs,id'],
+                'objeto_impuesto_id' => ['required', 'exists:tb_objetos_impuesto,id'],
+                'descripcion' => ['required'],
+            ],
+            // [
+            //     'cantidad.min' => 'La cantidad debe ser mayor o igual a 1.',
+            //     'cantidad.required' => 'Campo requerido.',
+            //     'precio_unitario.required' => 'Campo requerido.',
+            //     'precio_unitario.min' => 'El precio debe ser mayor o igual a 1.',
+            //     'clave_unidad_id.required' => 'Campo requerido.',
+            //     'clave_unidad_id.exists' => 'Clave no encontrada.',
+            //     'clave_prod_serv_id.required' => 'Campo requerido.',
+            //     'clave_prod_serv_id.exists' => 'Clave no encontrada.',
+            //     'objeto_impuesto_id.required' => 'Campo requerido.',
+            //     'objeto_impuesto_id.exists' => 'Objeto no encontrado.',
+            //     'descripcion.required' => 'Campo requerido.',
+            // ]
+        );
 
         if ($this->index === null)
             $this->emitTo($this->scope, 'concepto-creado', $data);

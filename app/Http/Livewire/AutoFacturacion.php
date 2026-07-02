@@ -283,30 +283,33 @@ class AutoFacturacion extends Component
         $collection->map(function ($cliente) {
             $cliente = Cliente::decryptInfo($cliente);
         });
-        $data = $this->validate([
-            'comensal.id' => 'nullable',
-            'comensal.rfc' => ['required', new RuleUnique($collection, $this->comensal['id']), new RfcRule('ambas')],
-            'comensal.nombre_comercial' => ['required', new RuleUnique($collection, $this->comensal['id'])],
-            'comensal.razon_social' => ['required', new RuleUnique($collection, $this->comensal['id'])],
-            'comensal.correo' => ['required'],
-            'comensal.telefono' => ['nullable'],
-            'comensal.regimen_fiscal_id' => ['nullable', new RfcYRegimenCoherentesRule($this->comensal['rfc'])],
-            'comensal.direccion_fiscal.codigo_postal' => ['required'],
-            'comensal.direccion_fiscal.calle' => 'nullable',
-            'comensal.direccion_fiscal.no_exterior' => 'nullable',
-            'comensal.direccion_fiscal.no_interior' => 'nullable',
-            'comensal.direccion_fiscal.colonia' => 'nullable',
-            'comensal.direccion_fiscal.localidad_id' => 'nullable',
-            'comensal.direccion_fiscal.municipio_id' => 'nullable',
-            'comensal.direccion_fiscal.estado_id' => 'nullable',
-            'comensal.direccion_fiscal.referencia' => 'nullable'
-        ], [
-            'comensal.nombre_comercial.required' => 'Campo requerido',
-            'comensal.razon_social.required' => 'Campo requerido',
-            'comensal.rfc.required' => 'Campo requerido',
-            'comensal.correo.required' => 'Campo requerido',
-            'comensal.direccion_fiscal.codigo_postal.required' => 'Campo requerido.'
-        ]);
+        $data = $this->validate(
+            [
+                'comensal.id' => 'nullable',
+                'comensal.rfc' => ['required', new RuleUnique($collection, $this->comensal['id']), new RfcRule('ambas')],
+                'comensal.nombre_comercial' => ['required', new RuleUnique($collection, $this->comensal['id'])],
+                'comensal.razon_social' => ['required', new RuleUnique($collection, $this->comensal['id'])],
+                'comensal.correo' => ['required'],
+                'comensal.telefono' => ['nullable'],
+                'comensal.regimen_fiscal_id' => ['nullable', new RfcYRegimenCoherentesRule($this->comensal['rfc'])],
+                'comensal.direccion_fiscal.codigo_postal' => ['required'],
+                'comensal.direccion_fiscal.calle' => 'nullable',
+                'comensal.direccion_fiscal.no_exterior' => 'nullable',
+                'comensal.direccion_fiscal.no_interior' => 'nullable',
+                'comensal.direccion_fiscal.colonia' => 'nullable',
+                'comensal.direccion_fiscal.localidad_id' => 'nullable',
+                'comensal.direccion_fiscal.municipio_id' => 'nullable',
+                'comensal.direccion_fiscal.estado_id' => 'nullable',
+                'comensal.direccion_fiscal.referencia' => 'nullable'
+            ],
+            // [
+            //     'comensal.nombre_comercial.required' => 'Campo requerido',
+            //     'comensal.razon_social.required' => 'Campo requerido',
+            //     'comensal.rfc.required' => 'Campo requerido',
+            //     'comensal.correo.required' => 'Campo requerido',
+            //     'comensal.direccion_fiscal.codigo_postal.required' => 'Campo requerido.'
+            // ]
+        );
 
         if (!$data['comensal']['id']) {
             $newComensal = Cliente::create([
@@ -399,16 +402,18 @@ class AutoFacturacion extends Component
             'codigo' => ['required', 'exists:tb_terminales,identificador'],
             'ticket' => ['required', 'exists:tb_tickets,id_transaccion'],
             'rfc' => ['required', 'exists:tb_clientes,rfc']
-        ], [
-            'suc.required' => 'Campo requerido!',
-            'suc.exists' => 'Sucursal no encontrada!',
-            'codigo.required' => 'Campo requerido!',
-            'codigo.exists' => 'Código no encontrado!',
-            'ticket.required' => 'Campo requerido!',
-            'ticket.exists' => 'Ticket no encontrado!',
-            'rfc.required' => 'Campo requerido!',
-            'rfc.exists' => 'RFC no encontrado!'
-        ]);
+        ],
+        // [
+        //     'suc.required' => 'Campo requerido!',
+        //     'suc.exists' => 'Sucursal no encontrada!',
+        //     'codigo.required' => 'Campo requerido!',
+        //     'codigo.exists' => 'Código no encontrado!',
+        //     'ticket.required' => 'Campo requerido!',
+        //     'ticket.exists' => 'Ticket no encontrado!',
+        //     'rfc.required' => 'Campo requerido!',
+        //     'rfc.exists' => 'RFC no encontrado!'
+        // ]
+        );
 
         if (
             DB::table('tb_tickets')

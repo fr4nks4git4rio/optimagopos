@@ -148,12 +148,15 @@ class TimbrarAutoFactura extends Component
 
     public function addCfdiRelacionado()
     {
-        $this->validate([
-            "tipo_relacion_factura_id" => ['required', 'exists:tb_tipo_relacion_facturas,id']
-        ], [
-            "tipo_relacion_factura_id.required" => 'Campo requerido!',
-            "tipo_relacion_factura_id.exists" => 'Tipo de relación no reconocida!',
-        ]);
+        $this->validate(
+            [
+                "tipo_relacion_factura_id" => ['required', 'exists:tb_tipo_relacion_facturas,id']
+            ],
+            // [
+            //     "tipo_relacion_factura_id.required" => 'Campo requerido!',
+            //     "tipo_relacion_factura_id.exists" => 'Tipo de relación no reconocida!',
+            // ]
+        );
         $this->cfdis_relacionados[] = '';
     }
 
@@ -172,15 +175,17 @@ class TimbrarAutoFactura extends Component
             'lugar_expedicion' => ['required'],
             'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id', new RfcYRegimenCoherentesRule($this->rfc)],
             'cfdi_id' => ['required', 'exists:tb_cfdis,id']
-        ], [
-            'nombre_comercial.required' => 'Campo requerido',
-            'razon_social.required' => 'Campo requerido',
-            'lugar_expedicion.required' => 'Campo requerido',
-            'regimen_fiscal_id.required' => 'Campo requerido',
-            'regimen_fiscal_id.exists' => 'Régimen Fiscal no encontrado',
-            'cfdi_id.required' => 'Campo requerido.',
-            'cfdi_id.exists' => 'Cfdi no encontrado.'
-        ]);
+        ],
+        // [
+        //     'nombre_comercial.required' => 'Campo requerido',
+        //     'razon_social.required' => 'Campo requerido',
+        //     'lugar_expedicion.required' => 'Campo requerido',
+        //     'regimen_fiscal_id.required' => 'Campo requerido',
+        //     'regimen_fiscal_id.exists' => 'Régimen Fiscal no encontrado',
+        //     'cfdi_id.required' => 'Campo requerido.',
+        //     'cfdi_id.exists' => 'Cfdi no encontrado.'
+        // ]
+        );
         try {
             DB::beginTransaction();
 

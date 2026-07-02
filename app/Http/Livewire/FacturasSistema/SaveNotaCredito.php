@@ -279,7 +279,10 @@ class SaveNotaCredito extends Component
             'facturas_conceptos.*.precio_unitario.required' => 'Campo requerido.',
             'facturas_conceptos.*.descripcion.required' => 'Campo requerido.',
         ];
-        $data = $this->validate($rules, $messages);
+        $data = $this->validate(
+            $rules,
+            // $messages
+        );
         if (!$this->notaCredito->exists) {
             $data['porciento_iva'] = system_iva();
             $data['propietario_id'] = get_system_owner()->id;

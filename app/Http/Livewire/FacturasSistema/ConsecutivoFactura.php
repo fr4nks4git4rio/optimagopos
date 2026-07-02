@@ -32,12 +32,15 @@ class ConsecutivoFactura extends Component
 
     public function guardar()
     {
-        $this->validate([
-            'consecutivo' => ['required', Rule::unique('tb_facturas', 'folio_interno')->ignore($this->factura->id)],
-        ], [
-            'consecutivo.required' => 'Campo requerido.',
-            'consecutivo.unique' => 'El consecutivo ya existe.',
-        ]);
+        $this->validate(
+            [
+                'consecutivo' => ['required', Rule::unique('tb_facturas', 'folio_interno')->ignore($this->factura->id)],
+            ],
+            // [
+            //     'consecutivo.required' => 'Campo requerido.',
+            //     'consecutivo.unique' => 'El consecutivo ya existe.',
+            // ]
+        );
 
         $this->factura->folio_interno = $this->consecutivo;
         $this->factura->save();

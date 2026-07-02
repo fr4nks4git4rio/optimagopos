@@ -49,10 +49,12 @@ class UpdateProfile extends Modal
         $data = $this->validate([
             'nombre' => ['required'],
             'apellidos' => ['required']
-        ], [
-            'nombre.required' => 'Campo requerido.',
-            'apellidos.required' => 'Campo requerido.'
-        ]);
+        ],
+        // [
+        //     'nombre.required' => 'Campo requerido.',
+        //     'apellidos.required' => 'Campo requerido.'
+        // ]
+        );
         $user = User::find(user()->id);
         $user->fill($data);
 

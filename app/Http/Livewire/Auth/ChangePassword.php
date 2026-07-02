@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Auth;
 use App\Http\Livewire\Layouts\Modal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 
 class ChangePassword extends Modal
@@ -27,7 +28,7 @@ class ChangePassword extends Modal
     {
         return [
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed'],
+            'password' => ['required', 'confirmed', Password::default()],
         ];
     }
 
@@ -43,7 +44,10 @@ class ChangePassword extends Modal
 
     public function update()
     {
-        $this->validate($this->rules(), $this->messages());
+        $this->validate(
+            $this->rules(),
+            // $this->messages()
+        );
 
         user()->update(['password' => Hash::make($this->password)]);
 

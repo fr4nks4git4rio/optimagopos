@@ -361,7 +361,10 @@ class SaveComplemento extends Component
             'facturas.*.importe_pagado.numeric' => 'Valor no válido.',
             'facturas.*.importe_pagado.gt' => 'El importe debe ser mayor a 0.'
         ];
-        $data = $this->validate($rules, $messages);
+        $data = $this->validate(
+            $rules,
+            // $messages
+        );
         if (!$this->complemento->exists) {
             $data['porciento_iva'] = system_iva();
             $data['propietario_id'] = get_system_owner()->id;

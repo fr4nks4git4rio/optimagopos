@@ -187,12 +187,15 @@ class TimbrarAutoFacturaPorFormaPago extends Component
 
     public function addCfdiRelacionado()
     {
-        $this->validate([
-            "facturas.$this->index_factura_active.tipo_relacion_factura_id" => ['required', 'exists:tb_tipo_relacion_facturas,id']
-        ], [
-            "facturas.$this->index_factura_active.tipo_relacion_factura_id.required" => 'Campo requerido!',
-            "facturas.$this->index_factura_active.tipo_relacion_factura_id.exists" => 'Tipo de relación no reconocida!',
-        ]);
+        $this->validate(
+            [
+                "facturas.$this->index_factura_active.tipo_relacion_factura_id" => ['required', 'exists:tb_tipo_relacion_facturas,id']
+            ],
+            // [
+            //     "facturas.$this->index_factura_active.tipo_relacion_factura_id.required" => 'Campo requerido!',
+            //     "facturas.$this->index_factura_active.tipo_relacion_factura_id.exists" => 'Tipo de relación no reconocida!',
+            // ]
+        );
         $this->facturas[$this->index_factura_active]['cfdis_relacionados'][] = '';
     }
 
@@ -204,22 +207,25 @@ class TimbrarAutoFacturaPorFormaPago extends Component
 
     public function timbrar($index)
     {
-        $data = $this->validate([
-            'rfc' => ['required', new RfcRule('ambas')],
-            'nombre_comercial' => ['required'],
-            'razon_social' => ['required'],
-            'lugar_expedicion' => ['required'],
-            'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id', new RfcYRegimenCoherentesRule($this->rfc)],
-            'cfdi_id' => ['required', 'exists:tb_cfdis,id']
-        ], [
-            'nombre_comercial.required' => 'Campo requerido',
-            'razon_social.required' => 'Campo requerido',
-            'lugar_expedicion.required' => 'Campo requerido',
-            'regimen_fiscal_id.required' => 'Campo requerido',
-            'regimen_fiscal_id.exists' => 'Régimen Fiscal no encontrado',
-            'cfdi_id.required' => 'Campo requerido.',
-            'cfdi_id.exists' => 'Cfdi no encontrado.'
-        ]);
+        $data = $this->validate(
+            [
+                'rfc' => ['required', new RfcRule('ambas')],
+                'nombre_comercial' => ['required'],
+                'razon_social' => ['required'],
+                'lugar_expedicion' => ['required'],
+                'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id', new RfcYRegimenCoherentesRule($this->rfc)],
+                'cfdi_id' => ['required', 'exists:tb_cfdis,id']
+            ],
+            //  [
+            //     'nombre_comercial.required' => 'Campo requerido',
+            //     'razon_social.required' => 'Campo requerido',
+            //     'lugar_expedicion.required' => 'Campo requerido',
+            //     'regimen_fiscal_id.required' => 'Campo requerido',
+            //     'regimen_fiscal_id.exists' => 'Régimen Fiscal no encontrado',
+            //     'cfdi_id.required' => 'Campo requerido.',
+            //     'cfdi_id.exists' => 'Cfdi no encontrado.'
+            // ]
+        );
         try {
             DB::beginTransaction();
 
