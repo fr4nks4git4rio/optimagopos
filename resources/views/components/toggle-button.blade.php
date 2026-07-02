@@ -1,4 +1,4 @@
-@props(['label', 'model', 'lazy' => false, 'inline' => false, 'onChange' => 'false', 'index' => ''])
+@props(['label' => '', 'model', 'lazy' => false, 'inline' => false, 'onChange' => 'false', 'index' => ''])
 
 @php
     if ($lazy) {

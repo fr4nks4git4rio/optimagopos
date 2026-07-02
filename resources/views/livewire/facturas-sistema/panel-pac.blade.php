@@ -4,77 +4,116 @@
     </x-slot:title>
 
     <x-slot:content>
-        <div wire:init="init" class="row">
-            <div
-                x-data='{
-                    buscarTimbresDisponibles(rfc){
-                        $.ajax({
-                        dataType: "json",
-                        url: "/cliente/obtener-timbres-disponibles/" + rfc,
-                        success: function (data){
-                            $(".input-group-text").css("display", "none");
-                            if (data.success){
-                                $("div.input-group.col-sm-12 > input."+rfc).addClass("text-success-dark");
-                                $("div.input-group.col-sm-12 > input."+rfc).val(data.disponibles);
-                            }else{
-                                $("div.input-group.col-sm-12 > input."+rfc).addClass("text-danger-dark");
-                                if (data.message){
-                                    $("div.input-group.col-sm-12 > input."+rfc).val(data.message);
-                                }else{
-                                    $("div.input-group.col-sm-12 > input."+rfc).val("Error Obteniendo la Información.");
-                                    $wire.emit("show-toast", data.slice(0, data.indexOf("}") + 1), "danger");
-                                }
-                            }
-                        },
-                        error: function (jqXHR, textStatus, errorThrown){
-                            $(".input-group-text").css("display", "none");
-                            $("div.input-group.col-sm-12 > input."+rfc).addClass("text-danger-dark");
-                            $("div.input-group.col-sm-12 > input."+rfc).val("Error Obteniendo la Información.");
-                            $wire.emit("show-toast", errorThrown, "danger");
-                        }
+        <div wire:init="init" class="row g-4">
+            <div class="col-12" x-data="{
+                rfc: '{{ $rfc }}',
+                portalPac: '{{ $portal_pac }}',
+                timbres: 'Obteniendo Información...',
+                loading: true,
+                statusClass: 'text-muted',
+
+                init() {
+                    window.livewire.on('cfdi_timbrado_productivo_updated', (value) => {
+                        this.$nextTick(() => {
+                            this.buscarTimbres();
                         });
+                    });
+
+                    this.buscarTimbres();
+                },
+
+                async buscarTimbres() {
+                    this.loading = true;
+                    this.timbres = 'Obteniendo Información...';
+                    this.statusClass = 'text-muted';
+                    console.log('Buscando Timbres Disponibles para el RFC: ' + this.rfc);
+                    try {
+                        let response = await fetch('/admin/obtener-timbres-disponibles/' + this.rfc);
+                        let data = await response.json();
+
+                        this.loading = false;
+                        if (data.success) {
+                            this.timbres = data.disponibles;
+                            this.statusClass = 'text-success fw-bold fs-5';
+                        } else {
+                            this.timbres = data.message || 'Error al obtener la información.';
+                            this.statusClass = 'text-danger small';
+                            if (!data.message) {
+                                $emit('show-toast', { message: 'Error inesperado', type: 'danger' });
+                            }
+                        }
+                    } catch (error) {
+                        this.loading = false;
+                        this.timbres = 'Error de conexión con el servidor.';
+                        this.statusClass = 'text-danger small';
+                        $emit('show-toast', { message: error.message, type: 'danger' });
                     }
-                }'>
-                <fieldset>
-                    <legend>Modo de Timbrado</legend>
-                    <hr>
-                    <div class="text-center pt-3">
-                        <x-toggle-button :label="'Modo Producción'" :lazy="true" :inline="true"
-                            model="cfdi_timbrado_productivo" />
-                    </div>
-                </fieldset>
-                <div class="col-sm-12 mt-3">
-                    <div class="row py-3" x-data="{}"
-                        x-init='
-                        $(document).ready(function () {
-                            buscarTimbresDisponibles("{{ $rfc }}");
-                        });'>
-                        <fieldset>
-                            <legend>Revisar Facturas</legend>
-                            <hr>
-                            <div class="text-center mt-3">
-                                <a href="{{ $portal_pac }}" target="_blank"
-                                    class="btn btn-outline-danger fw-bold" type="button">Visitar portal del
-                                    PAC</a>
-                            </div>
-                        </fieldset>
-                        <fieldset>
-                            <legend>Timbres Disponibles</legend>
-                            <hr>
-                            <div>
-                                <div class="input-group col-sm-12">
-                                    <span class="input-group-text">
-                                        <div class="spinner-border spinner-border-sm" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                    </span>
-                                    <input type="text" class="form-control {{ $rfc }}"
-                                        style="padding-left: 30px; width: 400px !important;"
-                                        value="Obteniendo Información" width="100%">
+                }
+            }">
+
+                <div class="row g-4">
+
+                    <div class="col-md-12">
+                        <div class="card h-100 shadow-sm border-0 rounded-3">
+                            <div
+                                class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                                <div class="bg-primary-subtle text-primary rounded-circle p-3 mb-3">
+                                    <i class="bi bi-toggle-on fs-4 p-1"></i>
+                                </div>
+                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-3">Modo de Timbrado
+                                </h6>
+                                <div class="py-2 w-100 bg-light rounded-3 border justify-content-center d-flex">
+                                    <div>
+                                        <label for="" class="form-label">Modo Productivo:</label>
+                                        <x-toggle-button :lazy="true" model="cfdi_timbrado_productivo" />
+                                    </div>
                                 </div>
                             </div>
-                        </fieldset>
+                        </div>
                     </div>
+
+                    <div class="col-md-12">
+                        <div class="card h-100 shadow-sm border-0 rounded-3">
+                            <div
+                                class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                                <div class="rounded-circle p-3 mb-3"
+                                    :class="loading ? 'bg-light text-muted' : 'bg-success-subtle text-success'">
+                                    <template x-if="loading">
+                                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                                    </template>
+                                    <template x-if="!loading">
+                                        <i class="bi bi-lightning-charge-fill fs-4 p-1"></i>
+                                    </template>
+                                </div>
+                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-2">Timbres
+                                    Disponibles</h6>
+
+                                <div class="w-100">
+                                    <input type="text"
+                                        class="form-control text-center bg-light border-secondary-subtle"
+                                        :class="statusClass" x-model="timbres" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card h-100 shadow-sm border-0 rounded-3">
+                            <div
+                                class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                                <div class="bg-danger-subtle text-danger rounded-circle p-3 mb-3">
+                                    <i class="bi bi-globe fs-4 p-1"></i>
+                                </div>
+                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-3">Revisar Facturas
+                                </h6>
+                                <a :href="portalPac" target="_blank"
+                                    class="btn btn-outline-danger fw-bold w-100 py-2 rounded-3 transition-all">
+                                    <i class="bi bi-box-arrow-up-right me-2"></i>Visitar portal del PAC
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

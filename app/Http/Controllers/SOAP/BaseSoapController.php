@@ -129,7 +129,7 @@ class BaseSoapController extends Controller
    */
   public static function getProdUsuarioIntegrador()
   {
-    return get_owner()->usuario_integrador_sat;
+    return self::$usuarioIntegrador;
   }
 
   /**
@@ -156,10 +156,9 @@ class BaseSoapController extends Controller
   /**
    * Metodo para establecer los parametros de produccion
    */
-  public function modo_productivo()
+  public static function modo_productivo()
   {
     self::setWsdl(self::getProdUrlWs());
-    self::setUsuarioIntegrador(self::getProdUsuarioIntegrador());
     self::setModoProductivo(true);
   }
 

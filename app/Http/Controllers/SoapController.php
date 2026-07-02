@@ -15,12 +15,10 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Models\Sucursal;
+use Illuminate\Support\Facades\Log;
 
 class SoapController extends BaseSoapController
 {
-    protected $service;
-    protected $sucursal;
-
     /**
      * SoapController constructor.
      */
@@ -29,25 +27,28 @@ class SoapController extends BaseSoapController
         $this->middleware('auth');
     }
 
-    private function establecer_modo()
+    public function obtenerTimbresDisponibles($rfc)
     {
-        $modo_productivo = $this->sucursal->cfdi_timbrado_productivo;
+        if (user()->cliente_id) {
+            $owner = Sucursal::where('rfc', $rfc)->first();
+            $modo_productivo = $owner->cfdi_timbrado_productivo;
+        } else {
+            $owner = Cliente::where('rfc', $rfc)->first();
+            $modo_productivo = system_config('cfdi_timbrado_productivo');
+        }
 
+        Log::info("Obteniendo Timbres Disponibles para el RFC: {$rfc}, Modo Productivo: {$modo_productivo}");
         if ($modo_productivo == 1) {
+            $this->setRfcEmisor($rfc);
+            $this->setUsuarioIntegrador($owner->usuario_integrador_sat);
             self::modo_productivo();
         } else {
             self::modo_pruebas();
         }
-        $this->service = InstanceSoapClient::init();
-        return $this;
-    }
-    public function obtenerTimbresDisponibles($rfc)
-    {
-        $this->sucursal = Sucursal::where('rfc', $rfc)->first();
-        $this->setRfcEmisor($rfc);
-        $this->establecer_modo();
-        if (is_array($this->service)) {
-            $response = ['success' => false, 'message' => $this->service['message']];
+        $service = InstanceSoapClient::init();
+
+        if (is_array($service)) {
+            $response = ['success' => false, 'message' => $service['message']];
             return json_encode($response);
         }
         try {
@@ -55,7 +56,7 @@ class SoapController extends BaseSoapController
                 'usuarioIntegrador' => self::getUsuarioIntegrador(),
                 'rfcEmisor' => self::getRfcEmisor()
             ];
-            $response = $this->service->ObtieneTimbresDisponibles($params);
+            $response = $service->ObtieneTimbresDisponibles($params);
         } catch (\Exception $e) {
             return json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -74,6 +75,7 @@ class SoapController extends BaseSoapController
             $response = ['success' => false, 'message' => $msg];
         }
 
+        Log::info("Resultado de la consulta de timbres disponibles: " . json_encode($response));
         return $response;
     }
 }
