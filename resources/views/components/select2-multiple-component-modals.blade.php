@@ -6,6 +6,7 @@
     'placeholder' => '',
     'dynamic' => false,
     'tags' => false,
+    'maxSelections' => null,
 ])
 
 @php
@@ -23,10 +24,15 @@
         'id' => $id,
         'wire:model' . $bind => $model,
     ]);
+
+    // Se pasa como -1 cuando no hay límite, que es lo que espera Select2 para "sin límite"
+    $maxSelectionsJs = $maxSelections !== null ? (int) $maxSelections : -1;
 @endphp
 
 <div class="mb-1">
     <div @if (!$dynamic) wire:ignore @endif x-data="{}" x-init="() => {
+        const maximumSelectionLength = {{ $maxSelectionsJs }};
+
         $(document).on('select2:open', () => {
             document.querySelector('.select2-container--open .select2-search__field').focus();
         });
@@ -37,7 +43,8 @@
                 language: 'es',
                 multiple: true,
                 allowClear: true,
-                tags: '{{ $tags }}'
+                tags: '{{ $tags }}',
+                maximumSelectionLength: maximumSelectionLength
             });
         }, 100);
         $('#{{ $id }}.select2').on('change', function(e) {
@@ -62,7 +69,8 @@
                     language: 'es',
                     multiple: true,
                     allowClear: true,
-                    tags: '{{ $tags }}'
+                    tags: '{{ $tags }}',
+                    maximumSelectionLength: maximumSelectionLength
                 });
             })
         });
@@ -73,7 +81,8 @@
                 language: 'es',
                 multiple: true,
                 allowClear: true,
-                tags: '{{ $tags }}'
+                tags: '{{ $tags }}',
+                maximumSelectionLength: maximumSelectionLength
             });
         });
 
@@ -104,7 +113,7 @@
         }
     }">
         @if ($label)
-            <label for="{{ $model }}">{{ $label }}</label>
+            <label for="{{ $model }}" class="text-capitalize">{{ $label }}</label>
         @endif
 
         <select {{ $attributes }} name="{{ $model }}[]" multiple="multiple" style="width: 100%;">
@@ -116,6 +125,11 @@
             @endforeach
         </select>
     </div>
+    @if ($maxSelections !== null)
+        <div class="fs-8 text-muted mt-1">
+            <i class="bi bi-info-circle me-1"></i> Máximo {{ $maxSelections }} selección(es).
+        </div>
+    @endif
     @error($model)
         <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror

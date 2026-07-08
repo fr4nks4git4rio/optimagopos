@@ -79,7 +79,7 @@
                                     @endcan
                                     @can('manageClientSuscripcion', App\Models\Cliente::find($cliente['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="bag-check" title="Subscripción"
+                                            <x-action icon="bag-check" title="Nueva Suscripción"
                                                 click="gestionarSuscripcion({{ $cliente['id'] }})" />
                                         </li>
                                     @endcan

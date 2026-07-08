@@ -1,26 +1,26 @@
-@section('title', __('sidebar.packages'))
+@section('title', __('site.packages.list.packages'))
 
 <div wire:init="init">
-    <h1 class="fs-1 mb-2">@yield('title')</h1>
+    <h1 class="fs-1 mb-2 text-capitalize">@yield('title')</h1>
 
     <div class="row justify-content-between">
         <div class="col-lg-auto mb-3">
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Paquetes" class="form-control"
+                <input type="search" placeholder="{{ __('site.packages.list.search_packages') }}" class="form-control text-capitalize"
                     wire:model.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
             @can('create', [App\Models\Paquete::class])
-                <button type="button" class="btn btn-site-primary btn-outline-warning"
+                <button type="button" class="btn btn-site-primary btn-outline-warning text-capitalize"
                     wire:click="$emit('openModal', 'paquetes.save')">
                     <x-icon name="plus-lg" />
-                    Crear
+                    {{ __('site.packages.list.create_package') }}
                 </button>
             @endcan
 
-            <x-dropdown icon="eye" :label="__($perPage)">
+            <x-dropdown icon="eye" :label="$perPage">
                 @foreach ($perPages as $perPage)
                     @if ($perPage == $this->perPage)
                         <x-dropdown-item label="{{ $perPage }}" class="active"
@@ -31,13 +31,13 @@
                 @endforeach
             </x-dropdown>
 
-            <x-dropdown icon="filter" :label="__($filter)">
+            <x-dropdown icon="filter" :label="$filter">
                 @foreach ($filters as $filter)
                     @if ($this->filter == $filter)
-                        <x-dropdown-item :label="__($filter)" class="active"
+                        <x-dropdown-item :label="$filter" class="active"
                             click="$set('filter', '{{ $filter }}')" />
                     @else
-                        <x-dropdown-item :label="__($filter)" click="$set('filter', '{{ $filter }}')" />
+                        <x-dropdown-item :label="$filter" click="$set('filter', '{{ $filter }}')" />
                     @endif
                 @endforeach
             </x-dropdown>
@@ -49,7 +49,7 @@
             <thead>
                 <tr>
                     @foreach ($sorts as $sort)
-                        <th class="text-left cursor-pointer" style="white-space: nowrap !important"
+                        <th class="text-left cursor-pointer text-uppercase" style="white-space: nowrap !important"
                             wire:click="changeSort('{{ $sort }}')">
                             <span>
                                 @if ($this->sort == $sort)
@@ -58,7 +58,7 @@
                             </span>
                         </th>
                     @endforeach
-                    <th class="text-center">Acciones</th>
+                    <th class="text-center text-uppercase"{{ __('site.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -73,20 +73,20 @@
                                 @if (!$paquete->deleted_at)
                                     @can('update', App\Models\Paquete::find($paquete->id))
                                         <li class="list-inline-item">
-                                            <x-action icon="pencil" title="Modificar"
+                                            <x-action icon="pencil" title="{{ __('site.common.edit') }}"
                                                 click="$emit('openModal', 'paquetes.save', {paquete: {{ $paquete->id }}})" />
                                         </li>
                                     @endcan
                                     @can('delete', App\Models\Paquete::find($paquete->id))
                                         <li class="list-inline-item">
-                                            <x-action icon="trash" title="Desactivar"
+                                            <x-action icon="trash" title="{{ __('site.common.deactivate') }}"
                                                 click="$emit('openModal', 'paquetes.delete', {paquete: {{ $paquete->id }}})" />
                                         </li>
                                     @endcan
                                 @else
                                     @can('restore', App\Models\Paquete::withTrashed()->find($paquete->id))
                                         <li class="list-inline-item">
-                                            <x-action icon="check-circle" title="Reactivar"
+                                            <x-action icon="check-circle" title="{{ __('site.common.restore') }}"
                                                 click="$emit('openModal', 'paquetes.restore', {paquete_id: {{ $paquete->id }}})" />
                                         </li>
                                     @endcan
@@ -98,7 +98,7 @@
                     <tr>
                         <td colspan="5">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{ __('site.common.results_not_found') }}
                             </div>
                         </td>
                     </tr>

@@ -6,6 +6,7 @@ use App\Models\Administracion\CodificadoresGenerales\PuntoRuta;
 use App\Models\API\CargaObject;
 use App\Models\API\GlobalSiteValues;
 use App\Models\Cliente;
+use App\Models\Cuarentena;
 use App\Models\Departamento;
 use App\Models\Empleado;
 use App\Models\Log as ModelsLog;
@@ -42,11 +43,26 @@ class HomeController
         }
 
         // Paso 3: Verificar si se decodificó correctamente
-        if (!$decoded || !isset($decoded['Items'])) {
+        if (
+            !$decoded
+            || !isset($decoded['Items'])
+            || (!isset($decoded['TerminalId']) && !isset($decoded['MerchantFiscalId']) && !isset($decoded['APIUserName']))
+            || !isset($decoded['PosId'])
+            || !isset($decoded['ClerkId'])
+            || !isset($decoded['ClerkName'])
+            || !isset($decoded['TransactionId'])
+            || !isset($decoded['TransactionStartTime'])
+        ) {
             ModelsLog::create([
                 'log' => 'Error. JSON inválido o incompleto',
                 'data' => $decoded ? json_encode($decoded) : '',
                 'status' => 400
+            ]);
+
+            Cuarentena::create([
+                'texto' => 'JSON inválido o incompleto',
+                'ip' => $request->ip(),
+                'data' => $decoded ? json_encode($decoded) : '',
             ]);
             return response()->json(['success' => false, 'error' => 'JSON inválido o incompleto'], 400);
         }
@@ -68,6 +84,28 @@ class HomeController
                 'data' => json_encode($decoded),
                 'status' => 400
             ]);
+            Cuarentena::create([
+                'texto' => 'Terminal no encontrada.',
+                'ip' => $request->ip(),
+                'data' => $decoded ? json_encode($decoded) : '',
+            ]);
+            return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
+        }
+
+        if (!$terminal->suscripcion->estado != 'ACTIVA') {
+            ModelsLog::create([
+                'log' => 'La terminal no pertenece a una Suscripción ACTIVA.',
+                'data' => json_encode($decoded),
+                'status' => 400
+            ]);
+            Cuarentena::create([
+                'texto' => 'La terminal no pertenece a una Suscripción ACTIVA.',
+                'ip' => $request->ip(),
+                'cliente_id' => $terminal->sucursal->cliente_id,
+                'sucursal_id' => $terminal->sucursal_id,
+                'terminal_id' => $terminal->id,
+                'data' => $decoded ? json_encode($decoded) : '',
+            ]);
             return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
         }
 
@@ -85,8 +123,16 @@ class HomeController
 
         try {
             // Paso 4: Acceder a datos generales
+            if (!$decoded['ClerkId']) {
+                Cuarentena::create([
+                    'texto' => 'Id de empleado no recibido.',
+                    'ip' => $request->ip(),
+                    'data' => $decoded ? json_encode($decoded) : '',
+                ]);
+                return response()->json(['success' => false, 'error' => 'Empelado no enviado'], 400);
+            }
             $clerk = Empleado::where('sucursal_id', $terminal->sucursal_id)->where('id_empleado', $decoded['ClerkId'])->first();
-            if (!$clerk && $decoded['ClerkId']) {
+            if (!$clerk) {
                 $clerk = Empleado::create([
                     'id_empleado' => $decoded['ClerkId'],
                     'nombre' => $decoded['ClerkName'] ? Crypt::encrypt($decoded['ClerkName']) : '',
@@ -141,7 +187,20 @@ class HomeController
             foreach ($items as $item) {
                 $type = $item['Type'] ?? 'Product';
 
+
                 if ($type === 'Tax') {
+                    if (!isset($item['Name']) || !isset($item['Amount'])) {
+                        Cuarentena::create([
+                            'texto' => 'Propiedad no recibida en ítem Tax. Propiedades esperadas: Name y Amount.',
+                            'ip' => $request->ip(),
+                            'data' => $decoded ? json_encode($decoded) : '',
+                            'terminal_id' => $terminal->id,
+                            'sucursal_id' => $terminal->sucursal_id,
+                            'cliente_id' => $terminal->sucursal->cliente_id
+                        ]);
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
+                    }
                     $ticket->impuestos()->create([
                         'nombre' => $item['Name'],
                         'monto' => $item['Amount']
@@ -149,9 +208,22 @@ class HomeController
                 }
 
                 if ($type === 'Tender') {
+                    if (!isset($item['Name']) || !isset($item['Amount'])) {
+                        Cuarentena::create([
+                            'texto' => 'Propiedad no recibida en ítem Tender. Propiedades esperadas: Name y Amount.',
+                            'ip' => $request->ip(),
+                            'data' => $decoded ? json_encode($decoded) : '',
+                            'terminal_id' => $terminal->id,
+                            'sucursal_id' => $terminal->sucursal_id,
+                            'cliente_id' => $terminal->sucursal->cliente_id
+                        ]);
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Tender'], 400);
+                    }
                     $forma_pago = DB::table('tb_sucursal_forma_pagos')
                         ->where('sucursal_id', $terminal->sucursal_id)
                         ->where('nombre', $item['Name'])
+                        ->whereNull('deleted_at')
                         ->get()->first();
                     if (!$forma_pago) {
                         ModelsLog::create([
@@ -159,6 +231,15 @@ class HomeController
                             'data' => json_encode($decoded),
                             'status' => 400,
                             'sucursal_id' => $terminal->sucursal_id
+                        ]);
+
+                        Cuarentena::create([
+                            'texto' => "Forma de pago no encontrada: {$item['Name']}.",
+                            'ip' => $request->ip(),
+                            'data' => $decoded ? json_encode($decoded) : '',
+                            'terminal_id' => $terminal->id,
+                            'sucursal_id' => $terminal->sucursal_id,
+                            'cliente_id' => $terminal->sucursal->cliente_id
                         ]);
                         DB::rollBack();
                         return response()->json(['success' => false, 'error' => 'Forma de pago no encontrada'], 400);
@@ -183,6 +264,19 @@ class HomeController
                 }
 
                 if ($type === 'Product') {
+                    if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty']) || !$item['DepartmentId'] || !$item['DepartmentName']) {
+                        Cuarentena::create([
+                            'texto' => 'Propiedad no recibida en ítem Product. Propiedades esperadas: Id, Name, Amount, Qty, DepartmentId y DepartmentName.',
+                            'ip' => $request->ip(),
+                            'data' => $decoded ? json_encode($decoded) : '',
+                            'terminal_id' => $terminal->id,
+                            'sucursal_id' => $terminal->sucursal_id,
+                            'cliente_id' => $terminal->sucursal->cliente_id
+                        ]);
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Product'], 400);
+                    }
+
                     $producto = Producto::where('sucursal_id', $terminal->sucursal_id)
                         ->where('id_producto', $item['Id'])
                         ->first();
@@ -229,6 +323,19 @@ class HomeController
                 }
 
                 if ($type === 'Correction') {
+                    if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        Cuarentena::create([
+                            'texto' => 'Propiedad no recibida en ítem Correction. Propiedades esperadas: Name, Amount y Qty.',
+                            'ip' => $request->ip(),
+                            'data' => $decoded ? json_encode($decoded) : '',
+                            'terminal_id' => $terminal->id,
+                            'sucursal_id' => $terminal->sucursal_id,
+                            'cliente_id' => $terminal->sucursal->cliente_id
+                        ]);
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Correction'], 400);
+                    }
+
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
                     $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
 
@@ -248,8 +355,14 @@ class HomeController
 
             DB::commit();
         } catch (Exception $e) {
+            Cuarentena::create([
+                'texto' => "Error recibiendo ticket json. Error: {$e->getMessage()}",
+                'ip' => $request->ip(),
+                'data' => $decoded ? json_encode($decoded) : ''
+            ]);
             Log::error("Error recibiendo ticket json. Error: {$e->getMessage()}");
             DB::rollBack();
+            return response()->json(['success' => false, 'error' => 'Error recibiendo ticket json'], 400);
         }
 
         return response()->json(['success' => true]);

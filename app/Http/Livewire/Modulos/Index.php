@@ -17,9 +17,9 @@ class Index extends Component
     public $search;
     public $order;
     public $sort;
-    public $sorts = ['Nombre', 'Descripción', 'Cant. Funciones', 'Costo Base'];
+    public $sorts = [];
     public $filter;
-    public $filters = ['Activos', 'Inactivos', 'Todos'];
+    public $filters = [];
 
     protected $queryString = ['search', 'perPage', 'sort', 'order', 'filter'];
 
@@ -27,6 +27,9 @@ class Index extends Component
 
     public function mount()
     {
+        $this->sorts = [__('site.modules.list.name'), __('site.modules.list.description'), __('site.modules.list.functions_count'), __('site.modules.list.base_cost')];
+        $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
+
         $this->perPage = $this->perPage ?? 10;
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
@@ -61,8 +64,8 @@ class Index extends Component
     public function query()
     {
         $query = match ($this->filter) {
-            'Activos' => Modulo::withoutTrashed(),
-            'Inactivos' => Modulo::onlyTrashed(),
+            __('site.common.actives') => Modulo::withoutTrashed(),
+            __('site.common.inactives') => Modulo::onlyTrashed(),
             default => Modulo::withTrashed(),
         };
 
@@ -75,22 +78,22 @@ class Index extends Component
             });
         }
         switch ($this->sort) {
-            case 'Nombre':
+            case __('site.modules.list.name'):
                 if ($this->order == 'asc')
                     $query->orderBy('nombre');
                 else
                     $query->orderByDesc('nombre');
-            case 'Descripción':
+            case __('site.modules.list.description'):
                 if ($this->order == 'asc')
                     $query->orderBy('descripcion');
                 else
                     $query->orderByDesc('descripcion');
-            case 'Cant. Funciones':
+            case __('site.modules.list.cant_functions'):
                 if ($this->order == 'asc')
                     $query->orderBy('cant_funciones');
                 else
                     $query->orderByDesc('cant_funciones');
-            case 'Costo Base':
+            case __('site.modules.list.base_cost'):
                 if ($this->order == 'asc')
                     $query->orderBy('costo_base');
                 else

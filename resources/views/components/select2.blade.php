@@ -85,7 +85,7 @@
     }
 }">
         @if($label)
-            <label for="{{ $model }}" class="">{{ $label }}</label>
+            <label for="{{ $model }}" class="text-capitalize">{{ $label }}</label>
         @endif
 
         <select {{ $attributes }} style="width: 100%;">

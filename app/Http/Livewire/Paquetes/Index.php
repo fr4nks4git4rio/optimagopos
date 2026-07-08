@@ -18,9 +18,9 @@ class Index extends Component
     public $search;
     public $order;
     public $sort;
-    public $sorts = ['Nombre', 'Descripción', 'Precio', 'Módulos'];
+    public $sorts = [];
     public $filter;
-    public $filters = ['Activos', 'Inactivos', 'Todos'];
+    public $filters = [];
 
     protected $queryString = ['search', 'perPage', 'sort', 'order', 'filter'];
 
@@ -28,6 +28,8 @@ class Index extends Component
 
     public function mount()
     {
+        $this->sorts = [__('site.packages.list.name'), __('site.packages.list.description'), __('site.packages.list.price'), __('site.packages.list.modules')];
+        $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
         $this->perPage = $this->perPage ?? 10;
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
@@ -62,8 +64,8 @@ class Index extends Component
     public function query()
     {
         $query = match ($this->filter) {
-            'Activos' => DB::table('tb_paquetes as p')->whereNull('p.deleted_at'),
-            'Inactivos' => DB::table('tb_paquetes as p')->whereNotNull('p.deleted_at'),
+            __('site.common.actives') => DB::table('tb_paquetes as p')->whereNull('p.deleted_at'),
+            __('site.common.inactives') => DB::table('tb_paquetes as p')->whereNotNull('p.deleted_at'),
             default => DB::table('tb_paquetes as p'),
         };
 
@@ -76,7 +78,7 @@ class Index extends Component
             'p.deleted_at'
         );
 
-        $query->leftJoin('tb_paquete_modulos as pm', 'p.id', 'pm.paquete_id')
+        $query->leftJoin('tb_paquetes_modulos as pm', 'p.id', 'pm.paquete_id')
             ->leftJoin('tb_modulos as m', function ($join) {
                 $join->on('m.id', 'pm.modulo_id')
                     ->whereNull('m.deleted_at');
@@ -91,22 +93,22 @@ class Index extends Component
             });
         }
         switch ($this->sort) {
-            case 'Nombre':
+            case __('site.packages.list.name'):
                 if ($this->order == 'asc')
                     $query->orderBy('p.nombre');
                 else
                     $query->orderByDesc('p.nombre');
-            case 'Descripción':
+            case __('site.packages.list.description'):
                 if ($this->order == 'asc')
                     $query->orderBy('p.descripcion');
                 else
                     $query->orderByDesc('p.descripcion');
-            case 'Precio':
+            case __('site.packages.list.price'):
                 if ($this->order == 'asc')
                     $query->orderBy('p.precio');
                 else
                     $query->orderByDesc('p.precio');
-            case 'Módulos':
+            case __('site.packages.list.modules'):
                 if ($this->order == 'asc')
                     $query->orderBy('m.nombre');
                 else

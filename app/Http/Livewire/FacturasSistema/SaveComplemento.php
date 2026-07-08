@@ -186,7 +186,7 @@ class SaveComplemento extends Component
                 $invoice->importe_pagado = $invoice->pivot->importe_pagado;
                 $invoice->can_be_removed = false;
                 $ids[] = $invoice->id;
-                $facturas->push($invoice);
+                $facturas->push($invoice->only(['id', 'folio_interno', 'estado', 'moneda', 'tipo_cambio', 'total', 'metodo_pago_id', 'fecha_certificacion', 'fecha_certificacion_str', 'fecha', 'seleccionada', 'balance_previo', 'balance_previo_temp', 'no_parcialidad', 'importe_pagado', 'can_be_removed']));
             });
         }
 
@@ -229,7 +229,7 @@ class SaveComplemento extends Component
             if ((abs($total - $paid) > 1)) {
                 $invoice = Factura::loadPreviousAndPaidInvoiceInformation($invoice);
                 $invoice->seleccionada = false;
-                $facturas->push($invoice);
+                $facturas->push($invoice->only(['id', 'folio_interno', 'estado', 'moneda', 'tipo_cambio', 'total', 'metodo_pago_id', 'fecha_certificacion', 'fecha_certificacion_str', 'fecha', 'seleccionada', 'balance_previo', 'balance_previo_temp', 'no_parcialidad', 'importe_pagado', 'can_be_removed']));
             }
         });
 
@@ -410,9 +410,11 @@ class SaveComplemento extends Component
 
     public function checkFactura($index, $id)
     {
+
         if ($this->facturasAll[$index]['seleccionada']) {
             $this->eliminarFactura($id);
         } else {
+            $this->facturasAll[$index]['seleccionada'] = true;
             $this->moneda = $this->facturasAll[$index]['moneda'];
             $this->facturas[] = $this->facturasAll[$index];
         }

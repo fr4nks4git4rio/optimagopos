@@ -12,7 +12,7 @@ class Restore extends Modal
 
     public function render()
     {
-        return view('livewire.administracion.usuarios.restore');
+        return view('livewire.usuarios.restore');
     }
 
     public function init()

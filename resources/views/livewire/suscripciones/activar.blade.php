@@ -1,4 +1,4 @@
-<x-modal form-action="delete">
+<x-modal form-action="activar">
     <x-slot:title>
         Activar Subscripción
     </x-slot:title>

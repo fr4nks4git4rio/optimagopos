@@ -35,6 +35,7 @@ class Sidebar extends Component
             || Request::is("$prefix/terminales*")
             || Request::is("$prefix/suscripciones*")
             || Request::is("$prefix/configuraciones*")
+            || Request::is("$prefix/cuarentena*")
             || Request::is("$prefix/trazas*");
     }
 
@@ -52,7 +53,7 @@ class Sidebar extends Component
     public function getReportesRoutesActiveProperty()
     {
         $prefix = user()->cliente_id ? 'cliente' : 'admin';
-        return Request::is($prefix . '/reportes/tickets*')
+        return Request::is($prefix . '/reportes/historico-operaciones*')
             || Request::is($prefix . '/reportes/logs*')
             || Request::is($prefix . '/reportes/ingresos*')
             || Request::is($prefix . '/reportes/ventas-periodo*')

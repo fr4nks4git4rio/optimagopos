@@ -202,6 +202,7 @@ return [
         'fecha_inicio_operaciones' => 'start date of operations',
         'fecha_inicio_pagos' => 'next payment date',
         'periodicidad_pagos' => 'payment period',
+        'rol_id' => 'role',
     ],
 
 ];

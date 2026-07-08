@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Summary of Paquete
+ *
+ * @property string $nombre
+ * @property string $descripcion
+ * @property string $precio
+ * @property string $cant_sucursales
+ * @property string $cant_terminales
+ * @property string $cant_usuarios
+ */
 class Paquete extends Model
 {
     use HasFactory, SoftDeletes;
@@ -23,6 +33,6 @@ class Paquete extends Model
 
     public function modulos()
     {
-        return $this->belongsToMany(Modulo::class, 'tb_paquete_modulos', 'paquete_id', 'modulo_id');
+        return $this->belongsToMany(Modulo::class, 'tb_paquetes_modulos', 'paquete_id', 'modulo_id');
     }
 }

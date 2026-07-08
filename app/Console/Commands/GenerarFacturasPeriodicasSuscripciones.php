@@ -70,7 +70,7 @@ class GenerarFacturasPeriodicasSuscripciones extends Command
                 $factura->propietario_id = get_system_owner()->id;
                 $factura->comentarios = "Suscripción " . $suscripcion->paquete->nombre;
                 $factura->suscripcion_id = $suscripcion->id;
-                $subtotal = round($suscripcion->precio_total * $suscripcion->multiplicador_periodicidad, 2);
+                $subtotal = round($suscripcion->total * $suscripcion->multiplicador_periodicidad, 2);
                 $factura->subtotal = $subtotal;
                 $iva = round($subtotal * (system_iva() / 100), 2);
                 $factura->iva = $iva;

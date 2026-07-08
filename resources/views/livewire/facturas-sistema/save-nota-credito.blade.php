@@ -25,7 +25,7 @@
             <h1 class="h2 fw-bold text-dark mb-0">@yield('title')</h1>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a href="javascript:void(0)" href="{{ route('admin.pre-facturas.index') }}"
+            <a href="{{ route('admin.pre-facturas.index') }}"
                 class="btn btn-outline-secondary px-3">
                 <i class="bi bi-arrow-left me-1"></i> Atrás
             </a>

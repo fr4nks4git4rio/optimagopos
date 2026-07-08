@@ -79,8 +79,10 @@ class AutoFacturacion extends Component
         $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only(['label', 'value']);
         $this->sucursales = DB::table('tb_sucursales as s')
             ->select('s.id as value', 's.nombre_comercial as label', 's.razon_social as razon_social')
+            ->join('tb_suscripciones as sub', 'sub.id', '=', 's.suscripcion_id')
             ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
             ->where('c.con_facturacion', 1)
+            ->where('sub.estado', 'ACTIVA')
             ->whereNull('s.deleted_at')
             ->whereNull('c.deleted_at')
             ->get()->map(function ($element) {
@@ -92,8 +94,10 @@ class AutoFacturacion extends Component
             })->toArray();
         $this->sucursalesFiltro = DB::table('tb_sucursales as s')
             ->select('s.id as value', 's.nombre_comercial as label', 's.razon_social as razon_social')
+            ->join('tb_suscripciones as sub', 'sub.id', '=', 's.suscripcion_id')
             ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
             ->where('c.con_facturacion', 1)
+            ->where('sub.estado', 'ACTIVA')
             ->whereNull('s.deleted_at')
             ->whereNull('c.deleted_at')
             ->get()->map(function ($element) {
@@ -245,6 +249,7 @@ class AutoFacturacion extends Component
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', '=', 'ticket.sucursal_id')
             ->leftJoin('tb_clientes as cliente', 'cliente.id', '=', 'sucursal.cliente_id')
             ->leftJoin('tb_terminales as terminal', 'terminal.id', '=', 'ticket.terminal_id')
+            ->join('tb_suscripciones as sub', 'sub.id', 'terminal.suscripcion_id')
             ->leftJoin('tb_clientes as comensal', 'comensal.id', '=', 'ticket.comensal_id');
 
         if ($this->facturar_por_forma_pago) {
@@ -253,6 +258,8 @@ class AutoFacturacion extends Component
         } else {
             $query->leftJoin('tb_facturas as factura', 'factura.id', '=', 'ticket.factura_id');
         }
+
+        $query->where('sub.estado', 'ACTIVA');
 
         $query->where(function ($query) {
             $query->where('factura.id', '=', '')
@@ -279,8 +286,9 @@ class AutoFacturacion extends Component
     {
         $collection = DB::table('tb_clientes')
             ->select('id', 'nombre_comercial', 'razon_social', 'rfc', DB::raw('0 as decrypted'))
+            ->whereNull('deleted_at')
             ->get();
-        $collection->map(function ($cliente) {
+        $collection->each(function ($cliente) {
             $cliente = Cliente::decryptInfo($cliente);
         });
         $data = $this->validate(
@@ -397,22 +405,23 @@ class AutoFacturacion extends Component
 
     public function facturar()
     {
-        $data = $this->validate([
-            'suc' => ['required', 'exists:tb_sucursales,id'],
-            'codigo' => ['required', 'exists:tb_terminales,identificador'],
-            'ticket' => ['required', 'exists:tb_tickets,id_transaccion'],
-            'rfc' => ['required', 'exists:tb_clientes,rfc']
-        ],
-        // [
-        //     'suc.required' => 'Campo requerido!',
-        //     'suc.exists' => 'Sucursal no encontrada!',
-        //     'codigo.required' => 'Campo requerido!',
-        //     'codigo.exists' => 'Código no encontrado!',
-        //     'ticket.required' => 'Campo requerido!',
-        //     'ticket.exists' => 'Ticket no encontrado!',
-        //     'rfc.required' => 'Campo requerido!',
-        //     'rfc.exists' => 'RFC no encontrado!'
-        // ]
+        $data = $this->validate(
+            [
+                'suc' => ['required', 'exists:tb_sucursales,id'],
+                'codigo' => ['required', 'exists:tb_terminales,identificador'],
+                'ticket' => ['required', 'exists:tb_tickets,id_transaccion'],
+                'rfc' => ['required', 'exists:tb_clientes,rfc']
+            ],
+            // [
+            //     'suc.required' => 'Campo requerido!',
+            //     'suc.exists' => 'Sucursal no encontrada!',
+            //     'codigo.required' => 'Campo requerido!',
+            //     'codigo.exists' => 'Código no encontrado!',
+            //     'ticket.required' => 'Campo requerido!',
+            //     'ticket.exists' => 'Ticket no encontrado!',
+            //     'rfc.required' => 'Campo requerido!',
+            //     'rfc.exists' => 'RFC no encontrado!'
+            // ]
         );
 
         if (

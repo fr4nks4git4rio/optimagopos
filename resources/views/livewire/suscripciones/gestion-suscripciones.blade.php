@@ -63,13 +63,19 @@
                 <span
                     class="badge bg-primary-subtle text-primary text-uppercase px-2 py-1 mb-2 tracking-wider small fw-bold">Asignación
                     Contractual de Recursos</span>
-                <h2 class="mb-1 fw-black text-white h3">
-                    {{ $cliente ? Illuminate\Support\Facades\Crypt::decrypt($cliente->nombre_comercial) : 'Seleccione un Cliente' }}
+                <h2 class="mb-1 fw-black text-white h3 d-flex align-items-center gap-2">
+                    {{ $this->cliente ? Illuminate\Support\Facades\Crypt::decrypt($this->cliente->nombre_comercial) : 'Seleccione un Cliente' }}
+                    @if ($this->cliente && $this->cliente->es_cliente_fiel)
+                        <span class="badge bg-warning text-dark px-2 py-1 fs-8 tracking-wide shadow-sm"
+                            title="Cliente con historial de fidelidad">
+                            <i class="bi bi-star-fill me-1"></i> Cliente Fiel
+                        </span>
+                    @endif
                 </h2>
-                @if ($cliente)
+                @if ($this->cliente)
                     <p class="mb-0 text-white-50 small">
                         <i class="bi bi-building me-1"></i> Identificador Cliente <span
-                            class="text-info fw-bold">#{{ $cliente->id }}</span>
+                            class="text-info fw-bold">#{{ $this->cliente->id }}</span>
                     </p>
                 @endif
             </div>
@@ -87,7 +93,7 @@
                         case 'VENCIDA':
                             $classEstado = 'warning';
                             break;
-                        case 'REVOCADA':
+                        case 'INACTIVA':
                             $classEstado = 'danger';
                             break;
                     }
@@ -99,6 +105,15 @@
                 </span>
             </div>
         </div>
+
+        @if ($this->cliente && $this->cliente->es_cliente_fiel)
+            <div class="bg-warning bg-opacity-10 border-top border-warning px-4 py-2 d-flex align-items-center gap-2">
+                <i class="bi bi-award-fill text-warning fs-5"></i>
+                <span class="text-warning fs-7 fw-bold">
+                    Este cliente es fiel — considera aplicar beneficios o descuentos preferenciales en esta suscripción.
+                </span>
+            </div>
+        @endif
     </div>
 
     <form wire:submit.prevent="submit">
@@ -293,7 +308,7 @@
                                     <div class="col-md-4">
                                         <label
                                             class="form-label fw-bold text-dark small">{{ $infra['label'] }}</label>
-                                        <div class="input-group input-group-sm shadow-sm rounded">
+                                        <div class="input-group input-group shadow-sm rounded">
                                             <span
                                                 class="input-group-text bg-white border-secondary-subtle text-muted"><i
                                                     class="{{ $infra['icon'] }}"></i></span>
@@ -321,6 +336,83 @@
                             </div>
                         </div>
 
+                        <div class="mt-4">
+                            <h6 class="text-uppercase text-muted fw-bold mb-3 tracking-wide fs-7">
+                                <i class="bi bi-diagram-3-fill me-1 text-primary"></i> Recursos Vinculados a la
+                                Suscripción
+                            </h6>
+                            <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
+
+                                {{-- SUCURSALES --}}
+                                <div class="col-md-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label fw-bold text-dark small mb-0">
+                                            <i class="bi bi-building me-1"></i> Sucursales
+                                            <span
+                                                class="badge bg-{{ count($sucursales) == $cant_sucursales ? 'success' : (count($sucursales) > $cant_sucursales ? 'danger' : 'secondary') }} ms-1">
+                                                {{ count($sucursales) }}/{{ $cant_sucursales }}
+                                            </span>
+                                        </label>
+                                        @if (count($sucursales) < $cant_sucursales && $this->cliente_id)
+                                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
+                                                wire:click="$emit('openModal', 'sucursales.save', { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $this->cliente_id }}, from_subscription: true })">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                    <x-select2-multiple :dynamic="true" :lazy="true" model="sucursales"
+                                        :options="$sucursalesDisponibles" class="form-control" :max-selections="$cant_sucursales" />
+                                </div>
+
+                                {{-- TERMINALES --}}
+                                <div class="col-md-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label fw-bold text-dark small mb-0">
+                                            <i class="bi bi-display me-1"></i> Terminales
+                                            <span
+                                                class="badge bg-{{ count($terminales) == $cant_terminales ? 'success' : (count($terminales) > $cant_terminales ? 'danger' : 'secondary') }} ms-1">
+                                                {{ count($terminales) }}/{{ $cant_terminales }}
+                                            </span>
+                                        </label>
+                                        @if (count($terminales) < $cant_terminales && count($sucursales) == 1)
+                                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
+                                                wire:click="$emit('openModal', 'terminales.save-system', { scope: 'suscripciones.gestion-suscripciones', sucursal_id: {{ $sucursales[0] }}, from_subscription: true })">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                    <x-select2-multiple :dynamic="true" :lazy="true" model="terminales"
+                                        :options="$terminalesDisponibles" class="form-control" :max-selections="$cant_terminales" />
+                                </div>
+
+                                {{-- USUARIOS --}}
+                                <div class="col-md-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label fw-bold text-dark small mb-0">
+                                            <i class="bi bi-people me-1"></i> Usuarios
+                                            <span
+                                                class="badge bg-{{ count($usuarios) == $cant_usuarios ? 'success' : (count($usuarios) > $cant_usuarios ? 'danger' : 'secondary') }} ms-1">
+                                                {{ count($usuarios) }}/{{ $cant_usuarios }}
+                                            </span>
+                                        </label>
+                                        @if (count($usuarios) < $cant_usuarios)
+                                            <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
+                                                wire:click="$dispatch('abrirModalCreacion', { tipo: 'usuario', cliente_id: {{ $this->cliente->id ?? 'null' }} })">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                    <x-select2-multiple :dynamic="true" :lazy="true" model="usuarios"
+                                        :options="$usuariosDisponibles" class="form-control" :max-selections="$cant_usuarios" />
+                                </div>
+
+                            </div>
+                            <div class="fs-7 text-muted mt-2">
+                                <i class="bi bi-info-circle-fill text-warning me-1"></i>
+                                La cantidad de recursos vinculados no puede exceder la capacidad contratada. Al alcanzar
+                                el límite, el selector bloqueará nuevas selecciones automáticamente.
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -385,7 +477,7 @@
                         <div class="text-center mb-4 bg-light border rounded-3 p-4">
                             <span class="text-uppercase text-muted fw-bold tracking-wider fs-8 d-block mb-1">Costo
                                 Estimado Recurrente ({{ $periodicidad_pagos }})</span>
-                            <h2 class="fw-black text-primary display-6 mb-1">${{ number_format($precio_total, 2) }}
+                            <h2 class="fw-black text-primary display-6 mb-1">${{ number_format($total, 2) }}
                             </h2>
                             <span
                                 class="badge bg-dark-subtle text-dark px-3 py-1 text-uppercase font-monospace tracking-wide fs-8">{{ $globalSettings['moneda_sistema'] }}
@@ -408,7 +500,7 @@
                         </div>
 
                         <h6 class="text-uppercase text-muted fw-bold tracking-wider fs-8 mb-2">Detalle de Cargos</h6>
-                        <div class="list-group list-group-flush border-bottom mb-4">
+                        <div class="list-group list-group-flush border-bottom mb-3">
                             <div
                                 class="list-group-item d-flex justify-content-between align-items-center px-0 py-2.5 bg-transparent fs-7">
                                 <div class="text-dark"><i class="bi bi-box me-2 text-secondary"></i>Base Cloud (Plan
@@ -421,6 +513,43 @@
                                     / Custom</div>
                                 <span class="fw-bold text-danger">+ ${{ number_format($precio_extra, 2) }}</span>
                             </div>
+                            @if ($descuento > 0)
+                                <div
+                                    class="list-group-item d-flex justify-content-between align-items-center px-0 py-2.5 bg-transparent fs-7">
+                                    <div class="text-success">
+                                        <i class="bi bi-dash-circle me-2"></i>Descuento Aplicado
+                                        <span class="badge bg-success-subtle text-success fs-9 ms-1">
+                                            -{{ number_format($this->porcentaje_descuento, 1) }}%
+                                        </span>
+                                    </div>
+                                    <span class="fw-bold text-success">- ${{ number_format($descuento, 2) }}</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark small">Descuento
+                                <span class="text-muted fw-normal">(monto fijo, opcional)</span>
+                            </label>
+                            <div class="input-group shadow-sm rounded">
+                                <span class="input-group-text bg-white border-secondary-subtle text-muted">
+                                    <i class="bi bi-tag-fill text-success"></i>
+                                </span>
+                                <input type="number" step="0.01" min="0"
+                                    class="form-control bg-white border-secondary-subtle fw-bold @error('descuento') is-invalid @enderror"
+                                    wire:model.lazy="descuento" placeholder="0.00">
+                                <span
+                                    class="input-group-text bg-white border-secondary-subtle text-muted text-uppercase fs-8">{{ $globalSettings['moneda_sistema'] }}</span>
+                            </div>
+                            @if ($descuento > 0)
+                                <div class="fs-8 text-success mt-1">
+                                    <i class="bi bi-info-circle me-1"></i> Este descuento equivale al
+                                    <strong>{{ number_format($this->porcentaje_descuento, 1) }}%</strong> del subtotal.
+                                </div>
+                            @endif
+                            @error('descuento')
+                                <div class="invalid-feedback d-block fs-7">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <button type="submit"

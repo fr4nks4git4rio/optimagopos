@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Livewire\Reportes\Tickets;
+namespace App\Http\Livewire\Reportes\HistoricoOperaciones;
 
 use App\Models\Sucursal;
+use App\Models\Terminal;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -13,6 +15,13 @@ use Livewire\WithPagination;
 class Index extends Component
 {
     use WithPagination;
+    public $fecha_inicio;
+    public $fecha_fin;
+    public $sucursales_query;
+    public $terminales_query;
+    public $sucursales = [];
+    public $terminales = [];
+    public $terminalesDisponibles = [];
 
     public $perPage;
     public $perPages = [10, 25, 50, 100];
@@ -25,17 +34,40 @@ class Index extends Component
         'search' => ['except' => null],
         'order' => ['except' => null],
         'perPage' => ['except' => null],
-        'sort' => ['except' => null]
+        'sort' => ['except' => null],
+        'fecha_inicio' => ['except' => null],
+        'fecha_fin' => ['except' => null],
+        'sucursales_query' => ['except' => null],
+        'terminales_query' => ['except' => null]
     ];
 
     protected $listeners = ['$refresh'];
 
     public function mount()
     {
-        $this->search = $this->perPage ?? null;
+        $this->search = $this->search ?? '';
         $this->perPage = $this->perPage ?? 10;
         $this->order = $this->order ?? 'desc';
         $this->sort = $this->sort ?? 'Fecha';
+
+        if ($this->sucursales_query) {
+            $this->sucursales = explode(',', $this->sucursales_query);
+            $this->loadTerminales();
+        }
+        if ($this->terminales_query)
+            $this->terminales = explode(',', $this->terminales_query);
+    }
+
+    public function hydrate()
+    {
+        $this->dispatchBrowserEvent('reApplySelect2');
+    }
+
+    public function updated($field)
+    {
+        if ($field == 'sucursales')
+            $this->loadTerminales();
+        $this->dispatchBrowserEvent('reApplySelect2');
     }
 
     public function render()
@@ -44,8 +76,14 @@ class Index extends Component
         $total = $tickets->count();
         $records = $tickets->forPage($this->page, $this->perPage);
         $tickets = new LengthAwarePaginator($records, $total, $this->perPage, $this->page);
-        return view('livewire.reportes.tickets.index', [
+        return view('livewire.reportes.historico-operaciones.index', [
             'tickets' => $tickets,
+            'sucursalesDisponibles' => Sucursal::where('cliente_id', user()->cliente_id)->whereIn('id', user()->sucursales->pluck('id')->toArray())->get()->map(function ($value) {
+                return [
+                    'value' => $value->id,
+                    'label' => Crypt::decrypt($value->nombre_comercial)
+                ];
+            })->toArray()
         ]);
     }
 
@@ -78,9 +116,18 @@ class Index extends Component
             ->leftJoin('tb_clientes as c', 'c.id', '=', 't.comensal_id')
             ->groupBy('t.id');
 
-        if (user()->is_admin) {
-            $query->where('s.cliente_id', user()->cliente_id);
-        }
+        if ($this->fecha_inicio)
+            $query->whereDate('t.fecha_transaccion', '>=', $this->fecha_inicio);
+        if ($this->fecha_fin)
+            $query->whereDate('t.fecha_transaccion', '<=', $this->fecha_fin);
+        if (count(Arr::wrap($this->sucursales)) > 0)
+            $query->whereIn('s.id', $this->sucursales);
+        else
+            $query->whereIn('s.id', user()->sucursales->pluck('id')->toArray());
+        if (count(Arr::wrap($this->terminales)) > 0)
+            $query->whereIn('ter.id', $this->terminales);
+        else
+            $query->whereIn('ter.id', user()->terminales->pluck('id')->toArray());
 
         $tickets = $query->get()->map(function ($element) {
             return (array) $element;
@@ -180,6 +227,11 @@ class Index extends Component
         }
 
         return $records_final;
+    }
+
+    public function loadTerminales()
+    {
+        $this->terminalesDisponibles = Terminal::whereIn('sucursal_id', Arr::wrap($this->sucursales))->whereIn('id', user()->terminales->pluck('id')->toArray())->get()->map->only(['value', 'label'])->toArray();
     }
 
     public function changeSort($sort)

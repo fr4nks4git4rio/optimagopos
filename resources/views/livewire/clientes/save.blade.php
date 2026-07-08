@@ -5,7 +5,16 @@
 
     <x-slot:content>
         <div class="row mb-1">
-            <x-toggle-button :label="'Incluye facturación'" :inline="true" model="con_facturacion" />
+            <x-toggle-button :label="'Incluye facturación'" :inline="true" :lazy="true" model="con_facturacion" />
+            @if ($con_facturacion)
+                <div class="mb-3">
+                    <input type="file" style="display: none" accept=".pdf" id="file_constacia_fiscal"
+                        wire:model="constancia_fiscal">
+                    <button type="button" class="btn btn-warning" wire:loading.attr="disabled"
+                        onclick="document.getElementById('file_constacia_fiscal').click()">Cargar datos fiscales desde
+                        Constancia Fiscal</button>
+                </div>
+            @endif
         </div>
         <div class="row mb-3">
             <div class="col-sm-5">
@@ -28,6 +37,11 @@
             <div class="col-sm-4">
                 <x-select2-component-modals label="Régimen Fiscal" :options="$regimenesFiscales" model="regimen_fiscal_id"
                     class="form-control" />
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <x-toggle-button :label="'Cliente fiel'" :inline="true" model="es_cliente_fiel" />
             </div>
         </div>
         <div wire:init="init" class="row">
@@ -54,8 +68,7 @@
                             Datos Contacto
                         </button>
                     </li>
-                    <li class="nav-item"
-                        role="presentation">
+                    <li class="nav-item" role="presentation">
                         <button wire:ignore.self class="nav-link" id="comentario-tab" data-bs-toggle="tab"
                             data-bs-target="#comentario-tab-pane" type="button" role="tab"
                             aria-controls="comentario-tab-pane" aria-selected="false">
@@ -108,8 +121,8 @@
                             </div>
                         </div>
                     </div>
-                    <div wire:ignore.self class="tab-pane fade pt-2" id="contacto-tab-pane"
-                        role="tabpanel" aria-labelledby="contacto-tab" tabindex="2">
+                    <div wire:ignore.self class="tab-pane fade pt-2" id="contacto-tab-pane" role="tabpanel"
+                        aria-labelledby="contacto-tab" tabindex="2">
                         <div class="row">
                             <div class="col-6">
                                 <x-input label="Nombre Completo" type="text" model="contacto_nombre" />

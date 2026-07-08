@@ -34,6 +34,7 @@ class Configuraciones extends Modal
         $this->moneda_sucursal = $this->sucursal->moneda_base_id;
         $this->monedas = DB::table('tb_monedas')
             ->select('id as value', 'acronimo as label')
+            ->whereNull('deleted_at')
             ->get()
             ->map(function ($value, $key) {
                 return (array)$value;

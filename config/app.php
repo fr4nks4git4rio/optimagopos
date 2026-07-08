@@ -189,4 +189,9 @@ return [
         'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
     ])->toArray(),
 
+    'GOOGLE_CLIENT_ID' => env('GOOGLE_CLIENT_ID'),
+    'GOOGLE_CLIENT_SECRET' => env('GOOGLE_CLIENT_SECRET'),
+    'GOOGLE_REDIRECT_URI' => env('GOOGLE_REDIRECT_URI'),
+    'GMAIL_USER' => env('GMAIL_USER')
+
 ];

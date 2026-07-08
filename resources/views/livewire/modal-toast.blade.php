@@ -1,13 +1,13 @@
 <x-modal form-action="delete">
     <x-slot:title>
-        {{$title}}
+        {{ $title }}
     </x-slot:title>
 
     <x-slot:content>
         @foreach ($messages as $message)
-        <x-alert icon="iconMessage('{{$message['type']}}')" alert="{{$message['type']}}">
-            {{$message['text']}}
-        </x-alert>
+            <x-alert icon="iconMessage('{{ $message['type'] }}')" alert="{{ $message['type'] }}">
+                {{ $message['text'] }}
+            </x-alert>
         @endforeach
     </x-slot:content>
 

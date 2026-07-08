@@ -91,7 +91,7 @@ class Index extends Component
                 $query->where('s.id', '>', 0);
         }
 
-        if (!user()->is_super_admin) {
+        if (user()->cliente_id) {
             $query->where('s.cliente_id', user()->cliente_id);
         }
 

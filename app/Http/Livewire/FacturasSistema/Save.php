@@ -348,11 +348,11 @@ class Save extends Component
         return view('livewire.facturas-sistema.save', [
             'factura' => $this->getFactura(),
 
-            'series' => $cleanArray(DB::table('tb_series')->select('id as value', 'descripcion as label')),
-            'metodosPago' => $cleanArray(DB::table('tb_metodo_pagos')->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
-            'formasPago' => $cleanArray(DB::table('tb_forma_pagos')->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
-            'usosCfdi' => $cleanArray(DB::table('tb_cfdis')->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
-            'tiposComprobante' => $cleanArray(DB::table('tb_tipo_comprobantes')->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
+            'series' => $cleanArray(DB::table('tb_series')->where('activo', 1)->select('id as value', 'descripcion as label')),
+            'metodosPago' => $cleanArray(DB::table('tb_metodo_pagos')->where('activo', 1)->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
+            'formasPago' => $cleanArray(DB::table('tb_forma_pagos')->where('activo', 1)->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
+            'usosCfdi' => $cleanArray(DB::table('tb_cfdis')->where('activo', 1)->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
+            'tiposComprobante' => $cleanArray(DB::table('tb_tipo_comprobantes')->where('activo', 1)->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
             'periodicidades' => $cleanArray(DB::table('tb_periodicidades_factura')->select('id as value', DB::raw("CONCAT_WS(' | ', clave, descripcion) as label"))),
             'meses' => $cleanArray(DB::table('tb_meses')->select('id as value', DB::raw("CONCAT_WS(' | ', clave, descripcion) as label"))),
             'anios' => range(date('Y'), date('Y') - 1),
@@ -410,6 +410,8 @@ class Save extends Component
                 'factura.id as id',
                 'factura.folio_interno as folio_interno',
                 'factura.estado',
+                'factura.es_nota_credito',
+                'factura.es_complemento',
                 'factura.tipo_relacion_factura_id as tipo_relacion_id',
                 DB::raw("DATE_FORMAT(factura.fecha_emision,'%d/%m/%Y %H:%i') as fecha_emision_str"),
                 DB::raw("0 as seleccionada"),
@@ -573,7 +575,7 @@ class Save extends Component
                     'seleccionada' => $concepto != null,
                     'paquete' => $sub->paquete ? $sub->paquete->nombre : 'Custom',
                     'estado' => $sub->estado,
-                    'monto_facturar' => $concepto ? ($sub->precio_total - $sub->factura_conceptos()->where('id', '!=',  $concepto->id)->sum(DB::raw('cantidad * precio_unitario'))) : $sub->pendiente_facturar
+                    'monto_facturar' => $concepto ? ($sub->total - $sub->factura_conceptos()->where('id', '!=',  $concepto->id)->sum(DB::raw('cantidad * precio_unitario'))) : $sub->pendiente_facturar
                 ];
             });
         } else {

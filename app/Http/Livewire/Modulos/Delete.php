@@ -25,6 +25,8 @@ class Delete extends Modal
 
     public function delete()
     {
+        $this->modulo->paquetes()->detach();
+        $this->modulo->suscripciones()->detach();
         $this->modulo->delete();
 
         $this->emit('show-toast', 'Módulo desactivado.');

@@ -3,11 +3,17 @@
 namespace App\Http\Livewire\Suscripciones;
 
 use App\Http\Livewire\Layouts\Modal;
+use App\Jobs\SendEmailJob;
 use App\Models\ClaveProdServ;
+use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\Suscripcion;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Validator;
 
 class Activar extends Modal
 {
@@ -29,7 +35,7 @@ class Activar extends Modal
             'id' => $this->suscripcion->id,
             'cliente_nombre' => Crypt::decrypt($this->suscripcion->cliente->nombre_comercial),
             'plan_nombre' => $this->suscripcion->paquete->nombre,
-            'monto' => $this->suscripcion->precio_total,
+            'monto' => $this->suscripcion->total,
             'frecuencia' => $this->suscripcion->periodicidad_pagos,
             'proximo_pago' => $this->suscripcion->fecha_inicio_pagos->format('d/m/Y'),
             'multiplicador' => $this->suscripcion->multiplicador_periodicidad
@@ -52,6 +58,30 @@ class Activar extends Modal
 
     public function activar()
     {
+        $cliente = $this->suscripcion->cliente->toArray();
+        $cliente =  Cliente::decryptInfo($cliente);
+        $validator = Validator::make($cliente, [
+            'razon_social' => 'required',
+            'rfc' => 'required',
+            'contacto_nombre' => 'required',
+            'contacto_correo' =>  'required|email',
+            'contacto_telefono' => 'required',
+            'direccion_fiscal'  => 'required',
+            'direccion_fiscal.codigo_postal'  => 'required',
+            'regimen_fiscal_id' => 'required|exists:tb_regimen_fiscales,id'
+        ]);
+
+        if ($validator->fails()) {
+            $messages = Arr::map(Arr::flatten($validator->messages()->messages()), function ($value) {
+                return [
+                    'type' => 'danger',
+                    'text' => $value
+                ];
+            });
+            $this->emit('openModal', 'modal-toast', ['messages' => $messages]);
+            return;
+        }
+
         DB::beginTransaction();
         try {
             $this->suscripcion->estado = 'ACTIVA';
@@ -76,7 +106,7 @@ class Activar extends Modal
             $factura->comentarios = "Suscripción " . $this->suscripcion->paquete->nombre;
             $factura->suscripcion_id = $this->suscripcion->id;
 
-            $subtotal = round($this->suscripcion->precio_total * $this->suscripcion->multiplicador_periodicidad, 2);
+            $subtotal = round($this->suscripcion->total * $this->suscripcion->multiplicador_periodicidad, 2);
 
             $factura->subtotal = $subtotal;
 
@@ -102,6 +132,35 @@ class Activar extends Modal
                 'suscripcion_id' => $this->suscripcion->id
             ]);
 
+            $pdf = $this->suscripcion->generarPdf();
+            $cliente_nombre = $this->suscripcion->cliente->nombre_comercial;
+            $cliente_nombre = Crypt::decrypt($cliente_nombre);
+            $to = $this->suscripcion->cliente->contacto_correo;
+            $to = Crypt::decrypt($to);
+
+            $pdf = public_path($pdf);
+            Log::info("Enviando correo a: $to");
+            Log::info("Pdf: $pdf");
+            SendEmailJob::dispatch(
+                recipients: $to,
+                from_email: '',
+                from_name: '',
+                subject: 'Activación de Suscripción - ' . config('app.name'),
+                view: 'emails.notifications.subscription-active',
+                data: [
+                    'cliente' => $cliente_nombre,
+                    'rfc' => $this->suscripcion->cliente->rfc,
+                    'fecha_inicio_operaciones' => $this->suscripcion->fecha_inicio_operaciones,
+                    'fecha_inicio_pagos' => $this->suscripcion->fecha_inicio_pagos,
+                    'periodicidad_pagos' => $this->suscripcion->periodicidad_pagos,
+                    'precio_total' => $this->suscripcion->precio_total,
+                    'moneda' => system_config('moneda_sistema')
+                ],
+                others: '',
+                attachment: $pdf,
+                delete_attachment_on_sent: true
+            );
+
             DB::commit();
 
             $this->emit('show-toast', 'Suscripción activada.');
@@ -109,6 +168,7 @@ class Activar extends Modal
             $this->emit('closeModal');
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error("Error al intentar activar la suscripcion. Error: {$e->getMessage()}");
             $this->emit('show-toast', 'Error al activar la suscripción.', 'danger');
             return;
         }

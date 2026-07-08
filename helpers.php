@@ -299,16 +299,6 @@ if (!function_exists('get_estados_mexico')) {
     }
 }
 
-if (!function_exists('get_dimensiones_opt')) {
-    function get_dimensiones_opt()
-    {
-        return [
-            '2.44 x 12.19 x 2.59',
-            '2.53 x 16.15 x 2.77'
-        ];
-    }
-}
-
 if (!function_exists('pretty_message')) {
     function pretty_message($message, $type = 'success')
     {
@@ -318,5 +308,135 @@ if (!function_exists('pretty_message')) {
             return $type === 'success' ? 'Acción realizada correctamente!' : 'Lo sentimos. Ha ocurrido un error intentando realizar la acción.';
 
         return $message;
+    }
+}
+
+if (!function_exists('extraer_datos_fiscales')) {
+    function extraer_datos_fiscales($texto)
+    {
+        // Normalizar espacios
+        $texto = preg_replace('/\s+/', ' ', $texto);
+
+        // Insertar saltos de línea antes de campos clave (PF y PM)
+        $campos = [
+            'RFC:',
+            'CURP:',
+            'Denominación/RazónSocial:',
+            'Nombre(s):',
+            'Nombre (s):',
+            'PrimerApellido:',
+            'Primer Apellido:',
+            'SegundoApellido:',
+            'Segundo Apellido:',
+            'RégimenCapital:',
+            'Régimen Capital:',
+            'NombreComercial:',
+            'Fechainiciodeoperaciones:',
+            'Estatusenelpadrón:',
+            'Fechadeúltimocambiodeestado:',
+            'CódigoPostal:',
+            'TipodeVialidad:',
+            'NombredeVialidad:',
+            'NúmeroExterior:',
+            'NúmeroInterior:',
+            'NombredelaColonia:',
+            'NombredelaLocalidad:',
+            'NombredelMunicipiooDemarcaciónTerritorial:',
+            'NombredelaEntidadFederativa:',
+            'EntreCalle:',
+            'YCalle:',
+            'Actividades Económicas:',
+            'Regímenes:'
+        ];
+
+        foreach ($campos as $campo) {
+            $texto = str_replace($campo, "\n" . $campo, $texto);
+        }
+
+        $lineas = explode("\n", $texto);
+        $datos = [];
+        foreach ($lineas as $linea) {
+            $linea = trim($linea);
+
+            // RFC
+            if (preg_match('/^RFC:\s*(.+)/', $linea, $m)) {
+                $datos['rfc'] = trim($m[1]);
+            }
+
+            // CURP (Persona Física)
+            elseif (preg_match('/^CURP:\s*(.+)/', $linea, $m)) {
+                $datos['curp'] = trim($m[1]);
+            }
+
+            // Persona Moral
+            elseif (preg_match('/^Denominación\/RazónSocial:\s*(.+)/i', $linea, $m)) {
+                $datos['tipo_persona'] = 'moral';
+                $datos['razon_social'] = trim($m[1]);
+            }
+
+            // Persona Moral
+            elseif (preg_match('/^Nombre\s*Comercial:\s*(.+)/i', $linea, $m)) {
+                $datos['nombre_comercial'] = trim($m[1]);
+            }
+
+            // Persona Física
+            elseif (preg_match('/^Nombre\s*\(s\):\s*(.+)/i', $linea, $m)) {
+                $datos['tipo_persona'] = 'fisica';
+                $datos['nombre'] = trim($m[1]);
+            } elseif (preg_match('/^Primer\s*Apellido:\s*(.+)/i', $linea, $m)) {
+                $datos['apellido_paterno'] = trim($m[1]);
+            } elseif (preg_match('/^Segundo\s*Apellido:\s*(.*)/i', $linea, $m)) {
+                $datos['apellido_materno'] = trim($m[1]);
+            }
+
+            // Campos comunes
+            elseif (preg_match('/^Fechainiciodeoperaciones:\s*(.+)/', $linea, $m)) {
+                $datos['fecha_inicio_operaciones'] = trim($m[1]);
+            } elseif (preg_match('/^Estatusenelpadrón:\s*(.+)/', $linea, $m)) {
+                $datos['estatus_padron'] = trim($m[1]);
+            } elseif (preg_match('/^CódigoPostal:\s*(\d{5})/', $linea, $m)) {
+                $datos['codigo_postal'] = $m[1];
+            } elseif (preg_match('/^NombredeVialidad:\s*(.+)/', $linea, $m)) {
+                $datos['calle'] = trim($m[1]);
+            } elseif (preg_match('/^NúmeroExterior:\s*(.+)/', $linea, $m)) {
+                $datos['numero_exterior'] = trim($m[1]);
+            } elseif (preg_match('/^NúmeroInterior:\s*(.*)/', $linea, $m)) {
+                $datos['numero_interior'] = trim($m[1]);
+            } elseif (preg_match('/^NombredelaColonia:\s*(.+)/', $linea, $m)) {
+                $datos['colonia'] = trim($m[1]);
+            } elseif (preg_match('/^NombredelaLocalidad:\s*(.+)/', $linea, $m)) {
+                $datos['localidad'] = trim($m[1]);
+            } elseif (preg_match('/^NombredelMunicipiooDemarcaciónTerritorial:\s*(.+)/', $linea, $m)) {
+                $datos['municipio'] = trim($m[1]);
+            } elseif (preg_match('/^NombredelaEntidadFederativa:\s*(.+)/', $linea, $m)) {
+                $datos['estado'] = trim($m[1]);
+            } elseif (preg_match('/^Actividades Económicas:\s*(.*)/', $linea, $m)) {
+                $datos['actividades_economicas'] = trim($m[1]);
+            }
+        }
+
+        // Extraer régimen fiscal
+        if (preg_match('/Regímenes:(.*?)Obligaciones:/', $texto, $bloqueRegimen)) {
+            $regimenesTexto = $bloqueRegimen[1];
+            $lineasRegimen = preg_split('/\s*Régimen\s+/i', $regimenesTexto);
+
+            $regimenesValidos = [];
+
+            foreach ($lineasRegimen as $linea) {
+                if (preg_match('/^(.+?)\s+\d{2}\/\d{2}\/\d{4}/', trim($linea), $m)) {
+                    $regimen = trim($m[1]);
+
+                    // Quitar "de las " solo si está al inicio
+                    $regimen = preg_replace('/^de\s+las\s+/i', '', $regimen);
+                    $regimenesValidos[] = $regimen;
+                }
+            }
+
+            if (count($regimenesValidos)) {
+                $datos['regimen_fiscal'] = end($regimenesValidos);
+            }
+        }
+
+        return $datos;
     }
 }

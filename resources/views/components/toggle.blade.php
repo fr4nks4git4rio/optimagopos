@@ -48,7 +48,7 @@
         });
     }">
     <label for="{{ $model }}"
-        class="form-check-label {{ $inline ? 'mr-2 mt-2' : ' mb-1' }}">{{ $label }}</label>
+        class="form-check-label {{ $inline ? 'mr-2 mt-2' : ' mb-1' }} text-capitalize">{{ $label }}</label>
     <div class="toggle-button-cover">
         <div class="button-cover">
             <div class="button {{ $size }} r button-toggle">

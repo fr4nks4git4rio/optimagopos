@@ -1,19 +1,19 @@
 <x-modal form-action="restore">
     <x-slot:title>
-        Reactivar Módulo
+        <span class="text-capitalize">{{ __('site.modules.restore.restore_module') }}</span>
     </x-slot:title>
 
     <x-slot:content>
         <div wire:init="init">
             <x-alert icon="exclamation-octagon" alert="danger">
-                Seguro/a que desea reactivar el Módulo?
+                {{ __('site.modules.restore.are_you_sure') }}
             </x-alert>
         </div>
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">Cerrar</button>
-        <button type="submit" class="btn btn-site-primary">Reactivar Módulo</button>
+        <button type="button" class="btn btn-secondary text-capitalize" data-bs-dismiss="modal"
+            wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
+        <button type="submit" class="btn btn-primary text-capitalize">{{ __('site.modules.restore.confirm_restore') }}</button>
     </x-slot:buttons>
 </x-modal>

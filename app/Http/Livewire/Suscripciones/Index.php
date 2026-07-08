@@ -3,10 +3,12 @@
 namespace App\Http\Livewire\Suscripciones;
 
 use App\Models\Suscripcion;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -25,6 +27,9 @@ class Index extends Component
     protected $queryString = ['search', 'order', 'sort', 'perPage'];
 
     protected $listeners = ['$refresh'];
+
+    public $iframeContainerClass = '';
+    public $iframeSrc = '';
 
     public function mount()
     {
@@ -73,7 +78,7 @@ class Index extends Component
                 DB::raw("DATE_FORMAT(sub.fecha_inicio_pagos, '%d/$%m/%Y') as inicio_pagos"),
                 'sub.periodicidad_pagos',
                 DB::raw("CONCAT_WS(', ', CONCAT('Sucursales: ', sub.cant_sucursales), CONCAT('Terminales: ', sub.cant_terminales), CONCAT('Usuarios: ', sub.cant_usuarios)) as capacidad"),
-                'sub.precio_total',
+                'sub.total',
                 'sub.estado',
                 'sub.cliente_id'
             )
@@ -97,7 +102,7 @@ class Index extends Component
                 || Str::contains($sub['inicio_pagos'], $search)
                 || Str::contains(Str::upper($sub['periodicidad_pagos']), $search)
                 || Str::contains(Str::upper($sub['capacidad']), $search)
-                || Str::contains($sub['precio_total'], $search)
+                || Str::contains($sub['total'], $search)
                 || Str::contains(Str::upper($sub['estado']), $search)
             ) {
                 $records_final->push($sub);
@@ -143,9 +148,9 @@ class Index extends Component
                 break;
             case 'Precio':
                 if ($this->order == 'asc')
-                    $records_final = $records_final->sortBy('precio_total', SORT_NUMERIC)->values();
+                    $records_final = $records_final->sortBy('total', SORT_NUMERIC)->values();
                 else
-                    $records_final = $records_final->sortByDesc('precio_total', SORT_NUMERIC)->values();
+                    $records_final = $records_final->sortByDesc('total', SORT_NUMERIC)->values();
                 break;
             case 'Estado':
                 if ($this->order == 'asc')
@@ -156,6 +161,14 @@ class Index extends Component
         }
 
         return $records_final;
+    }
+
+    public function descargarPdf($id)
+    {
+        $name = Suscripcion::find($id)->generarPdf();
+
+        $this->iframeContainerClass = 'show';
+        $this->iframeSrc = Request::root() . "/$name";
     }
 
     public function changeSort($sort)

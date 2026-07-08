@@ -34,7 +34,7 @@ class Index extends Component
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
         $this->sort = $this->sort ?? 'Identificador';
-        $this->sorts = ['Identificador', 'Sucursal', 'Comentarios'];
+        $this->sorts = ['Identificador', 'Nombre', 'Sucursal', 'Comentarios'];
         $this->filter = $this->filter ?? 'Activos';
         $this->filters = ['Activos', 'Inactivos', 'Todos'];
         $this->perPage = $this->perPage ?? 10;
@@ -71,13 +71,14 @@ class Index extends Component
             ->select(
                 't.id',
                 't.identificador',
+                't.nombre',
                 't.comentarios',
                 't.deleted_at',
                 's.nombre_comercial as sucursal'
             )
             ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id');
 
-        if (!user()->is_super_admin) {
+        if (user()->cliente_id) {
             $query->where('s.cliente_id', user()->cliente_id);
         }
 
@@ -104,6 +105,7 @@ class Index extends Component
             if (
                 !$this->search
                 || Str::contains(Str::upper($terminal['identificador']), Str::upper($this->search))
+                || Str::contains(Str::upper($terminal['nombre']), Str::upper($this->search))
                 || Str::contains(Str::upper($terminal['comentarios']), Str::upper($this->search))
                 || Str::contains(Str::upper($terminal['sucursal']), Str::upper($this->search))
             ) {
@@ -117,6 +119,12 @@ class Index extends Component
                     $records_final = $records_final->sortBy('identificador', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('identificador', SORT_NATURAL)->values();
+                break;
+            case 'Nombre':
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('nombre', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('nombre', SORT_NATURAL)->values();
                 break;
             case 'Sucursal':
                 if ($this->order == 'asc')

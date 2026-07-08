@@ -78,7 +78,7 @@ class SucursalObserver
      */
     public function restored(Sucursal $sucursal)
     {
-        activity("Sucursal Restaurado")
+        activity("Sucursal Restaurada")
             ->on($sucursal)
             ->event('restored')
             ->withProperties(Sucursal::parseData(Arr::except(

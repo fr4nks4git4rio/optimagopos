@@ -89,7 +89,7 @@ class Save extends Modal
         $collection = DB::table('tb_clientes')
             ->select('id', 'nombre_comercial', 'razon_social', 'rfc', DB::raw('0 as decrypted'))
             ->get();
-        $collection->map(function ($comensal) {
+        $collection->each(function ($comensal) {
             $comensal = Cliente::decryptInfo($comensal);
         });
         return [

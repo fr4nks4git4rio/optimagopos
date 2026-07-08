@@ -28,6 +28,8 @@ class Delete extends Modal
 
     public function delete()
     {
+        $this->terminal->suscripcion_id = null;
+        $this->terminal->save();    
         $this->terminal->delete();
 
         $this->emit('show-toast', 'Terminal desactivada.');

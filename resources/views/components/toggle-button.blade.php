@@ -143,7 +143,7 @@
 </style>
 
 <div class="mb-3 {{ $inline ? 'd-flex' : '' }}">
-    <label for="{{ $model }}" class="form-check-label {{ $inline ? 'mr-2' : ' mb-1' }}">{{ $label }}</label>
+    <label for="{{ $model }}" class="form-check-label {{ $inline ? 'mr-2' : ' mb-1' }} text-capitalize">{{ $label }}</label>
     <div class="toggle-button-cover">
         <div class="button-cover">
             <div class="button r button-toggle">

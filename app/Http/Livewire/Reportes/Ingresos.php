@@ -41,7 +41,7 @@ class Ingresos extends Component
         $this->perPage = 10;
         $this->perPages = [10, 25, 50, 100];
         $this->sort = 'Fecha';
-        $this->sorts = ['Fecha', 'Folio Interno', 'Cliente', 'Póliza', 'Folio UUID', 'Moneda', 'Importe'];
+        $this->sorts = ['Fecha', 'Folio Interno', 'Cliente', 'Folio UUID', 'Moneda', 'Importe'];
     }
 
     public function render()
@@ -58,7 +58,7 @@ class Ingresos extends Component
                 'ingreso.id as id',
                 'ingreso.fecha',
                 DB::raw("DATE_FORMAT(ingreso.fecha, '%d/%m/%Y') as fecha_str"),
-                DB::raw("IF(ingreso_factura.nota_credito_id = null, factura.folio_interno, nota_credito.folio_interno) as folio_interno"),
+                DB::raw("IF(ingreso_factura.nota_credito_id IS NULL, factura.folio_interno, nota_credito.folio_interno) as folio_interno"),
                 'cliente.razon_social as razon_social',
                 'factura.uuid as uuid',
                 'ingreso_factura.monto as monto',

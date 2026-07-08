@@ -153,28 +153,34 @@ class Save extends Component
 
         $this->sucursales = DB::table('tb_sucursales')
             ->select('id as value', 'nombre_comercial as label')
+            ->whereIn('id', user()->sucursales->pluck('id')->toArray())
             ->where('cliente_id', user()->cliente_id)
+            ->whereNull('deleted_at')
             ->get()->map(function ($value, $key) {
                 $value->label = Crypt::decrypt($value->label);
                 return (array)$value;
             })->toArray();
         $this->series = DB::table('tb_series')
             ->select('id as value', 'descripcion as label')
+            ->where('activo', 1)
             ->get()->map(function ($value, $key) {
                 return (array)$value;
             })->toArray();
         $this->metodosPago = DB::table('tb_metodo_pagos')
             ->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))
+            ->where('activo', 1)
             ->get()->map(function ($value, $key) {
                 return (array)$value;
             })->toArray();
         $this->formasPago = DB::table('tb_forma_pagos')
             ->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))
+            ->where('activo', 1)
             ->get()->map(function ($value, $key) {
                 return (array)$value;
             })->toArray();
         $this->usosCfdi = DB::table('tb_cfdis')
             ->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))
+            ->where('activo', 1)
             ->get()->map(function ($value, $key) {
                 return (array)$value;
             })->toArray();
@@ -191,16 +197,19 @@ class Save extends Component
         $this->anios = [today()->year, today()->year - 1];
         $this->clavesProdServ = DB::table('tb_clave_prod_servs')
             ->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, nombre) as label"))
+            ->where('activo', 1)
             ->get()->map(function ($value, $key) {
                 return (array)$value;
             })->toArray();
         $this->clavesUnidad = DB::table('tb_clave_unidades')
             ->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))
+            ->where('activo', 1)
             ->get()->map(function ($value, $key) {
                 return (array)$value;
             })->toArray();
         $this->objetosImpuesto = DB::table('tb_objetos_impuesto')
             ->select('id as value', DB::raw("CONCAT_WS(' | ', clave, descripcion) as label"))
+            ->where('activo', 1)
             ->get()->map(function ($value, $key) {
                 return (array)$value;
             })->toArray();
@@ -224,6 +233,7 @@ class Save extends Component
             $sucursal = Sucursal::find($value);
             $this->formasPagoSucursal = DB::table('tb_sucursal_forma_pagos as sfp')
                 ->select('sfp.id as value', 'sfp.nombre as label')
+                ->whereNull('sfp.deleted_at')
                 ->where('sfp.sucursal_id', $value)
                 ->get()->map(function ($value, $key) {
                     return (array)$value;
@@ -262,6 +272,7 @@ class Save extends Component
             ->leftJoin('tb_localidades as localidad', 'localidad.id', '=', 'direccion.localidad_id')
             ->leftJoin('tb_municipios as municipio', 'municipio.id', '=', 'direccion.municipio_id')
             ->leftJoin('tb_estados as estado', 'estado.id', '=', 'direccion.estado_id')
+            ->where('es_comensal', 1)
             ->where('cliente.id', $this->cliente_id)->get()->map(function ($element) {
                 $element->razon_social = Crypt::decrypt($element->razon_social);
                 return $element;

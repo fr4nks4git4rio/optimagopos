@@ -3,9 +3,11 @@
 namespace App\Http;
 
 use App\Http\Middleware\ConFacturacion;
+use App\Http\Middleware\EnsureTwoFactorIsVerified;
 use App\Http\Middleware\HasRole;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TwoFactorAuthenticated;
+use App\Http\Middleware\UserActiveSubscription;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -71,6 +73,8 @@ class Kernel extends HttpKernel
         '2fa' => TwoFactorAuthenticated::class,
         'hasRole' => HasRole::class,
         'conFacturacion' => ConFacturacion::class,
-        'set.locale' => SetLocale::class
+        'set.locale' => SetLocale::class,
+        'two-factor' => EnsureTwoFactorIsVerified::class,
+        'user-with-active-subscription' => UserActiveSubscription::class
     ];
 }

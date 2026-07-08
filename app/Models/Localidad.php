@@ -12,10 +12,10 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models\Administracion
  * @version May 6, 2019, 7:19 pm UTC
  *
- * @property string codigo
- * @property string nombre
- * @property boolean activo
- * @property integer estado_id
+ * @property string $codigo
+ * @property string $nombre
+ * @property boolean $activo
+ * @property integer $estado_id
  */
 class Localidad extends Model
 {

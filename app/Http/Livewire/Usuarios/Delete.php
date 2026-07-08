@@ -15,10 +15,11 @@ class Delete extends Modal
 
     public function render()
     {
-        return view('livewire.administracion.usuarios.delete');
+        return view('livewire.usuarios.delete');
     }
 
-    public function init(){
+    public function init()
+    {
         if (user()->cannot('delete', $this->usuario)) {
             $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
             $this->emit('closeModal');
@@ -28,6 +29,7 @@ class Delete extends Modal
 
     public function delete()
     {
+        $this->usuario->suscripciones()->detach();
         $this->usuario->delete();
 
         $this->emit('show-toast', 'Usuario desactivado.');

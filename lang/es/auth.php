@@ -14,6 +14,7 @@ return [
     */
 
     'failed' => 'Las credenciales no coinciden con nuestros registros.',
+    'subscription_failed' => 'El usuario no está vinculado a ninguna Suscripción activa.',
     'password' => 'La contraseña es incorrecta.',
     'throttle' => 'Demasiados intentos de autenticación. Por favor intenténtelo nuevamente en :seconds segundos.',
 

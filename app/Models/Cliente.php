@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Storage;
  * @property boolean $es_comensal
  * @property boolean $es_cliente
  * @property boolean $es_propietario
+ * @property boolean $es_cliente_fiel
  * @property string $comentarios
  * @property boolean $con_facturacion
  * @property string $logo
@@ -59,6 +60,7 @@ class Cliente extends Model
         'es_comensal',
         'es_cliente',
         'es_propietario',
+        'es_cliente_fiel',
         'comentarios',
         'con_facturacion',
         'logo',
@@ -85,6 +87,8 @@ class Cliente extends Model
         'prefijo' => 'string',
         'es_comensal' => 'boolean',
         'es_cliente' => 'boolean',
+        'es_propietario' => 'boolean',
+        'es_cliente_fiel' => 'boolean',
         'comentarios' => 'string',
         'con_facturacion' => 'boolean',
         'portal_pac' => 'string',
@@ -265,9 +269,9 @@ class Cliente extends Model
 
     public function suscripciones()
     {
-        return $this->hasOne(Suscripcion::class, 'cliente_id');
+        return $this->hasMany(Suscripcion::class, 'cliente_id');
     }
-    public function suscripcion_activa()
+    public function suscripciones_activa()
     {
         return $this->hasOne(Suscripcion::class, 'cliente_id')->where('estado', 'ACTIVA');
     }

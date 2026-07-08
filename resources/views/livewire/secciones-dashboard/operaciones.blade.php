@@ -46,19 +46,28 @@
         <div x-data="{
             datosVentasHora: @entangle('operacionesData.grafica_ventas_hora'),
             chart: null,
-
+            sinDatos: false,
+            horasDelDia: [],
+        
             init() {
-                const horasDelDia = Array.from({ length: 24 }, (_, i) => {
+                this.horasDelDia = Array.from({ length: 24 }, (_, i) => {
                     return i.toString().padStart(2, '0') + ':00'; // Genera ['00:00', '01:00', ..., '23:00']
                 });
+        
                 // Escuchamos los cambios en los datos que vienen de Livewire
                 this.$watch('datosVentasHora', value => {
-
-                    if (value) {
-                        let serie24Horas = horasDelDia.map((hora, index) => {
+                    let el = document.getElementById('mi-canvas-grafica-ventas-hora');
+                    if (!el) return;
+        
+                    const hayDatos = value && Object.keys(value).length > 0;
+        
+                    if (hayDatos) {
+                        this.sinDatos = false;
+        
+                        let serie24Horas = this.horasDelDia.map((hora, index) => {
                             let claveSimple = index.toString();
                             let claveFormateada = hora;
-
+        
                             if (value[claveFormateada] !== undefined) {
                                 return Number(value[claveFormateada]);
                             } else if (value[claveSimple] !== undefined) {
@@ -66,78 +75,82 @@
                             }
                             return 0; // Si la hora no viene en tu objeto, va un cero
                         });
-
-                        // Buscamos el elemento de forma nativa e inequívoca
-                        let el = document.getElementById('mi-canvas-grafica-ventas-hora');
-
-                        if (el) {
-                            if (!this.chart) {
-                                // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
-                                let options = {
-                                    chart: {
-                                        type: 'bar',
-                                        height: 280,
-                                        animations: {
-                                            enabled: true,
-                                            easing: 'smooth',
-                                            dynamicAnimation: { speed: 500 }
-                                        },
-                                        toolbar: {
-                                            show: true,
-                                            offsetY: -30,
-                                            tools: {
-                                                download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
-                                                selection: false,
-                                                zoom: false, // Quita la lupa de zoom
-                                                zoomin: false, // Quita el botón +
-                                                zoomout: false, // Quita el botón -
-                                                pan: false, // Quita la mano de paneo
-                                                reset: false // Quita el botón de resetear vista
-                                            }
-                                        },
-                                    },
-                                    series: [{ name: 'Ventas por hora', data: serie24Horas }],
-                                    colors: ['#065F46'],
-                                    xaxis: {
-                                        type: 'category',
-                                        categories: horasDelDia, // Forzamos a que siempre muestre las 24 marcas
-                                        labels: {
-                                            rotate: -45, // Rota las horas un poco para que no se encimen en pantallas chicas
-                                            style: { fontSize: '10px' }
-                                        }
-                                    },
-                                    yaxis: {
-                                        min: 0,
-                                        forceNiceScale: true
-                                    },
-                                    plotOptions: {
-                                        bar: {
-                                            columnWidth: '75%', // Un ancho cómodo para que quepan 24 barras
-                                            dataLabels: { position: 'top' }
-                                        }
-                                    },
-                                    dataLabels: {
+        
+                        if (!this.chart) {
+                            // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
+                            let options = {
+                                chart: {
+                                    type: 'bar',
+                                    height: 280,
+                                    animations: {
                                         enabled: true,
-                                        offsetY: -20,
-                                        style: { fontSize: '9px', colors: ['#304758'] },
-                                        // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
-                                        formatter: function(val) {
-                                            return val > 0 ? val : '';
+                                        easing: 'smooth',
+                                        dynamicAnimation: { speed: 500 }
+                                    },
+                                    toolbar: {
+                                        show: true,
+                                        offsetY: -30,
+                                        tools: {
+                                            download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
+                                            selection: false,
+                                            zoom: false, // Quita la lupa de zoom
+                                            zoomin: false, // Quita el botón +
+                                            zoomout: false, // Quita el botón -
+                                            pan: false, // Quita la mano de paneo
+                                            reset: false // Quita el botón de resetear vista
                                         }
+                                    },
+                                },
+                                series: [{ name: 'Ventas por hora', data: serie24Horas }],
+                                colors: ['#065F46'],
+                                xaxis: {
+                                    type: 'category',
+                                    categories: this.horasDelDia, // Forzamos a que siempre muestre las 24 marcas
+                                    labels: {
+                                        rotate: -45, // Rota las horas un poco para que no se encimen en pantallas chicas
+                                        style: { fontSize: '10px' }
                                     }
-                                };
-
-                                this.chart = new ApexCharts(el, options);
-                                this.chart.render();
-                            } else {
-                                // 2. Si ya existe, solo actualizamos los datos
-                                this.chart.updateSeries([{ data: serie24Horas }]);
-                            }
+                                },
+                                yaxis: {
+                                    min: 0,
+                                    forceNiceScale: true
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        columnWidth: '75%', // Un ancho cómodo para que quepan 24 barras
+                                        dataLabels: { position: 'top' }
+                                    }
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    offsetY: -20,
+                                    style: { fontSize: '9px', colors: ['#304758'] },
+                                    // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
+                                    formatter: function(val) {
+                                        return val > 0 ? val : '';
+                                    }
+                                }
+                            };
+        
+                            this.chart = new ApexCharts(el, options);
+                            this.chart.render();
+                        } else {
+                            // 2. Si ya existe, solo actualizamos los datos
+                            this.chart.updateSeries([{ data: serie24Horas }]);
+                        }
+                    } else {
+                        // 3. Resultado vacío/null: limpiamos la serie en vez de dejar la anterior.
+                        // Mantenemos las 24 categorías en cero para no perder el eje X si luego vuelve a haber datos.
+                        this.sinDatos = true;
+        
+                        if (this.chart) {
+                            let serieVacia = this.horasDelDia.map(() => 0);
+                            this.chart.updateSeries([{ data: serieVacia }]);
                         }
                     }
                 });
             },
-
+        
             destroy() {
                 if (this.chart) {
                     this.chart.destroy();
@@ -146,13 +159,19 @@
         }" class="card shadow-sm bg-site-primary-subtle">
             <div class="card-body">
                 <span class="fs-5 fw-bold">Ventas por hora</span>
-                <template x-if="!chart">
+                <template x-if="!chart && !sinDatos">
                     <div class="text-center py-3 text-muted">
                         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         Cargando datos...
                     </div>
                 </template>
-                <div id="contenedor-grafica-ventas-hora" wire:ignore>
+                <template x-if="sinDatos">
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-graph-down fs-3 d-block mb-1"></i>
+                        Sin ventas registradas para los filtros seleccionados
+                    </div>
+                </template>
+                <div id="contenedor-grafica-ventas-hora" wire:ignore x-show="!sinDatos">
                     <div id="mi-canvas-grafica-ventas-hora"></div>
                 </div>
             </div>
@@ -162,19 +181,28 @@
         <div x-data="{
             datosOperacionesHora: @entangle('operacionesData.grafica_operaciones_hora'),
             chart: null,
-
+            sinDatos: false,
+            horasDelDia: [],
+        
             init() {
-                const horasDelDia = Array.from({ length: 24 }, (_, i) => {
+                this.horasDelDia = Array.from({ length: 24 }, (_, i) => {
                     return i.toString().padStart(2, '0') + ':00'; // Genera ['00:00', '01:00', ..., '23:00']
                 });
+        
                 // Escuchamos los cambios en los datos que vienen de Livewire
                 this.$watch('datosOperacionesHora', value => {
-
-                    if (value) {
-                        let serie24Horas = horasDelDia.map((hora, index) => {
+                    let el = document.getElementById('mi-canvas-grafica-operaciones-hora');
+                    if (!el) return;
+        
+                    const hayDatos = value && Object.keys(value).length > 0;
+        
+                    if (hayDatos) {
+                        this.sinDatos = false;
+        
+                        let serie24Horas = this.horasDelDia.map((hora, index) => {
                             let claveSimple = index.toString();
                             let claveFormateada = hora;
-
+        
                             if (value[claveFormateada] !== undefined) {
                                 return Number(value[claveFormateada]);
                             } else if (value[claveSimple] !== undefined) {
@@ -182,78 +210,82 @@
                             }
                             return 0; // Si la hora no viene en tu objeto, va un cero
                         });
-
-                        // Buscamos el elemento de forma nativa e inequívoca
-                        let el = document.getElementById('mi-canvas-grafica-operaciones-hora');
-
-                        if (el) {
-                            if (!this.chart) {
-                                // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
-                                let options = {
-                                    chart: {
-                                        type: 'line',
-                                        height: 280,
-                                        animations: {
-                                            enabled: true,
-                                            easing: 'smooth',
-                                            dynamicAnimation: { speed: 500 }
-                                        },
-                                        toolbar: {
-                                            show: true,
-                                            offsetY: -30,
-                                            tools: {
-                                                download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
-                                                selection: false,
-                                                zoom: false, // Quita la lupa de zoom
-                                                zoomin: false, // Quita el botón +
-                                                zoomout: false, // Quita el botón -
-                                                pan: false, // Quita la mano de paneo
-                                                reset: false // Quita el botón de resetear vista
-                                            }
-                                        },
-                                    },
-                                    series: [{ name: 'Operaciones por hora', data: serie24Horas }],
-                                    colors: ['#065F46'],
-                                    xaxis: {
-                                        type: 'category',
-                                        categories: horasDelDia, // Forzamos a que siempre muestre las 24 marcas
-                                        labels: {
-                                            rotate: -45, // Rota las horas un poco para que no se encimen en pantallas chicas
-                                            style: { fontSize: '10px' }
-                                        }
-                                    },
-                                    yaxis: {
-                                        min: 0,
-                                        forceNiceScale: true
-                                    },
-                                    plotOptions: {
-                                        line: {
-                                            columnWidth: '75%', // Un ancho cómodo para que quepan 24 barras
-                                            dataLabels: { position: 'top' }
-                                        }
-                                    },
-                                    dataLabels: {
+        
+                        if (!this.chart) {
+                            // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
+                            let options = {
+                                chart: {
+                                    type: 'line',
+                                    height: 280,
+                                    animations: {
                                         enabled: true,
-                                        offsetY: -20,
-                                        style: { fontSize: '9px', colors: ['#304758'] },
-                                        // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
-                                        formatter: function(val) {
-                                            return val > 0 ? val : '';
+                                        easing: 'smooth',
+                                        dynamicAnimation: { speed: 500 }
+                                    },
+                                    toolbar: {
+                                        show: true,
+                                        offsetY: -30,
+                                        tools: {
+                                            download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
+                                            selection: false,
+                                            zoom: false, // Quita la lupa de zoom
+                                            zoomin: false, // Quita el botón +
+                                            zoomout: false, // Quita el botón -
+                                            pan: false, // Quita la mano de paneo
+                                            reset: false // Quita el botón de resetear vista
                                         }
+                                    },
+                                },
+                                series: [{ name: 'Operaciones por hora', data: serie24Horas }],
+                                colors: ['#065F46'],
+                                xaxis: {
+                                    type: 'category',
+                                    categories: this.horasDelDia, // Forzamos a que siempre muestre las 24 marcas
+                                    labels: {
+                                        rotate: -45, // Rota las horas un poco para que no se encimen en pantallas chicas
+                                        style: { fontSize: '10px' }
                                     }
-                                };
-
-                                this.chart = new ApexCharts(el, options);
-                                this.chart.render();
-                            } else {
-                                // 2. Si ya existe, solo actualizamos los datos
-                                this.chart.updateSeries([{ data: serie24Horas }]);
-                            }
+                                },
+                                yaxis: {
+                                    min: 0,
+                                    forceNiceScale: true
+                                },
+                                plotOptions: {
+                                    line: {
+                                        columnWidth: '75%', // Un ancho cómodo para que quepan 24 barras
+                                        dataLabels: { position: 'top' }
+                                    }
+                                },
+                                dataLabels: {
+                                    enabled: true,
+                                    offsetY: -20,
+                                    style: { fontSize: '9px', colors: ['#304758'] },
+                                    // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
+                                    formatter: function(val) {
+                                        return val > 0 ? val : '';
+                                    }
+                                }
+                            };
+        
+                            this.chart = new ApexCharts(el, options);
+                            this.chart.render();
+                        } else {
+                            // 2. Si ya existe, solo actualizamos los datos
+                            this.chart.updateSeries([{ data: serie24Horas }]);
+                        }
+                    } else {
+                        // 3. Resultado vacío/null: limpiamos la serie en vez de dejar la anterior.
+                        // Mantenemos las 24 categorías en cero para no perder el eje X si luego vuelve a haber datos.
+                        this.sinDatos = true;
+        
+                        if (this.chart) {
+                            let serieVacia = this.horasDelDia.map(() => 0);
+                            this.chart.updateSeries([{ data: serieVacia }]);
                         }
                     }
                 });
             },
-
+        
             destroy() {
                 if (this.chart) {
                     this.chart.destroy();
@@ -262,13 +294,19 @@
         }" class="card shadow-sm bg-site-primary-subtle">
             <div class="card-body">
                 <span class="fs-5 fw-bold">Operaciones por hora</span>
-                <template x-if="!chart">
+                <template x-if="!chart && !sinDatos">
                     <div class="text-center py-3 text-muted">
                         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         Cargando datos...
                     </div>
                 </template>
-                <div id="contenedor-grafica-operaciones-hora" wire:ignore>
+                <template x-if="sinDatos">
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-graph-down fs-3 d-block mb-1"></i>
+                        Sin operaciones registradas para los filtros seleccionados
+                    </div>
+                </template>
+                <div id="contenedor-grafica-operaciones-hora" wire:ignore x-show="!sinDatos">
                     <div id="mi-canvas-grafica-operaciones-hora"></div>
                 </div>
             </div>
@@ -278,122 +316,138 @@
         <div x-data="{
             datosTopTickets: @entangle('operacionesData.top_tickets'),
             chart: null,
-
+            sinDatos: false,
+        
             init() {
                 // Escuchamos los cambios en los datos que vienen de Livewire
                 this.$watch('datosTopTickets', value => {
-                    if (value && Object.keys(value).length > 0) {
-
+                    let el = document.getElementById('mi-canvas-grafica-top-tickets');
+                    if (!el) return;
+        
+                    const hayDatos = value && Object.keys(value).length > 0;
+        
+                    if (hayDatos) {
+                        this.sinDatos = false;
+        
                         // 1. Convertimos el objeto de Livewire en un array de pares [clave, valor]
                         let items = Object.entries(value);
-
+        
                         // 2. Extraemos las etiquetas (nombres/folios de los tickets)
                         let nombresTickets = items.map(([clave, valor]) => valor.id_transaccion);
-
+        
                         // 3. Extraemos los importes (los números)
                         let importesTickets = items.map(([clave, valor]) => Number(valor.importe));
-
-                        // Buscamos el elemento de forma nativa e inequívoca
-                        let el = document.getElementById('mi-canvas-grafica-top-tickets');
-
-                        if (el) {
-                            if (!this.chart) {
-                                // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
-                                let options = {
-                                    chart: {
-                                        type: 'bar',
-                                        height: 400,
-                                        animations: {
-                                            enabled: true,
-                                            easing: 'smooth',
-                                            dynamicAnimation: { speed: 500 }
-                                        },
-                                        toolbar: {
-                                            show: true,
-                                            offsetY: -30,
-                                            tools: {
-                                                download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
-                                                selection: false,
-                                                zoom: false, // Quita la lupa de zoom
-                                                zoomin: false, // Quita el botón +
-                                                zoomout: false, // Quita el botón -
-                                                pan: false, // Quita la mano de paneo
-                                                reset: false // Quita el botón de resetear vista
-                                            }
-                                        },
-                                    },
-                                    series: [{ name: 'Importe', data: importesTickets }],
-                                    plotOptions: {
-                                        bar: {
-                                            horizontal: true, // Barras de izquierda a derecha 👈 👉
-                                            barHeight: '60%', // Grosor elegante para las 5 barras
-                                            {{-- dataLabels: { position: 'right' } --}}
-                                        }
-                                    },
-
-                                    // EL TRUCO: Las categorías se quedan en XAXIS aunque se grafiquen en vertical
-                                    xaxis: {
-                                        type: 'category',
-                                        categories: nombresTickets,
-                                        min: 0,
-                                        forceNiceScale: true,
-                                        labels: {
-                                            style: { fontSize: '11px' },
-                                            formatter: function(val) {
-                                                // Evitamos que intente ponerle signo de pesos a los nombres de los tickets
-                                                return typeof val === 'number' ? '$' + val : val;
-                                            }
-                                        }
-                                    },
-
-                                    // El eje Y se queda meramente para dar estilo visual a los textos laterales
-                                    yaxis: {
-                                        labels: {
-                                            style: { fontSize: '12px', fontWeight: 'bold', colors: ['#2D3142'] }
-                                        }
-                                    },
-
-                                    // Si pusiste 'distributed: true', puedes pasar un array de 5 colores para tu top
-                                    // Ejemplo con degradados sutiles de tu paleta Chic/Rosa:
-                                    colors: ['#065F46'],
-
-                                    dataLabels: {
+        
+                        if (!this.chart) {
+                            // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
+                            let options = {
+                                chart: {
+                                    type: 'bar',
+                                    height: 400,
+                                    animations: {
                                         enabled: true,
-                                        style: {
-                                            fontSize: '16px',
-                                            colors: ['#C29A6B']
-                                        },
-                                        // Formateador para que el número flotante se vea como dinero (Ej: $1,250)
+                                        easing: 'smooth',
+                                        dynamicAnimation: { speed: 500 }
+                                    },
+                                    toolbar: {
+                                        show: true,
+                                        offsetY: -30,
+                                        tools: {
+                                            download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
+                                            selection: false,
+                                            zoom: false, // Quita la lupa de zoom
+                                            zoomin: false, // Quita el botón +
+                                            zoomout: false, // Quita el botón -
+                                            pan: false, // Quita la mano de paneo
+                                            reset: false // Quita el botón de resetear vista
+                                        }
+                                    },
+                                },
+                                series: [{ name: 'Importe', data: importesTickets }],
+                                plotOptions: {
+                                    bar: {
+                                        horizontal: true, // Barras de izquierda a derecha 👈 👉
+                                        barHeight: '60%', // Grosor elegante para las 5 barras
+                                        {{-- dataLabels: { position: 'right' } --}}
+                                    }
+                                },
+        
+                                // EL TRUCO: Las categorías se quedan en XAXIS aunque se grafiquen en vertical
+                                xaxis: {
+                                    type: 'category',
+                                    categories: nombresTickets,
+                                    min: 0,
+                                    forceNiceScale: true,
+                                    labels: {
+                                        style: { fontSize: '11px' },
                                         formatter: function(val) {
-                                            return '$' + val.toLocaleString();
+                                            // Evitamos que intente ponerle signo de pesos a los nombres de los tickets
+                                            return typeof val === 'number' ? '$' + val : val;
                                         }
+                                    }
+                                },
+        
+                                // El eje Y se queda meramente para dar estilo visual a los textos laterales
+                                yaxis: {
+                                    labels: {
+                                        style: { fontSize: '12px', fontWeight: 'bold', colors: ['#2D3142'] }
+                                    }
+                                },
+        
+                                // Si pusiste 'distributed: true', puedes pasar un array de 5 colores para tu top
+                                // Ejemplo con degradados sutiles de tu paleta Chic/Rosa:
+                                colors: ['#065F46'],
+        
+                                dataLabels: {
+                                    enabled: true,
+                                    style: {
+                                        fontSize: '16px',
+                                        colors: ['#C29A6B']
                                     },
-                                    legend: { show: false } // Ocultamos la leyenda ya que el eje Y dice de quién es cada barra
-                                };
-
-                                this.chart = new ApexCharts(el, options);
-                                this.chart.render();
-                            } else {
-                                // ========================================================
-                                // SOLUCIÓN MAESTRA: ACTUALIZACIÓN EN UN SOLO BLOQUE UNIFICADO
-                                // ========================================================
-                                this.chart.updateOptions({
-                                    // 1. Modificamos el eje Y (vertical) porque es horizontal: true
-                                    yaxis: {
-                                        categories: nombresTickets,
-                                        labels: {
-                                            style: { fontSize: '12px', fontWeight: 'bold', colors: ['#2D3142'] }
+                                    // Formateador para que el número flotante se vea como dinero (Ej: $1,250)
+                                    formatter: function(val) {
+                                        return '$' + val.toLocaleString();
+                                    }
+                                },
+                                legend: { show: false } // Ocultamos la leyenda ya que el eje Y dice de quién es cada barra
+                            };
+        
+                            this.chart = new ApexCharts(el, options);
+                            this.chart.render();
+                        } else {
+                            // ========================================================
+                            // SOLUCIÓN MAESTRA: ACTUALIZACIÓN EN UN SOLO BLOQUE UNIFICADO
+                            // ========================================================
+                            this.chart.updateOptions({
+                                // 1. Modificamos el eje Y (vertical) porque es horizontal: true
+                                xaxis: {
+                                    categories: nombresTickets,
+                                    labels: {
+                                        style: { fontSize: '11px' },
+                                        formatter: function(val) {
+                                            return typeof val === 'number' ? '$' + val : val;
                                         }
-                                    },
-                                    // 2. Inyectamos los nuevos datos en la misma llamada para evitar conflictos de hilos
-                                    series: [{ name: 'Importe', data: importesTickets }]
-                                }, false, true); // false = no recrear el gráfico desde cero, true = animar el cambio
-                            }
+                                    }
+                                },
+                                // 2. Inyectamos los nuevos datos en la misma llamada para evitar conflictos de hilos
+                                series: [{ name: 'Importe', data: importesTickets }]
+                            }, false, true); // false = no recrear el gráfico desde cero, true = animar el cambio
+                        }
+                    } else {
+                        // Resultado vacío/null: limpiamos la serie y las categorías en vez de dejar las anteriores.
+                        // A diferencia de las gráficas de 24 horas, aquí no hay categorías fijas que preservar.
+                        this.sinDatos = true;
+        
+                        if (this.chart) {
+                            this.chart.updateOptions({
+                                xaxis: { categories: [] },
+                                series: [{ name: 'Importe', data: [] }]
+                            }, false, true);
                         }
                     }
                 });
             },
-
+        
             destroy() {
                 if (this.chart) {
                     this.chart.destroy();
@@ -404,13 +458,19 @@
                 <span class="fs-5 fw-bold">
                     Top tickets
                 </span>
-                <template x-if="!chart">
+                <template x-if="!chart && !sinDatos">
                     <div class="text-center py-3 text-muted">
                         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                         Cargando datos...
                     </div>
                 </template>
-                <div id="contenedor-grafica-top-tickets" wire:ignore>
+                <template x-if="sinDatos">
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-receipt fs-3 d-block mb-1"></i>
+                        Sin tickets registrados para los filtros seleccionados
+                    </div>
+                </template>
+                <div id="contenedor-grafica-top-tickets" wire:ignore x-show="!sinDatos">
                     <div id="mi-canvas-grafica-top-tickets"></div>
                 </div>
             </div>

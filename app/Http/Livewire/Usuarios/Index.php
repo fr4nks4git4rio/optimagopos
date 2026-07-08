@@ -31,13 +31,13 @@ class Index extends Component
     public function mount()
     {
         if (user()->is_super_admin)
-            $this->sorts = ['Nombre Completo', 'Correo', 'Cliente'];
+            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email'), __('site.users.list.client')];
         else
-            $this->sorts = ['Nombre Completo', 'Correo'];
+            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email')];
         $this->order = $this->order ?? 'asc';
-        $this->sort = $this->sort ?? 'Nombre Completo';
-        $this->filter = $this->filter ?? 'Activos';
-        $this->filters = ['Activos', 'Inactivos', 'Todos'];
+        $this->sort = $this->sort ?? __('site.users.list.full_nombre');
+        $this->filter = $this->filter ?? __('site.common.actives');
+        $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
         $this->perPage = $this->perPage ?? 10;
         $this->perPages = [10, 25, 50, 100];
     }
@@ -80,18 +80,18 @@ class Index extends Component
             )
             ->leftJoin('tb_clientes as c', 'c.id', '=', 'u.cliente_id');
 
-        if (!user()->is_super_admin)
+        if (user()->cliente_id)
             $query->where('cliente_id', user()->cliente_id);
 
         switch ($this->filter) {
-            case 'Activos':
+            case __('site.common.actives'):
                 $query->where('u.deleted_at', null);
                 break;
-            case 'Inactivos':
+            case __('site.common.inactives'):
                 $query->where('u.deleted_at', '!=', null);
                 break;
-            default:
-                $query->where('u,.id', '>', 0);
+            case __('site.common.all'):
+                // No need to add any additional conditions
                 break;
         }
 
@@ -118,19 +118,19 @@ class Index extends Component
         }
 
         switch ($this->sort) {
-            case 'Nombre Completo':
+            case __('site.users.list.full_nombre'):
                 if ($this->order == 'asc')
                     $records_final = $records_final->sortBy('nombre', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('nombre', SORT_NATURAL)->values();
                 break;
-            case 'Correo':
+            case __('site.users.list.email'):
                 if ($this->order == 'asc')
                     $records_final = $records_final->sortBy('email', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('email', SORT_NATURAL)->values();
                 break;
-            case 'Cliente':
+            case __('site.users.list.client'):
                 if ($this->order == 'asc')
                     $records_final = $records_final->sortBy('cliente', SORT_NATURAL)->values();
                 else

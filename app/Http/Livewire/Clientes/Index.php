@@ -133,16 +133,6 @@ class Index extends Component
             'direccion_fiscal'  => 'required',
             'direccion_fiscal.codigo_postal'  => 'required',
             'regimen_fiscal_id' => 'required|exists:tb_regimen_fiscales,id'
-        ], [
-            'razon_social.required' => 'Entre la Razón Social.',
-            'rfc.required' => 'Entre el RFC.',
-            'contacto_nombre.required' => 'Entre el nombre del contacto.',
-            'contacto_correo.required' => 'Entre el correo del contacto.',
-            'contacto_telefono.required' => 'Entre el teléfono del contacto.',
-            'direccion_fiscal.required' => 'Defina la dirección fiscal del cliente.',
-            'direccion_fiscal.codigo_postal.required' => 'Entre el código postal.',
-            'regimen_fiscal_id.required' => 'Entre el régimen fiscal.',
-            'regimen_fiscal_id.exists' => 'El régimen fiscal del cliente no es correcto.'
         ]);
 
         if ($validator->fails()) {
@@ -156,7 +146,7 @@ class Index extends Component
             return;
         }
 
-        return redirect()->route('admin.clientes.suscripcion', $id);
+        return redirect()->route('admin.suscripciones.save', ['clienteId' => $id]);
     }
 
     public function changeSort($sort)

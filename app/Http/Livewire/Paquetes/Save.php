@@ -89,6 +89,7 @@ class Save extends Modal
 
         // Persistencia en la Base de Datos
         $this->paquete->fill(Arr::except($validatedData, ['modulos']))->save();
+        // $this->paquete->fill(Arr::except($validatedData, ['modulos']))->save();
 
         $this->paquete->modulos()->sync($validatedData['modulos']);
 

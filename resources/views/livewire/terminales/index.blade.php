@@ -13,11 +13,19 @@
         </div>
         <div class="col-lg-auto mb-3">
             @can('create', [App\Models\Terminal::class])
-                <button type="button" class="btn btn-site-primary btn-outline-warning"
-                    wire:click="$emit('openModal', 'terminales.save')">
-                    <x-icon name="plus-lg" />
-                    Crear
-                </button>
+                @if (user()->cliente_id)
+                    <button type="button" class="btn btn-site-primary btn-outline-warning"
+                        wire:click="$emit('openModal', 'terminales.save')">
+                        <x-icon name="plus-lg" />
+                        Crear
+                    </button>
+                @else
+                    <button type="button" class="btn btn-site-primary btn-outline-warning"
+                        wire:click="$emit('openModal', 'terminales.save-system')">
+                        <x-icon name="plus-lg" />
+                        Crear
+                    </button>
+                @endif
             @endcan
 
             <x-dropdown icon="eye" :label="__($perPage)">
@@ -65,16 +73,24 @@
                 @forelse($terminales as $terminal)
                     <tr>
                         <td>{{ $terminal['identificador'] }}</td>
+                        <td>{{ $terminal['nombre'] }}</td>
                         <td>{{ $terminal['sucursal'] }}</td>
                         <td>{{ $terminal['comentarios'] }}</td>
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$terminal['deleted_at'])
                                     @can('update', App\Models\Terminal::find($terminal['id']))
-                                        <li class="list-inline-item">
-                                            <x-action icon="pencil" title="Modificar"
-                                                click="$emit('openModal', 'terminales.save', {terminal: {{ $terminal['id'] }}})" />
-                                        </li>
+                                        @if (user()->cliente_id)
+                                            <li class="list-inline-item">
+                                                <x-action icon="pencil" title="Modificar"
+                                                    click="$emit('openModal', 'terminales.save', {terminal: {{ $terminal['id'] }}})" />
+                                            </li>
+                                        @else
+                                            <li class="list-inline-item">
+                                                <x-action icon="pencil" title="Modificar"
+                                                    click="$emit('openModal', 'terminales.save-system', {terminal: {{ $terminal['id'] }}})" />
+                                            </li>
+                                        @endif
                                     @endcan
                                     @can('delete', App\Models\Terminal::find($terminal['id']))
                                         <li class="list-inline-item">
@@ -95,7 +111,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             <div class="list-group-item">
                                 No se encontraron resultados...
                             </div>

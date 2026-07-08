@@ -46,9 +46,10 @@ class Logs extends Component
                 'log.status'
             );
 
-        if(!user()->is_super_admin){
+        if (user()->cliente_id) {
             $query->join('tb_sucursales as sucursal', 'sucursal.id', 'log.sucursal_id')
-                ->where('sucursal.cliente_id', user()->cliente_id);
+                ->where('sucursal.cliente_id', user()->cliente_id)
+                ->whereIn('sucursal.id', user()->sucursales->pluck('id')->toArray());
         }
 
         if ($this->search) {

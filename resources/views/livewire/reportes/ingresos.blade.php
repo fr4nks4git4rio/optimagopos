@@ -65,7 +65,6 @@
                     <th>Fecha</th>
                     <th>Folio Interno</th>
                     <th>Cliente</th>
-                    <th>Póliza</th>
                     <th>Folio UUID</th>
                     <th>Moneda</th>
                     <th>Importe</th>
@@ -88,8 +87,7 @@
                     <tr>
                         <td>{{ $ingreso->fecha_str }}</td>
                         <td>{{ $ingreso->folio_interno }}</td>
-                        <td>{{ $ingreso->razon_social }}</td>
-                        <td>{{ $ingreso->nombre_poliza }}</td>
+                        <td>{{ Illuminate\Support\Facades\Crypt::decrypt($ingreso->razon_social) }}</td>
                         <td>{{ $ingreso->uuid }}</td>
                         <td>{{ $ingreso->moneda }}</td>
                         <td>${{ number_format($ingreso->monto, 2) }}</td>
@@ -112,7 +110,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8">
+                        <td colspan="7">
                             <div class="list-group-item">
                                 No se encontraron resultados...
                             </div>
@@ -121,14 +119,14 @@
                 @endforelse
                 @if (count($ingresos) > 0)
                     <tr>
-                        <td colspan="6" class="text-end fw-bold">
+                        <td colspan="5" class="text-end fw-bold">
                             Total MXN:
                         </td>
                         <td class="fw-bold">${{ number_format($total_mxn, 2) }}</td>
                         <td></td>
                     </tr>
                     <tr>
-                        <td colspan="6" class="text-end fw-bold">
+                        <td colspan="5" class="text-end fw-bold">
                             Total USD:
                         </td>
                         <td class="fw-bold">${{ number_format($total_usd, 2) }}</td>

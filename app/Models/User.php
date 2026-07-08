@@ -22,6 +22,9 @@ use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+
 /**
  * Class User
  *
@@ -31,12 +34,15 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $password
  * @property string $avatar
  * @property string $lang
+ * @property string $two_factor_code
+ * @property string $two_factor_expires_at
+ * @property string $remember_token
  * @property integer $rol_id
  * @property integer $cliente_id
  */
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable, CausesActivity, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, CausesActivity, SoftDeletes, HasRelationships;
 
     protected $table = 'tb_usuarios';
 
@@ -53,6 +59,9 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'avatar',
         'lang',
+        'two_factor_code',
+        'two_factor_expires_at',
+        'remember_token',
         'rol_id',
         'cliente_id',
         // 'two_factor_authentication_enabled',
@@ -68,7 +77,7 @@ class User extends Authenticatable implements JWTSubject
         // 'two_factor_authentication_enabled'
     ];
 
-    protected $appends = ['nombre_completo', 'is_super_admin', 'is_contabilidad', 'is_admin'];
+    protected $appends = ['value', 'label', 'nombre_completo', 'is_super_admin', 'is_contabilidad', 'is_admin'];
 
     public function rules()
     {
@@ -78,7 +87,8 @@ class User extends Authenticatable implements JWTSubject
             'apellidos' => ['nullable'],
             'rol_id' => ['required'],
             'cliente_id' => ['nullable', 'required_if:rol_id,2', 'exists:tb_clientes,id'],
-            'password' => [Rule::requiredIf(fn() => $this->id == null), 'confirmed', Password::default()]
+            'suscripciones' => 'nullable|array',
+            'password' => ['confirmed', Password::default()]
         ];
     }
 
@@ -112,6 +122,15 @@ class User extends Authenticatable implements JWTSubject
             //            return Storage::disk('avatars')->url($this->avatar);
             return asset('avatars/' . $this->avatar);
         return '';
+    }
+    public function getValueAttribute()
+    {
+        return $this->getKey();
+    }
+
+    public function getLabelAttribute()
+    {
+        return $this->nombre_completo;
     }
     public function getNombreCompletoAttribute()
     {
@@ -175,5 +194,55 @@ class User extends Authenticatable implements JWTSubject
     public function owner()
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
+    }
+
+    public function suscripciones()
+    {
+        return $this->belongsToMany(Suscripcion::class, 'tb_suscripciones_usuarios', 'usuario_id', 'suscripcion_id');
+    }
+    public function suscripciones_activas()
+    {
+        return $this->belongsToMany(Suscripcion::class, 'tb_suscripciones_usuarios', 'usuario_id', 'suscripcion_id')->where('estado', 'ACTIVA');
+    }
+
+    public function sucursales(): HasManyDeep
+    {
+        return $this->hasManyDeep(
+            Sucursal::class,
+            ['tb_suscripciones_usuarios', Suscripcion::class],  // Tablas intermedias en orden
+            // 1. LLAVES FORÁNEAS (Foreign Keys) en orden de la cadena:
+            [
+                'usuario_id',         // 1er paso: Llave en la tabla pivote que apunta a `users`
+                'id',                 // 2do paso: Llave en `subscriptions` que conecta con la pivote
+                'suscripcion_id'   // 3er paso: Llave en `sucursales` que apunta a `subscriptions`
+            ],
+
+            // 2. LLAVES LOCALES (Local Keys) en orden de la cadena:
+            [
+                'id',                 // 1er paso: Llave local en `users`
+                'suscripcion_id',     // 2do paso: Llave en la tabla pivote que apunta a `subscriptions`
+                'id'                  // 3er paso: Llave local en `subscriptions`
+            ]
+        );
+    }
+    public function terminales(): HasManyDeep
+    {
+        return $this->hasManyDeep(
+            Terminal::class,
+            ['tb_suscripciones_usuarios', Suscripcion::class], // Tablas intermedias en orden
+            // 1. LLAVES FORÁNEAS (Foreign Keys) en orden de la cadena:
+            [
+                'usuario_id',         // 1er paso: Llave en la tabla pivote que apunta a `users`
+                'id',                 // 2do paso: Llave en `subscriptions` que conecta con la pivote
+                'suscripcion_id'   // 3er paso: Llave en `sucursales` que apunta a `subscriptions`
+            ],
+
+            // 2. LLAVES LOCALES (Local Keys) en orden de la cadena:
+            [
+                'id',                 // 1er paso: Llave local en `users`
+                'suscripcion_id',     // 2do paso: Llave en la tabla pivote que apunta a `subscriptions`
+                'id'                  // 3er paso: Llave local en `subscriptions`
+            ]
+        );
     }
 }

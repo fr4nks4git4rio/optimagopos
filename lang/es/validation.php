@@ -184,6 +184,7 @@ return [
         'nombre-atributo' => [
             'nombre-regla' => 'mensaje-personalizado',
         ],
+
     ],
 
     /*

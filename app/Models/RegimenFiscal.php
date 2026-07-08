@@ -13,9 +13,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models\Administracion\CodificadoresFacturacion
  * @version January 12, 2021, 7:54 pm CST
  *
- * @property string codigo
- * @property string descripcion
- * @property boolean activo
+ * @property string $codigo
+ * @property string $descripcion
+ * @property boolean $activo
  */
 class RegimenFiscal extends Model
 {
@@ -101,7 +101,12 @@ class RegimenFiscal extends Model
     {
         return $this->descripcion . ' (' . $this->codigo . ')';
     }
-    public static function findByCode($code){
-        return self::where('codigo', $code)->where('activo', 1)->first();
+    public static function findByCode($code)
+    {
+        return self::where('codigo', $code)->first();
+    }
+    public static function findByDescription($description)
+    {
+        return self::where('descripcion', $description)->first();
     }
 }

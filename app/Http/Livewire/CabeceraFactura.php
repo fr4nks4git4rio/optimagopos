@@ -41,6 +41,7 @@ class CabeceraFactura extends Component
         $this->monedas = Moneda::all()->map->only(['value', 'label'])->toArray();
         $this->formasPagoOptions = DB::table('tb_forma_pagos')
             ->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))
+            ->where('activo', 1)
             ->get()
             ->map(function ($value, $key) {
                 return (array)$value;
@@ -122,6 +123,7 @@ class CabeceraFactura extends Component
                 ->leftJoin('tb_forma_pagos as fp', 'fp.id', '=', 'sfp.forma_pago_id')
                 ->leftJoin('tb_monedas as moneda', 'moneda.id', '=', 'sfp.moneda_id')
                 ->where('sucursal_id', $this->sucursales[$index]['id'])
+                ->whereNull('sfp.deleted_at')
                 ->get()->map(function ($value, $key) {
                     return (array)$value;
                 })->toArray();
@@ -140,6 +142,7 @@ class CabeceraFactura extends Component
                     ->leftJoin('tb_forma_pagos as fp', 'fp.id', '=', 'sfp.forma_pago_id')
                     ->leftJoin('tb_monedas as moneda', 'moneda.id', '=', 'sfp.moneda_id')
                     ->where('sucursal_id', $sucursal['id'])
+                    ->whereNull('sfp.deleted_at')
                     ->get()->map(function ($value, $key) {
                         return (array)$value;
                     })->toArray();
@@ -152,7 +155,7 @@ class CabeceraFactura extends Component
         $collection = DB::table('tb_sucursales')
             ->select('id', 'nombre_comercial', 'razon_social', 'rfc', DB::raw('0 as decrypted'))
             ->get();
-        $collection->map(function ($sucursal) {
+        $collection->each(function ($sucursal) {
             $sucursal = Sucursal::decryptInfo($sucursal);
         });
         return [
@@ -173,7 +176,7 @@ class CabeceraFactura extends Component
         $collection = DB::table('tb_sucursales')
             ->select('id', 'nombre_comercial', 'razon_social', 'rfc', DB::raw('0 as decrypted'))
             ->get();
-        $collection->map(function ($sucursal) {
+        $collection->each(function ($sucursal) {
             $sucursal = Sucursal::decryptInfo($sucursal);
         });
         return [

@@ -30,7 +30,7 @@
 
 <div class="mb-1">
     @if($label)
-        <label for="{{ $model }}" class="">{{ $label }}</label>
+        <label for="{{ $model }}" class="text-capitalize">{{ $label }}</label>
     @endif
 
     <input {{ $attributes }}>

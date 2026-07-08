@@ -25,7 +25,11 @@ class FacturaPolicy
      */
     public function view(User $user, Factura $factura): bool
     {
-        if ($user->is_admin && $user->cliente_id ==  $factura->propietario_id)
+        if (
+            $user->is_admin
+            && $user->cliente_id == $factura->propietario_id
+            && in_array($factura->propietario_id, $user->suscripciones_activas()->pluck('id')->toArray())
+        )
             return true;
 
         return false;
@@ -47,7 +51,11 @@ class FacturaPolicy
      */
     public function update(User $user, Factura $factura): bool
     {
-        if ($user->is_admin && $user->cliente_id ==  $factura->propietario_id)
+        if (
+            $user->is_admin
+            && $user->cliente_id ==  $factura->propietario_id
+            && in_array($factura->propietario_id, $user->suscripciones_activas()->pluck('id')->toArray())
+        )
             return true;
 
         return false;
@@ -58,7 +66,11 @@ class FacturaPolicy
      */
     public function delete(User $user, Factura $factura): bool
     {
-        if ($user->is_admin && $user->cliente_id ==  $factura->propietario_id)
+        if (
+            $user->is_admin
+            && $user->cliente_id ==  $factura->propietario_id
+            && in_array($factura->propietario_id, $user->suscripciones_activas()->pluck('id')->toArray())
+        )
             return true;
 
         return false;
@@ -82,7 +94,11 @@ class FacturaPolicy
 
     public function cancel(User $user, Factura $factura): bool
     {
-        if ($user->is_admin && $user->cliente_id ==  $factura->propietario_id)
+        if (
+            $user->is_admin
+            && $user->cliente_id ==  $factura->propietario_id
+            && in_array($factura->propietario_id, $user->suscripciones_activas()->pluck('id')->toArray())
+        )
             return true;
 
         return false;

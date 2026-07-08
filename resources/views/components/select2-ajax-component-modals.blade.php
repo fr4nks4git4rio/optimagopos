@@ -157,7 +157,7 @@
     }
 }">
         @if($label)
-            <label for="{{ $id }}" class="">{{ $label }}</label>
+            <label for="{{ $id }}" class="text-capitalize">{{ $label }}</label>
         @endif
 
         <select {{ $attributes }} style="width: 100%;">

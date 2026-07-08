@@ -17,8 +17,8 @@
 <div {{ $attributes }}>
     @if($links->count() && $count)
         <div class="col-auto text-muted">
-           Mostrando: {{ $links->firstItem() }} {{ __('-') }} {{ $links->lastItem() }}
-            de {{ $links->total() }}
+            {{ __('site.paginator.showing') }}: {{ $links->firstItem() }} {{ __('site.paginator.to') }} {{ $links->lastItem() }}
+            {{ __('site.paginator.of') }} {{ $links->total() }}
         </div>
     @endif
     <div class="col-auto mb-n3">

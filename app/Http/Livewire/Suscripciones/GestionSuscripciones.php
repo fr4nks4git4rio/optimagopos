@@ -1,23 +1,26 @@
 <?php
 
-namespace App\Http\Livewire\Clientes;
+namespace App\Http\Livewire\Suscripciones;
 
 use App\Http\Livewire\Layouts\Modal;
 use App\Models\Cliente;
 use App\Models\Config;
 use App\Models\Modulo;
 use App\Models\Paquete;
+use App\Models\Sucursal;
 use App\Models\Suscripcion;
+use App\Models\Terminal;
+use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class GestionSuscripciones extends Component
 {
     public Suscripcion $suscripcion;
-
-    // Propiedades del formulario / suscripción
-    public Cliente $cliente;
+    public $clienteId = '';
     public $cliente_id = '';
     public $paquete_id = '';
     public $cant_sucursales = 1;
@@ -33,9 +36,22 @@ class GestionSuscripciones extends Component
     public $precio_paquete = 0.00;
     public $precio_extra = 0.00;
     public $precio_total = 0.00;
+    public $descuento = 0.00;
+    public $total = 0.00;
 
     // Objeto para almacenar la configuración global de la base de datos
     public $globalSettings;
+
+    public $sucursales = [];
+    public $sucursalesDisponibles = [];
+    public $terminales = [];
+    public $terminalesDisponibles = [];
+    public $usuarios = [];
+    public $usuariosDisponibles = [];
+    protected $queryString = [
+        'clienteId' => ['except' => '']
+    ];
+    protected $listeners = ['$refresh', 'sucursal-created' => 'AddSucursal', 'terminal-created' => 'AddTerminal', 'usuario-created' => 'AddUsuario'];
 
     protected function rules()
     {
@@ -50,6 +66,14 @@ class GestionSuscripciones extends Component
             'fecha_inicio_operaciones' => 'required|date',
             'fecha_inicio_pagos' => 'required|date',
             'periodicidad_pagos' => 'required|in:MENSUAL,BIMESTRAL,TRIMESTRAL,SEMESTRAL,ANUAL',
+            'precio_paquete' => 'required|numeric',
+            'precio_extra' => 'required|numeric',
+            'precio_total' => 'required|numeric',
+            'descuento' => 'nullable|numeric|min:0|max:' . ($this->precio_paquete + $this->precio_extra),
+            'total' => 'required|numeric',
+            'sucursales' => 'nullable|array',
+            'terminales' => 'nullable|array',
+            'usuarios' => 'nullable|array'
         ];
     }
 
@@ -61,19 +85,20 @@ class GestionSuscripciones extends Component
     //     'periodicidad_pagos.in' => 'Período no encontrado'
     // ];
 
-    public function mount($clienteId = null)
+    public function mount($suscripcionId = null)
     {
-        $this->cliente_id = $clienteId;
-        // Cargamos el cliente junto a su suscripción activa y los módulos de dicha suscripción
-        if ($this->cliente_id)
-            $this->cliente = Cliente::with('suscripcion_activa.modulos')->findOrFail($this->cliente_id);
 
+        if ($this->clienteId) {
+            $this->cliente_id = $this->clienteId;
+            $this->clienteId = '';
+        }
         // Traer las configuraciones globales de precios por excedentes
         $this->globalSettings = Config::all()->pluck('valor', 'llave')->toArray();
 
-        if (isset($this->cliente) && ($this->cliente->suscripcion_pendiente || $this->cliente->suscripcion_activa)) {
-            $this->suscripcion = $this->cliente->suscripcion_pendiente ?? $this->cliente->suscripcion_activa;
+        if ($suscripcionId) {
+            $this->suscripcion = Suscripcion::find($suscripcionId);
             $this->paquete_id = $this->suscripcion->paquete_id ?? '';
+            $this->cliente_id = $this->suscripcion->cliente_id;
             $this->cant_sucursales = $this->suscripcion->cant_sucursales;
             $this->cant_terminales = $this->suscripcion->cant_terminales;
             $this->cant_usuarios = $this->suscripcion->cant_usuarios;
@@ -81,11 +106,27 @@ class GestionSuscripciones extends Component
             $this->fecha_inicio_pagos = $this->suscripcion->fecha_inicio_pagos ? $this->suscripcion->fecha_inicio_pagos->format('Y-m-d') : today()->format('Y-m-d');
             $this->periodicidad_pagos = $sub->periodicidad_pagos ?? 'MENSUAL';
             $this->estado = $sub->estado ?? 'PENDIENTE';
+            $this->precio_paquete = $this->suscripcion ? $this->suscripcion->precio_paquete : 0.00;
+            $this->precio_extra = $this->suscripcion ? $this->suscripcion->precio_extra : 0.00;
+            $this->precio_total = $this->suscripcion ? $this->suscripcion->precio_total : 0.00;
+            $this->descuento = $this->suscripcion ? $this->suscripcion->descuento : 0.00;
+            $this->total = $this->suscripcion ? $this->suscripcion->total : 0.00;
             $this->modulos = $this->suscripcion->modulos->pluck('id')->map(fn($id) => (string)$id)->toArray();
+            $this->sucursales = $this->suscripcion->sucursales()->pluck('id')->toArray();
+            $this->terminales = $this->suscripcion->terminales()->pluck('id')->toArray();
+            $this->usuarios = $this->suscripcion->usuarios()->pluck('id')->toArray();
+        } else {
+            $this->suscripcion = new Suscripcion();
         }
 
+        if ($this->cliente_id) {
+            $this->loadSucursales();
+            $this->loadUsuarios();
+            if (count($this->sucursales) > 0)
+                $this->loadTerminales();
+        }
         // Ejecutar el primer cálculo financiero al cargar
-        $this->calculatePricing();
+        // $this->calculatePricing();
     }
 
     public function hydrate()
@@ -101,8 +142,20 @@ class GestionSuscripciones extends Component
         //     $this->paquete_id = '';
         // }
         if ($propertyName == 'cliente_id') {
-            if ($value)
-                $this->cliente = Cliente::with('suscripcion_activa.modulos')->findOrFail($value);
+            $this->sucursales = [];
+            $this->terminales = [];
+            $this->usuarios = [];
+            $this->sucursalesDisponibles = [];
+            $this->terminalesDisponibles = [];
+            $this->usuariosDisponibles = [];
+            $this->loadSucursales();
+            $this->loadTerminales();
+        }
+
+        if ($propertyName == 'sucursales') {
+            $this->terminales = [];
+            $this->terminalesDisponibles = [];
+            $this->loadTerminales();
         }
 
         // Si cambia el paquete, sincronizamos sus límites y módulos de inmediato
@@ -119,9 +172,25 @@ class GestionSuscripciones extends Component
         $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
+
+    public function getClienteProperty()
+    {
+        return $this->cliente_id ? Cliente::find($this->cliente_id) : null;
+    }
     public function getModulosPaqueteProperty()
     {
         return $this->paquete_id ? Paquete::find($this->paquete_id)->modulos()->pluck('id')->toArray() : [];
+    }
+
+    public function getPorcentajeDescuentoProperty()
+    {
+        $subtotal = $this->precio_paquete + $this->precio_extra;
+
+        if ($subtotal <= 0) {
+            return 0;
+        }
+
+        return ($this->descuento / $subtotal) * 100;
     }
 
     public function calculatePricing()
@@ -166,21 +235,25 @@ class GestionSuscripciones extends Component
         }
 
         $this->precio_total = $this->precio_paquete + $this->precio_extra;
+        $this->total = $this->precio_total - max($this->descuento, 0);
     }
 
     public function incrementSucursales()
     {
         $this->cant_sucursales += 1;
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
     public function incrementTerminales()
     {
         $this->cant_terminales += 1;
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
     public function incrementUsuarios()
     {
         $this->cant_usuarios += 1;
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
 
@@ -191,6 +264,7 @@ class GestionSuscripciones extends Component
             if ($this->cant_sucursales > $paquete->cant_sucursales)
                 $this->cant_sucursales -= 1;
         }
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
     public function decrementTerminales()
@@ -200,6 +274,7 @@ class GestionSuscripciones extends Component
             if ($this->cant_terminales > $paquete->cant_terminales)
                 $this->cant_terminales -= 1;
         }
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
     public function decrementUsuarios()
@@ -209,6 +284,7 @@ class GestionSuscripciones extends Component
             if ($this->cant_usuarios > $paquete->cant_usuarios)
                 $this->cant_usuarios -= 1;
         }
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
     public function resetSucursales()
@@ -217,6 +293,7 @@ class GestionSuscripciones extends Component
             $paquete = Paquete::find($this->paquete_id);
             $this->cant_sucursales = $paquete->cant_sucursales;
         }
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
     public function resetTerminales()
@@ -225,6 +302,7 @@ class GestionSuscripciones extends Component
             $paquete = Paquete::find($this->paquete_id);
             $this->cant_terminales = $paquete->cant_terminales;
         }
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
     public function resetUsuarios()
@@ -233,34 +311,94 @@ class GestionSuscripciones extends Component
             $paquete = Paquete::find($this->paquete_id);
             $this->cant_usuarios = $paquete->cant_usuarios;
         }
+        $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
+    }
+
+    public function loadSucursales()
+    {
+        $this->sucursalesDisponibles = Sucursal::where('cliente_id', $this->cliente_id)->whereDoesntHave('suscripcion')->orWhere('suscripcion_id', $this->suscripcion->id)->lazy()->map(function ($value) {
+            return [
+                'value' => $value->id,
+                'label' => Crypt::decrypt($value->nombre_comercial)
+            ];
+        })->toArray();
+    }
+
+    public function loadTerminales()
+    {
+        $this->terminalesDisponibles = Terminal::whereIn('sucursal_id', $this->sucursales)
+            ->whereDoesntHave('suscripcion')
+            ->orWhere('suscripcion_id', $this->suscripcion->id)
+            ->lazy()->map->only(['value', 'label'])->toArray();
+    }
+
+    public function loadUsuarios()
+    {
+        $this->usuariosDisponibles = User::where(function ($query) {
+            $query->whereDoesntHave('suscripciones')
+                ->Where('cliente_id', $this->cliente_id);
+        })->whereNotNull('cliente_id')
+            ->orWhereIn('id', Arr::wrap($this->usuarios))->lazy()->map->only(['value', 'label'])->toArray();
+    }
+
+    public function AddSucursal($id)
+    {
+        $this->sucursales[] = $id;
+        $sucursal = Sucursal::find($id)->only(['value', 'label']);
+        $sucursal['label'] = Crypt::decrypt($sucursal['label']);
+        $this->sucursalesDisponibles[] = $sucursal;
+    }
+    public function AddTerminal($id)
+    {
+        $this->terminales[] = $id;
+        $this->terminalesDisponibles[] = Terminal::find($id)->only(['value', 'label']);
+    }
+    public function AddUsuario($id)
+    {
+        $this->usuarios[] = $id;
+        $this->usuariosDisponibles[] = User::find($id)->only(['value', 'label']);
     }
 
     public function submit()
     {
-        $this->validate();
+        $data = $this->validate();
         $this->calculatePricing(); // Forzar recalculación de seguridad antes de persistir
 
-        // Guardamos o actualizamos en la tabla 'subscriptions' usando la relación del Cliente
-        $subscription = $this->cliente->suscripciones()->updateOrCreate(
-            ['estado' => $this->estado], // Busca la suscripción activa actual para pisarla
-            [
-                'paquete_id' => $this->paquete_id ?: null,
-                'cant_sucursales' => $this->cant_sucursales,
-                'cant_terminales' => $this->cant_terminales,
-                'cant_usuarios' => $this->cant_usuarios,
-                'fecha_inicio_operaciones' => $this->fecha_inicio_operaciones,
-                'fecha_inicio_pagos' => $this->fecha_inicio_pagos,
-                'periodicidad_pagos' => $this->periodicidad_pagos,
-                // Registramos los históricos de precios de esta venta
-                'precio_paquete' => $this->precio_paquete,
-                'precio_extra' => $this->precio_extra,
-                'precio_total' => $this->precio_total,
-            ]
-        );
+        $withErrors = false;
+        if (count($data['sucursales']) > $this->cant_sucursales) {
+            $this->addError('sucursales', __('subscription_branches_exceeded'));
+            $withErrors = true;
+        }
+        if (count($data['terminales']) > $this->cant_terminales) {
+            $this->addError('terminales', __('subscription_terminals_exceeded'));
+            $withErrors = true;
+        }
+        if (count($data['usuarios']) > $this->cant_usuarios) {
+            $this->addError('usuarios', __('subscription_users_exceeded'));
+            $withErrors = true;
+        }
+
+        if ($withErrors)
+            return;
+
+        $this->suscripcion->fill(Arr::except($data, [
+            'modulos',
+            'sucursales',
+            'terminales',
+            'usuarios'
+        ]))->save();
 
         // Sincronizamos los módulos asignados directamente con la Suscripción (Relación muchos a muchos)
-        $subscription->modulos()->sync($this->modulos);
+        $this->suscripcion->modulos()->sync($this->modulos);
+
+        $this->suscripcion->usuarios()->sync($this->usuarios);
+
+        $this->suscripcion->sucursales()->update(['suscripcion_id' => null]);
+        Sucursal::whereIn('id', $this->sucursales)->update(['suscripcion_id' => $this->suscripcion->id]);
+
+        $this->suscripcion->terminales()->update(['suscripcion_id' => null]);
+        Terminal::whereIn('id', $this->terminales)->update(['suscripcion_id' => $this->suscripcion->id]);
 
         $this->emit('show-toast', 'Subscripción guardada correctamente.', 'success');
     }
@@ -268,7 +406,6 @@ class GestionSuscripciones extends Component
     public function render()
     {
         $clientes = Cliente::whereDoesntHave('suscripcion_pendiente')
-            ->whereDoesntHave('suscripcion_activa')
             ->whereHas('direccion_fiscal', function ($query) {
                 return $query->whereNotNull('codigo_postal')
                     ->where('codigo_postal', '!=', '');
@@ -292,7 +429,7 @@ class GestionSuscripciones extends Component
                 ];
             })->toArray();
 
-        return view('livewire.clientes.gestion-suscripciones', [
+        return view('livewire.suscripciones.gestion-suscripciones', [
             'paquetes' => Paquete::all(),
             'modulosDisponibles' => Modulo::all(),
             'clientes' => $clientes

@@ -203,7 +203,7 @@
                         </div>
                         <div class="col-md-4 col-12">
                             <label class="text-primary small fw-bold">Importe Total Percibido</label>
-                            <div class="input-group input-group-sm">
+                            <div class="input-group input-group">
                                 <span
                                     class="input-group-text bg-primary-subtle text-primary border-primary-subtle font-monospace fw-bold">$</span>
                                 <input type="text"
@@ -297,7 +297,7 @@
                                 <tr>
                                     <td colspan="10" class="p-0">
                                         <div
-                                            class="alert alert-danger rounded-0 mb-0 border-0 py-2 font-medium small px-4">
+                                            class="alert alert-danger rounded-1 mb-0 border-0 py-2 font-medium small px-4">
                                             {{ $message }}</div>
                                     </td>
                                 </tr>
@@ -308,7 +308,7 @@
                                     <tr>
                                         <td class="text-center">
                                             <button type="button" wire:click="eliminarFactura({{ $factura['id'] }})"
-                                                class="btn btn-outline-danger btn-sm border-0 rounded-circle shadow-none p-1 d-inline-flex"
+                                                class="btn btn-outline-danger btn-sm border-0 rounded-2 shadow-none p-1 d-inline-flex"
                                                 title="Desvincular">
                                                 <i class="bi bi-trash fs-6"></i>
                                             </button>

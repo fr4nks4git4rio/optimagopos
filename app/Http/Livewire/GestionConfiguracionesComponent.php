@@ -6,6 +6,7 @@ use App\Models\Config;
 use App\Models\Moneda;
 use Livewire\Component;
 use App\Models\Setting;
+use App\Models\Suscripcion;
 
 class GestionConfiguracionesComponent extends Component
 {
@@ -42,6 +43,109 @@ class GestionConfiguracionesComponent extends Component
 
     public function updated($field, $value)
     {
+        $oldValue = system_config($field);
+        switch ($field) {
+            case 'precio_sucursal_adicional':
+                if ($value < $oldValue) {
+                    Suscripcion::with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_sucursales > $suscripcion->paquete->cant_sucursales) {
+
+                            $suc_extras = $suscripcion->cant_sucursales - $suscripcion->paquete->cant_sucursales;
+                            $precio_extra = $suscripcion->precio_extra - ($suc_extras * $oldValue);
+                            $precio_extra += $suc_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                } elseif ($value > $oldValue) {
+                    Suscripcion::whereHas('cliente', function ($query) {
+                        $query->where('es_cliente_fiel', 0);
+                    })->with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_sucursales > $suscripcion->paquete->cant_sucursales) {
+
+                            $suc_extras = $suscripcion->cant_sucursales - $suscripcion->paquete->cant_sucursales;
+                            $precio_extra = $suscripcion->precio_extra - ($suc_extras * $oldValue);
+                            $precio_extra += $suc_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                }
+                break;
+            case 'precio_terminal_adicional':
+                if ($value < $oldValue) {
+                    Suscripcion::with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_terminales > $suscripcion->paquete->cant_terminales) {
+
+                            $suc_extras = $suscripcion->cant_terminales - $suscripcion->paquete->cant_terminales;
+                            $precio_extra = $suscripcion->precio_extra - ($suc_extras * $oldValue);
+                            $precio_extra += $suc_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                } elseif ($value > $oldValue) {
+                    Suscripcion::whereHas('cliente', function ($query) {
+                        $query->where('es_cliente_fiel', 0);
+                    })->with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_terminales > $suscripcion->paquete->cant_terminales) {
+
+                            $suc_extras = $suscripcion->cant_terminales - $suscripcion->paquete->cant_terminales;
+                            $precio_extra = $suscripcion->precio_extra - ($suc_extras * $oldValue);
+                            $precio_extra += $suc_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                }
+                break;
+            case 'precio_usuario_adicional':
+                if ($value < $oldValue) {
+                    Suscripcion::with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_usuarios > $suscripcion->paquete->cant_usuarios) {
+
+                            $suc_extras = $suscripcion->cant_usuarios - $suscripcion->paquete->cant_usuarios;
+                            $precio_extra = $suscripcion->precio_extra - ($suc_extras * $oldValue);
+                            $precio_extra += $suc_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                } elseif ($value > $oldValue) {
+                    Suscripcion::whereHas('cliente', function ($query) {
+                        $query->where('es_cliente_fiel', 0);
+                    })->with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_usuarios > $suscripcion->paquete->cant_usuarios) {
+
+                            $suc_extras = $suscripcion->cant_usuarios - $suscripcion->paquete->cant_usuarios;
+                            $precio_extra = $suscripcion->precio_extra - ($suc_extras * $oldValue);
+                            $precio_extra += $suc_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                }
+                break;
+        }
+
         system_config($field, $value);
 
         $this->emit('show-toast', 'Configuración global guardada correctamente', 'success');

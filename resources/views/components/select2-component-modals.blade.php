@@ -10,6 +10,7 @@
     'tags' => false,
     'onChange' => 'false',
     'index' => '',
+    'disabled' => false
 ])
 
 @php
@@ -26,6 +27,7 @@
     $attributes = $attributes->class(['form-select', 'select2', 'is-invalid' => $errors->has($model)])->merge([
         'id' => $id,
         'wire:model' . $bind => $model,
+        'disabled' => $disabled ? 'disabled' : false
     ]);
 @endphp
 
@@ -99,7 +101,7 @@
         }
     }">
         @if ($label)
-            <label for="{{ $model }}" class="">{{ $label }}</label>
+            <label for="{{ $model }}" class="text-capitalize">{{ $label }}</label>
         @endif
 
         <select {{ $attributes }} style="width: 100%;">

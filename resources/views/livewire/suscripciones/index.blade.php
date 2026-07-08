@@ -13,7 +13,7 @@
         </div>
         <div class="col-lg-auto mb-3">
             @can('create', [App\Models\Suscripcion::class])
-                <a href="{{ route('admin.clientes.suscripcion') }}" class="btn btn-site-primary btn-outline-warning">
+                <a href="{{ route('admin.suscripciones.save') }}" class="btn btn-site-primary btn-outline-warning">
                     <x-icon name="plus-lg" />
                     Crear
                 </a>
@@ -64,7 +64,7 @@
                                 @endforeach
                             </ul>
                         </td>
-                        <td>${{ number_format($sub['precio_total'], 2) }}</td>
+                        <td>${{ number_format($sub['total'], 2) }}</td>
                         <td class="text-center">
                             @php
                                 $classEstado = 'dark';
@@ -78,7 +78,7 @@
                                     case 'VENCIDA':
                                         $classEstado = 'warning';
                                         break;
-                                    case 'REVOCADA':
+                                    case 'INACTIVA':
                                         $classEstado = 'danger';
                                         break;
                                 }
@@ -93,7 +93,7 @@
                                 @if (in_array($sub['estado'], ['PENDIENTE', 'ACTIVA']))
                                     @can('update', App\Models\Suscripcion::find($sub['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="pencil" title="Modificar" :href="route('admin.clientes.suscripcion', $sub['cliente_id'])" />
+                                            <x-action icon="pencil" title="Modificar" :href="route('admin.suscripciones.save', $sub['id'])" />
                                         </li>
                                     @endcan
                                     @can('activate', App\Models\Suscripcion::find($sub['id']))
@@ -102,6 +102,12 @@
                                                 click="$emit('openModal', 'suscripciones.activar', {'suscripcion': {{ $sub['id'] }}})" />
                                         </li>
                                     @endcan
+                                    @if ($sub['estado'] == 'ACTIVA')
+                                        <li class="list-inline-item">
+                                            <x-action icon="file-pdf" title="Descargar PDF"
+                                                click="descargarPdf({{ $sub['id'] }})" />
+                                        </li>
+                                    @endif
                                     @can('revoke', App\Models\Suscripcion::find($sub['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="Revocar" />
@@ -125,4 +131,28 @@
     </div>
 
     <x-pagination :links="$suscripciones" :count="true" />
+
+    @if ($iframeContainerClass)
+        <div class="modal {{ $iframeContainerClass }}">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">PDF</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            wire:click="$set('iframeContainerClass', '')"></button>
+                    </div>
+                    <div class="modal-body pb-0 text-center">
+                        <div class="row">
+                            <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
+                                height="500px"></iframe>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            wire:click="$set('iframeContainerClass', '')">{{ __('Cerrar') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

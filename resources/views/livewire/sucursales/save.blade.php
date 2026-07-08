@@ -33,24 +33,44 @@
             <div class="col-12 col-md-9">
                 @if (user()->is_super_admin)
                     <div class="row mb-3">
-                        <x-select2-ajax-component-modals label="Cliente" placeholder="Seleccione..."
-                            class="form-control" url="{{ route('clientes.load-clientes') }}" model="cliente_id"
-                            :dynamic="true" />
+                        <div class="col-md-6 col-12">
+                            @if ($from_subscription)
+                                <x-select2-ajax-component-modals label="Cliente" placeholder="Seleccione..."
+                                    class="form-control" url="{{ route('clientes.load-clientes') }}" model="cliente_id"
+                                    :dynamic="true" disabled />
+                            @else
+                                <x-select2-ajax-component-modals label="Cliente" placeholder="Seleccione..."
+                                    class="form-control" url="{{ route('clientes.load-clientes') }}" model="cliente_id"
+                                    :dynamic="true" />
+                            @endif
+                        </div>
+                        @if (!$from_subscription)
+                            <div class="col-md-6 col-12">
+                                <x-select2-component-modals label="Suscripción" placeholder="Seleccione..."
+                                    class="form-control" :options="$suscripciones" model="suscripcion_id" :dynamic="true" />
+                            </div>
+                        @endif
                     </div>
                 @endif
-                @if ($this->con_facturacion)
-                    <div class="row mb-1">
-                        <x-toggle-button :lazy="true" :label="'Tomar datos fiscales de empresa matriz'" :inline="true"
-                            model="tomar_datos_fiscales_de_empresa_matriz" />
+                <div class="row mb-2">
+                    <div class="col-md-6 col-12">
+                        <input type="file" style="display: none" accept=".pdf" id="file_constacia_fiscal"
+                            wire:model="constancia_fiscal">
+                        <button type="button" class="btn btn-warning" wire:loading.attr="disabled"
+                            onclick="document.getElementById('file_constacia_fiscal').click()">Cargar datos fiscales
+                            desde
+                            Constancia Fiscal</button>
                     </div>
-                @endif
+                    @if ($this->con_facturacion)
+                        <div class="col-md-6 col-12">
+                            <x-toggle-button :lazy="true" :label="'Tomar datos fiscales de empresa matriz'" :inline="true"
+                                model="tomar_datos_fiscales_de_empresa_matriz" />
+                        </div>
+                    @endif
+                </div>
                 <div class="row mb-3">
                     <div class="col-sm-4">
-                        @if ($tomar_datos_fiscales_de_empresa_matriz)
-                            <x-input label="Nombre Comercial" type="text" model="nombre_comercial" disabled />
-                        @else
-                            <x-input label="Nombre Comercial" type="text" model="nombre_comercial" />
-                        @endif
+                        <x-input label="Nombre Comercial" type="text" model="nombre_comercial" />
                     </div>
                     <div class="col-sm-5">
                         @if ($tomar_datos_fiscales_de_empresa_matriz)
@@ -75,13 +95,8 @@
                         <x-input label="Teléfono" model="telefono" />
                     </div>
                     <div class="col-sm-4">
-                        @if ($tomar_datos_fiscales_de_empresa_matriz)
-                            <x-select2-component-modals label="Régimen Fiscal" :options="$regimenesFiscales"
-                                model="regimen_fiscal_id" class="form-control" :dynamic="true" disabled />
-                        @else
-                            <x-select2-component-modals label="Régimen Fiscal" :options="$regimenesFiscales"
-                                model="regimen_fiscal_id" class="form-control" :dynamic="true" />
-                        @endif
+                        <x-select2-component-modals label="Régimen Fiscal" :options="$regimenesFiscales" model="regimen_fiscal_id"
+                            class="form-control" :dynamic="true" />
                     </div>
                 </div>
                 <div class="row mb-3">

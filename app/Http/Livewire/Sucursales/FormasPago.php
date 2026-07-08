@@ -31,6 +31,7 @@ class FormasPago extends Modal
     {
         $this->monedas = DB::table('tb_monedas')
             ->select('id as value', 'acronimo as label')
+            ->whereNull('deleted_at')
             ->get()
             ->map(function ($value, $key) {
                 return (array)$value;

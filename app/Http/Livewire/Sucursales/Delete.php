@@ -25,6 +25,8 @@ class Delete extends Modal
 
     public function delete()
     {
+        $this->sucursal->suscripcion_id = null;
+        $this->sucursal->save();
         $this->sucursal->delete();
 
         $this->emit('show-toast', 'Sucursal desactivada.');

@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Storage;
  * @property integer $regimen_fiscal_id
  * @property integer $moneda_base_id
  * @property integer $moneda_facturacion_id
+ * @property integer $suscripcion_id
  */
 class Sucursal extends Model
 {
@@ -56,7 +57,8 @@ class Sucursal extends Model
         'direccion_fiscal_id',
         'regimen_fiscal_id',
         'moneda_base_id',
-        'moneda_facturacion_id'
+        'moneda_facturacion_id',
+        'suscripcion_id'
     ];
 
     protected $appends = ['value', 'label', 'direccion_text', 'direccion_plain', 'logo_uri', 'codigo_postal'];
@@ -79,6 +81,7 @@ class Sucursal extends Model
         'regimen_fiscal_id' => 'integer',
         'moneda_base_id' => 'integer',
         'moneda_facturacion_id' => 'integer',
+        'suscripcion_id' => 'integer'
     ];
 
     /**
@@ -143,6 +146,12 @@ class Sucursal extends Model
                     case 'regimen_fiscal_id':
                         $data['regimen_fiscal'] = DB::table('tb_regimen_fiscales')
                             ->selectRaw('id, CONCAT(codigo, " - ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'suscripcion_id':
+                        $data['suscripcion'] = DB::table('tb_suscripciones as sub')
+                            ->selectRaw('sub.id, CONCAT("Suscripción #", sub.id, " - ", IF(paquete.id IS NULL, "CUSTOM", paquete.nombre)) as nombre')
+                            ->leftJoin('tb_paquetes as paquete', 'paquete.id', 'sub.paquete_id')
+                            ->where('sub.id', $value)->first()->nombre;
                         break;
                     case 'moneda_base_id':
                     case 'moneda_facturacion_id':
@@ -248,7 +257,10 @@ class Sucursal extends Model
     {
         return $this->belongsTo(Moneda::class, 'moneda_facturacion_id');
     }
-
+    public function suscripcion()
+    {
+        return $this->belongsTo(Suscripcion::class, 'suscripcion_id');
+    }
     public function formas_pago()
     {
         return $this->hasMany(SucursalFormaPago::class, 'sucursal_id');

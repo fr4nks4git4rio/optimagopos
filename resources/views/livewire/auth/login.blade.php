@@ -1,71 +1,57 @@
 @section('title', __('Login'))
-@push('styles')
-    <style>
-        html {
-            background-image: url(images/splash/splash002.jpg);
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            background-size: cover;
-        }
 
-        body {
-            background: transparent;
-        }
+<div class="row justify-content-center align-items-center min-vh-100 py-5 mx-0 bg-light">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
 
-        .logo {
-            /*color: #ffffff !important;*/
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: .05em;
-            line-height: 60px;
-            text-transform: uppercase;
-        }
-    </style>
-@endpush
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-dark h3 mb-1">{{ __('Bienvenido') }}</h2>
+            <p class="text-muted small">Ingresa tus credenciales para acceder</p>
+        </div>
 
-<div class="d-grid col-lg-4 mx-auto mt-5">
-    <div class="text-center mb-5">
-        {{-- <a href="#" class="logo">PUERTA MAYA</a>
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4 p-sm-5">
 
-        <br> --}}
-        <!-- <img class="bg-black p-2 b-radius-5 m-auto" src="{{config('app.url')}}/images/bretail.png" alt=""> -->
-{{--        <h2 class="logo mt-2">BRetail</h2>--}}
-    </div>
-    <form class="card" wire:submit.prevent="login">
-        {{--<h5 class="card-header bg-custom">--}}
-        {{----}}
-        {{--</h5>--}}
-        <div class="card-body p-4">
-            <div class="p-2">
-                <x-input-group :label="__('Email')" icon="bi bi-person" type="text" model="email"/>
-                <x-input-group :label="__('Password')" icon="bi bi-keyboard" type="password" model="password"/>
+                <form wire:submit.prevent="login">
 
-                <div class="d-flex justify-content-between">
-                    {{--                    --}}
-
-                    {{--@if(Route::has('password.forgot'))--}}
-                    {{--<a href="{{ route('password.forgot') }}">{{ __('Forgot password?') }}</a>--}}
-                    {{--@endif--}}
-                </div>
-                <div class="form-group text-center mt-4">
-                    <div class="row">
-                        <div class="col-4 mt-2">
-                            <x-checkbox :label="'Recuérdame'" model="remember"/>
-                        </div>
-                        <div class="col-8">
-                            <button class="btn btn-site-primary btn-lg w-50 float-end" type="submit">Entrar</button>
-                        </div>
+                    <div class="mb-3">
+                        <x-input-group :label="__('Email')" icon="bi bi-envelope" type="text" model="email" />
                     </div>
-{{--                    <div class="col-12">--}}
-{{--                        <a class="btn btn-lg btn-danger w-100 mt-2" href="#">--}}
-{{--                            <i class="bi bi-google float-start"></i> Iniciar sesión G Suite--}}
-{{--                        </a>--}}
-{{--                    </div>--}}
-                </div>
+
+                    <div class="mb-3">
+                        <x-input-group :label="__('Password')" icon="bi bi-lock" type="password" model="password" />
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4 small">
+                        <div class="form-check-sm">
+                            <x-checkbox :label="'Recuérdame'" model="remember" />
+                        </div>
+                        {{-- @if (Route::has('password.forgot')) --}}
+                        <a href="{{ route('password.forgot') }}" class="text-decoration-none fw-medium text-primary">
+                            {{ __('Forgot password?') }}
+                        </a>
+                        {{-- @endif --}}
+                    </div>
+
+                    <div class="mb-4">
+                        <button
+                            class="btn btn-site-primary btn-lg w-100 py-2.5 fw-semibold text-uppercase tracking-wide"
+                            style="font-size: 0.9rem;" type="submit">
+                            {{ __('Entrar') }}
+                        </button>
+                    </div>
+
+                    <div class="d-flex align-items-center my-4">
+                        <hr class="flex-grow-1 text-muted opacity-25 m-0">
+                        <span class="mx-3 text-muted small fw-medium text-uppercase text-nowrap"
+                            style="font-size: 0.75rem; letter-spacing: 0.05rem;">o continuar con</span>
+                        <hr class="flex-grow-1 text-muted opacity-25 m-0">
+                    </div>
+
+                    <livewire:auth.social-login />
+                </form>
+
             </div>
         </div>
-        {{--<div class="card-footer d-flex justify-content-end bg-custom">--}}
-        {{--<button type="submit" class="btn btn-site-primary">{{ __($caption_login) }}</button>--}}
-        {{--</div>--}}
-    </form>
+
+    </div>
 </div>

@@ -253,7 +253,7 @@ class Ingresar extends Modal
         DB::commit();
         $this->emit('show-toast', "Ingreso registrado satisfactoriamente.");
         $this->emit('closeModal');
-        return redirect()->route('cuentas_cobrar.index');
+        return redirect()->route('admin.cuentas-cobrar.index');
     }
 
     public function close()

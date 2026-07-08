@@ -12,13 +12,17 @@ use App\Models\Cliente;
 use App\Rules\RfcRule;
 use App\Rules\RfcYRegimenCoherentesRule;
 use App\Rules\RuleUnique;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Livewire\WithFileUploads;
+use Smalot\PdfParser\Parser;
 
 class Save extends Modal
 {
+    use WithFileUploads;
     public $scope = null;
     public Cliente $cliente;
     public $nombre_comercial;
@@ -32,8 +36,10 @@ class Save extends Modal
     public $contacto_cargo;
     public $comentarios;
     public $con_facturacion;
+    public $es_cliente_fiel;
     public $regimen_fiscal_id;
     public $direccion_fiscal;
+    public $constancia_fiscal;
 
     public $regimenesFiscales = [];
     public $estados = [];
@@ -42,7 +48,7 @@ class Save extends Modal
 
     public function mount()
     {
-        $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only('label', 'value');
+        $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only(['label', 'value']);
 
         if (!isset($this->cliente)) {
             $this->cliente = new Cliente();
@@ -59,6 +65,7 @@ class Save extends Modal
             $this->contacto_cargo = $this->cliente->contacto_cargo;
             $this->comentarios = $this->cliente->comentarios;
             $this->con_facturacion = $this->cliente->con_facturacion;
+            $this->es_cliente_fiel = $this->cliente->es_cliente_fiel;
             $this->regimen_fiscal_id = $this->cliente->regimen_fiscal_id;
         }
         $this->direccion_fiscal = $this->cliente->direccion_fiscal->toArray();
@@ -92,12 +99,59 @@ class Save extends Modal
         $this->init();
     }
 
+    public function updatedConstanciaFiscal($value)
+    {
+        if ($value) {
+            if ($value->getMimeType() != 'application/pdf') {
+                $this->emit('show-toast', 'Seleccione el fichero correcto. Solo se aceptan archivos del tipo PDF.', 'danger');
+                return;
+            }
+
+            try {
+                $parser = new Parser();
+                $content = file_get_contents($value->getRealPath());
+                $pdf = $parser->parseContent($content);
+                $text = $pdf->getText();
+
+                $datos_fiscales = extraer_datos_fiscales($text);
+
+                if ($datos_fiscales['tipo_persona'] == 'fisica') {
+                    $nombre = $datos_fiscales['nombre'] . ' ' . $datos_fiscales['apellido_paterno'] . ' ' . $datos_fiscales['apellido_materno'];
+                    $this->razon_social = $nombre;
+                    $this->nombre_comercial = $nombre;
+                } else {
+                    $this->razon_social = $datos_fiscales['razon_social'];
+                    $this->nombre_comercial = $datos_fiscales['nombre_comercial'];
+                }
+                $this->rfc = $datos_fiscales['rfc'];
+                $this->direccion_fiscal['codigo_postal'] = $datos_fiscales['codigo_postal'];
+                $this->direccion_fiscal['calle'] = $datos_fiscales['calle'];
+                $this->direccion_fiscal['no_exterior'] = $datos_fiscales['numero_exterior'];
+                $this->direccion_fiscal['no_interior'] = $datos_fiscales['numero_interior'];
+                $this->direccion_fiscal['colonia'] = $datos_fiscales['colonia'];
+                $this->direccion_fiscal['ciudad'] = $datos_fiscales['localidad'];
+                $this->direccion_fiscal['delegacion'] = $datos_fiscales['municipio'];
+                $this->direccion_fiscal['estado'] = $datos_fiscales['estado'];
+                $this->regimen_fiscal_id = optional(RegimenFiscal::findByDescription($datos_fiscales['regimen_fiscal']))->id;
+                $this->direccion_fiscal['estado_id'] = Estado::where('nombre', $datos_fiscales['estado'])->first()?->id;
+                if ($this->direccion_fiscal['estado_id']) {
+                    $this->direccion_fiscal['localidad_id'] = Localidad::where('estado_id', $this->direccion_fiscal['estado_id'])->where('nombre', $datos_fiscales['localidad'])->first()?->id;
+                    $this->direccion_fiscal['municipio_id'] = Municipio::where('estado_id', $this->direccion_fiscal['estado_id'])->where('nombre', $datos_fiscales['municipio'])->first()?->id;
+                }
+                $this->regimen_fiscal_id = optional(RegimenFiscal::findByDescription($datos_fiscales['regimen_fiscal']))->id;
+                $this->emit('show-toast', 'Datos cargados correctamente.', 'success');
+            } catch (Exception $e) {
+                $this->emit('show-toast', 'Lo sentimos no se pudo realizar la carga de información. Documento inválido o corrupto.', 'danger');
+            }
+        }
+    }
+
     public function rules()
     {
         $collection = DB::table('tb_clientes')
             ->select('id', 'nombre_comercial', 'razon_social', 'rfc', DB::raw('0 as decrypted'))
             ->get();
-        $collection->map(function ($cliente) {
+        $collection->each(function ($cliente) {
             $cliente = Cliente::decryptInfo($cliente);
         });
         return [
@@ -112,6 +166,7 @@ class Save extends Modal
             'contacto_telefono' => ['nullable'],
             'contacto_cargo' => ['nullable'],
             'comentarios' => ['nullable'],
+            'es_cliente_fiel' => 'nullable|boolean',
             'regimen_fiscal_id' => ['required_if:con_facturacion,true', new RfcYRegimenCoherentesRule($this->rfc)],
             'direccion_fiscal.codigo_postal' => ['required_if:con_facturacion,true'],
             'direccion_fiscal.calle' => 'nullable',
@@ -163,6 +218,7 @@ class Save extends Modal
                 'contacto_telefono',
                 'contacto_cargo',
                 'es_cliente',
+                'es_cliente_fiel',
                 'comentarios',
                 'con_facturacion',
                 'regimen_fiscal_id'

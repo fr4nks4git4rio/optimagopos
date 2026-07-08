@@ -30,7 +30,11 @@ class TerminalPolicy
         if ($user->is_super_admin)
             return true;
 
-        if ($user->is_admin && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
+        if (
+            $user->is_admin
+            && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+            && in_array($terminal->id, $user->terminales->pluck('id')->toArray())
+        )
             return true;
 
         return false;
@@ -55,7 +59,11 @@ class TerminalPolicy
         if ($user->is_super_admin)
             return true;
 
-        if ($user->is_admin && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
+        if (
+            $user->is_admin
+            && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+            && in_array($terminal->id, $user->terminales->pluck('id')->toArray())
+        )
             return true;
 
         return false;
@@ -69,7 +77,11 @@ class TerminalPolicy
         if ($user->is_super_admin)
             return true;
 
-        if ($user->is_admin && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
+        if (
+            $user->is_admin
+            && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+            && in_array($terminal->id, $user->terminales->pluck('id')->toArray())
+        )
             return true;
 
         return false;
@@ -83,7 +95,11 @@ class TerminalPolicy
         if ($user->is_super_admin)
             return true;
 
-        if ($user->is_admin && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales()->get()->pluck('cliente_id')->toArray()))
+        if (
+            $user->is_admin
+            && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+            && in_array($terminal->id, $user->terminales->pluck('id')->toArray())
+        )
             return true;
 
         return false;

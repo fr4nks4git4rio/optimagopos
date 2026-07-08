@@ -84,7 +84,7 @@ class MyCompany extends Modal
         $collection = DB::table('tb_clientes')
             ->select('id', 'nombre_comercial', 'razon_social', 'rfc', DB::raw('0 as decrypted'))
             ->get();
-        $collection->map(function ($cliente) {
+        $collection->each(function ($cliente) {
             $cliente = Cliente::decryptInfo($cliente);
         });
         return [

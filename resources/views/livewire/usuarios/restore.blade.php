@@ -1,19 +1,20 @@
 <x-modal form-action="restore">
     <x-slot:title>
-        Activar Usuario
+        <span class="text-capitalize">{{ __('site.users.restore.restore_user') }}</span>
     </x-slot:title>
 
     <x-slot:content>
         <div wire:init="init">
             <x-alert icon="exclamation-octagon" alert="danger">
-                Seguro/a que desea activar el Usuario?
+                {{ __('site.users.restore.are_you_sure') }}
             </x-alert>
         </div>
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">Cerrar</button>
-        <button type="submit" class="btn btn-site-primary">Activar Usuario</button>
+        <button type="button" class="btn btn-secondary text-capitalize" data-bs-dismiss="modal"
+            wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
+        <button type="submit"
+            class="btn btn-site-primary text-capitalize">{{ __('site.users.restore.confirm_restore') }}</button>
     </x-slot:buttons>
 </x-modal>

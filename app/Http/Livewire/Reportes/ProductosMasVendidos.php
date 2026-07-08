@@ -65,6 +65,7 @@ class ProductosMasVendidos extends Component
     {
         $this->sucursales = DB::table('tb_sucursales')
             ->select('id', 'nombre_comercial', 'razon_social')
+            ->whereIn('id', user()->sucursales->pluck('id')->toArray())
             ->whereNull('deleted_at')
             ->where('cliente_id', user()->cliente_id)
             ->get()
