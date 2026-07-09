@@ -1,4 +1,4 @@
-@section('title', 'Clientes')
+@section('title', __('site.clients.index.title'))
 
 <div wire:init="init">
     <h1 class="fs-1 mb-2">@yield('title')</h1>
@@ -7,7 +7,7 @@
         <div class="col-lg-auto mb-3">
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Clientes" class="form-control"
+                <input type="search" placeholder="{{ __('site.clients.index.search_clients') }}" class="form-control"
                     wire:model.debounce.500ms="search">
             </div>
         </div>
@@ -68,6 +68,14 @@
                         <td>{{ $cliente['rfc'] }}</td>
                         <td>{{ $cliente['razon_social'] }}</td>
                         <td>{{ $cliente['telefono'] }}</td>
+                        <td>
+                            @if ($cliente['deleted_at'])
+                                <span class="badge bg-danger-subtle text-danger border-1 border-danger">{{ __('site.common.inactive') }}</span>
+                            @else
+                                <span
+                                    class="badge bg-success-subtle text-success border-1 border-success">{{ __('site.common.active') }}</span>
+                            @endif
+                        </td>
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$cliente['deleted_at'])

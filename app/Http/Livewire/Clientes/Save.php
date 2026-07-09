@@ -141,6 +141,7 @@ class Save extends Modal
                 $this->regimen_fiscal_id = optional(RegimenFiscal::findByDescription($datos_fiscales['regimen_fiscal']))->id;
                 $this->emit('show-toast', 'Datos cargados correctamente.', 'success');
             } catch (Exception $e) {
+                Log::error("cargando los datos fiscales desde documento fiscal. Error: {$e->getMessage()}");
                 $this->emit('show-toast', 'Lo sentimos no se pudo realizar la carga de información. Documento inválido o corrupto.', 'danger');
             }
         }
@@ -150,6 +151,7 @@ class Save extends Modal
     {
         $collection = DB::table('tb_clientes')
             ->select('id', 'nombre_comercial', 'razon_social', 'rfc', DB::raw('0 as decrypted'))
+            ->where('es_cliente', 1)
             ->get();
         $collection->each(function ($cliente) {
             $cliente = Cliente::decryptInfo($cliente);
@@ -200,14 +202,24 @@ class Save extends Modal
             $this->rules(),
             // $this->messages()
         );
+
         DB::beginTransaction();
         try {
+
             $data['rfc'] = strtoupper(str_replace(' ', '', $data['rfc']));
+
+            $clienteDB = $this->cliente->id ? null : Cliente::withTrashed()->where('rfc', $data['rfc'])->first();
+
+            if (!$clienteDB)
+                $clienteDB = $this->cliente;
+            if ($clienteDB->trashed())
+                $clienteDB->restore();
+
             $data['es_cliente'] = 1;
             $data = Cliente::encryptInfo($data);
 
             $data['regimen_fiscal_id'] = $data['regimen_fiscal_id'] ?: null;
-            $this->cliente->fill(Arr::only($data, [
+            $clienteDB->fill(Arr::only($data, [
                 'nombre_comercial',
                 'razon_social',
                 'rfc',
@@ -224,8 +236,8 @@ class Save extends Modal
                 'regimen_fiscal_id'
             ]))->save();
 
-            if ($this->cliente->direccion_fiscal()->exists()) {
-                $this->cliente->direccion_fiscal->fill([
+            if ($clienteDB->direccion_fiscal()->exists()) {
+                $clienteDB->direccion_fiscal->fill([
                     'calle' => $data['direccion_fiscal']['calle'],
                     'no_exterior' => $data['direccion_fiscal']['no_exterior'],
                     'no_interior' => $data['direccion_fiscal']['no_interior'],
@@ -236,16 +248,16 @@ class Save extends Modal
                     'estado_id' => $data['direccion_fiscal']['estado_id'] ? $data['direccion_fiscal']['estado_id'] : null,
                     'referencia' => $data['direccion_fiscal']['referencia'],
                 ]);
-                if (count($this->cliente->direccion_fiscal->getDirty()) > 0) {
-                    $attributes = Arr::except($this->cliente->direccion_fiscal->getDirty(), ['created_at', 'updated_at']);
-                    $log = $this->cliente->rfc ? "La Dirección Fiscal del Cliente con RFC: {$this->cliente->rfc}, ha sido actualizada." : "La Dirección Fiscal del Cliente con nombre comercial: {$this->cliente->nombre_comercial}, ha sido actualizada.";
+                if (count($clienteDB->direccion_fiscal->getDirty()) > 0) {
+                    $attributes = Arr::except($clienteDB->direccion_fiscal->getDirty(), ['created_at', 'updated_at']);
+                    $log = $clienteDB->rfc ? "La Dirección Fiscal del Cliente con RFC: {$clienteDB->rfc}, ha sido actualizada." : "La Dirección Fiscal del Cliente con nombre comercial: {$this->cliente->nombre_comercial}, ha sido actualizada.";
                     activity('Dirección Fiscal de Cliente Actualizada')
-                        ->on($this->cliente->direccion_fiscal)
+                        ->on($clienteDB->direccion_fiscal)
                         ->event('updated')
                         ->withProperty('attributes', Direccion::parseData($attributes))
-                        ->withProperty('old', Direccion::parseData(Arr::only($this->cliente->direccion_fiscal->getOriginal(), array_keys($attributes))))
+                        ->withProperty('old', Direccion::parseData(Arr::only($clienteDB->direccion_fiscal->getOriginal(), array_keys($attributes))))
                         ->log($log);
-                    $this->cliente->direccion_fiscal->save();
+                    $clienteDB->direccion_fiscal->save();
                 }
             } else {
                 $dir = Direccion::create([
@@ -259,10 +271,10 @@ class Save extends Modal
                     'estado_id' => $data['direccion_fiscal']['estado_id'] ? $data['direccion_fiscal']['estado_id'] : null,
                     'referencia' => $data['direccion_fiscal']['referencia'],
                 ]);
-                $this->cliente->direccion_fiscal_id = $dir->id;
-                $this->cliente->save();
+                $clienteDB->direccion_fiscal_id = $dir->id;
+                $clienteDB->save();
 
-                $log = $this->cliente->rfc ? "La Dirección Fiscal del Cliente con RFC: {$this->cliente->rfc}, ha sido creada." : "La Dirección Fiscal del Cliente con nombre comercial: {$this->cliente->nombre_comercial}, ha sido creada.";
+                $log = $clienteDB->rfc ? "La Dirección Fiscal del Cliente con RFC: {$clienteDB->rfc}, ha sido creada." : "La Dirección Fiscal del Cliente con nombre comercial: {$clienteDB->nombre_comercial}, ha sido creada.";
 
                 activity("Dirección Fiscal de Cliente Creada")
                     ->on($dir)
@@ -273,10 +285,10 @@ class Save extends Modal
 
             $this->emit('show-toast', 'Cliente guardado.');
             if ($this->scope) {
-                if ($this->cliente->wasRecentlyCreated) {
-                    $this->emitTo($this->scope, 'cliente-created', $this->cliente->id);
+                if ($clienteDB->wasRecentlyCreated) {
+                    $this->emitTo($this->scope, 'cliente-created', $clienteDB->id);
                 } else {
-                    $this->emitTo($this->scope, 'cliente-updated', $this->cliente->id);
+                    $this->emitTo($this->scope, 'cliente-updated', $clienteDB->id);
                 }
             } else {
                 $this->emit('$refresh');
@@ -292,7 +304,7 @@ class Save extends Modal
 
     public function init()
     {
-        if (user()->cannot($this->cliente->exists() ? 'updateCliente' : 'createCliente', $this->cliente->exists() ? $this->cliente : [Cliente::class])) {
+        if (user()->cannot($this->cliente->id ? 'updateCliente' : 'createCliente', $this->cliente->id ? $this->cliente : [Cliente::class])) {
             $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
             $this->emit('closeModal');
             return;

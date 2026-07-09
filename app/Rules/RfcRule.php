@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 class RfcRule implements ValidationRule
 {
     protected $tipo_persona;
-    private $message = "Formato incorrecto.";
 
     /**
      * @param $tipo_persona 'persona_fisica' o 'persona_moral'
@@ -31,11 +30,16 @@ class RfcRule implements ValidationRule
             $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $value);
 
             if ($this->tipo_persona == 'persona_fisica' && !$isFisica)
-                $fail($this->message);
+                $fail($this->getMessage());
             if ($this->tipo_persona == 'persona_moral' && !$isMoral)
-                $fail($this->message);
+                $fail($this->getMessage());
             if (!$isFisica && !$isMoral)
-                $fail($this->message);
+                $fail($this->getMessage());
         }
+    }
+
+    private function getMessage()
+    {
+        return __('site.validation.rfc_format');
     }
 }

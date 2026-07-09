@@ -107,7 +107,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ user()->is_super_admin ? '5' : '4' }}">
+                        <td colspan="{{ user()->cliente_id ? '4' : '5' }}">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>

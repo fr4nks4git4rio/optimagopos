@@ -39,6 +39,11 @@ class UpdateProfile extends Modal
         $this->avatar_src = $this->avatar;
     }
 
+    public function getRolProperty()
+    {
+        return user()->rol->nombre;
+    }
+
     public function render()
     {
         return view('livewire.auth.update-profile');
@@ -46,14 +51,15 @@ class UpdateProfile extends Modal
 
     public function update()
     {
-        $data = $this->validate([
-            'nombre' => ['required'],
-            'apellidos' => ['required']
-        ],
-        // [
-        //     'nombre.required' => 'Campo requerido.',
-        //     'apellidos.required' => 'Campo requerido.'
-        // ]
+        $data = $this->validate(
+            [
+                'nombre' => ['required'],
+                'apellidos' => ['required']
+            ],
+            // [
+            //     'nombre.required' => 'Campo requerido.',
+            //     'apellidos.required' => 'Campo requerido.'
+            // ]
         );
         $user = User::find(user()->id);
         $user->fill($data);

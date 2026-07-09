@@ -36,8 +36,6 @@ class RfcYRegimenCoherentesRule implements ValidationRule
         '630'
     ];
 
-    private $message = 'El RFC y el régimen fiscal no son coherentes.';
-
     public function __construct($rfc)
     {
         $this->rfc = $rfc;
@@ -60,15 +58,20 @@ class RfcYRegimenCoherentesRule implements ValidationRule
             $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $this->rfc);
 
             if (!$isFisica && !$isMoral)
-                $fail($this->message);
+                $fail($this->getMessage());
 
             if ($isFisica && !in_array($value, self::REGIMENES_FISICAS)) {
-                $fail($this->message);
+                $fail($this->getMessage());
             }
 
             if ($isMoral && !in_array($value, self::REGIMENES_MORALES)) {
-                $fail($this->message);
+                $fail($this->getMessage());
             }
         }
+    }
+
+    public function getMessage()
+    {
+        return __('site.validation.rfc_fiscal_regimen_incoherent');
     }
 }

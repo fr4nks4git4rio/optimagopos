@@ -6,10 +6,9 @@
                 style="width: 56px; height: 56px;">
                 <i class="bi bi-key-fill" style="font-size: 1.5rem;"></i>
             </div>
-            <h2 class="fw-bold text-dark h4 mb-2">{{ __('Reset Password') }}</h2>
+            <h2 class="fw-bold text-dark h4 mb-2 text-capitalize">{{ __('site.forgot_password.reset_password') }}</h2>
             <p class="text-muted small px-3">
-                ¿Olvidaste tu contraseña? No te preocupes. Introduce tu correo y te enviaremos un enlace para
-                restaurarla.
+                {{ __('site.forgot_password.reset_detail') }}
             </p>
         </div>
 
@@ -25,7 +24,7 @@
 
                 <div class="mb-4">
                     <label for="email" class="form-label small fw-semibold text-uppercase text-muted tracking-wider">
-                        {{ __('Email Address') }}
+                        {{ __('site.forgot_password.email_address') }}
                     </label>
 
                     <div class="input-group">
@@ -34,7 +33,7 @@
                         <input id="email" type="email"
                             class="form-control bg-light border-start-0 ps-0 @error('email') is-invalid @enderror"
                             name="email" value="{{ old('email') }}" wire:model="email" required autocomplete="email"
-                            autofocus placeholder="ejemplo@correo.com">
+                            autofocus placeholder="{{ __('site.forgot_password.email_placeholder') }}">
                     </div>
 
                     @error('email')
@@ -48,14 +47,14 @@
                     <button type="button" wire:click="sendResetLinkEmail"
                         class="btn btn-site-primary btn-lg w-100 py-2.5 fw-semibold text-uppercase tracking-wide"
                         style="font-size: 0.9rem;">
-                        {{ __('Send Password Reset Link') }}
+                        {{ __('site.forgot_password.send_link') }}
                     </button>
                 </div>
 
                 <div class="text-center mt-4">
                     <a href="{{ route('login') }}"
                         class="text-decoration-none small fw-semibold text-secondary d-inline-flex align-items-center gap-2">
-                        <i class="bi bi-arrow-left"></i> Volver al inicio de sesión
+                        <i class="bi bi-arrow-left"></i> {{ __('site.forgot_password.back_to_login') }}
                     </a>
                 </div>
             </div>

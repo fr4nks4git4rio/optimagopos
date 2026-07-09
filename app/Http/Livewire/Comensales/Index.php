@@ -15,14 +15,31 @@ class Index extends Component
     public $perPage = 10;
     public $perPages = [10, 25, 50, 100];
     public $search;
-    public $sort = 'Nombre Comercial';
-    public $sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono'];
-    public $filter = 'Activos';
-    public $filters = ['Activos', 'Inactivos', 'Todos'];
+    public $order;
+    public $sort;
+    public $sorts = [];
+    public $filter;
+    public $filters = [];
 
     protected $queryString = ['search', 'perPage', 'sort', 'filter'];
 
     protected $listeners = ['$refresh'];
+
+    public function mount()
+    {
+        $this->sorts = [__('site.diners.index.commercial_name'), __('site.diners.index.rfc'), __('site.diners.index.social_reason'), __('site.diners.index.phone'), __('site.diners.index.status')];
+        $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
+        $this->search = $this->search ?? '';
+        $this->perPage = $this->perPage ?? '';
+        $this->order = $this->order ?? 'asc';
+        $this->sort = $this->sort ?? __('site.diners.index.commercial_name');
+        $this->filter = $this->filter ?? __('site.common.actives');
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
+    }
 
     public function render()
     {
@@ -46,17 +63,26 @@ class Index extends Component
     public function query()
     {
         $query = match ($this->filter) {
-            'Activos' => user()->cliente->comensales()->withoutTrashed(),
-            'Inactivos' => user()->cliente->comensales()->onlyTrashed(),
-            default => user()->cliente->comensales()->withTrashed(),
+            __('site.common.actives') => Cliente::find(user()->cliente_id)->comensales_activos(),
+            __('site.common.inactives') => user()->cliente->comensales_inactivos(),
+            default => user()->cliente->comensales(),
         };
 
-        $clientes = $query->where('es_comensal', 1)->get()->map->only(['id', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at'])->toArray();
+        $clientes = $query->get()->map(function ($value) {
+            Cliente::decryptInfo($value);
+            return [
+                'id' => $value->id,
+                'nombre_comercial' => $value->nombre_comercial,
+                'rfc' => $value->rfc,
+                'razon_social' => $value->razon_social,
+                'telefono' => $value->telefono,
+                'activo' => $value->pivot->activo
+            ];
+        })->toArray();
+
         $records_final = collect();
 
         foreach ($clientes as $cliente) {
-            $cliente = Cliente::decryptInfo($cliente);
-
             if (
                 !$this->search
                 || Str::contains(Str::upper($cliente['nombre_comercial']), Str::upper($this->search))
@@ -69,20 +95,44 @@ class Index extends Component
         }
 
         switch ($this->sort) {
-            case 'Nombre Comercial':
-                $records_final = $records_final->sortBy('nombre_comercial', SORT_NATURAL)->values();
+            case __('site.diners.index.commercial_name'):
+                if ($this->order ==  'asc')
+                    $records_final = $records_final->sortBy('nombre_comercial', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('nombre_comercial', SORT_NATURAL)->values();
                 break;
-            case 'RFC':
-                $records_final = $records_final->sortBy('rfc', SORT_NATURAL)->values();
+            case __('site.diners.index.rfc'):
+                if ($this->order ==  'asc')
+                    $records_final = $records_final->sortBy('rfc', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('rfc', SORT_NATURAL)->values();
                 break;
-            case 'Razón Social':
-                $records_final = $records_final->sortBy('razon_social', SORT_NATURAL)->values();
+            case __('site.diners.index.social_reason'):
+                if ($this->order ==  'asc')
+                    $records_final = $records_final->sortBy('razon_social', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('razon_social', SORT_NATURAL)->values();
                 break;
-            case 'Teléfono':
-                $records_final = $records_final->sortBy('telefono', SORT_NATURAL)->values();
+            case __('site.diners.index.phone'):
+                if ($this->order ==  'asc')
+                    $records_final = $records_final->sortBy('telefono', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('telefono', SORT_NATURAL)->values();
+                break;
+            case __('site.diners.index.status'):
+                if ($this->order ==  'asc')
+                    $records_final = $records_final->sortBy('activo', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('activo', SORT_NATURAL)->values();
                 break;
         }
 
         return $records_final;
+    }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
     }
 }

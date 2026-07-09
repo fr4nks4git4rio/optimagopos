@@ -55,7 +55,7 @@ class RuleUnique implements ValidationRule
             });
 
             if (!$passes) {
-                $fail('El/La :attribute ya se encuentra en uso!');
+                $fail(__('validation.unique', ['attribute' => $attribute]));
             }
         }
     }

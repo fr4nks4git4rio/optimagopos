@@ -133,7 +133,7 @@ class ClientePolicy
      */
     public function viewComensal(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')->toArray()))
+        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales->pluck('id')->toArray()))
             return true;
 
         return false;
@@ -146,15 +146,19 @@ class ClientePolicy
     {
         if ($user->is_admin)
             return true;
+
         return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Cliente $cliente): bool
+    public function updateComensal(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')->toArray()))
+        if ($cliente->rfc === 'XAXX010101000')
+            return false;
+
+        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales_activos->pluck('id')->toArray()))
             return true;
 
         return false;
@@ -163,9 +167,9 @@ class ClientePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Cliente $cliente): bool
+    public function deleteComensal(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')->toArray()))
+        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales_activos->pluck('id')->toArray()))
             return true;
 
         return false;
@@ -174,9 +178,9 @@ class ClientePolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Cliente $cliente): bool
+    public function restoreComensal(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales()->get()->pluck('id')->toArray()))
+        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales_inactivos->pluck('id')->toArray()))
             return true;
 
         return false;
@@ -185,7 +189,7 @@ class ClientePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Cliente $cliente): bool
+    public function forceDeleteComensal(User $user, Cliente $cliente): bool
     {
         return false;
     }

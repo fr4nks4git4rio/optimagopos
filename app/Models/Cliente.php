@@ -282,8 +282,18 @@ class Cliente extends Model
 
     public function comensales()
     {
-        return $this->belongsToMany(Cliente::class, 'tb_clientes_comensales', 'cliente_id', 'comensal_id');
+        return $this->belongsToMany(Cliente::class, 'tb_clientes_comensales', 'cliente_id', 'comensal_id')->where('es_comensal', 1)->withPivot(['activo']);
     }
+
+    public function comensales_activos()
+    {
+        return $this->comensales()->wherePivot('activo', 1);
+    }
+    public function comensales_inactivos()
+    {
+        return $this->comensales()->wherePivot('activo', 0);
+    }
+
     public function sucursales()
     {
         return $this->hasMany(Sucursal::class, 'cliente_id');

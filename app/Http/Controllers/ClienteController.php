@@ -42,10 +42,9 @@ class ClienteController extends Controller
         $label = $request->label ?: 'nombre_comercial';
 
         $cliente = Cliente::find(user()->cliente_id);
-        $query = $cliente->comensales()->newQuery();
+        $query = $cliente->comensalescomensales_activos()->newQuery();
 
-        $query->where('deleted_at', null)
-            ->select('id', $label);
+        $query->select('id', $label);
 
         if ($request->term) {
             $clientes = [];

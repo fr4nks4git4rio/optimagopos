@@ -61,7 +61,7 @@
                                         <div class="col-lg-12 col-sm-12 col-12">
                                             <span>{{ __('nav.notifications') }} {{ count($notifications) }}</span>
                                             <a href="javascript:void(0)" wire:click="$emit('markNotificationsAllAsRead')"
-                                                class="float-end text-light">{{ __('nav.mark-as-read') }}</a>
+                                                class="float-end text-light">{{ __('site.nav.mark-as-reads') }}</a>
                                         </div>
                                     </div>
                                 </li>
@@ -85,12 +85,12 @@
                                                     <a href="javascript:void(0)" class="float-start ml-3"
                                                         style="text-decoration: none"
                                                         wire:click="goToLink('{{ $notification->id }}')"><small
-                                                            class="text-danger">Ver</small></a>
+                                                            class="text-danger">{{ __('site.nav.see') }}</small></a>
                                                 @endif
                                                 <a href="javascript:void(0)" class="float-end mr-3"
                                                     style="text-decoration: none"
                                                     wire:click="$emit('markNotificationAsRead', '{{ $notification->id }}')"><small
-                                                        class="text-danger">{{ __('nav.mark-as-read') }}</small></a>
+                                                        class="text-danger">{{ __('site.nav.mark-as-read') }}</small></a>
                                             </div>
                                         </div>
                                     </li>
@@ -119,14 +119,14 @@
                                 class="hidden-xs">{{ user()->nombre_completo }}</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
-                            <x-dropdown-item label="{{ __('nav.update-profile') }}"
+                            <x-dropdown-item label="{{ __('site.nav.update-profile') }}"
                                 click="$emit('openModal', 'auth.update-profile')" />
 
-                            <x-dropdown-item label="{{ __('nav.change-password') }}"
+                            <x-dropdown-item label="{{ __('site.nav.change-password') }}"
                                 click="$emit('openModal', 'auth.change-password')" />
 
                             @if (user()->is_admin)
-                                <x-dropdown-item label="{{ __('nav.my-company') }}"
+                                <x-dropdown-item label="{{ __('site.nav.my-company') }}"
                                     click="$emit('openModal', 'auth.my-company', {company: {{ user()->cliente_id }}})" />
                             @endif
 

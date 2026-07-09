@@ -19,7 +19,7 @@ class Index extends Component
     public $search;
     public $order;
     public $sort;
-    public $sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono'];
+    public $sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono', 'Estado'];
     public $filter;
     public $filters = ['Activos', 'Inactivos', 'Todos'];
 
@@ -109,6 +109,12 @@ class Index extends Component
                     $records_final = $records_final->sortBy('telefono', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('telefono', SORT_NATURAL)->values();
+                break;
+            case 'Estado':
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('deleted_at', SORT_REGULAR)->values();
+                else
+                    $records_final = $records_final->sortByDesc('deleted_at', SORT_REGULAR)->values();
                 break;
         }
 

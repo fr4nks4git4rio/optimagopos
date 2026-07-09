@@ -2,8 +2,8 @@
     editing: false
 }" class="nav-link mt-1">
     <a href="javascript:void(0)" class="nav-link pt-0 float-start">
-        <span x-show="!is_mobile_screen">Tipo de Cambio:&nbsp;</span>
-        <span x-show="is_mobile_screen">TC:&nbsp;</span>
+        <span x-show="!is_mobile_screen">{{ __('site.nav.exchange_rate') }}:&nbsp;</span>
+        <span x-show="is_mobile_screen">{{ __('site.nav.exchange_rate_sm') }}:&nbsp;</span>
     </a>
     @if ($this->hay_tipo_cambio)
         <span x-show="!editing"
@@ -13,14 +13,14 @@
             style="max-width: 70px;border-radius: 5px;line-height: 10px;border: none;color: #000 !important">
     @else
         <a href="" wire:loading style="color: #fff; text-decoration: none; font-style: italic;"><i
-                class="spinner-border spinner-border-sm"></i>&nbsp;Cargando...</a>
+                class="spinner-border spinner-border-sm"></i>&nbsp;{{ __('site.nav.loading') }}...</a>
 
         <a wire:loading.remove x-show="!editing" href="javascript:void(0)" class="btn btn-primary"
             style="padding: 1px 4px; margin-top: -3px"
-            @click="editing = true; setTimeout(() => {$refs.input2.focus()}, 100);" title="Entrar Manualmente"><i
+            @click="editing = true; setTimeout(() => {$refs.input2.focus()}, 100);" title="{{ __('site.nav.enter_manually') }}"><i
                 class="bi bi-pencil"></i></a>
         <a wire:loading.remove x-show="!editing" href="javascript:void(0)" class="btn btn-success"
-            style="padding: 1px 4px; margin-top: -3px" wire:click="searchDof" title="Obtener del DOF"><i
+            style="padding: 1px 4px; margin-top: -3px" wire:click="searchDof" title="{{ __('site.nav.obtain_from_dof') }}"><i
                 class="bi bi-cloud-download"></i></a>
 
         <input wire:loading.remove type="text" wire:model.lazy="tipo_cambio" x-ref="input2" x-show="editing"

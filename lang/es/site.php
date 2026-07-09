@@ -12,10 +12,50 @@ return [
         'restore' => 'Restaurar',
         'actives' => 'Activos',
         'inactives' => 'Inactivos',
+        'active' => 'Activo',
+        'inactive' => 'Inactivo',
         'all' => 'Todos',
         'actions' => 'Acciones',
         'select' => 'Seleccione...',
         'results_not_found' => 'No se encontraron resultados...',
+        'client_no_permissions' => 'No tiene permisos para realizar estar acción.',
+    ],
+    'validation' => [
+        'rfc_format' => 'El RFC no tiene un formato válido.',
+        'rfc_fiscal_regimen_incoherent' => 'El RFC y el régimen fiscal no son coherentes.',
+    ],
+    'login' => [
+        'welcome'  => 'bienvenido',
+        'welcome_detail' => 'Ingresa tus credenciales para acceder',
+        'email' => 'Correo',
+        'password' => 'Contraseña',
+        'remember_me' => 'Recuérdame',
+        'forgot_password' => '¿Olvidaste tu contraseña?',
+        'enter' => 'entrar',
+        'or_continue_with' => 'o continuar con',
+        'enter_with_gmail' => 'Iniciar sesión con G Suite'
+    ],
+    'nav' => [
+        'exchange_rate' => 'Tipo de Cambio',
+        'exchange_rate_sm' => 'TC',
+        'loading' => 'Cargando',
+        'enter_manually' => 'Entrar Manualmente',
+        'obtain_from_dof' => 'Obtener del DOF',
+        'mark-as-reads' => 'Marcar como leidos',
+        'mark-as-read' => 'Marcar como leido',
+        'see'  => 'Ver',
+        'notifications' => 'Notificaciones',
+        'update-profile' => 'Modificar Perfil',
+        'change-password' => 'Cambiar contraseña',
+        'my-company' => 'Mi Empresa',
+    ],
+    'forgot_password' => [
+        'reset_password' => 'resetear contraseña',
+        'reset_detail' => '¿Olvidaste tu contraseña? No te preocupes. Introduce tu correo y te enviaremos un enlace para restaurarla.',
+        'email_address' => 'dirección de correo',
+        'email_placeholder' => 'ejemplo@correo.com',
+        'send_link' => 'enviar enlace para restablecer la contraseña',
+        'back_to_login' => 'Volver al inicio de sesión'
     ],
     'sidebar' => [
         'administration' => 'Administración',
@@ -39,13 +79,28 @@ return [
         'most-sold-products' => 'Productos más Vendidos',
         'incomes' => 'Ingresos',
         'logs' => 'Trazas',
-        'quarantine' => 'Cuarentena'
+        'quarantine' => 'Cuarentena',
+        'sales_by_period' => 'Ventas por Período',
+        'best_selling_products' =>  'Productos más Vendidos',
+        'operations_history' => 'Histórico de Operaciones'
     ],
     'paginator' => [
         'showing' => 'Mostrando',
         'to' => 'a',
         'of' => 'de',
         'results' => 'resultados'
+    ],
+    'address' => [
+        'address' => 'Dirección',
+        'street' => 'Calle',
+        'number' => 'Número',
+        'colony' => 'Colonia',
+        'city' => 'Ciudad',
+        'municipality' => 'Municipio',
+        'state' => 'Estado',
+        'country' => 'País',
+        'postal_code' => 'Código Postal',
+        'reference' => 'Referencia',
     ],
     'users' => [
         'list' => [
@@ -156,6 +211,63 @@ return [
             'restore_package' => 'restaurar paquete',
             'are_you_sure' => '¿Está seguro de restaurar este paquete?',
             'confirm_restore' => 'Confirmar restauración',
+        ]
+    ],
+    'diners' => [
+        'index' => [
+            'title' => 'Clientes',
+            'search_diners' => 'Buscar Clientes',
+            'commercial_name' => 'Nombre Comercial',
+            'rfc' => 'RFC',
+            'social_reason' => 'Razón Social',
+            'phone' => 'Teléfono',
+            'status' => 'estado'
+        ],
+        'save' => [
+            'include_billing' => 'Incluir Facturación',
+            'load_fiscal_data' => 'Cargar datos fiscales desde Constancia Fiscal',
+            'create_diner' => 'Crear Cliente',
+            'edit_diner' => 'Editar Cliente',
+            'commercial_name' => 'Nombre Comercial',
+            'rfc' => 'RFC',
+            'social_reason' => 'Razón Social',
+            'phone' => 'Teléfono',
+            'email' => 'Correo Electrónico',
+            'fiscal_regime' => 'Régimen Fiscal',
+            'fiscal_address' => 'Dirección Fiscal',
+            'comments' => 'Comentarios',
+            'save_diner' => 'Guardar Cliente',
+            'invalid_file_type' => 'Seleccione el fichero correcto. Solo se aceptan archivos del tipo PDF.',
+            'fiscal_data_loaded' => 'Datos cargados correctamente.',
+            'invalid_fiscal_document' => 'Lo sentimos no se pudo realizar la carga de información. Documento inválido o corrupto.',
+            'address_updated_rfc' => 'La Dirección Fiscal del Comensal con RFC: :rfc, ha sido actualizada.',
+            'address_updated_commercial_name' => 'La Dirección Fiscal del Comensal con nombre comercial: :nombre_comercial, ha sido actualizada.',
+            'address_updated_log' => 'Dirección Fiscal de Comensal Actualizada',
+            'address_created_rfc' => 'La Dirección Fiscal del Comensal con RFC: :rfc, ha sido creada.',
+            'address_created_commercial_name' => 'La Dirección Fiscal del Comensal con nombre comercial: :nombre_comercial, ha sido creada.',
+            'address_created_log' => 'Dirección Fiscal de Comensal Creada',
+            'client_saved_successfully' => 'Cliente guardado.',
+            'client_save_failed' => 'Ocurrio un error. No se pudo guardar el cliente.'
+        ],
+        'delete' => [
+            'delete_diner' => 'Desactivar Cliente',
+            'are_you_sure' => '¿Está seguro de desactivar este cliente?',
+            'confirm_delete' => 'Confirmar desactivación',
+            'client_delete_success' => 'Cliente desactivado.',
+            'client_delete_failed' => 'Ocurrio un error. No se pudo desactivar el cliente.'
+        ],
+        'restore' => [
+            'restore_diner' => 'Restaurar Cliente',
+            'are_you_sure' => '¿Está seguro de restaurar este cliente?',
+            'confirm_restore' => 'Confirmar restauración',
+            'client_restore_success' => 'Cliente restaurado.',
+            'client_restore_failed' => 'Ocurrio un error. No se pudo restaurar el cliente.'
+        ]
+    ],
+    'clients' => [
+        'index' => [
+            'title' => 'Clientes',
+            'search_clients' => 'Buscar Clientes'
         ]
     ]
 ];
