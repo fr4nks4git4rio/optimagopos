@@ -64,7 +64,7 @@
             wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
         <button wire:loading.attr="disabled" type="submit" class="btn btn-danger">
             <span wire:loading.remove wire:target="confirmarActivacion">
-                <i class="bi bi-check-circle-fill me-1"></i> {{ __('site.subscription.activate.activate_subscription') }}
+                <i class="bi bi-check-circle-fill me-1"></i> {{ __('site.subscriptions.activate.activate_subscription') }}
             </span>
             <span wire:loading wire:target="confirmarActivacion" class="spinner-border spinner-border-sm" role="status"
                 aria-hidden="true"></span>

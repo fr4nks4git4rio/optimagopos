@@ -111,6 +111,32 @@
                     <i class="bi bi-box-seam me-1 text-primary"></i>
                     {{ $paquete_id ? __('site.subscriptions.manage_subscription.subscription_by_package') : __('site.subscriptions.manage_subscription.custom_subscription') }}
                 </span>
+
+                @if ($suscripcion && $suscripcion->id)
+                    <div class="d-flex gap-2 mt-1">
+                        @if ($estado !== 'ACTIVA')
+                            <button type="button" wire:loading.attr="disabled"
+                                wire:click="$emit('openModal', 'suscripciones.activar', {'scope': 'suscripciones.gestion-suscripciones', 'suscripcion': {{ $suscripcion->id }}})"
+                                class="btn btn-success btn-sm fw-bold shadow-sm">
+                                <i class="bi bi-check-circle-fill me-1"
+                                    wire:target="activarSuscripcion"></i>
+                                Activar
+                            </button>
+                        @endif
+
+                        {{-- @if ($estado === 'ACTIVA')
+                            <button type="button" wire:loading.attr="disabled" wire:target="desactivarSuscripcion"
+                                onclick="if(confirm('¿Confirmas desactivar esta suscripción? El cliente perderá el acceso al sistema.')) { @this.call('desactivarSuscripcion') }"
+                                class="btn btn-danger btn-sm fw-bold shadow-sm">
+                                <span wire:loading wire:target="desactivarSuscripcion"
+                                    class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                <i class="bi bi-x-circle-fill me-1" wire:loading.remove
+                                    wire:target="desactivarSuscripcion"></i>
+                                Desactivar
+                            </button>
+                        @endif --}}
+                    </div>
+                @endif
             </div>
         </div>
 

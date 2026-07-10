@@ -28,8 +28,8 @@ class GestionSuscripciones extends Component
     public $cant_usuarios = 1;
     public $fecha_inicio_operaciones;
     public $fecha_inicio_pagos;
-    public $periodicidad_pagos = 'MENSUAL';
-    public $estado = 'PENDIENTE';
+    public $periodicidad_pagos;
+    public $estado;
     public $modulos = [];
 
     // Propiedades calculadas en tiempo real para la vista
@@ -51,7 +51,7 @@ class GestionSuscripciones extends Component
     protected $queryString = [
         'clienteId' => ['except' => '']
     ];
-    protected $listeners = ['$refresh', 'sucursal-created' => 'AddSucursal', 'terminal-created' => 'AddTerminal', 'usuario-created' => 'AddUsuario'];
+    protected $listeners = ['$refresh', 'sucursal-created' => 'AddSucursal', 'terminal-created' => 'AddTerminal', 'usuario-created' => 'AddUsuario', 'suscripcion-activated' => 'SuscripcionActivada'];
 
     protected function rules()
     {
@@ -104,8 +104,8 @@ class GestionSuscripciones extends Component
             $this->cant_usuarios = $this->suscripcion->cant_usuarios;
             $this->fecha_inicio_operaciones = $this->suscripcion->fecha_inicio_operaciones ? $this->suscripcion->fecha_inicio_operaciones->format('Y-m-d') : today()->format('Y-m-d');
             $this->fecha_inicio_pagos = $this->suscripcion->fecha_inicio_pagos ? $this->suscripcion->fecha_inicio_pagos->format('Y-m-d') : today()->format('Y-m-d');
-            $this->periodicidad_pagos = $sub->periodicidad_pagos ?? 'MENSUAL';
-            $this->estado = $sub->estado ?? 'PENDIENTE';
+            $this->periodicidad_pagos = $this->suscripcion->periodicidad_pagos ?? 'MENSUAL';
+            $this->estado = $this->suscripcion->estado ?? 'PENDIENTE';
             $this->precio_paquete = $this->suscripcion ? $this->suscripcion->precio_paquete : 0.00;
             $this->precio_extra = $this->suscripcion ? $this->suscripcion->precio_extra : 0.00;
             $this->precio_total = $this->suscripcion ? $this->suscripcion->precio_total : 0.00;
@@ -360,6 +360,15 @@ class GestionSuscripciones extends Component
         $this->usuariosDisponibles[] = User::find($id)->only(['value', 'label']);
     }
 
+    public function SuscripcionActivada($id)
+    {
+        return redirect()->route('admin.suscripciones.save', $id);
+    }
+    public function SuscripcionDesactivada()
+    {
+        return redirect()->route('admin.suscripciones.index');
+    }
+
     public function submit()
     {
         $data = $this->validate();
@@ -406,9 +415,9 @@ class GestionSuscripciones extends Component
     public function render()
     {
         $clientes = Cliente::whereHas('direccion_fiscal', function ($query) {
-                return $query->whereNotNull('codigo_postal')
-                    ->where('codigo_postal', '!=', '');
-            })
+            return $query->whereNotNull('codigo_postal')
+                ->where('codigo_postal', '!=', '');
+        })
             ->where('es_cliente', 1)
             ->whereNotNull('razon_social')
             ->where('razon_social', '!=', '')

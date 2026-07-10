@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 
 class Activar extends Modal
 {
+    public $scope;
     public Suscripcion $suscripcion;
 
     public $selectedSubscriptionData = [
@@ -164,6 +165,8 @@ class Activar extends Modal
             DB::commit();
 
             $this->emit('show-toast', 'Suscripción activada.');
+            if ($this->scope)
+                $this->emitTo($this->scope, 'suscripcion-activated', $this->suscripcion->id);
             $this->emit('$refresh');
             $this->emit('closeModal');
         } catch (\Exception $e) {
