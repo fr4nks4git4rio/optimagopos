@@ -17,7 +17,7 @@ class Delete extends Modal
     public function init()
     {
         if (user()->cannot('delete', $this->sucursal)) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -29,7 +29,7 @@ class Delete extends Modal
         $this->sucursal->save();
         $this->sucursal->delete();
 
-        $this->emit('show-toast', 'Sucursal desactivada.');
+        $this->emit('show-toast', __('site.branches.delete.branch_delete_success'));
         $this->emit('$refresh');
         $this->emit('closeModal');
     }

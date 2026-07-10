@@ -17,7 +17,7 @@ class Delete extends Modal
     public function init()
     {
         if (user()->cannot('deleteCliente', $this->cliente)) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -27,7 +27,7 @@ class Delete extends Modal
     {
         $this->cliente->delete();
 
-        $this->emit('show-toast', 'Cliente desactivado.');
+        $this->emit('show-toast', __('site.clientes.delete.client_delete_success'));
         $this->emit('$refresh');
         $this->emit('closeModal');
     }

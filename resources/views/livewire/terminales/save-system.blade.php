@@ -1,28 +1,28 @@
 <x-modal form-action="save">
     <x-slot:title>
-        {{ $terminal->exists ? 'Editar ' : 'Crear ' }}Terminal
+        {{ $terminal->id ? __('site.terminals.save.edit_terminal') : __('site.terminals.save.create_terminal') }}
     </x-slot:title>
 
     <x-slot:content>
         <div wire:init="init">
 
-            <x-select2-component-modals label="Cliente" placeholder="Seleccione..." class="form-control" :options="$clientes"
+            <x-select2-component-modals label="{{__('site.terminals.save.client')}}" placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$clientes"
                 model="cliente_id" :lazy="true" :disabled="$from_subscription" />
 
-            <x-select2-component-modals label="Sucursal" placeholder="Seleccione..." class="form-control" :options="$sucursales"
+            <x-select2-component-modals label="{{__('site.terminals.save.branch')}}" placeholder="{{__('site.common.select')}}..." class="form-control" :options="$sucursales"
                 model="sucursal_id" :dynamic="true" :disabled="$from_subscription" />
 
             @if (!$from_subscription)
-                <x-select2-component-modals label="Suscripción" placeholder="Seleccione..." class="form-control"
+                <x-select2-component-modals label="{{__('site.terminals.save.subscription')}}" placeholder="{{__('site.common.select')}}..." class="form-control"
                     :options="$suscripciones" model="suscripcion_id" :dynamic="true" />
             @endif
 
-            <x-input label="Nombre" type="text" model="nombre" />
+            <x-input label="{{__('site.terminals.save.name')}}" type="text" model="nombre" />
 
-            <x-input label="Identificador" disabled type="text" model="identificador" />
+            <x-input label="{{__('site.terminals.save.identifier')}}" disabled type="text" model="identificador" />
 
             <div class="mb-1">
-                <label for="">Comentarios:</label>
+                <label for="">{{__('site.terminals.save.comments')}}:</label>
                 <textarea class="form-control" wire:model.defer="comentarios" rows="3"></textarea>
             </div>
         </div>
@@ -30,8 +30,8 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
-            Cerrar
+            {{__('site.common.close')}}
         </button>
-        <button type="submit" class="btn btn-primary">Guardar Terminal</button>
+        <button type="submit" class="btn btn-primary">{{__('site.terminals.save.save_terminal')}}</button>
     </x-slot:buttons>
 </x-modal>

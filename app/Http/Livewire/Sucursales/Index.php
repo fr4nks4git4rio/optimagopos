@@ -19,9 +19,9 @@ class Index extends Component
     public $search;
     public $order;
     public $sort;
-    public $sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono', 'Cliente'];
+    public $sorts = [];
     public $filter;
-    public $filters = ['Activos', 'Inactivos', 'Todos'];
+    public $filters = [];
 
     protected $queryString = ['search', 'perPage', 'sort', 'filter'];
 
@@ -30,14 +30,15 @@ class Index extends Component
     public function mount()
     {
         if (user()->is_super_admin)
-            $this->sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono', 'Cliente'];
+            $this->sorts = [__('site.branches.index.commercial_name'), __('site.branches.index.rfc'), __('site.branches.index.social_reason'), __('site.branches.index.phone'), __('site.branches.index.client')];
         else
-            $this->sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono'];
+            $this->sorts = [__('site.branches.index.commercial_name'), __('site.branches.index.rfc'), __('site.branches.index.social_reason'), __('site.branches.index.phone')];
+        $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
         $this->perPage = $this->perPage ?? 10;
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
-        $this->sort = $this->sort ?? 'Nombre Comercial';
-        $this->filter = $this->filter ?? 'Activos';
+        $this->sort = $this->sort ?? __('site.branches.index.commercial_name');
+        $this->filter = $this->filter ?? __('site.common.actives');
     }
 
     public function getClassSortProperty()

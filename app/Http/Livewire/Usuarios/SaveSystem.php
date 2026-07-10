@@ -129,7 +129,7 @@ class SaveSystem extends Modal
         }
         $this->user->save();
 
-        $this->emit('show-toast', 'Usuario guardado.');
+        $this->emit('show-toast', __('site.users.save.user_saved'));
 
         if ($this->scope) {
             if ($this->user->wasRecentlyCreated) {
@@ -158,7 +158,7 @@ class SaveSystem extends Modal
     public function init()
     {
         if (user()->cannot($this->user->exists() ? 'update' : 'create', $this->user->exists() ? $this->user : [User::class])) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }

@@ -73,7 +73,7 @@ class Configuraciones extends Modal
     public function init()
     {
         if (user()->cannot('setConfigs', $this->sucursal)) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -95,15 +95,15 @@ class Configuraciones extends Modal
     {
         if ($key == 'moneda_sucursal') {
             if (!$this->{$key}) {
-                $this->emit('show-toast', 'Hay errores en el formulario.', 'danger');
-                $this->addError($key, 'Campo obligatorio.');
+                $this->emit('show-toast', __('site.common.form_with_errors'), 'danger');
+                $this->addError($key, __('validation.required', ['attribute' => __("validation.attributes.$key")]));
                 $this->{$key} = $this->sucursal->moneda_base_id;
                 return;
             }
             DB::table('tb_sucursales')->where('id', $this->sucursal->id)->update(['moneda_base_id' => $this->{$key}]);
         }
 
-        $this->emit('show-toast', 'Configuración actualizada!');
+        $this->emit('show-toast', __('site.branches.configs.configs_updated'));
         $this->emit('$refresh');
     }
 
@@ -137,7 +137,7 @@ class Configuraciones extends Modal
             ]
         );
         $this->loadTiposCambio();
-        $this->emit('show-toast', 'Tasa de cambio guardada!');
+        $this->emit('show-toast', __('site.branches.configs.exchange_rate_saved'));
         $this->emit('$refresh');
     }
 
@@ -145,7 +145,7 @@ class Configuraciones extends Modal
     {
         $tipo_cambio = TipoCambio::find($id);
         if (!$tipo_cambio || $tipo_cambio->sucursal_id != $this->sucursal->id) {
-            $this->emit('show-toast', 'Tasa de cambio no encontrada.', 'danger');
+            $this->emit('show-toast', __('site.branches.configs.exchange_rate_not_found'), 'danger');
             return;
         }
         $this->tipo_cambio = [

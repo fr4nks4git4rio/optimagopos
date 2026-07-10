@@ -103,7 +103,7 @@ class Save extends Modal
     {
         if ($value) {
             if ($value->getMimeType() != 'application/pdf') {
-                $this->emit('show-toast', 'Seleccione el fichero correcto. Solo se aceptan archivos del tipo PDF.', 'danger');
+                $this->emit('show-toast', __('site.clients.save.invalid_file_type'), 'danger');
                 return;
             }
 
@@ -139,10 +139,10 @@ class Save extends Modal
                     $this->direccion_fiscal['municipio_id'] = Municipio::where('estado_id', $this->direccion_fiscal['estado_id'])->where('nombre', $datos_fiscales['municipio'])->first()?->id;
                 }
                 $this->regimen_fiscal_id = optional(RegimenFiscal::findByDescription($datos_fiscales['regimen_fiscal']))->id;
-                $this->emit('show-toast', 'Datos cargados correctamente.', 'success');
+                $this->emit('show-toast', __('site.clients.save.fiscal_data_loaded'), 'success');
             } catch (Exception $e) {
                 Log::error("cargando los datos fiscales desde documento fiscal. Error: {$e->getMessage()}");
-                $this->emit('show-toast', 'Lo sentimos no se pudo realizar la carga de información. Documento inválido o corrupto.', 'danger');
+                $this->emit('show-toast', __('site.clients.save.invalid_fiscal_document'), 'danger');
             }
         }
     }
@@ -250,8 +250,12 @@ class Save extends Modal
                 ]);
                 if (count($clienteDB->direccion_fiscal->getDirty()) > 0) {
                     $attributes = Arr::except($clienteDB->direccion_fiscal->getDirty(), ['created_at', 'updated_at']);
-                    $log = $clienteDB->rfc ? "La Dirección Fiscal del Cliente con RFC: {$clienteDB->rfc}, ha sido actualizada." : "La Dirección Fiscal del Cliente con nombre comercial: {$this->cliente->nombre_comercial}, ha sido actualizada.";
-                    activity('Dirección Fiscal de Cliente Actualizada')
+                    if ($clienteDB->rfc) {
+                        $log = __('site.clients.save.address_updated_rfc', ['rfc' => $clienteDB->rfc]);
+                    } else {
+                        $log = __('site.clients.save.address_updated_commercial_name', ['nombre_comercial' => Crypt::decrypt($clienteDB->nombre_comercial)]);
+                    }
+                    activity(__('site.clients.save.fiscal_address_updated'))
                         ->on($clienteDB->direccion_fiscal)
                         ->event('updated')
                         ->withProperty('attributes', Direccion::parseData($attributes))
@@ -274,16 +278,20 @@ class Save extends Modal
                 $clienteDB->direccion_fiscal_id = $dir->id;
                 $clienteDB->save();
 
-                $log = $clienteDB->rfc ? "La Dirección Fiscal del Cliente con RFC: {$clienteDB->rfc}, ha sido creada." : "La Dirección Fiscal del Cliente con nombre comercial: {$clienteDB->nombre_comercial}, ha sido creada.";
+                if ($clienteDB->rfc) {
+                    $log = __('site.clients.save.address_created_rfc', ['rfc' => $clienteDB->rfc]);
+                } else {
+                    $log = __('site.clients.save.address_created_commercial_name', ['nombre_comercial' => Crypt::decrypt($clienteDB->nombre_comercial)]);
+                }
 
-                activity("Dirección Fiscal de Cliente Creada")
+                activity(__('site.clients.save.fiscal_address_created'))
                     ->on($dir)
                     ->event('created')
                     ->withProperties(Direccion::parseData(Arr::except($dir->toArray(), ['updated_at'])))
                     ->log($log);
             }
 
-            $this->emit('show-toast', 'Cliente guardado.');
+            $this->emit('show-toast', __('site.clients.save.client_saved_successfully'));
             if ($this->scope) {
                 if ($clienteDB->wasRecentlyCreated) {
                     $this->emitTo($this->scope, 'cliente-created', $clienteDB->id);
@@ -298,14 +306,14 @@ class Save extends Modal
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
-            $this->emit('show-toast', 'Ocurrio un error. ' . $e->getMessage(), 'danger');
+            $this->emit('show-toast', __('site.clients.save.client_save_failed'), 'danger');
         }
     }
 
     public function init()
     {
         if (user()->cannot($this->cliente->id ? 'updateCliente' : 'createCliente', $this->cliente->id ? $this->cliente : [Cliente::class])) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }

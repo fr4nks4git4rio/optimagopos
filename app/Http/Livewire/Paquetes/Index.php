@@ -33,8 +33,8 @@ class Index extends Component
         $this->perPage = $this->perPage ?? 10;
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
-        $this->sort = $this->sort ?? 'Nombre';
-        $this->filter = $this->filter ?? 'Activos';
+        $this->sort = $this->sort ?? __('site.packages.list.name');
+        $this->filter = $this->filter ?? __('site.common.actives');
     }
 
     public function getClassSortProperty()
@@ -56,7 +56,7 @@ class Index extends Component
     public function init()
     {
         if (user()->cannot('viewAny', [Paquete::class])) {
-            $this->emit('show-toast', 'No tiene permisos para acceder a estos registros.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
     }

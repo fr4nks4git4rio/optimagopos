@@ -1,4 +1,4 @@
-@section('title', 'Sucursales')
+@section('title', __('site.branches.index.title'))
 
 <div wire:init="init">
     <h1 class="fs-1 mb-2">@yield('title')</h1>
@@ -7,7 +7,7 @@
         <div class="col-lg-auto mb-3">
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Sucursales" class="form-control"
+                <input type="search" placeholder="{{ __('site.branches.index.search_branches') }}" class="form-control"
                     wire:model.debounce.500ms="search">
             </div>
         </div>
@@ -16,7 +16,7 @@
                 <button type="button" class="btn btn-site-primary btn-outline-warning"
                     wire:click="$emit('openModal', 'sucursales.save')">
                     <x-icon name="plus-lg" />
-                    Crear
+                    {{ __('site.common.create') }}
                 </button>
             @endcan
 
@@ -31,13 +31,13 @@
                 @endforeach
             </x-dropdown>
 
-            <x-dropdown icon="filter" :label="__($filter)">
+            <x-dropdown icon="filter" :label="$filter">
                 @foreach ($filters as $filter)
                     @if ($this->filter == $filter)
-                        <x-dropdown-item :label="__($filter)" class="active"
+                        <x-dropdown-item :label="$filter" class="active"
                             click="$set('filter', '{{ $filter }}')" />
                     @else
-                        <x-dropdown-item :label="__($filter)" click="$set('filter', '{{ $filter }}')" />
+                        <x-dropdown-item :label="$filter" click="$set('filter', '{{ $filter }}')" />
                     @endif
                 @endforeach
             </x-dropdown>
@@ -48,9 +48,9 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th>Logo</th>
+                    <th>{{ __('site.branches.index.logo') }}</th>
                     @foreach ($sorts as $sort)
-                        <th class="text-left cursor-pointer" style="white-space: nowrap !important"
+                        <th class="text-left cursor-pointer text-uppercase" style="white-space: nowrap !important"
                             wire:click="changeSort('{{ $sort }}')">
                             <span>
                                 @if ($this->sort == $sort)
@@ -59,7 +59,7 @@
                             </span>
                         </th>
                     @endforeach
-                    <th class="text-center">Acciones</th>
+                    <th class="text-center text-uppercase">{{ __('site.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -81,32 +81,32 @@
                                 @if (!$sucursal['deleted_at'])
                                     @can('update', App\Models\Sucursal::find($sucursal['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="pencil" title="Modificar"
+                                            <x-action icon="pencil" title="{{ __('site.common.edit') }}"
                                                 click="$emit('openModal', 'sucursales.save', {sucursal : {{ $sucursal['id'] }}})" />
                                         </li>
                                     @endcan
                                     @can('setPaymentForms', App\Models\Sucursal::find($sucursal['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="card-list" title="Formas de Pago"
+                                            <x-action icon="card-list" title="{{ __('site.common.payment_form') }}"
                                                 click="$emit('openModal', 'sucursales.formas-pago', {sucursal: {{ $sucursal['id'] }}})" />
                                         </li>
                                     @endcan
                                     @can('setConfigs', App\Models\Sucursal::find($sucursal['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="gear" title="Configuraciones"
+                                            <x-action icon="gear" title="{{ __('site.common.configs') }}"
                                                 click="$emit('openModal', 'sucursales.configuraciones', {sucursal: {{ $sucursal['id'] }}})" />
                                         </li>
                                     @endcan
                                     @can('delete', App\Models\Sucursal::find($sucursal['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="trash" title="Desactivar"
+                                            <x-action icon="trash" title="{{ __('site.common.deactivate') }}"
                                                 click="$emit('openModal', 'sucursales.delete', {sucursal: {{ $sucursal['id'] }}})" />
                                         </li>
                                     @endcan
                                 @else
                                     @can('restore', App\Models\Sucursal::withTrashed()->find($sucursal['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="check-circle" title="Reactivar"
+                                            <x-action icon="check-circle" title="{{ __('site.common.restore') }}"
                                                 click="$emit('openModal', 'sucursales.restore', {sucursal_id: {{ $sucursal['id'] }}})" />
                                         </li>
                                     @endcan
@@ -116,9 +116,9 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ user()->is_super_admin ? 7 : 6 }}">
+                        <td colspan="{{ user()->cliente_id ? 6 : 7 }}">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{ __('site.common.results_not_found') }}
                             </div>
                         </td>
                     </tr>

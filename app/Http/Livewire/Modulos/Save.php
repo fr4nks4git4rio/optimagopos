@@ -66,7 +66,7 @@ class Save extends Modal
 
         // Emitir alerta de éxito (puedes atraparla con SweetAlert o Bootstrap Toasts)
 
-        $this->emit('show-toast', 'Módulo guardado correctamente', 'success');
+        $this->emit('show-toast', __('site.modules.save.module_saved'), 'success');
 
         $this->emit('$refresh');
         $this->emit('closeModal');
@@ -74,8 +74,8 @@ class Save extends Modal
 
     public function init()
     {
-        if (user()->cannot($this->modulo->exists() ? 'update' : 'create', $this->modulo->exists() ? $this->modulo : [Modulo::class])) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+        if (user()->cannot($this->modulo->id ? 'update' : 'create', $this->modulo->id ? $this->modulo : [Modulo::class])) {
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }

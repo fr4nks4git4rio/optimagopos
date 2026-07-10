@@ -1,4 +1,4 @@
-@section('title', 'Suscripciones')
+@section('title', __('site.subscriptions.index.title'))
 
 <div wire:init="init">
     <h1 class="fs-1 mb-2">@yield('title')</h1>
@@ -7,7 +7,7 @@
         <div class="col-lg-auto mb-3">
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Suscripciones" class="form-control"
+                <input type="search" placeholder="{{__('site.subscriptions.index.search_subscriptions')}}" class="form-control"
                     wire:model.debounce.500ms="search">
             </div>
         </div>
@@ -15,7 +15,7 @@
             @can('create', [App\Models\Suscripcion::class])
                 <a href="{{ route('admin.suscripciones.save') }}" class="btn btn-site-primary btn-outline-warning">
                     <x-icon name="plus-lg" />
-                    Crear
+                    {{__('site.common.create')}}
                 </a>
             @endcan
 
@@ -37,7 +37,7 @@
             <thead>
                 <tr>
                     @foreach ($sorts as $sort)
-                        <th class="text-left cursor-pointer" style="white-space: nowrap !important"
+                        <th class="text-left cursor-pointer text-uppercase" style="white-space: nowrap !important"
                             wire:click="changeSort('{{ $sort }}')">
                             <span>
                                 @if ($this->sort == $sort)
@@ -46,7 +46,7 @@
                             </span>
                         </th>
                     @endforeach
-                    <th class="text-center">Acciones</th>
+                    <th class="text-center text-uppercase">{{__('site.common.actions')}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,24 +68,29 @@
                         <td class="text-center">
                             @php
                                 $classEstado = 'dark';
+                                $estado = __('site.subscriptions.index.no_status');
                                 switch ($sub['estado']) {
                                     case 'PENDIENTE':
                                         $classEstado = 'primary';
+                                        $estado = __('site.subscriptions.index.pending');
                                         break;
                                     case 'ACTIVA':
                                         $classEstado = 'success';
+                                        $estado = __('site.subscriptions.index.active');
                                         break;
                                     case 'VENCIDA':
                                         $classEstado = 'warning';
+                                        $estado = __('site.subscriptions.index.expired');
                                         break;
                                     case 'INACTIVA':
                                         $classEstado = 'danger';
+                                        $estado = __('site.subscriptions.index.inactive');
                                         break;
                                 }
                             @endphp
                             <span
                                 class="badge bg-{{ $classEstado }}-subtle text-{{ $classEstado }} border-1 border-{{ $classEstado }}">
-                                {{ $sub['estado'] }}
+                                {{ $estado }}
                             </span>
                         </td>
                         <td class="text-center">
@@ -93,24 +98,24 @@
                                 @if (in_array($sub['estado'], ['PENDIENTE', 'ACTIVA']))
                                     @can('update', App\Models\Suscripcion::find($sub['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="pencil" title="Modificar" :href="route('admin.suscripciones.save', $sub['id'])" />
+                                            <x-action icon="pencil" title="{{__('site.common.edit')}}" :href="route('admin.suscripciones.save', $sub['id'])" />
                                         </li>
                                     @endcan
                                     @can('activate', App\Models\Suscripcion::find($sub['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="check2-square" title="Activar"
+                                            <x-action icon="check2-square" title="{{__('site.common.activate')}}"
                                                 click="$emit('openModal', 'suscripciones.activar', {'suscripcion': {{ $sub['id'] }}})" />
                                         </li>
                                     @endcan
                                     @if ($sub['estado'] == 'ACTIVA')
                                         <li class="list-inline-item">
-                                            <x-action icon="file-pdf" title="Descargar PDF"
+                                            <x-action icon="file-pdf" title="{{__('site.common.download_pdf')}}"
                                                 click="descargarPdf({{ $sub['id'] }})" />
                                         </li>
                                     @endif
                                     @can('revoke', App\Models\Suscripcion::find($sub['id']))
                                         <li class="list-inline-item">
-                                            <x-action icon="trash" title="Revocar" />
+                                            <x-action icon="trash" title="{{ __('site.common.deactivate') }}" />
                                         </li>
                                     @endcan
                                 @endif
@@ -121,7 +126,7 @@
                     <tr>
                         <td colspan="9">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{__('site.common.results_not_found')}}
                             </div>
                         </td>
                     </tr>
@@ -137,7 +142,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">PDF</h5>
+                        <h5 class="modal-title">{{__('site.common.pdf')}}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                             wire:click="$set('iframeContainerClass', '')"></button>
                     </div>
@@ -149,7 +154,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')">{{ __('Cerrar') }}</button>
+                            wire:click="$set('iframeContainerClass', '')">{{ __('site.common.close') }}</button>
                     </div>
                 </div>
             </div>

@@ -92,7 +92,7 @@
                                     model="direccion_fiscal.estado_id" :dynamic="true" />
                             </div>
                             <div class="col-3">
-                                <x-select2-ajax-component-modals label="{{ __('site.address.city') }}" placeholder="Seleccione..."
+                                <x-select2-ajax-component-modals label="{{ __('site.address.locality') }}" placeholder="Seleccione..."
                                     class="form-control"
                                     url="{{ route('localidades.load-localidades', ['estado_id' => $direccion_fiscal['estado_id']]) }}"
                                     model="direccion_fiscal.localidad_id" :dynamic="true" />

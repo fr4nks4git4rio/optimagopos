@@ -16,7 +16,7 @@
                 <button type="button" class="btn btn-site-primary btn-outline-warning"
                     wire:click="$emit('openModal', 'clientes.save')">
                     <x-icon name="plus-lg" />
-                    Crear
+                    {{ __('site.common.create') }}
                 </button>
             @endcan
 
@@ -58,7 +58,7 @@
                             </span>
                         </th>
                     @endforeach
-                    <th class="text-center">Acciones</th>
+                    <th class="text-center">{{ __('site.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -70,7 +70,8 @@
                         <td>{{ $cliente['telefono'] }}</td>
                         <td>
                             @if ($cliente['deleted_at'])
-                                <span class="badge bg-danger-subtle text-danger border-1 border-danger">{{ __('site.common.inactive') }}</span>
+                                <span
+                                    class="badge bg-danger-subtle text-danger border-1 border-danger">{{ __('site.common.inactive') }}</span>
                             @else
                                 <span
                                     class="badge bg-success-subtle text-success border-1 border-success">{{ __('site.common.active') }}</span>
@@ -112,7 +113,7 @@
                     <tr>
                         <td colspan="4">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{ __('site.common.results_not_found') }}
                             </div>
                         </td>
                     </tr>

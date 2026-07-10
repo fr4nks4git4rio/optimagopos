@@ -113,7 +113,7 @@ class SaveSystem extends Modal
     public function init()
     {
         if (user()->cannot($this->terminal->exists() ? 'update' : 'create', $this->terminal->exists() ? $this->terminal : [Terminal::class])) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -135,7 +135,7 @@ class SaveSystem extends Modal
 
         $this->terminal->fill($data)->save();
 
-        $this->emit('show-toast', 'Terminal guardada.');
+        $this->emit('show-toast', __('site.terminals.save.terminal_saved'));
 
         if ($this->scope) {
             if ($this->terminal->wasRecentlyCreated) {

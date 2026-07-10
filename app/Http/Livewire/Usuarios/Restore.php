@@ -18,7 +18,7 @@ class Restore extends Modal
     public function init()
     {
         if (user()->cannot('restore', User::withTrashed()->find($this->usuario))) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -29,7 +29,7 @@ class Restore extends Modal
         $this->usuario = User::onlyTrashed()->find($this->usuario);
         $this->usuario->restore();
 
-        $this->emit('show-toast', 'Usuario activado.');
+        $this->emit('show-toast', __('site.users.restore.user_activated'));
         $this->emit('$refresh');
         $this->emit('closeModal');
     }

@@ -1,17 +1,17 @@
 <x-modal form-action="save">
     <x-slot:title>
-        Editar Terminal
+        {{ __('site.terminals.save.edit_terminal') }}
     </x-slot:title>
 
     <x-slot:content>
         <div wire:init="init">
 
-            <x-input label="Nombre" type="text" model="nombre" />
+            <x-input label="{{ __('site.terminals.save.name') }}" type="text" model="nombre" />
 
-            <x-input label="Identificador" disabled type="text" model="identificador" />
+            <x-input label="__('site.terminals.save.identifier')" disabled type="text" model="identificador" />
 
             <div class="mb-1">
-                <label for="">Comentarios:</label>
+                <label for="">{{ __('site.terminals.save.comments') }}:</label>
                 <textarea class="form-control" wire:model.defer="comentarios" rows="3"></textarea>
             </div>
         </div>
@@ -19,8 +19,8 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
-            Cerrar
+            {{ __('site.common.close') }}
         </button>
-        <button type="submit" class="btn btn-primary">Guardar Terminal</button>
+        <button type="submit" class="btn btn-primary">{{ __('site.terminals.save.save_terminal') }}</button>
     </x-slot:buttons>
 </x-modal>

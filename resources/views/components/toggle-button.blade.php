@@ -104,7 +104,8 @@
     }
 
     .button-toggle .knobs:before {
-        content: "NO";
+        content: "{{ __('site.common.no') }}";
+        text-transform: uppercase;
         position: absolute;
         top: 0;
         left: 0;
@@ -122,7 +123,8 @@
     }
 
     .button-toggle .checkbox:checked+.knobs:before {
-        content: "SI";
+        content: "{{ __('site.common.yes') }}";
+        text-transform: uppercase;
         left: 38px;
         background-color: var(--color-primary);
     }

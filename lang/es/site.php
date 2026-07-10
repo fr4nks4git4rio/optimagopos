@@ -10,6 +10,8 @@ return [
         'create' => 'Crear',
         'update' => 'Actualizar',
         'restore' => 'Restaurar',
+        'activate' => 'Activar',
+        'download_pdf' => 'Descargar PDF',
         'actives' => 'Activos',
         'inactives' => 'Inactivos',
         'active' => 'Activo',
@@ -19,6 +21,12 @@ return [
         'select' => 'Seleccione...',
         'results_not_found' => 'No se encontraron resultados...',
         'client_no_permissions' => 'No tiene permisos para realizar estar acción.',
+        'yes' => 'si',
+        'no' =>  'no',
+        'payment_form' => 'Forma de Pago',
+        'configs' => 'Configuraciones',
+        'form_with_errors' => 'Hay errores en el formulario.',
+        'pdf' => 'PDF'
     ],
     'validation' => [
         'rfc_format' => 'El RFC no tiene un formato válido.',
@@ -93,14 +101,21 @@ return [
     'address' => [
         'address' => 'Dirección',
         'street' => 'Calle',
-        'number' => 'Número',
+        'exterior_number' => 'Número exterior',
+        'interior_number' => 'Número interior',
         'colony' => 'Colonia',
-        'city' => 'Ciudad',
+        'locality' => 'Localidad',
         'municipality' => 'Municipio',
         'state' => 'Estado',
         'country' => 'País',
         'postal_code' => 'Código Postal',
         'reference' => 'Referencia',
+    ],
+    'contact_info' => [
+        'full_name' => 'Nombre Completo',
+        'email' => 'Correo',
+        'phone' => 'Teléfono',
+        'position' => 'Cargo'
     ],
     'users' => [
         'list' => [
@@ -126,16 +141,19 @@ return [
             'password' => 'contraseña',
             'confirm_password' => 'confirmar contraseña',
             'save_user' => 'guardar usuario',
+            'user_saved' => 'Usuario guardado'
         ],
         'delete' => [
             'delete_user' => 'desactivar usuario',
             'are_you_sure' => '¿Está seguro de desactivar este usuario?',
             'confirm_delete' => 'Confirmar desactivación',
+            'user_deactivated' => 'Usuario desactivado.'
         ],
         'restore' => [
             'restore_user' => 'restaurar usuario',
             'are_you_sure' => '¿Está seguro de restaurar este usuario?',
             'confirm_restore' => 'Confirmar restauración',
+            'user_activated' => 'Usuario activado.'
         ]
     ],
     'modules' => [
@@ -163,16 +181,20 @@ return [
             'module_description_placeholder' => 'Aquí aparecerá la descripción introducida para el módulo...',
             'functions' => 'funciones',
             'save_module' => 'guardar módulo',
+            'module_saved' => 'Módulo guardado.'
         ],
         'delete' => [
             'delete_module' => 'eliminar módulo',
             'are_you_sure' => '¿Está seguro de eliminar este módulo?',
             'confirm_delete' => 'Confirmar eliminación',
+            'module_deactivated' => 'Módulo desactivado'
         ],
         'restore' => [
             'restore_module' => 'restaurar módulo',
             'are_you_sure' => '¿Está seguro de restaurar este módulo?',
             'confirm_restore' => 'Confirmar restauración',
+            'module_not_found' => 'Módulo no encontrado',
+            'module_activated' => 'Módulo activado.'
         ]
     ],
     'packages' => [
@@ -201,16 +223,20 @@ return [
             'package_description_placeholder' => 'Aquí aparecerá la descripción introducida para el paquete...',
             'functions' => 'funciones',
             'save_package' => 'guardar paquete',
+            'package_saved' => 'Paquete guardado.'
         ],
         'delete' => [
             'delete_package' => 'eliminar paquete',
             'are_you_sure' => '¿Está seguro de eliminar este paquete?',
             'confirm_delete' => 'Confirmar eliminación',
+            'package_deactivated' => 'Paquete desactivado.'
         ],
         'restore' => [
             'restore_package' => 'restaurar paquete',
             'are_you_sure' => '¿Está seguro de restaurar este paquete?',
             'confirm_restore' => 'Confirmar restauración',
+            'package_not_found' => 'Paquete no encontrado',
+            'package_activated' => 'Paquete activado.'
         ]
     ],
     'diners' => [
@@ -247,7 +273,9 @@ return [
             'address_created_commercial_name' => 'La Dirección Fiscal del Comensal con nombre comercial: :nombre_comercial, ha sido creada.',
             'address_created_log' => 'Dirección Fiscal de Comensal Creada',
             'client_saved_successfully' => 'Cliente guardado.',
-            'client_save_failed' => 'Ocurrio un error. No se pudo guardar el cliente.'
+            'client_save_failed' => 'Ocurrio un error. No se pudo guardar el cliente.',
+            'fiscal_address_created' => 'Dirección Fiscal de Comensal Creada',
+            'fiscal_address_updated' => 'Dirección Fiscal de Comensal Actualizada',
         ],
         'delete' => [
             'delete_diner' => 'Desactivar Cliente',
@@ -267,7 +295,257 @@ return [
     'clients' => [
         'index' => [
             'title' => 'Clientes',
-            'search_clients' => 'Buscar Clientes'
+            'search_clients' => 'Buscar Clientes',
+            'commercial_name' => 'Nombre Comercial',
+            'rfc' => 'RFC',
+            'social_reason' => 'Razón Social',
+            'phone' => 'Teléfono',
+            'status' => 'Estado'
+        ],
+        'save' => [
+            'create_client' => 'Crear Cliente',
+            'edit_client' => 'Editar Cliente',
+            'include_billing' => 'Facturación incluida',
+            'load_fiscal_data' => 'Cargar datos fiscales desde Constancia Fiscal',
+            'commercial_name' => 'Nombre Comercial',
+            'rfc' => 'RFC',
+            'social_reason' => 'Razón Social',
+            'phone' => 'Teléfono',
+            'email' => 'Correo Electrónico',
+            'fiscal_regime' => 'Régimen Fiscal',
+            'loyal_client' => 'Cliente fiel',
+            'fiscal_address' => 'Dirección Fiscal',
+            'contact_info' => 'Datos Contacto',
+            'comments' => 'Comentarios',
+            'save_client' => 'Guardar Cliente',
+            'invalid_file_type' => 'Seleccione el fichero correcto. Solo se aceptan archivos del tipo PDF.',
+            'fiscal_data_loaded' => 'Datos cargados correctamente.',
+            'invalid_fiscal_document' => 'Lo sentimos no se pudo realizar la carga de información. Documento inválido o corrupto.',
+            'address_updated_rfc' => 'La Dirección Fiscal del Comensal con RFC: :rfc, ha sido actualizada.',
+            'address_updated_commercial_name' => 'La Dirección Fiscal del Comensal con nombre comercial: :nombre_comercial, ha sido actualizada.',
+            'address_updated_log' => 'Dirección Fiscal de Comensal Actualizada',
+            'address_created_rfc' => 'La Dirección Fiscal del Comensal con RFC: :rfc, ha sido creada.',
+            'address_created_commercial_name' => 'La Dirección Fiscal del Comensal con nombre comercial: :nombre_comercial, ha sido creada.',
+            'address_created_log' => 'Dirección Fiscal de Comensal Creada',
+            'client_saved_successfully' => 'Cliente guardado.',
+            'client_save_failed' => 'Ocurrio un error. No se pudo guardar el cliente.',
+            'fiscal_address_created' => 'Dirección Fiscal de Cliente Creada',
+            'fiscal_address_updated' => 'Dirección Fiscal de Cliente Actualizada',
+        ],
+        'delete' => [
+            'delete_client' => 'Desactivar Cliente',
+            'are_you_sure' => '¿Está seguro de desactivar este cliente?',
+            'confirm_delete' => 'Confirmar desactivación',
+            'client_delete_success' => 'Cliente desactivado.',
+            'client_delete_failed' => 'Ocurrio un error. No se pudo desactivar el cliente.',
+        ],
+        'restore' => [
+            'restore_client' => 'Restaurar Cliente',
+            'are_you_sure' => '¿Está seguro de restaurar este cliente?',
+            'confirm_restore' => 'Confirmar restauración',
+            'client_restore_success' => 'Cliente restaurado.',
+            'client_restore_failed' => 'Ocurrio un error. No se pudo restaurar el cliente.',
+            'client_not_found' => 'Cliente no encontrado.'
+        ]
+    ],
+    'branches' => [
+        'index' => [
+            'title' => 'Sucursales',
+            'search_branches' => 'Buscar Sucursales',
+            'create_branch' => 'Crear Sucursal',
+            'edit_branch' => 'Editar Sucursal',
+            'logo' => 'Logo',
+            'commercial_name' => 'Nombre Comercial',
+            'rfc' => 'RFC',
+            'social_reason' => 'Razón Social',
+            'phone' => 'Teléfono',
+            'client' => 'Cliente'
+        ],
+        'save' => [
+            'create_branch' => 'Crear Sucursal',
+            'edit_branch' => 'Editar Sucursal',
+            'logo' => 'Logo',
+            'client' => 'Cliente',
+            'subscription' => 'Suscripción',
+            'obtain_tax_data_from_company' => 'Tomar datos fiscales de empresa matriz',
+            'upload_logo' => 'Subir Logo',
+            'remove_logo' => 'Quitar Logo',
+            'load_fiscal_data' => 'Cargar datos fiscales desde Constancia Fiscal',
+            'commercial_name' => 'Nombre Comercial',
+            'rfc' => 'RFC',
+            'social_reason' => 'Razón Social',
+            'phone' => 'Teléfono',
+            'email' => 'Correo Electrónico',
+            'fiscal_regime' => 'Régimen Fiscal',
+            'ticket_validity_for_billing' => 'Vigencia de tickets para facturación',
+            'number_of_days' => 'Cantidad de días',
+            'fiscal_address' => 'Dirección Fiscal',
+            'save_branch' => 'Guardar Sucursal',
+            'invalid_file_type' => 'Seleccione el fichero correcto. Solo se aceptan archivos del tipo PDF.',
+            'fiscal_data_loaded' => 'Datos cargados correctamente.',
+            'invalid_fiscal_document' => 'Lo sentimos no se pudo realizar la carga de información. Documento inválido o corrupto.',
+            'address_updated_rfc' => 'La Dirección Fiscal del Comensal con RFC: :rfc, ha sido actualizada.',
+            'address_updated_commercial_name' => 'La Dirección Fiscal de la Sucursal con nombre comercial: :nombre_comercial, ha sido actualizada.',
+            'address_updated_log' => 'Dirección Fiscal de Sucursal Actualizada',
+            'address_created_rfc' => 'La Dirección Fiscal de la Sucursal con RFC: :rfc, ha sido creada.',
+            'address_created_commercial_name' => 'La Dirección Fiscal de la Sucursal con nombre comercial: :nombre_comercial, ha sido creada.',
+            'address_created_log' => 'Dirección Fiscal de Sucursal Creada',
+            'branch_saved_successfully' => 'Sucursal guardada.',
+            'branch_save_failed' => 'Ocurrio un error. No se pudo guardar la sucursal.',
+            'fiscal_address_created' => 'Dirección Fiscal de Sucursal Creada',
+            'fiscal_address_updated' => 'Dirección Fiscal de Sucursal Actualizada',
+        ],
+        'configs' => [
+            'title' => 'Configuraciones de Sucursal',
+            'configs_updated' => 'Configuración actualizada',
+            'exchange_rate_saved' => 'Tasa de cambio guardada!',
+            'exchange_rate_not_found' => 'Tasa de cambio no encontrada.',
+            'branch' => 'Sucursal',
+            'exchange_rates' => 'Tasas de Cambio',
+            'base_currency' => 'Moneda Base',
+            'destination_currency' => 'Moneda Destino',
+            'exchange_rate' => 'Tasa de Cambio',
+            'save_exchange_rate' => 'Guardar Tasa',
+            'others_configs' => 'Otras Configuraciones',
+            'branch_currency' => 'Moneda de Sucursal'
+        ],
+        'branch_payment_forms' => [
+            'title' => 'Formas de Pago de Sucursal',
+            'branch' => 'Sucursal',
+            'new_payment_form' => 'Nueva Forma de Pago',
+            'name' => 'Nombre',
+            'currency' => 'Moneda',
+            'status' => 'Estado',
+            'payment_form_saved' => 'Forma de Pago guardada.',
+            'payment_form_deactivated' => 'Forma de pago desactivada.',
+            'payment_form_activated' => 'Forma de pago activada.',
+            'edit_payment_form' => 'Nueva Forma de Pago',
+            'changes_alert' => '<strong>Importante:</strong> Tenga en cuenta que, cualquier cambio en el
+                                        <strong>nombre</strong>, deberá también aplicarse en las terminales de la
+                                        Sucursal!',
+            'save_payment_form' => 'Guardar Forma de Pago'
+        ],
+        'delete' => [
+            'delete_branch' => 'Desactivar Sucursal',
+            'are_you_sure' => '¿Está seguro de desactivar esta sucursal?',
+            'confirm_delete' => 'Confirmar desactivación',
+            'branch_delete_success' => 'Sucursal desactivada.',
+            'branch_delete_failed' => 'Ocurrio un error. No se pudo desactivar la sucursal.',
+        ],
+        'restore' => [
+            'restore_branch' => 'Restaurar Sucursal',
+            'are_you_sure' => '¿Está seguro de restaurar esta sucursal?',
+            'confirm_restore' => 'Confirmar restauración',
+            'branch_restore_success' => 'Sucursal restaurada.',
+            'branch_restore_failed' => 'Ocurrio un error. No se pudo restaurar la sucursal.',
+            'branch_not_found' => 'Sucursal no encontrada.'
+        ]
+    ],
+    'terminals' => [
+        'index' => [
+            'title' => 'Terminales',
+            'search_terminals' => 'Buscar Terminales',
+            'identifier' => 'identificador',
+            'name' => 'Nombre',
+            'branch' => 'Sucursal',
+            'comments' => 'Comentarios',
+        ],
+        'save' => [
+            'create_terminal' => 'Crear Terminal',
+            'edit_terminal' => 'Editar Terminal',
+            'client' => 'Cliente',
+            'branch' => 'Sucursal',
+            'subscription' => 'Suscripción',
+            'name' => 'Nombre',
+            'identifier' => 'Identificador',
+            'comments' => 'Comentarios',
+            'save_terminal' => 'Guardar Terminal',
+            'terminal_saved' => 'Terminal guardada.'
+        ],
+        'delete' => [
+            'delete_terminal' => 'Desactivar Terminal',
+            'are_you_sure' => '¿Está seguro de desactivar esta terminal?',
+            'confirm_delete' => 'Confirmar desactivación',
+            'terminal_delete_success' => 'Terminal desactivada.',
+            'terminal_delete_failed' => 'Ocurrio un error. No se pudo desactivar la terminal.',
+        ],
+        'restore' => [
+            'restore_terminal' => 'Restaurar Terminal',
+            'are_you_sure' => '¿Está seguro de restaurar esta terminal?',
+            'confirm_restore' => 'Confirmar restauración',
+            'terminal_restore_success' => 'Terminal restaurada.',
+            'terminal_restore_failed' => 'Ocurrio un error. No se pudo restaurar la terminal.',
+            'terminal_not_found' => 'Terminal no encontrada.'
+        ]
+    ],
+    'subscriptions' => [
+        'index' => [
+            'title' => 'Suscripciones',
+            'search_subscriptions'  => 'Buscar Suscripciones',
+            'client' => 'Cliente',
+            'package' => 'Paquete',
+            'operations_start' => 'Inicio Operaciones',
+            'payments_start' => 'Inicio Pagos',
+            'periodicity' => 'Periodicidad',
+            'capacity_infrastructure' => 'Capacidad e Infraestructura',
+            'price' => 'Precio',
+            'status' => 'Estado',
+            'no_status' =>  'Sin Estado',
+            'pending' => 'PENDIENTE',
+            'active' => 'ACTIVA',
+            'expired' => 'VENCIDA',
+            'inactive' => 'INACTIVA'
+        ],
+        'manage_subscription' => [
+            'title' => 'Gestión de Suscripción de Cliente',
+            'contractual_allocation_resources' => 'Asignación Contractual de Recursos',
+            'select_client' => 'Seleccione un Cliente',
+            'loyal_client' => 'Cliente Fiel',
+            'client_identifier'  => 'Identificador Cliente',
+            'no_status' =>  'Sin Estado',
+            'pending' => 'PENDIENTE',
+            'active' => 'ACTIVA',
+            'expired' => 'VENCIDA',
+            'inactive' => 'INACTIVA',
+            'subscription_by_package' => 'Suscripción por Paquete',
+            'custom_subscription' => 'Suscripción Personalizada',
+            'loyal_client_message' => 'Este cliente es fiel — considera aplicar beneficios o descuentos preferenciales en esta suscripción.',
+            'subscription_configs' => 'Configuración de la Suscripción',
+            'select_client_message' => 'Solo clientes con datos fiscales y datos de contacto definidos.',
+            'select_package' => 'Seleccione un Plan o Paquete Base',
+            'custom' => 'Custom',
+            'tailor_made_plan' => 'Plan a la Medida',
+            'tailor_made_plan_message' => 'Diseña la estructura ideal desde cero activando manualmente los módulos y capacidades que requiera el cliente.',
+            'base_price' => 'Precio Base',
+            'package' => 'Paquete',
+            'no_description_message' => 'Ideal para operaciones estándar y escalabilidad controlada.',
+            'base_branches' => 'Sucursales base',
+            'base_terminals' => 'Terminales base',
+            'base_users' => 'Usuarios base',
+            'included_modules' => 'Módulos Incluidos',
+            'base_monthly_price' => 'Precio Mensual Base',
+            'validity_and_nilling_cycle' => 'Vigencias y Ciclo de Cobro',
+            'operations_start' => 'Inicio de Operaciones',
+            'next_charge_date' => 'Próxima Fecha de Cobro',
+            'payment_periodicity' => 'Periodicidad del Cobro',
+            'monthly' => 'Mensual',
+            'bimonthly' => 'Bimestral',
+            'quarterly' => 'Trimestral',
+            'biannual' => 'Semestral',
+            'annual' => 'Anual',
+            'capacity_infrastructure' => 'Capacidades de Infraestructura'
+          ],
+        'activate' => [
+            'title' => 'Activar Suscripción',
+            'question' => '¿Activar Suscripción?',
+            'are_you_sure' => 'Estás a punto de reestablecer el ciclo de cobro automatizado para este cliente. Se generará la cola
+                    de facturación correspondiente.',
+            'subscription' => 'Suscripción',
+            'periodic_amount' => 'Monto Recurrente',
+            'next_charge' => 'Próximo Cargo Obligatorio',
+            'fiscal_note'  => '<strong>Nota fiscal importante:</strong> Al activar, el sistema generará las facturas correspondientes
+                en dependencia de la periodicidad definida y los parámetros de facturación automática.',
+            'activate_subscription' => 'Activar Suscripción'
         ]
     ]
 ];

@@ -1,26 +1,27 @@
 <x-modal>
     <x-slot:title>
-        Formas de Pago de Sucursal
+        {{ __('site.branches.branch_payment_forms.title') }}
     </x-slot:title>
 
     <x-slot:content>
         <div wire:init="init" class="row">
             <div class="col-sm-12 mb-3">
                 <div class="mb-1">
-                    <label for="">Sucursal:</label>
+                    <label for="">{{ __('site.branches.branch_payment_forms.branch') }}:</label>
                     <input type="text" class="form-control" value="{{ $this->nombre_sucursal }}" disabled>
                 </div>
             </div>
             <div class="col-sm-12 table-responsive pb-2">
-                <button type="button" class="btn btn-primary float-end" wire:click="showModalFormaPago()">Nueva Forma de
-                    Pago</button>
+                <button type="button" class="btn btn-primary float-end" wire:click="showModalFormaPago()">
+                    {{ __('site.branches.branch_payment_forms.new_payment_form') }}
+                </button>
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th class="text-center">Moneda</th>
-                            <th class="text-center">Activa</th>
-                            <th class="text-center">Acciones</th>
+                            <th>{{ __('site.branches.branch_payment_forms.name') }}</th>
+                            <th class="text-center">{{ __('site.branches.branch_payment_forms.currency') }}</th>
+                            <th class="text-center">{{ __('site.branches.branch_payment_forms.status') }}</th>
+                            <th class="text-center">{{ __('site.common.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,25 +34,27 @@
                                 </td>
                                 <td class="text-center">
                                     @if ($forma_pago['deleted_at'])
-                                        <span class="text-danger">NO</span>
+                                        <span
+                                            class="badge bg-danger-subtle text-danger border-1 border-danger">{{ __('site.common.inactive') }}</span>
                                     @else
-                                        <span class="text-success">SI</span>
+                                        <span
+                                            class="badge bg-success-subtle text-success border-1 border-success">{{ __('site.common.active') }}</span>
                                     @endif
                                 </td>
                                 <td class="text-center">
                                     <ul class="list-unstyled mb-0">
                                         @if ($forma_pago['deleted_at'])
                                             <li class="list-inline-item mb-1">
-                                                <x-action icon="check-circle" title="Reactivar"
+                                                <x-action icon="check-circle" title="{{ __('site.common.restore') }}"
                                                     click="showModalRestoreFormPago('{{ $key }}')" />
                                             </li>
                                         @else
                                             <li class="list-inline-item mb-1">
-                                                <x-action icon="pencil" title="Editar"
+                                                <x-action icon="pencil" title="{{ __('site.common.edit') }}"
                                                     click="showModalFormaPago('{{ $key }}')" />
                                             </li>
                                             <li class="list-inline-item mb-1">
-                                                <x-action icon="trash" title="Desactivar"
+                                                <x-action icon="trash" title="{{ __('site.common.deactivate') }}"
                                                     click="showModalDeleteFormPago('{{ $key }}')" />
                                             </li>
                                         @endif
@@ -61,7 +64,7 @@
                         @empty
                             <tr>
                                 <td class="text-center" colspan="4">
-                                    Sin datos que mostrar
+                                    {{ __('site.common.results_not_found') }}
                                 </td>
                             </tr>
                         @endforelse
@@ -74,35 +77,37 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h3 class="modal-title">{{ $index_forma_pago_activa !== null ? 'Editar ' : 'Nueva ' }}Forma
-                                de Pago</h3>
+                            <h3 class="modal-title">
+                                {{ $index_forma_pago_activa !== null ? __('site.branches.branch_payment_forms.edit_payment_form') : __('site.branches.branch_payment_forms.new_payment_form') }}
+                            </h3>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 wire:click="$set('modalFormaPagoSaveClass', '')"></button>
                         </div>
                         <div class="modal-body pb-0">
                             <div class="row">
                                 @if ($index_forma_pago_activa !== null)
-                                    <x-alert icon="exclamation-triangle" alert="info">
-                                        <strong>Importante:</strong> Tenga en cuenta que, cualquier cambio en el
-                                        <strong>nombre</strong>, deberá también aplicarse en las terminales de la
-                                        Sucursal!
-                                    </x-alert>
+                                    <div class="col-12">
+                                        <x-alert icon="exclamation-triangle" alert="info">
+                                            {!! __('site.branches.branch_payment_forms.changes_alert') !!}
+                                        </x-alert>
+                                    </div>
                                 @endif
-                                <x-input label="Nombre" model="forma_pago_activa.nombre" />
+                                <x-input label="{{ __('site.branches.branch_payment_forms.name') }}" model="forma_pago_activa.nombre" />
                                 @if ($index_forma_pago_activa !== null)
-                                    <x-select2-modals label="Moneda" :options="$monedas"
+                                    <x-select2-modals label="{{ __('site.branches.branch_payment_forms.currency') }}" :options="$monedas"
                                         model="forma_pago_activa.moneda_id" class="form-control" disabled />
                                 @else
-                                    <x-select2-modals label="Moneda" :options="$monedas"
+                                    <x-select2-modals label="{{ __('site.branches.branch_payment_forms.currency') }}" :options="$monedas"
                                         model="forma_pago_activa.moneda_id" class="form-control" />
                                 @endif
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                wire:click="$set('modalFormaPagoSaveClass', '')">{{ __('Cerrar') }}</button>
-                            <button type="button" class="btn btn-primary" wire:click="guardarFormPago()">Guardar Forma
-                                de Pago</button>
+                                wire:click="$set('modalFormaPagoSaveClass', '')">{{ __('site.common.close') }}</button>
+                            <button type="button" class="btn btn-primary" wire:click="guardarFormPago()">
+                            {{ __('site.branches.branch_payment_forms.save_payment_form') }}
+                            </button>
                         </div>
                     </div>
                 </div>

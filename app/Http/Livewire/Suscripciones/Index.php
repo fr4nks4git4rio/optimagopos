@@ -33,10 +33,10 @@ class Index extends Component
 
     public function mount()
     {
+        $this->sorts = [__('site.subscriptions.index.client'), __('site.subscriptions.index.package'), __('site.subscriptions.index.operations_start'), __('site.subscriptions.index.payments_start'), __('site.subscriptions.index.periodicity'), __('site.subscriptions.index.capacity_infrastructure'), __('site.subscriptions.index.price'), __('site.subscriptions.index.status')];
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
-        $this->sort = $this->sort ?? 'Identificador';
-        $this->sorts = ['Cliente', 'Paquete', 'Inicio Operaciones', 'Inicio Pagos', 'Periodicidad', 'Capacidad e Infraestructura', 'Precio', 'Estado'];
+        $this->sort = $this->sort ?? __('site.subscriptions.index.client');
         $this->perPage = $this->perPage ?? 10;
         $this->perPages = [10, 25, 50, 100];
     }
@@ -60,7 +60,7 @@ class Index extends Component
     public function init()
     {
         if (user()->cannot('viewAny', [Suscripcion::class])) {
-            $this->emit('show-toast', 'No tiene permisos para visualizar los registros.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
     }

@@ -1,4 +1,4 @@
-@section('title', 'Gestión de Subscripción de Cliente')
+@section('title', __('site.subscriptions.manage_subscription.title'))
 
 <div class="container-fluid py-3">
     <style>
@@ -61,20 +61,23 @@
         <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
             <div>
                 <span
-                    class="badge bg-primary-subtle text-primary text-uppercase px-2 py-1 mb-2 tracking-wider small fw-bold">Asignación
-                    Contractual de Recursos</span>
+                    class="badge bg-primary-subtle text-primary text-uppercase px-2 py-1 mb-2 tracking-wider small fw-bold">
+                    {{ __('site.subscriptions.manage_subscription.contractual_allocation_resources') }}
+                </span>
                 <h2 class="mb-1 fw-black text-white h3 d-flex align-items-center gap-2">
-                    {{ $this->cliente ? Illuminate\Support\Facades\Crypt::decrypt($this->cliente->nombre_comercial) : 'Seleccione un Cliente' }}
+                    {{ $this->cliente ? Illuminate\Support\Facades\Crypt::decrypt($this->cliente->nombre_comercial) : __('site.subscriptions.manage_subscription.select_client') }}
                     @if ($this->cliente && $this->cliente->es_cliente_fiel)
                         <span class="badge bg-warning text-dark px-2 py-1 fs-8 tracking-wide shadow-sm"
                             title="Cliente con historial de fidelidad">
-                            <i class="bi bi-star-fill me-1"></i> Cliente Fiel
+                            <i class="bi bi-star-fill me-1"></i>
+                            {{ __('site.subscriptions.manage_subscription.loyal_client') }}
                         </span>
                     @endif
                 </h2>
                 @if ($this->cliente)
                     <p class="mb-0 text-white-50 small">
-                        <i class="bi bi-building me-1"></i> Identificador Cliente <span
+                        <i class="bi bi-building me-1"></i>
+                        {{ __('site.subscriptions.manage_subscription.client_identifier') }} <span
                             class="text-info fw-bold">#{{ $this->cliente->id }}</span>
                     </p>
                 @endif
@@ -83,25 +86,30 @@
                 class="text-md-end d-flex flex-row flex-md-column gap-2 justify-content-start align-items-center align-items-md-end">
                 @php
                     $classEstado = 'dark';
+                    $estado_str = __('site.subscriptions.manage_subscription.no_status');
                     switch ($estado) {
                         case 'PENDIENTE':
                             $classEstado = 'primary';
+                            $estado_str = __('site.subscriptions.manage_subscription.pending');
                             break;
                         case 'ACTIVA':
                             $classEstado = 'success';
+                            $estado_str = __('site.subscriptions.manage_subscription.active');
                             break;
                         case 'VENCIDA':
                             $classEstado = 'warning';
+                            $estado_str = __('site.subscriptions.manage_subscription.expired');
                             break;
                         case 'INACTIVA':
                             $classEstado = 'danger';
+                            $estado_str = __('site.subscriptions.manage_subscription.inactive');
                             break;
                     }
                 @endphp
-                <span class="badge bg-{{ $classEstado }} px-3 py-1.5 fs-6 shadow-sm">{{ $estado }}</span>
+                <span class="badge bg-{{ $classEstado }} px-3 py-1.5 fs-6 shadow-sm">{{ $estado_str }}</span>
                 <span class="badge bg-white text-dark border fs-7 py-1.5 shadow-sm">
                     <i class="bi bi-box-seam me-1 text-primary"></i>
-                    {{ $paquete_id ? 'Suscripción por Paquete' : 'Suscripción Personalizada' }}
+                    {{ $paquete_id ? __('site.subscriptions.manage_subscription.subscription_by_package') : __('site.subscriptions.manage_subscription.custom_subscription') }}
                 </span>
             </div>
         </div>
@@ -110,7 +118,7 @@
             <div class="bg-warning bg-opacity-10 border-top border-warning px-4 py-2 d-flex align-items-center gap-2">
                 <i class="bi bi-award-fill text-warning fs-5"></i>
                 <span class="text-warning fs-7 fw-bold">
-                    Este cliente es fiel — considera aplicar beneficios o descuentos preferenciales en esta suscripción.
+                    {{ __('site.subscriptions.manage_subscription.loyal_client_message') }}
                 </span>
             </div>
         @endif
@@ -126,24 +134,27 @@
                         <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
                             <div class="bg-primary-subtle text-primary rounded p-2 me-3"><i
                                     class="bi bi-sliders fs-5"></i></div>
-                            <h5 class="mb-0 text-dark fw-bold">Configuración de la Suscripción</h5>
+                            <h5 class="mb-0 text-dark fw-bold">
+                                {{ __('site.subscriptions.manage_subscription.subscription_configs') }}</h5>
                         </div>
 
                         @if (!$suscripcion || !$suscripcion->id)
                             <div class="mb-4 p-3 bg-light rounded-3 border">
-                                <label class="form-label fw-bold text-secondary small">Seleccione el Cliente:</label>
+                                <label
+                                    class="form-label fw-bold text-secondary small">{{ __('site.subscriptions.manage_subscription.select_client') }}:</label>
                                 <x-select2 :dynamic="true" :lazy="true" model="cliente_id" :options="$clientes"
                                     class="form-control" />
                                 <div class="text-muted fs-7 mt-2">
-                                    <i class="bi bi-info-circle-fill text-warning me-1"></i> Solo clientes sin
-                                    suscripciones activas/pendientes y con datos fiscales validados.
+                                    <i class="bi bi-info-circle-fill text-warning me-1"></i>
+                                    {{ __('site.subscriptions.manage_subscription.select_client_message') }}
                                 </div>
                             </div>
                         @endif
 
                         <div class="mb-4">
                             <label class="form-label fw-bold text-secondary small mb-3">
-                                <i class="bi bi-box-seam me-1"></i> Seleccione un Plan o Paquete Base:
+                                <i class="bi bi-box-seam me-1"></i>
+                                {{ __('site.subscriptions.manage_subscription.select_package') }}:
                             </label>
 
                             <div class="row g-3 row-cols-1 row-cols-md-2 row-cols-xl-3">
@@ -155,18 +166,21 @@
                                             <div>
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                                     <span
-                                                        class="badge {{ $paquete_id == '' ? 'bg-primary' : 'bg-secondary' }} text-uppercase tracking-wider fs-8 px-2 py-1">Custom</span>
+                                                        class="badge {{ $paquete_id == '' ? 'bg-primary' : 'bg-secondary' }} text-uppercase tracking-wider fs-8 px-2 py-1">{{ __('site.subscriptions.manage_subscription.custom') }}</span>
                                                     @if ($paquete_id == '')
                                                         <i class="bi bi-check-circle-fill text-primary fs-5"></i>
                                                     @endif
                                                 </div>
-                                                <h6 class="fw-bold text-dark mb-2">Plan a la Medida</h6>
-                                                <p class="text-muted fs-7 mb-3">Diseña la estructura ideal desde cero
-                                                    activando manualmente los módulos y capacidades que requiera el
-                                                    cliente.</p>
+                                                <h6 class="fw-bold text-dark mb-2">
+                                                    {{ __('site.subscriptions.manage_subscription.tailor_made_plan') }}
+                                                </h6>
+                                                <p class="text-muted fs-7 mb-3">
+                                                    {{ __('site.subscriptions.manage_subscription.tailor_made_plan_message') }}
+                                                </p>
                                             </div>
                                             <div class="border-top pt-2 mt-2 text-center">
-                                                <span class="fs-7 text-muted">Precio Base:</span>
+                                                <span
+                                                    class="fs-7 text-muted">{{ __('site.subscriptions.manage_subscription.base_price') }}:</span>
                                                 <span class="fw-black text-dark d-block fs-5">$0.00 <small
                                                         class="fs-8 text-uppercase">{{ $globalSettings['moneda_sistema'] }}</small></span>
                                             </div>
@@ -184,7 +198,7 @@
                                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                                         <span
                                                             class="badge {{ $paquete_id == $pkg->id ? 'bg-primary' : 'bg-dark-subtle text-dark' }} text-uppercase tracking-wider fs-8 px-2 py-1">
-                                                            Paquete
+                                                            {{ __('site.subscriptions.manage_subscription.package') }}
                                                         </span>
                                                         @if ($paquete_id == $pkg->id)
                                                             <i class="bi bi-check-circle-fill text-primary fs-5"></i>
@@ -194,25 +208,28 @@
                                                     <h6 class="fw-bold text-dark mb-1">{{ $pkg->nombre }}</h6>
 
                                                     <p class="text-muted fs-7 mb-2 text-truncate-2">
-                                                        {{ $pkg->descripcion ?? 'Ideal para operaciones estándar y escalabilidad controlada.' }}
+                                                        {{ $pkg->descripcion ?? __('site.subscriptions.manage_subscription.no_description_message') }}
                                                     </p>
 
                                                     <div class="bg-light rounded-2 p-2 mb-2 fs-8 text-secondary">
                                                         <div class="d-flex justify-content-between mb-1">
-                                                            <span><i class="bi bi-building me-1"></i> Sucursales
-                                                                base:</span>
+                                                            <span><i class="bi bi-building me-1"></i>
+                                                                {{ __('site.subscriptions.manage_subscription.base_branches') }}:
+                                                            </span>
                                                             <span
                                                                 class="fw-bold text-dark">{{ $pkg->cant_sucursales }}</span>
                                                         </div>
                                                         <div class="d-flex justify-content-between mb-1">
-                                                            <span><i class="bi bi-display me-1"></i> Terminales
-                                                                base:</span>
+                                                            <span><i class="bi bi-display me-1"></i>
+                                                                {{ __('site.subscriptions.manage_subscription.base_terminals') }}:
+                                                            </span>
                                                             <span
                                                                 class="fw-bold text-dark">{{ $pkg->cant_terminales }}</span>
                                                         </div>
                                                         <div class="d-flex justify-content-between">
-                                                            <span><i class="bi bi-person me-1"></i> Usuarios
-                                                                base:</span>
+                                                            <span><i class="bi bi-person me-1"></i>
+                                                                {{ __('site.subscriptions.manage_subscription.base_users') }}:
+                                                            </span>
                                                             <span
                                                                 class="fw-bold text-dark">{{ $pkg->cant_usuarios }}</span>
                                                         </div>
@@ -221,8 +238,9 @@
                                                     @if (isset($pkg->modulos) && count($pkg->modulos) > 0)
                                                         <div class="mb-2">
                                                             <span
-                                                                class="text-uppercase text-muted fw-bold tracking-wide fs-9 d-block mb-1">Módulos
-                                                                Incluidos:</span>
+                                                                class="text-uppercase text-muted fw-bold tracking-wide fs-9 d-block mb-1">
+                                                                {{ __('site.subscriptions.manage_subscription.included_modules') }}:
+                                                            </span>
                                                             <div class="d-flex flex-wrap gap-1">
                                                                 @foreach ($pkg->modulos as $modPkg)
                                                                     <span
@@ -240,7 +258,8 @@
                                                 </div>
 
                                                 <div class="border-top pt-2 mt-2 text-center">
-                                                    <span class="fs-7 text-muted">Precio Mensual Base:</span>
+                                                    <span
+                                                        class="fs-7 text-muted">{{ __('site.subscriptions.manage_subscription.base_monthly_prices') }}:</span>
                                                     <span class="fw-black text-primary d-block fs-5">
                                                         ${{ number_format($pkg->precio, 2) }}
                                                         <small
@@ -258,11 +277,14 @@
 
                         <div class="mb-4">
                             <h6 class="text-uppercase text-muted fw-bold mb-3 tracking-wide fs-7">
-                                <i class="bi bi-calendar3 me-1 text-primary"></i> Vigencias y Ciclo de Cobro
+                                <i class="bi bi-calendar3 me-1 text-primary"></i>
+                                {{ __('site.subscriptions.manage_subscription.validity_and_nilling_cycle') }}
                             </h6>
                             <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold text-dark small">Inicio de Operaciones *</label>
+                                    <label
+                                        class="form-label fw-bold text-dark small">{{ __('site.subscriptions.manage_subscription.operations_start') }}
+                                        *</label>
                                     <input type="date"
                                         class="form-control border-secondary-subtle @error('fecha_inicio_operaciones') is-invalid @enderror"
                                         wire:model="fecha_inicio_operaciones">
@@ -272,7 +294,9 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold text-dark small">Próxima Fecha de Cobro *</label>
+                                    <label
+                                        class="form-label fw-bold text-dark small">{{ __('site.subscriptions.manage_subscription.next_charge_date') }}
+                                        *</label>
                                     <input type="date"
                                         class="form-control border-secondary-subtle @error('fecha_inicio_pagos') is-invalid @enderror"
                                         wire:model="fecha_inicio_pagos">
@@ -282,15 +306,22 @@
                                 </div>
 
                                 <div class="col-12 mt-3">
-                                    <label class="form-label fw-bold text-dark small">Periodicidad del Cobro *</label>
+                                    <label
+                                        class="form-label fw-bold text-dark small">{{ __('site.subscriptions.manage_subscription.payment_periodicity') }}
+                                        *</label>
                                     <select
                                         class="form-select border-secondary-subtle @error('periodicidad_pagos') is-invalid @enderror"
                                         wire:model="periodicidad_pagos">
-                                        <option value="MENSUAL">Mensual</option>
-                                        <option value="BIMESTRAL">Bimestral</option>
-                                        <option value="TRIMESTRAL">Trimestral</option>
-                                        <option value="SEMESTRAL">Semestral</option>
-                                        <option value="ANUAL">Anual</option>
+                                        <option value="MENSUAL">
+                                            {{ __('site.subscriptions.manage_subscription.monthly') }}</option>
+                                        <option value="BIMESTRAL">
+                                            {{ __('site.subscriptions.manage_subscription.bimonthly') }}</option>
+                                        <option value="TRIMESTRAL">
+                                            {{ __('site.subscriptions.manage_subscription.quarterly') }}</option>
+                                        <option value="SEMESTRAL">
+                                            {{ __('site.subscriptions.manage_subscription.biannual') }}</option>
+                                        <option value="ANUAL">
+                                            {{ __('site.subscriptions.manage_subscription.annual') }}</option>
                                     </select>
                                     @error('periodicidad_pagos')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -301,7 +332,8 @@
 
                         <div>
                             <h6 class="text-uppercase text-muted fw-bold mb-3 tracking-wide fs-7">
-                                <i class="bi bi-cpu-fill me-1 text-primary"></i> Capacidades de Infraestructura
+                                <i class="bi bi-cpu-fill me-1 text-primary"></i>
+                                {{ __('site.subscriptions.manage_subscription.capacity_infrastructure') }}
                             </h6>
                             <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
                                 @foreach ([['label' => 'Sucursales', 'model' => 'cant_sucursales', 'icon' => 'bi-building', 'inc' => 'incrementSucursales', 'dec' => 'decrementSucursales', 'res' => 'resetSucursales'], ['label' => 'Terminales (APOS)', 'model' => 'cant_terminales', 'icon' => 'bi-display', 'inc' => 'incrementTerminales', 'dec' => 'decrementTerminales', 'res' => 'resetTerminales'], ['label' => 'Usuarios Cloud', 'model' => 'cant_usuarios', 'icon' => 'bi-people', 'inc' => 'incrementUsuarios', 'dec' => 'decrementUsuarios', 'res' => 'resetUsuarios']] as $infra)

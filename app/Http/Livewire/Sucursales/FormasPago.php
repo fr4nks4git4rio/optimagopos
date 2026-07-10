@@ -51,7 +51,7 @@ class FormasPago extends Modal
     public function init()
     {
         if (user()->cannot('setPaymentForms', $this->sucursal)) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -117,7 +117,7 @@ class FormasPago extends Modal
             ->where('s.cliente_id', $this->sucursal->cliente_id)
             ->count() > 0
         ) {
-            $this->addError('forma_pago_activa.nombre', 'El nombre ya está en uso.');
+            $this->addError('forma_pago_activa.nombre', __('validation.unique', ['attribute' => 'nombre']));
             return;
         }
 
@@ -135,7 +135,7 @@ class FormasPago extends Modal
             'moneda_id' => null
         ];
         $this->modalFormaPagoSaveClass = '';
-        $this->emit('show-toast', 'Forma de Pago guardada.');
+        $this->emit('show-toast', __('site.branches.branch_payment_forms.payment_form_saved'));
     }
 
     public function showModalDeleteFormPago($index)
@@ -148,7 +148,7 @@ class FormasPago extends Modal
     {
         if ($this->index_forma_pago_activa !== null) {
             SucursalFormaPago::where('id', $this->formas_pago[$this->index_forma_pago_activa]['id'])->delete();
-            $this->emit('show-toast', 'Forma de pago desactivada.');
+            $this->emit('show-toast', __('site.branches.branch_payment_forms.payment_form_deactivated'));
             $this->loadFormasPago();
         }
         $this->modalDeleteFormaPagoClass = '';
@@ -164,7 +164,7 @@ class FormasPago extends Modal
     {
         if ($this->index_forma_pago_activa !== null) {
             SucursalFormaPago::where('id', $this->formas_pago[$this->index_forma_pago_activa]['id'])->restore();
-            $this->emit('show-toast', 'Forma de pago reactivada.');
+            $this->emit('show-toast', __('site.branches.branch_payment_forms.payment_form_activated'));
             $this->loadFormasPago();
         }
         $this->modalRestoreFormaPagoClass = '';

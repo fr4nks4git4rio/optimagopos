@@ -20,7 +20,7 @@ class Delete extends Modal
     public function init()
     {
         if (user()->cannot('delete', $this->terminal)) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -29,10 +29,10 @@ class Delete extends Modal
     public function delete()
     {
         $this->terminal->suscripcion_id = null;
-        $this->terminal->save();    
+        $this->terminal->save();
         $this->terminal->delete();
 
-        $this->emit('show-toast', 'Terminal desactivada.');
+        $this->emit('show-toast', __('site.terminals.delete.terminal_delete_success'));
         $this->emit('$refresh');
         $this->emit('closeModal');
     }

@@ -225,7 +225,7 @@ class Save extends Modal
                     if ($comensalDB->rfc) {
                         $log = __('site.diners.save.address_updated_rfc', ['rfc' => $comensalDB->rfc]);
                     } else {
-                        $log = __('site.diners.save.address_updated_commercial_name', ['nombre_comercial' => $comensalDB->nombre_comercial]);
+                        $log = __('site.diners.save.address_updated_commercial_name', ['nombre_comercial' => Crypt::decrypt($comensalDB->nombre_comercial)]);
                     }
                     activity(__("site.diners.save.address_updated_log"))
                         ->on($comensalDB->direccion_fiscal)
@@ -253,7 +253,7 @@ class Save extends Modal
                 if ($comensalDB->rfc) {
                     $log = __('site.diners.save.address_created_rfc', ['rfc' => $comensalDB->rfc]);
                 } else {
-                    $log = __('site.diners.save.address_created_commercial_name', ['nombre_comercial' => $comensalDB->nombre_comercial]);
+                    $log = __('site.diners.save.address_created_commercial_name', ['nombre_comercial' => Crypt::decrypt($comensalDB->nombre_comercial)]);
                 }
 
                 activity(__("site.diners.save.address_created_log"))

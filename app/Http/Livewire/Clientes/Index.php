@@ -19,9 +19,9 @@ class Index extends Component
     public $search;
     public $order;
     public $sort;
-    public $sorts = ['Nombre Comercial', 'RFC', 'Razón Social', 'Teléfono', 'Estado'];
+    public $sorts = [];
     public $filter;
-    public $filters = ['Activos', 'Inactivos', 'Todos'];
+    public $filters = [];
 
     protected $queryString = ['search', 'perPage', 'sort', 'order', 'filter'];
 
@@ -29,11 +29,13 @@ class Index extends Component
 
     public function mount()
     {
+        $this->sorts = [__('site.clients.index.commercial_name'), __('site.clients.index.rfc'), __('site.clients.index.social_reason'), __('site.clients.index.phone'), __('site.clients.index.status')];
+        $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
         $this->perPage = $this->perPage ?? 10;
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
-        $this->sort = $this->sort ?? 'Nombre Comercial';
-        $this->filter = $this->filter ?? 'Activos';
+        $this->sort = $this->sort ?? __('site.clients.index.commercial_name');
+        $this->filter = $this->filter ?? __('site.common.actives');
     }
 
     public function getClassSortProperty()
@@ -55,7 +57,7 @@ class Index extends Component
     public function init()
     {
         if (user()->cannot('viewAnyCliente', [Cliente::class])) {
-            $this->emit('show-toast', 'No tiene permisos para acceder a estos registros.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
     }
@@ -125,7 +127,7 @@ class Index extends Component
     {
         $cliente = Cliente::with('direccion_fiscal')->find($id);
         if (!$cliente->es_cliente) {
-            $this->emit('show-toast', 'Cliente no encontrado!', 'danger');
+            $this->emit('show-toast', __('site.clients.restore.client_not_found'), 'danger');
             return;
         }
 

@@ -1,19 +1,19 @@
 <x-modal form-action="delete">
     <x-slot:title>
-        Desactivar Terminal
+        {{__('site.terminals.delete.delete_terminal')}}
     </x-slot:title>
 
     <x-slot:content>
         <div wire:init="init">
             <x-alert icon="exclamation-octagon" alert="danger">
-                Seguro/a que desea desactivar la Terminal?
+                {{ __('site.terminals.delete.are_you_sure') }}
             </x-alert>
         </div>
     </x-slot:content>
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">Cerrar</button>
-        <button type="submit" class="btn btn-danger">Desactivar Terminal</button>
+            wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
+        <button type="submit" class="btn btn-danger">{{ __('site.terminals.delete.confirm_delete') }}</button>
     </x-slot:buttons>
 </x-modal>

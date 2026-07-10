@@ -107,7 +107,7 @@ class Save extends Modal
     {
         if ($value) {
             if ($value->getMimeType() != 'application/pdf') {
-                $this->emit('show-toast', 'Seleccione el fichero correcto. Solo se aceptan archivos del tipo PDF.', 'danger');
+                $this->emit('show-toast', __('site.branches.save.invalid_fiscal_document'), 'danger');
                 return;
             }
 
@@ -144,9 +144,9 @@ class Save extends Modal
                 }
                 $this->regimen_fiscal_id = optional(RegimenFiscal::findByDescription($datos_fiscales['regimen_fiscal']))->id;
                 $this->tomar_datos_fiscales_de_empresa_matriz = false;
-                $this->emit('show-toast', 'Datos cargados correctamente.', 'success');
+                $this->emit('show-toast', __('site.branches.save.fiscal_data_loaded'), 'success');
             } catch (Exception $e) {
-                $this->emit('show-toast', 'Lo sentimos no se pudo realizar la carga de información. Documento inválido o corrupto.', 'danger');
+                $this->emit('show-toast', __('site.branches.save.invalid_fiscal_document'), 'danger');
             }
         }
     }
@@ -304,12 +304,17 @@ class Save extends Modal
                 ]);
                 if (count($this->sucursal->direccion_fiscal->getDirty()) > 0) {
                     $attributes = Arr::except($this->sucursal->direccion_fiscal->getDirty(), ['created_at', 'updated_at']);
-                    activity('Dirección Fiscal de Sucursal Actualizada')
+                    if ($this->sucursal->rfc) {
+                        $log = __('site.branches.save.address_updated_rfc', ['rfc' => $this->sucursal->rfc]);
+                    } else {
+                        $log = __('site.branches.save.address_updated_commercial_name', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial)]);
+                    }
+                    activity(__('site.branches.save.fiscal_address_updated'))
                         ->on($this->sucursal->direccion_fiscal)
                         ->event('updated')
                         ->withProperty('attributes', Direccion::parseData($attributes))
                         ->withProperty('old', Direccion::parseData(Arr::only($this->sucursal->direccion_fiscal->getOriginal(), array_keys($attributes))))
-                        ->log('La Dirección Fiscal de la Sucursal con RFC: ' . $this->sucursal->rfc . ' ha sido actualizada.');
+                        ->log($log);
                     $this->sucursal->direccion_fiscal->save();
                 }
             } else {
@@ -327,11 +332,17 @@ class Save extends Modal
                 $this->sucursal->direccion_fiscal_id = $dir->id;
                 $this->sucursal->save();
 
-                activity("Dirección Fiscal de Sucursal Creada")
+                if ($this->sucursal->rfc) {
+                    $log = __('site.branches.save.address_created_rfc', ['rfc' => $this->sucursal->rfc]);
+                } else {
+                    $log = __('site.branches.save.address_created_commercial_name', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial)]);
+                }
+
+                activity(__('site.branches.save.fiscal_address_created'))
                     ->on($dir)
                     ->event('created')
                     ->withProperties(Direccion::parseData(Arr::except($dir->toArray(), ['updated_at'])))
-                    ->log('La Dirección Fiscal de la Sucursal con RFC: ' . $this->sucursal->rfc . ' ha sido creada.');
+                    ->log($log);
             }
 
             if ($this->logo && !is_string($this->logo)) {
@@ -347,7 +358,7 @@ class Save extends Modal
             }
             $this->sucursal->save();
 
-            $this->emit('show-toast', 'Sucursal guardada.');
+            $this->emit('show-toast', __('site.branches.save.branch_saved_successfully'));
             if ($this->scope) {
                 if ($this->sucursal->wasRecentlyCreated) {
                     $this->emitTo($this->scope, 'sucursal-created', $this->sucursal->id);
@@ -363,14 +374,14 @@ class Save extends Modal
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
-            $this->emit('show-toast', 'Ocurrio un error. ' . $e->getMessage(), 'danger');
+            $this->emit('show-toast', __('site.branches.save.branch_save_failed'), 'danger');
         }
     }
 
     public function init()
     {
         if (user()->cannot($this->sucursal->exists() ? 'update' : 'create', $this->sucursal->exists() ? $this->sucursal : [Sucursal::class])) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }

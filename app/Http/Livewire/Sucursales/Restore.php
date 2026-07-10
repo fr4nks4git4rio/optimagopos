@@ -17,7 +17,7 @@ class Restore extends Modal
     public function init()
     {
         if (user()->cannot('restore', Sucursal::withTrashed()->find($this->sucursal_id))) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -27,13 +27,13 @@ class Restore extends Modal
     {
         $sucursal = Sucursal::onlyTrashed()->find($this->sucursal_id);
         if (!$sucursal) {
-            $this->emit('show-toast', 'Sucursal no encontrada.', 'danger');
+            $this->emit('show-toast', __('site.branches.restore.branch_not_found'), 'danger');
             $this->emit('closeModal');
             return;
         }
         $sucursal->restore();
 
-        $this->emit('show-toast', 'Sucursal reactivada.');
+        $this->emit('show-toast', __('site.branches.restore.branch_restore_success'));
         $this->emit('$refresh');
         $this->emit('closeModal');
     }

@@ -31,12 +31,12 @@ class Index extends Component
 
     public function mount()
     {
+        $this->sorts = [__('site.terminals.index.identifier'), __('site.terminals.index.name'), __('site.terminals.index.branch'), __('site.terminals.index.comments')];
+        $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
-        $this->sort = $this->sort ?? 'Identificador';
-        $this->sorts = ['Identificador', 'Nombre', 'Sucursal', 'Comentarios'];
-        $this->filter = $this->filter ?? 'Activos';
-        $this->filters = ['Activos', 'Inactivos', 'Todos'];
+        $this->sort = $this->sort ?? __('site.terminals.index.identifier');
+        $this->filter = $this->filter ?? __('site.common.actives');
         $this->perPage = $this->perPage ?? 10;
         $this->perPages = [10, 25, 50, 100];
     }
@@ -60,7 +60,7 @@ class Index extends Component
     public function init()
     {
         if (user()->cannot('viewAny', [Terminal::class])) {
-            $this->emit('show-toast', 'No tiene permisos para visualizar los registros.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
     }

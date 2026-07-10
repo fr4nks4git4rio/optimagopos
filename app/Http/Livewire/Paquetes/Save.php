@@ -93,7 +93,7 @@ class Save extends Modal
 
         $this->paquete->modulos()->sync($validatedData['modulos']);
 
-        $this->emit('show-toast', 'Paquete guardado correctamente', 'success');
+        $this->emit('show-toast', __('site.packages.save.package_saved'), 'success');
 
         $this->emit('$refresh');
         $this->emit('closeModal');
@@ -101,8 +101,8 @@ class Save extends Modal
 
     public function init()
     {
-        if (user()->cannot($this->paquete->exists() ? 'update' : 'create', $this->paquete->exists() ? $this->paquete : [Paquete::class])) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+        if (user()->cannot($this->paquete->id ? 'update' : 'create', $this->paquete->exists() ? $this->paquete : [Paquete::class])) {
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }

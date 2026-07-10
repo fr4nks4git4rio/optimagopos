@@ -61,7 +61,7 @@ class Index extends Component
     public function init()
     {
         if (user()->cannot('viewAny', [User::class])) {
-            $this->emit('show-toast', 'No tiene permisos para acceder a estos registros.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
     }

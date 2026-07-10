@@ -405,8 +405,7 @@ class GestionSuscripciones extends Component
 
     public function render()
     {
-        $clientes = Cliente::whereDoesntHave('suscripcion_pendiente')
-            ->whereHas('direccion_fiscal', function ($query) {
+        $clientes = Cliente::whereHas('direccion_fiscal', function ($query) {
                 return $query->whereNotNull('codigo_postal')
                     ->where('codigo_postal', '!=', '');
             })
