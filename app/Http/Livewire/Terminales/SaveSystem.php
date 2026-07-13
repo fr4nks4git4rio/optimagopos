@@ -58,7 +58,6 @@ class SaveSystem extends Modal
         if ($this->cliente_id) {
             $this->sucursales = DB::table('tb_sucursales')
                 ->select('id as value', 'nombre_comercial as label')
-                ->whereIn('id', user()->sucursales->pluck('id')->toArray())
                 ->where('deleted_at', null)
                 ->where('cliente_id', $this->cliente_id)
                 ->get()->map(function ($element) {
@@ -88,7 +87,6 @@ class SaveSystem extends Modal
         if ($value) {
             $this->sucursales = DB::table('tb_sucursales')
                 ->select('id as value', 'nombre_comercial as label')
-                ->whereIn('id', user()->sucursales->pluck('id')->toArray())
                 ->where('deleted_at', null)
                 ->where('cliente_id', $value)
                 ->get()->map(function ($element) {
