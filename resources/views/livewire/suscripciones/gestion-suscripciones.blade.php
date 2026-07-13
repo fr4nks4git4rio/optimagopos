@@ -284,7 +284,7 @@
 
                                                 <div class="border-top pt-2 mt-2 text-center">
                                                     <span
-                                                        class="fs-7 text-muted">{{ __('site.subscriptions.manage_subscription.base_monthly_prices') }}:</span>
+                                                        class="fs-7 text-muted">{{ __('site.subscriptions.manage_subscription.base_monthly_price') }}:</span>
                                                     <span class="fw-black text-primary d-block fs-5">
                                                         ${{ number_format($pkg->precio, 2) }}
                                                         <small
