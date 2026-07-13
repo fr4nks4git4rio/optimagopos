@@ -348,11 +348,7 @@ class GestionSuscripciones extends Component
 
     public function loadUsuarios()
     {
-        $this->usuariosDisponibles = User::where(function ($query) {
-            $query->whereDoesntHave('suscripciones')
-                ->Where('cliente_id', $this->cliente_id);
-        })->whereNotNull('cliente_id')
-            ->orWhereIn('id', Arr::wrap($this->usuarios))->lazy()->map->only(['value', 'label'])->toArray();
+        $this->usuariosDisponibles = User::whereNotNull('cliente_id')->lazy()->map->only(['value', 'label'])->toArray();
     }
 
     public function AddSucursal($id)
