@@ -141,8 +141,6 @@ class Activar extends Modal
             $to = Crypt::decrypt($to);
 
             $pdf = public_path($pdf);
-            Log::info("Enviando correo a: $to");
-            Log::info("Pdf: $pdf");
             SendEmailJob::dispatch(
                 recipients: $to,
                 from_email: '',

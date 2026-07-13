@@ -28,8 +28,8 @@ class GestionSuscripciones extends Component
     public $cant_usuarios = 1;
     public $fecha_inicio_operaciones;
     public $fecha_inicio_pagos;
-    public $periodicidad_pagos;
-    public $estado;
+    public $periodicidad_pagos = 'MENSUAL';
+    public $estado = 'PENDIENTE';
     public $modulos = [];
 
     // Propiedades calculadas en tiempo real para la vista
