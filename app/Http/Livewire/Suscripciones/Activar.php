@@ -170,7 +170,7 @@ class Activar extends Modal
             $this->emit('closeModal');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error al intentar activar la suscripcion. Error: {$e->getMessage()}");
+            Log::error("Error al intentar activar la suscripcion. Error: {$e->getMessage()}. {$e->getTrace()}");
             $this->emit('show-toast', 'Error al activar la suscripción.', 'danger');
             return;
         }
