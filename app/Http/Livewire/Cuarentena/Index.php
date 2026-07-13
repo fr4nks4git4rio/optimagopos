@@ -31,7 +31,16 @@ class Index extends Component
     public $sucursales = [];
     public $terminales = [];
 
-    protected $queryString = ['search', 'page', 'perPage', 'sort', 'cliente' => ['except' => null], 'sucursal' => ['except' => null], 'terminal' => ['except' => null]];
+    protected $queryString = [
+        'search' => ['except' => null],
+        'page' => ['except' => null],
+        'perPage' => ['except' => null],
+        'order' => ['except' => null],
+        'sort' => ['except' => null],
+        'cliente' => ['except' => null],
+        'sucursal' => ['except' => null],
+        'terminal' => ['except' => null]
+    ];
 
     protected $listeners = ['$refresh'];
 
@@ -41,8 +50,8 @@ class Index extends Component
         $this->perPage = $this->perPage ?? 10;
         $this->sorts = [__('site.quarantine.index.date'), __('site.quarantine.index.text'), __('site.quarantine.index.ip'), __('site.quarantine.index.client'), __('site.quarantine.index.branch'), __('site.quarantine.index.terminal')];
         $this->search = $this->search ?? '';
-        $this->sort = $this->sort ?? '';
-        $this->order = $this->order ?? 'asc';
+        $this->sort = $this->sort ?? __('site.quarantine.index.date');
+        $this->order = $this->order ?? 'dec';
 
         $this->clientes = Cliente::all()->lazy()->map(function ($value) {
             return ['value' => $value->id, 'label' => Crypt::decrypt($value->nombre_comercial)];
@@ -128,8 +137,8 @@ class Index extends Component
         }
 
         $total = $records->count();
-        $records  = $records->forPage($this->page, 10);
-        $records = new LengthAwarePaginator($records, $total, 10, $this->page);
+        $records  = $records->forPage($this->page, $this->perPage);
+        $records = new LengthAwarePaginator($records, $total, $this->perPage, $this->page);
         return view('livewire.cuarentena.index', [
             'tickets' => $records,
         ]);
