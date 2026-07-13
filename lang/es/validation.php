@@ -207,7 +207,10 @@ return [
         'fecha_inicio_operaciones' => 'fecha de inicio de operaciones',
         'fecha_inicio_pagos' => 'fecha de próximo cobro',
         'periodicidad_pagos' => 'período de cobro',
-        'moneda_sucursal' => 'moneda de sucursal'
+        'moneda_sucursal' => 'moneda de sucursal',
+        'objeto_impuesto_id' => 'objeto impuesto',
+        'clave_prod_serv_id' => 'clave producto servicio',
+        'clave_unidad_id' => 'clave unidad'
     ],
 
 ];

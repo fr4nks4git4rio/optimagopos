@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{$name}}</title>
+    <title>{{ $name }}</title>
     <style>
         @page {
             margin: 15px;
@@ -86,131 +86,142 @@
             <tbody>
                 <tr>
                     <td style="width: 65%; vertical-align: top">
-                        <h1>{{$owner->razon_social}}</h1>
-                        <p><strong>RFC: </strong>{{$owner->rfc}}</p>
-                        <p>{{$owner->direccion_plain}}</p>
-                        <p><strong>Lugar de
-                                Expedición: </strong>{{$owner->codigo_postal}} {{$owner->direccion_fiscal ? optional($owner->direccion_fiscal->estado)->nombre : ''}}
+                        <h1>{{ $owner->razon_social }}</h1>
+                        <p><strong>{{ __('site.invoices.pdf_invoice.rfc') }}: </strong>{{ $owner->rfc }}</p>
+                        <p>{{ $owner->direccion_plain }}</p>
+                        <p><strong>{{ __('site.invoices.pdf_invoice.postal_code') }}: </strong>{{ $owner->codigo_postal }}
+                            {{ $owner->direccion_fiscal ? optional($owner->direccion_fiscal->estado)->nombre : '' }}
                         </p>
-                        <p><strong>Régimen Fiscal: </strong>{{optional($owner->regimen_fiscal)->codigo}}
-                            - {{optional($owner->regimen_fiscal)->descripcion}}</p>
+                        <p><strong>{{ __('site.invoices.pdf_invoice.fiscal_regime') }}: </strong>{{ optional($owner->regimen_fiscal)->codigo }}
+                            - {{ optional($owner->regimen_fiscal)->descripcion }}</p>
                     </td>
                     <td style="width: 15%; vertical-align: top">
-                        <small><strong>Folio:</strong></small><br>
-                        <small><strong>Fecha emisión:</strong></small><br>
-                        <small><strong>Folio fiscal:</strong></small><br>
-                        <small><strong>Moneda:</strong></small><br>
-                        <small><strong>Forma de Pago:</strong></small><br>
-                        <small><strong>Método de Pago:</strong></small><br>
-                        <small><strong>Lugar de expedición:</strong></small><br>
-                        <small><strong>Régimen fiscal:</strong></small><br>
-                        <small><strong>Tipo de Comprobante:</strong></small><br>
-                        <small><strong>Uso CFDI:</strong></small><br>
-                        <small><strong>Exportación:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.internal_folio') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.issued_date') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.fiscal_folio') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.currency') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.payment_form') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.payment_method') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.postal_code') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.fiscal_regime') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.receipt_type') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.cfdi') }}:</strong></small><br>
+                        <small><strong>{{ __('site.invoices.pdf_invoice.to_export') }}:</strong></small><br>
                     </td>
                     <td style="vertical-align: top">
-                        <small>{{$factura->folio_interno}}</small><br>
-                        <small>{{$factura->fecha_emision->format('d M Y, H:i')}}</small><br>
-                        <small>{{$factura->uuid}}</small><br>
-                        <small>{{$factura->moneda ." (TC ".number_format($factura->tipo_cambio, 6).")"}}</small><br>
-                        <small>{{$factura->forma_pago->nombre}}</small><br>
-                        <small>{{$factura->metodo_pago->nombre}}</small><br>
-                        <small>{{$factura->lugar_expedicion}}</small><br>
-                        <small>{{optional($owner->regimen_fiscal)->nombre}}</small><br>
-                        <small>{{$factura->tipo_comprobante->nombre}}</small><br>
-                        <small>{{$factura->cfdi->nombre}}</small><br>
-                        <small>No Aplica (01)</small><br>
+                        <small>{{ $factura->folio_interno }}</small><br>
+                        <small>{{ $factura->fecha_emision->format('d M Y, H:i') }}</small><br>
+                        <small>{{ $factura->uuid }}</small><br>
+                        <small>{{ $factura->moneda . ' (TC ' . number_format($factura->tipo_cambio, 6) . ')' }}</small><br>
+                        <small>{{ $factura->forma_pago->nombre }}</small><br>
+                        <small>{{ $factura->metodo_pago->nombre }}</small><br>
+                        <small>{{ $factura->lugar_expedicion }}</small><br>
+                        <small>{{ optional($owner->regimen_fiscal)->nombre }}</small><br>
+                        <small>{{ $factura->tipo_comprobante->nombre }}</small><br>
+                        <small>{{ $factura->cfdi?->nombre }}</small>
+                        <small>{{ __('site.invoices.pdf_invoice.no_apply') }} (01)</small>
                     </td>
                 </tr>
             </tbody>
         </table>
         <br>
-        <p><strong>Emitido a</strong></p>
-        <p>{{$cliente->razon_social}}</p>
-        <p>{{"RFC: " . $cliente->rfc}}</p>
-        <p>{{"Dirección Fiscal: MEX, " . $cliente->codigo_postal}}</p>
-        <p>{{"Régimen Fiscal: " . optional($cliente->regimen_fiscal)->nombre}}</p>
+        <p><strong>{{ __('site.invoices.pdf_invoice.emitted_to') }}</strong></p>
+        <p>{{ $cliente->razon_social }}</p>
+        <p>{{ __('site.invoices.pdf_invoice.rfc') . $cliente->rfc }}</p>
+        <p>{{ __('site.invoices.pdf_invoice.fiscal_address') .': MEX, ' . $cliente->codigo_postal }}</p>
+        <p>{{ __('site.invoices.pdf_invoice.fiscal_regime') .': ' . optional($cliente->regimen_fiscal)->nombre }}</p>
         <br>
-        @if($factura->cfdis_relacionados)
-        <p><strong>Concepto de Relación:</strong>&nbsp;{{$factura->tipo_relacion_factura->label}}</p>
-        <p><strong>Facturas Relacionadas</strong></p>
-        <ul>
-            @foreach (explode(",", $factura->cfdis_relacionados) as $f)
-            <li> {{ $f }} </li>
-            @endforeach
-        </ul>
-        <br>
+        @if ($factura->cfdis_relacionados)
+            <p><strong>{{ __('site.invoices.pdf_invoice.relation_concept') }}:</strong>&nbsp;{{ $factura->tipo_relacion_factura->label }}</p>
+            <p><strong>{{ __('site.invoices.pdf_invoice.related_invoices') }}</strong></p>
+            <ul>
+                @foreach (explode(',', $factura->cfdis_relacionados) as $f)
+                    <li> {{ $f }} </li>
+                @endforeach
+            </ul>
+            <br>
         @endif
         <table class="table">
             <thead>
                 <tr>
-                    <th style="background: rgb(201, 209, 217)">CTD</th>
-                    <th style="background: rgb(201, 209, 217)">CONCEPTO</th>
-                    <th style="background: rgb(201, 209, 217)">U DE M</th>
-                    <th style="background: rgb(201, 209, 217)">P UNITARIO</th>
-                    <th style="background: rgb(201, 209, 217)">TOTAL</th>
+                    <th style="background: rgb(201, 209, 217); text-transform: uppercase">{{ __('site.invoices.pdf_invoice.ctd') }}</th>
+                    <th style="background: rgb(201, 209, 217); text-transform: uppercase">{{ __('site.invoices.pdf_invoice.concept') }}</th>
+                    <th style="background: rgb(201, 209, 217); text-transform: uppercase">{{ __('site.invoices.pdf_invoice.m_u') }}</th>
+                    <th style="background: rgb(201, 209, 217); text-transform: uppercase">{{ __('site.invoices.pdf_invoice.unit_p') }}</th>
+                    <th style="background: rgb(201, 209, 217); text-transform: uppercase">{{ __('site.invoices.pdf_invoice.total') }}</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($factura->factura_conceptos as $concepto)
-                <tr>
-                    <td>{{$concepto->cantidad}}</td>
-                    <td>{{$concepto->descripcion}}</td>
-                    <td>{{$concepto->clave_unidad->label}}</td>
-                    <td>{{'$' . number_format($concepto->precio_unitario, 2)}}</td>
-                    <td>{{'$' . number_format($concepto->precio_unitario, 2)}}</td>
-                </tr>
+                @foreach ($factura->factura_conceptos as $concepto)
+                    <tr>
+                        <td>{{ $concepto->cantidad }}</td>
+                        <td>{{ $concepto->descripcion }}</td>
+                        <td>{{ $concepto->clave_unidad->label }}</td>
+                        <td>{{ '$' . number_format($concepto->precio_unitario, 2) }}</td>
+                        <td>{{ '$' . number_format($concepto->precio_unitario, 2) }}</td>
+                    </tr>
                 @endforeach
                 <tr>
                     <td colspan="3" style="border-bottom: none">
-                        <p style="text-transform: uppercase;">{{$factura->cantidad_letras}}</p>
+                        <p style="text-transform: uppercase;">{{ $factura->cantidad_letras }}</p>
                     </td>
-                    <td style="text-align: right; border-bottom: none"><strong>SUBTOTAL</strong></td>
-                    <td style="text-align: right; border-bottom: none"><strong>{{'$' . number_format($factura->subtotal, 2)}}</strong></td>
+                    <td style="text-align: right; border-bottom: none; text-transform: uppercase"><strong>{{ __('site.invoices.pdf_invoice.subtotal') }}</strong></td>
+                    <td style="text-align: right; border-bottom: none">
+                        <strong>{{ '$' . number_format($factura->subtotal, 2) }}</strong></td>
                 </tr>
                 <tr>
-                    <td colspan="4" style="text-align: right; border-bottom: none"><strong>{{'IVA (' . $factura->porciento_iva . '%)'}}</strong></td>
-                    <td style="text-align: right; border-bottom: none"><strong>{{'$' . number_format($factura->iva, 2)}}</strong></td>
+                    <td colspan="4" style="text-align: right; border-bottom: none; text-transform: uppercase">
+                        <strong>{{ __('site.invoices.pdf_invoice.iva').' (' . $factura->porciento_iva . '%)' }}</strong></td>
+                    <td style="text-align: right; border-bottom: none">
+                        <strong>{{ '$' . number_format($factura->iva, 2) }}</strong></td>
                 </tr>
-                @if($factura->porciento_ret_iva > 0)
-                <tr>
-                    <td colspan="4" style="text-align: right; border-bottom: none"><strong>{{'Retenc. IVA (' . $factura->porciento_ret_iva . '%)'}}</strong></td>
-                    <td style="text-align: right; border-bottom: none"><strong>{{'$' . number_format($factura->ret_iva, 2)}}</strong></td>
-                </tr>
+                @if ($factura->porciento_ret_iva > 0)
+                    <tr>
+                        <td colspan="4" style="text-align: right; border-bottom: none; text-transform: uppercase">
+                            <strong>{{ __('site.invoices.pdf_invoice.ret_iva') .' (' . $factura->porciento_ret_iva . '%)' }}</strong></td>
+                        <td style="text-align: right; border-bottom: none">
+                            <strong>{{ '$' . number_format($factura->ret_iva, 2) }}</strong></td>
+                    </tr>
                 @endif
                 <tr>
-                    <td colspan="4" style="text-align: right; border-bottom: none"><strong>TOTAL</strong></td>
-                    <td style="text-align: right; border-bottom: none"><strong>{{'$' . number_format($factura->total, 2)}}</strong></td>
+                    <td colspan="4" style="text-align: right; border-bottom: none; text-transform: uppercase;"><strong>{{ __('site.invoices.pdf_invoice.total') }}</strong></td>
+                    <td style="text-align: right; border-bottom: none">
+                        <strong>{{ '$' . number_format($factura->total, 2) }}</strong></td>
                 </tr>
             </tbody>
         </table>
         <br>
-        <p><strong>Comentarios</strong></p>
+        <p><strong>{{ __('site.invoices.pdf_invoice.comments') }}</strong></p>
         <p>{!! $factura->comentarios !!}</p>
         <br>
         <table class="table">
             <tbody>
                 <tr>
                     <td style="border-bottom: 0">
-                        <p><small><strong>Fecha y Hora de Certificación</strong></small></p>
-                        <p style="margin-bottom: 5px"><small>{{$factura->fecha_certificacion_str}}</small></p>
-                        <p><small><strong>No de Serie del Certificado de Sello Digital del Emisor:</strong></small></p>
+                        <p><small><strong>{{ __('site.invoices.pdf_invoice.certification_date') }}</strong></small></p>
+                        <p style="margin-bottom: 5px"><small>{{ $factura->fecha_certificacion_str }}</small></p>
+                        <p><small><strong>{{ __('site.invoices.pdf_invoice.issuer_digital_seal_serial_number') }}:</strong></small></p>
                         <p class="break" style="margin-bottom: 5px">
-                            <small>{{$factura->numero_serie_emisor}}</small>
+                            <small>{{ $factura->numero_serie_emisor }}</small>
                         </p>
-                        <p><small><strong>No de Serie del Certificado de Sello Digital del Emisor:</strong></small></p>
-                        <p class="break" style="margin-bottom: 5px"><small>{{$factura->numero_serie_sat}}</small>
+                        <p><small><strong>{{ __('site.invoices.pdf_invoice.sat_digital_seal_serial_number') }}:</strong></small></p>
+                        <p class="break" style="margin-bottom: 5px"><small>{{ $factura->numero_serie_sat }}</small>
                         </p>
-                        <p><small><strong>Sello Digital del Emisor</strong></small></p>
-                        <p class="break" style="margin-bottom: 5px"><small>{{$factura->sello_digital_cfdi}}</small></p>
-                        <p><small><strong>Sello Digital del SAT</strong></small></p>
-                        <p class="break" style="margin-bottom: 5px"><small>{{$factura->sello_digital_sat}}</small></p>
-                        <p><small><strong>Cadena Original del complemento de certificación digital del SAT:</strong></small></p>
-                        <p class="break" style="margin-bottom: 5px"><small>{{$factura->cadena_original}}</small></p>
+                        <p><small><strong>{{ __('site.invoices.pdf_invoice.issuer_digital_seal') }}/strong></small></p>
+                        <p class="break" style="margin-bottom: 5px"><small>{{ $factura->sello_digital_cfdi }}</small>
+                        </p>
+                        <p><small><strong>{{ __('site.invoices.pdf_invoice.sat_digital_seal') }}</strong></small></p>
+                        <p class="break" style="margin-bottom: 5px"><small>{{ $factura->sello_digital_sat }}</small>
+                        </p>
+                        <p><small><strong>{{ __('site.invoices.pdf_invoice.original_string_sat') }}:</strong></small></p>
+                        <p class="break" style="margin-bottom: 5px"><small>{{ $factura->cadena_original }}</small></p>
                     </td>
                     <td style="border-bottom: 0; vertical-align: top">
-                        @if($factura->direccion_codigo_qr && file_exists(\Illuminate\Support\Facades\Storage::path("/public/$factura->direccion_codigo_qr")))
-                        <img src="{{public_path($factura->direccion_codigo_qr_relativa)}}" alt="" style="height: 140px">
+                        @if (
+                            $factura->direccion_codigo_qr &&
+                                file_exists(\Illuminate\Support\Facades\Storage::path("/public/$factura->direccion_codigo_qr")))
+                            <img src="{{ public_path($factura->direccion_codigo_qr_relativa) }}" alt=""
+                                style="height: 140px">
                         @endif
                     </td>
                 </tr>

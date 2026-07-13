@@ -13,7 +13,7 @@ class SuscripcionPolicy
      */
     public function viewAny(User $user): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -24,7 +24,7 @@ class SuscripcionPolicy
      */
     public function view(User $user, Suscripcion $suscripcion): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -35,7 +35,7 @@ class SuscripcionPolicy
      */
     public function create(User $user): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -49,7 +49,7 @@ class SuscripcionPolicy
         if (!in_array($suscripcion->estado, ['PENDIENTE', 'ACTIVA']))
             return false;
 
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -60,18 +60,18 @@ class SuscripcionPolicy
         if ($suscripcion->estado != 'PENDIENTE')
             return false;
 
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
     }
 
-    public function revoke(User $user, Suscripcion $suscripcion): bool
+    public function deactivate(User $user, Suscripcion $suscripcion): bool
     {
         if (!in_array($suscripcion->estado, ['PENDIENTE', 'ACTIVA']))
             return false;
 
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;

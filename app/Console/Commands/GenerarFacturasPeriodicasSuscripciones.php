@@ -77,6 +77,7 @@ class GenerarFacturasPeriodicasSuscripciones extends Command
                 $factura->total = $subtotal + $iva;
                 $factura->cantidad_letras = convertir_numero_a_letras(round($factura->total, 2), $factura->moneda);
                 $factura->del_sistema = 1;
+                $factura->propietario_type = Cliente::class;
                 $factura->save();
 
                 $factura->folio_interno = $factura->serie?->descripcion . $factura->id;

@@ -84,7 +84,7 @@ class CabeceraFactura extends Component
     public function init()
     {
         if (user()->cannot('setCabeceraFacturaFacturaSistema', [Factura::class])) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
         if ($this->direccion['estado_id']) {
@@ -167,13 +167,15 @@ class CabeceraFactura extends Component
             'es_propietario' => 1
         ], $data);
 
-        activity("Cabecera de Factura del Sistema")
+
+
+        activity(__('site.invoice_header.log_general_data_system_name'))
             ->on($owner)
             ->event('updated')
             ->withProperties(Cliente::parseData($data))
-            ->log('Los datos de la Cabecera de Factura del sistema ha sido actualizada.');
+            ->log(__('site.invoice_header.log_general_data_system_detail'));
 
-        $this->emit('show-toast', 'Datos Generales guardados.');
+        $this->emit('show-toast', __('site.invoice_header.general_data_saved'));
         //        $this->emit('$refresh');
     }
 
@@ -187,7 +189,7 @@ class CabeceraFactura extends Component
         $owner = Cliente::where('es_propietario', 1)->first();
 
         if (!$owner) {
-            $this->emit('show-toast', 'Primero debe realizar un guardado de los datos generales', 'danger');
+            $this->emit('show-toast', __('site.invoice_header.save_general_data_first'), 'danger');
             return;
         }
 
@@ -199,13 +201,13 @@ class CabeceraFactura extends Component
             $owner->save();
         }
 
-        activity("Dirección de Cabecera de Factura del Sistema")
+        activity(__('site.invoice_header.log_address_system_name'))
             ->on($owner)
             ->event('updated')
             ->withProperties(Cliente::parseData($data['direccion']))
-            ->log('Los datos de la Cabecera de Factura del sistema ha sido actualizada.');
+            ->log(__('site.invoice_header.log_address_system_detail'));
 
-        $this->emit('show-toast', 'Dirección guardada.');
+        $this->emit('show-toast', __('site.invoice_header.address_saved'));
         //        $this->emit('$refresh');
     }
 }

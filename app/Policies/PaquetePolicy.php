@@ -13,7 +13,7 @@ class PaquetePolicy
      */
     public function viewAny(User $user): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -24,7 +24,7 @@ class PaquetePolicy
      */
     public function view(User $user, Paquete $paquete): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -35,7 +35,7 @@ class PaquetePolicy
      */
     public function create(User $user): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -46,7 +46,7 @@ class PaquetePolicy
      */
     public function update(User $user, Paquete $paquete): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -57,7 +57,7 @@ class PaquetePolicy
      */
     public function delete(User $user, Paquete $paquete): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -68,7 +68,7 @@ class PaquetePolicy
      */
     public function restore(User $user, Paquete $paquete): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;
@@ -79,7 +79,7 @@ class PaquetePolicy
      */
     public function forceDelete(User $user, Paquete $paquete): bool
     {
-        if (user()->is_super_admin)
+        if ($user->is_super_admin)
             return true;
 
         return false;

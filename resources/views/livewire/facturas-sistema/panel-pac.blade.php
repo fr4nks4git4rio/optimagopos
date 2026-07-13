@@ -1,6 +1,6 @@
 <x-modal form-action="save">
     <x-slot:title>
-        Panel PAC
+        {{ __('site.panel_pac.title') }}
     </x-slot:title>
 
     <x-slot:content>
@@ -8,7 +8,7 @@
             <div class="col-12" x-data="{
                 rfc: '{{ $rfc }}',
                 portalPac: '{{ $portal_pac }}',
-                timbres: 'Obteniendo Información...',
+                timbres: '{{ __('site.panel_pac.getting_data') }}...',
                 loading: true,
                 statusClass: 'text-muted',
 
@@ -24,9 +24,8 @@
 
                 async buscarTimbres() {
                     this.loading = true;
-                    this.timbres = 'Obteniendo Información...';
+                    this.timbres = '{{ __('site.panel_pac.getting_data') }}...';
                     this.statusClass = 'text-muted';
-                    console.log('Buscando Timbres Disponibles para el RFC: ' + this.rfc);
                     try {
                         let response = await fetch('/admin/obtener-timbres-disponibles/' + this.rfc);
                         let data = await response.json();
@@ -36,15 +35,15 @@
                             this.timbres = data.disponibles;
                             this.statusClass = 'text-success fw-bold fs-5';
                         } else {
-                            this.timbres = data.message || 'Error al obtener la información.';
+                            this.timbres = data.message || '{{ __('site.panel_pac.getting_data_error') }}';
                             this.statusClass = 'text-danger small';
                             if (!data.message) {
-                                $emit('show-toast', { message: 'Error inesperado', type: 'danger' });
+                                $emit('show-toast', { message: '{{ __('site.panel_pac.error') }}', type: 'danger' });
                             }
                         }
                     } catch (error) {
                         this.loading = false;
-                        this.timbres = 'Error de conexión con el servidor.';
+                        this.timbres = '{{__('site.panel_pac.connection_error')}}';
                         this.statusClass = 'text-danger small';
                         $emit('show-toast', { message: error.message, type: 'danger' });
                     }
@@ -60,11 +59,11 @@
                                 <div class="bg-primary-subtle text-primary rounded-circle p-3 mb-3">
                                     <i class="bi bi-toggle-on fs-4 p-1"></i>
                                 </div>
-                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-3">Modo de Timbrado
+                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-3">{{__('site.panel_pac.stamping_method')}}
                                 </h6>
                                 <div class="py-2 w-100 bg-light rounded-3 border justify-content-center d-flex">
                                     <div>
-                                        <label for="" class="form-label">Modo Productivo:</label>
+                                        <label for="" class="form-label">{{ __('site.panel_pac.production_method') }}:</label>
                                         <x-toggle-button :lazy="true" model="cfdi_timbrado_productivo" />
                                     </div>
                                 </div>
@@ -85,8 +84,9 @@
                                         <i class="bi bi-lightning-charge-fill fs-4 p-1"></i>
                                     </template>
                                 </div>
-                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-2">Timbres
-                                    Disponibles</h6>
+                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-2">
+                                    {{__('site.panel_pac.available_stamps')}}
+                                </h6>
 
                                 <div class="w-100">
                                     <input type="text"
@@ -104,11 +104,11 @@
                                 <div class="bg-danger-subtle text-danger rounded-circle p-3 mb-3">
                                     <i class="bi bi-globe fs-4 p-1"></i>
                                 </div>
-                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-3">Revisar Facturas
+                                <h6 class="text-uppercase text-muted fw-bold fs-8 tracking-wider mb-3">{{ __('site.panel_pac.review_invoices') }}
                                 </h6>
                                 <a :href="portalPac" target="_blank"
                                     class="btn btn-outline-danger fw-bold w-100 py-2 rounded-3 transition-all">
-                                    <i class="bi bi-box-arrow-up-right me-2"></i>Visitar portal del PAC
+                                    <i class="bi bi-box-arrow-up-right me-2"></i>{{ __('site.panel_pac.visit_panel_pac_site') }}
                                 </a>
                             </div>
                         </div>
@@ -121,7 +121,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
-            Cerrar
+            {{__('site.common.close')}}
         </button>
     </x-slot:buttons>
 </x-modal>

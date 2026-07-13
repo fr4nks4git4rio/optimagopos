@@ -1,6 +1,6 @@
 @section('title', __('site.subscriptions.manage_subscription.title'))
 
-<div class="container-fluid py-3">
+<div wire:init="init" class="container-fluid py-3">
     <style>
         /* Pequeños tweaks CSS complementarios para clavar la estética de la imagen */
         .fw-black {
@@ -118,15 +118,14 @@
                             <button type="button" wire:loading.attr="disabled"
                                 wire:click="$emit('openModal', 'suscripciones.activar', {'scope': 'suscripciones.gestion-suscripciones', 'suscripcion': {{ $suscripcion->id }}})"
                                 class="btn btn-success btn-sm fw-bold shadow-sm">
-                                <i class="bi bi-check-circle-fill me-1"
-                                    wire:target="activarSuscripcion"></i>
+                                <i class="bi bi-check-circle-fill me-1" wire:target="activarSuscripcion"></i>
                                 Activar
                             </button>
                         @endif
 
-                        {{-- @if ($estado === 'ACTIVA')
+                        @if ($estado === 'ACTIVA')
                             <button type="button" wire:loading.attr="disabled" wire:target="desactivarSuscripcion"
-                                onclick="if(confirm('¿Confirmas desactivar esta suscripción? El cliente perderá el acceso al sistema.')) { @this.call('desactivarSuscripcion') }"
+                                wire:click="$emit('openModal', 'suscripciones.delete', {'scope': 'suscripciones.gestion-suscripciones', 'suscripcion': {{ $suscripcion->id }}})"
                                 class="btn btn-danger btn-sm fw-bold shadow-sm">
                                 <span wire:loading wire:target="desactivarSuscripcion"
                                     class="spinner-border spinner-border-sm me-1" role="status"></span>
@@ -134,7 +133,7 @@
                                     wire:target="desactivarSuscripcion"></i>
                                 Desactivar
                             </button>
-                        @endif --}}
+                        @endif
                     </div>
                 @endif
             </div>
@@ -186,7 +185,7 @@
                             <div class="row g-3 row-cols-1 row-cols-md-2 row-cols-xl-3">
 
                                 <div class="col">
-                                    <div wire:click="$set('paquete_id', '')"
+                                    <div @if ($this->can_edit_subscription) wire:click="$set('paquete_id', '')" @endif
                                         class="card h-100 border transition-all rounded-3 position-relative cursor-pointer {{ $paquete_id == '' ? 'border-primary shadow bg-primary-subtle bg-opacity-10' : 'border-secondary-subtle bg-white' }}">
                                         <div class="card-body p-3 d-flex flex-column justify-content-between">
                                             <div>
@@ -216,7 +215,7 @@
 
                                 @foreach ($paquetes as $pkg)
                                     <div class="col">
-                                        <div wire:click="$set('paquete_id', {{ $pkg->id }})"
+                                        <div @if ($this->can_edit_subscription) wire:click="$set('paquete_id', {{ $pkg->id }})" @endif
                                             class="card h-100 border transition-all rounded-3 position-relative cursor-pointer {{ $paquete_id == $pkg->id ? 'border-primary shadow bg-primary-subtle bg-opacity-10' : 'border-secondary-subtle bg-white' }}">
 
                                             <div class="card-body p-3 d-flex flex-column justify-content-between">
@@ -311,7 +310,7 @@
                                     <label
                                         class="form-label fw-bold text-dark small">{{ __('site.subscriptions.manage_subscription.operations_start') }}
                                         *</label>
-                                    <input type="date"
+                                    <input type="date" @if (!$this->can_edit_subscription) disabled @endif
                                         class="form-control border-secondary-subtle @error('fecha_inicio_operaciones') is-invalid @enderror"
                                         wire:model="fecha_inicio_operaciones">
                                     @error('fecha_inicio_operaciones')
@@ -323,7 +322,7 @@
                                     <label
                                         class="form-label fw-bold text-dark small">{{ __('site.subscriptions.manage_subscription.next_charge_date') }}
                                         *</label>
-                                    <input type="date"
+                                    <input type="date" @if (!$this->can_edit_subscription) disabled @endif
                                         class="form-control border-secondary-subtle @error('fecha_inicio_pagos') is-invalid @enderror"
                                         wire:model="fecha_inicio_pagos">
                                     @error('fecha_inicio_pagos')
@@ -335,8 +334,8 @@
                                     <label
                                         class="form-label fw-bold text-dark small">{{ __('site.subscriptions.manage_subscription.payment_periodicity') }}
                                         *</label>
-                                    <select
-                                        class="form-select border-secondary-subtle @error('periodicidad_pagos') is-invalid @enderror"
+                                    <select @if (!$this->can_edit_subscription) disabled @endif
+                                        class="form-control form-select border-secondary-subtle @error('periodicidad_pagos') is-invalid @enderror"
                                         wire:model="periodicidad_pagos">
                                         <option value="MENSUAL">
                                             {{ __('site.subscriptions.manage_subscription.monthly') }}</option>
@@ -362,7 +361,7 @@
                                 {{ __('site.subscriptions.manage_subscription.capacity_infrastructure') }}
                             </h6>
                             <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
-                                @foreach ([['label' => 'Sucursales', 'model' => 'cant_sucursales', 'icon' => 'bi-building', 'inc' => 'incrementSucursales', 'dec' => 'decrementSucursales', 'res' => 'resetSucursales'], ['label' => 'Terminales (APOS)', 'model' => 'cant_terminales', 'icon' => 'bi-display', 'inc' => 'incrementTerminales', 'dec' => 'decrementTerminales', 'res' => 'resetTerminales'], ['label' => 'Usuarios Cloud', 'model' => 'cant_usuarios', 'icon' => 'bi-people', 'inc' => 'incrementUsuarios', 'dec' => 'decrementUsuarios', 'res' => 'resetUsuarios']] as $infra)
+                                @foreach ([['label' => __('site.subscriptions.manage_subscription.branches'), 'model' => 'cant_sucursales', 'icon' => 'bi-building', 'inc' => 'incrementSucursales', 'dec' => 'decrementSucursales', 'res' => 'resetSucursales'], ['label' => __('site.subscriptions.manage_subscription.terminals'), 'model' => 'cant_terminales', 'icon' => 'bi-display', 'inc' => 'incrementTerminales', 'dec' => 'decrementTerminales', 'res' => 'resetTerminales'], ['label' => __('site.subscriptions.manage_subscription.users'), 'model' => 'cant_usuarios', 'icon' => 'bi-people', 'inc' => 'incrementUsuarios', 'dec' => 'decrementUsuarios', 'res' => 'resetUsuarios']] as $infra)
                                     <div class="col-md-4">
                                         <label
                                             class="form-label fw-bold text-dark small">{{ $infra['label'] }}</label>
@@ -374,7 +373,7 @@
                                                 class="form-control text-center bg-white border-secondary-subtle fw-bold @error($infra['model']) is-invalid @enderror"
                                                 @if ($paquete_id) disabled @endif
                                                 wire:model="{{ $infra['model'] }}" min="1">
-                                            @if ($paquete_id)
+                                            @if ($paquete_id && $this->can_edit_subscription)
                                                 <button type="button" wire:click="{{ $infra['inc'] }}"
                                                     class="btn btn-success border-success text-white px-2"><i
                                                         class="bi bi-plus"></i></button>
@@ -396,8 +395,8 @@
 
                         <div class="mt-4">
                             <h6 class="text-uppercase text-muted fw-bold mb-3 tracking-wide fs-7">
-                                <i class="bi bi-diagram-3-fill me-1 text-primary"></i> Recursos Vinculados a la
-                                Suscripción
+                                <i class="bi bi-diagram-3-fill me-1 text-primary"></i>
+                                {{ __('site.subscriptions.manage_subscription.resources') }}
                             </h6>
                             <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
 
@@ -405,70 +404,87 @@
                                 <div class="col-md-4">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <label class="form-label fw-bold text-dark small mb-0">
-                                            <i class="bi bi-building me-1"></i> Sucursales
+                                            <i class="bi bi-building me-1"></i>
+                                            {{ __('site.subscriptions.manage_subscription.branches') }}
                                             <span
                                                 class="badge bg-{{ count($sucursales) == $cant_sucursales ? 'success' : (count($sucursales) > $cant_sucursales ? 'danger' : 'secondary') }} ms-1">
                                                 {{ count($sucursales) }}/{{ $cant_sucursales }}
                                             </span>
                                         </label>
-                                        @if (count($sucursales) < $cant_sucursales && $this->cliente_id)
+                                        @if (count($sucursales) < $cant_sucursales && $this->cliente_id && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
                                                 wire:click="$emit('openModal', 'sucursales.save', { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $this->cliente_id }}, from_subscription: true })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif
                                     </div>
-                                    <x-select2-multiple :dynamic="true" :lazy="true" model="sucursales"
-                                        :options="$sucursalesDisponibles" class="form-control" :max-selections="$cant_sucursales" />
+                                    @if ($this->can_edit_subscription)
+                                        <x-select2-multiple :dynamic="true" :lazy="true" model="sucursales"
+                                            :options="$sucursalesDisponibles" class="form-control" :max-selections="$cant_sucursales" />
+                                    @else
+                                        <x-select2-multiple :dynamic="true" :lazy="true" model="sucursales"
+                                            disabled :options="$sucursalesDisponibles" class="form-control" :max-selections="$cant_sucursales" />
+                                    @endif
                                 </div>
 
                                 {{-- TERMINALES --}}
                                 <div class="col-md-4">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <label class="form-label fw-bold text-dark small mb-0">
-                                            <i class="bi bi-display me-1"></i> Terminales
+                                            <i class="bi bi-display me-1"></i>
+                                            {{ __('site.subscriptions.manage_subscription.terminals') }}
                                             <span
                                                 class="badge bg-{{ count($terminales) == $cant_terminales ? 'success' : (count($terminales) > $cant_terminales ? 'danger' : 'secondary') }} ms-1">
                                                 {{ count($terminales) }}/{{ $cant_terminales }}
                                             </span>
                                         </label>
-                                        @if (count($terminales) < $cant_terminales && count($sucursales) == 1)
+                                        @if (count($terminales) < $cant_terminales && count($sucursales) == 1 && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
                                                 wire:click="$emit('openModal', 'terminales.save-system', { scope: 'suscripciones.gestion-suscripciones', sucursal_id: {{ $sucursales[0] }}, from_subscription: true })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif
                                     </div>
-                                    <x-select2-multiple :dynamic="true" :lazy="true" model="terminales"
-                                        :options="$terminalesDisponibles" class="form-control" :max-selections="$cant_terminales" />
+                                    @if ($this->can_edit_subscription)
+                                        <x-select2-multiple :dynamic="true" :lazy="true" model="terminales"
+                                            :options="$terminalesDisponibles" class="form-control" :max-selections="$cant_terminales" />
+                                    @else
+                                        <x-select2-multiple :dynamic="true" :lazy="true" model="terminales"
+                                            disabled :options="$terminalesDisponibles" class="form-control" :max-selections="$cant_terminales" />
+                                    @endif
                                 </div>
 
                                 {{-- USUARIOS --}}
                                 <div class="col-md-4">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
                                         <label class="form-label fw-bold text-dark small mb-0">
-                                            <i class="bi bi-people me-1"></i> Usuarios
+                                            <i class="bi bi-people me-1"></i>
+                                            {{ __('site.subscriptions.manage_subscription.users') }}
                                             <span
                                                 class="badge bg-{{ count($usuarios) == $cant_usuarios ? 'success' : (count($usuarios) > $cant_usuarios ? 'danger' : 'secondary') }} ms-1">
                                                 {{ count($usuarios) }}/{{ $cant_usuarios }}
                                             </span>
                                         </label>
-                                        @if (count($usuarios) < $cant_usuarios)
+                                        @if (count($usuarios) < $cant_usuarios && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
                                                 wire:click="$dispatch('abrirModalCreacion', { tipo: 'usuario', cliente_id: {{ $this->cliente->id ?? 'null' }} })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif
                                     </div>
-                                    <x-select2-multiple :dynamic="true" :lazy="true" model="usuarios"
-                                        :options="$usuariosDisponibles" class="form-control" :max-selections="$cant_usuarios" />
+                                    @if ($this->can_edit_subscription)
+                                        <x-select2-multiple :dynamic="true" :lazy="true" model="usuarios"
+                                            :options="$usuariosDisponibles" class="form-control" :max-selections="$cant_usuarios" />
+                                    @else
+                                        <x-select2-multiple :dynamic="true" :lazy="true" model="usuarios"
+                                            disabled :options="$usuariosDisponibles" class="form-control" :max-selections="$cant_usuarios" />
+                                    @endif
                                 </div>
 
                             </div>
                             <div class="fs-7 text-muted mt-2">
                                 <i class="bi bi-info-circle-fill text-warning me-1"></i>
-                                La cantidad de recursos vinculados no puede exceder la capacidad contratada. Al alcanzar
-                                el límite, el selector bloqueará nuevas selecciones automáticamente.
+                                {{ __('site.subscriptions.manage_subscription.resources_message') }}
                             </div>
                         </div>
                     </div>
@@ -480,10 +496,11 @@
                         <div class="d-flex align-items-center">
                             <div class="bg-primary-subtle text-primary rounded p-2 me-3"><i
                                     class="bi bi-grid-3x3-gap-fill fs-5"></i></div>
-                            <h5 class="mb-0 text-dark fw-bold">Aprovisionamiento de Módulos</h5>
+                            <h5 class="mb-0 text-dark fw-bold">
+                                {{ __('site.subscriptions.manage_subscription.module_provisioning') }}</h5>
                         </div>
-                        <span class="badge bg-primary px-3 py-1.5 rounded-pill fw-bold">{{ count($modulos) }} Módulos
-                            Activos</span>
+                        <span class="badge bg-primary px-3 py-1.5 rounded-pill fw-bold">{{ count($modulos) }}
+                            {{ __('site.subscriptions.manage_subscription.active_modules') }} </span>
                     </div>
                     <div class="card-body p-4">
                         <div class="row g-3" style="max-height: 400px; overflow-y: auto; padding-right: 4px;">
@@ -496,7 +513,7 @@
                                             <div class="form-check form-switch me-2 pt-1">
                                                 <input class="form-check-input check-modulo-custom" type="checkbox"
                                                     role="switch" value="{{ $module->id }}" wire:model="modulos"
-                                                    @if ($paquete_id && in_array($module->id, $this->modulos_paquete)) disabled @endif
+                                                    @if (($paquete_id && in_array($module->id, $this->modulos_paquete)) || !$this->can_edit_subscription) disabled @endif
                                                     id="mod-{{ $module->id }}">
                                             </div>
 
@@ -527,55 +544,61 @@
                     style="top: 24px; border-top: 4px solid var(--bs-primary) !important;">
                     <div class="card-header bg-white py-3 border-bottom">
                         <h6 class="mb-0 text-uppercase fw-black text-secondary tracking-wide fs-7">
-                            <i class="bi bi-receipt me-2 text-primary"></i> Estructura de Precios Mensual
+                            <i class="bi bi-receipt me-2 text-primary"></i>
+                            {{ __('site.subscriptions.manage_subscription.monthly_pricing_structure') }}
                         </h6>
                     </div>
                     <div class="card-body p-4">
 
                         <div class="text-center mb-4 bg-light border rounded-3 p-4">
-                            <span class="text-uppercase text-muted fw-bold tracking-wider fs-8 d-block mb-1">Costo
-                                Estimado Recurrente ({{ $periodicidad_pagos }})</span>
+                            <span class="text-uppercase text-muted fw-bold tracking-wider fs-8 d-block mb-1">
+                                {{ __('site.subscriptions.manage_subscription.monthly_pricing_structure') }}
+                                ({{ __($periodicidad_pagos) }})</span>
                             <h2 class="fw-black text-primary display-6 mb-1">${{ number_format($total, 2) }}
                             </h2>
                             <span
                                 class="badge bg-dark-subtle text-dark px-3 py-1 text-uppercase font-monospace tracking-wide fs-8">{{ $globalSettings['moneda_sistema'] }}
-                                / Neto</span>
+                                / {{ __('site.subscriptions.manage_subscription.net') }}</span>
                         </div>
 
                         <div class="p-3 bg-light rounded-3 border border-dashed mb-4 fs-7">
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted"><i class="bi bi-arrow-repeat me-1"></i> Ciclo de
-                                    facturación:</span>
+                                <span class="text-muted"><i class="bi bi-arrow-repeat me-1"></i>
+                                    {{ __('site.subscriptions.manage_subscription.billing_cycle') }}:</span>
                                 <span
                                     class="fw-bold text-dark text-uppercase tracking-wide">{{ $periodicidad_pagos }}</span>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted"><i class="bi bi-calendar-event me-1"></i> Próximo
-                                    cobro:</span>
+                                <span class="text-muted"><i class="bi bi-calendar-event me-1"></i>
+                                    {{ __('site.subscriptions.manage_subscription.next_payment') }}:</span>
                                 <span
                                     class="fw-bold text-primary">{{ $fecha_inicio_pagos ? date('d/m/Y', strtotime($fecha_inicio_pagos)) : '— / — / —' }}</span>
                             </div>
                         </div>
 
-                        <h6 class="text-uppercase text-muted fw-bold tracking-wider fs-8 mb-2">Detalle de Cargos</h6>
+                        <h6 class="text-uppercase text-muted fw-bold tracking-wider fs-8 mb-2">
+                            {{ __('site.subscriptions.manage_subscription.charge_details') }}</h6>
                         <div class="list-group list-group-flush border-bottom mb-3">
                             <div
                                 class="list-group-item d-flex justify-content-between align-items-center px-0 py-2.5 bg-transparent fs-7">
-                                <div class="text-dark"><i class="bi bi-box me-2 text-secondary"></i>Base Cloud (Plan
-                                    Seleccionado)</div>
+                                <div class="text-dark"><i class="bi bi-box me-2 text-secondary"></i>
+                                    {{ __('site.subscriptions.manage_subscription.selected_plan') }}
+                                </div>
                                 <span class="fw-bold text-dark">${{ number_format($precio_paquete, 2) }}</span>
                             </div>
                             <div
                                 class="list-group-item d-flex justify-content-between align-items-center px-0 py-2.5 bg-transparent fs-7">
-                                <div class="text-dark"><i class="bi bi-plus-circle me-2 text-danger"></i>Módulos Extra
-                                    / Custom</div>
+                                <div class="text-dark"><i class="bi bi-plus-circle me-2 text-danger"></i>
+                                    {{ __('site.subscriptions.manage_subscription.extra_modules') }}
+                                </div>
                                 <span class="fw-bold text-danger">+ ${{ number_format($precio_extra, 2) }}</span>
                             </div>
                             @if ($descuento > 0)
                                 <div
                                     class="list-group-item d-flex justify-content-between align-items-center px-0 py-2.5 bg-transparent fs-7">
                                     <div class="text-success">
-                                        <i class="bi bi-dash-circle me-2"></i>Descuento Aplicado
+                                        <i
+                                            class="bi bi-dash-circle me-2"></i>{{ __('site.subscriptions.manage_subscription.applied_discount') }}
                                         <span class="badge bg-success-subtle text-success fs-9 ms-1">
                                             -{{ number_format($this->porcentaje_descuento, 1) }}%
                                         </span>
@@ -586,14 +609,17 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-dark small">Descuento
-                                <span class="text-muted fw-normal">(monto fijo, opcional)</span>
+                            <label
+                                class="form-label fw-bold text-dark small">{{ __('site.subscriptions.manage_subscription.discount') }}
+                                <span
+                                    class="text-muted fw-normal">({{ __('site.subscriptions.manage_subscription.discount_sub') }})</span>
                             </label>
                             <div class="input-group shadow-sm rounded">
                                 <span class="input-group-text bg-white border-secondary-subtle text-muted">
                                     <i class="bi bi-tag-fill text-success"></i>
                                 </span>
                                 <input type="number" step="0.01" min="0"
+                                    @if (!$this->can_edit_subscription) disabled @endif
                                     class="form-control bg-white border-secondary-subtle fw-bold @error('descuento') is-invalid @enderror"
                                     wire:model.lazy="descuento" placeholder="0.00">
                                 <span
@@ -601,8 +627,9 @@
                             </div>
                             @if ($descuento > 0)
                                 <div class="fs-8 text-success mt-1">
-                                    <i class="bi bi-info-circle me-1"></i> Este descuento equivale al
-                                    <strong>{{ number_format($this->porcentaje_descuento, 1) }}%</strong> del subtotal.
+                                    <i class="bi bi-info-circle me-1"></i> {!! __('site.subscriptions.manage_subscription.discount_details', [
+                                        'percent' => number_format($this->porcentaje_descuento, 1),
+                                    ]) !!}
                                 </div>
                             @endif
                             @error('descuento')
@@ -610,13 +637,16 @@
                             @enderror
                         </div>
 
-                        <button type="submit"
-                            class="btn btn-primary btn-lg w-100 py-3 fw-bold rounded-3 shadow-sm text-uppercase tracking-wide fs-7">
-                            <span wire:loading wire:target="submit" class="spinner-border spinner-border-sm me-2"
-                                role="status"></span>
-                            <i class="bi bi-cloud-arrow-up-fill me-2" wire:loading.remove wire:target="submit"></i>
-                            Guardar Contrato de Suscripción
-                        </button>
+                        @if ($this->can_edit_subscription)
+                            <button type="submit"
+                                class="btn btn-primary btn-lg w-100 py-3 fw-bold rounded-3 shadow-sm text-uppercase tracking-wide fs-7">
+                                <span wire:loading wire:target="submit" class="spinner-border spinner-border-sm me-2"
+                                    role="status"></span>
+                                <i class="bi bi-cloud-arrow-up-fill me-2" wire:loading.remove
+                                    wire:target="submit"></i>
+                                {{ __('site.subscriptions.manage_subscription.save_subscription_contract') }}
+                            </button>
+                        @endif
 
                     </div>
                 </div>

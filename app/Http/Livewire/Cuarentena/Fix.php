@@ -9,6 +9,7 @@ use App\Models\Cuarentena;
 use App\Models\Sucursal;
 use App\Models\Terminal;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 
 class Fix extends Modal
 {
@@ -93,6 +94,7 @@ class Fix extends Modal
             'FiscalInvoice' => 'No',
             'PrinterHeader' => null,
             'TransactionId' => '',
+            'TerminalId' => '',
             'CustomerFiscalId' => '',
             'MerchantFiscalId' => '',
             'TransactionEndTime' => '',
@@ -193,7 +195,7 @@ class Fix extends Modal
         $decoded = json_decode($this->rawJson, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->addError('rawJson', 'El JSON no es válido: ' . json_last_error_msg());
+            $this->addError('rawJson', __('site.quarantine.fix.json_error', ['error' => json_last_error_msg()]));
             // Revertimos el toggle para que no pierda su trabajo en modo avanzado
             $this->modoAvanzado = true;
             return;
@@ -209,7 +211,7 @@ class Fix extends Modal
         $decoded = json_decode($this->rawJson, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->addError('rawJson', 'No se puede formatear: el JSON no es válido.');
+            $this->addError('rawJson', __('site.quarantine.fix.json_error', ['error' => 'el JSON nos es válido']));
             return;
         }
 
@@ -235,7 +237,7 @@ class Fix extends Modal
         if ($this->modoAvanzado) {
             $decoded = json_decode($this->rawJson, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return '// JSON inválido, no se puede previsualizar';
+                return __('site.quarantine.fix.cant_preview_json');
             }
             return json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
@@ -270,7 +272,7 @@ class Fix extends Modal
         if ($this->modoAvanzado) {
             $decoded = json_decode($this->rawJson, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $this->addError('rawJson', 'El JSON no es válido: ' . json_last_error_msg());
+                $this->addError('rawJson', __('site.quarantine.fix.json_error', ['error' => json_last_error_msg()]));
                 return null;
             }
             return json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -296,7 +298,7 @@ class Fix extends Modal
             'terminal_id' => $this->terminal_id,
         ]);
 
-        $this->emit('show-toast', 'Registro guardo correctamente', 'success');
+        $this->emit('show-toast', __('site.quarantine.fix.ticket_save_successfully'), 'success');
         $this->emit('$refresh');
         $this->emit('closeModal');
     }
@@ -325,23 +327,31 @@ class Fix extends Modal
             $res = $procesador->execute();
 
             if ($res) {
+                $data = $this->registro;
                 $this->registro->delete(); // o marcar como resuelto, según tu flujo
-                $this->emit('show-toast', 'Registro procesado correctamente.', 'success');
+
+                activity(__('site.quarantine.fix.quarantine_ticket_processed'))
+                ->by(user()->id)
+                ->withProperties($data)
+                ->log(__('site.quarantine.fix.quarantine_ticket_processed_log'));
+
+                $this->emit('show-toast', __('site.quarantine.fix.ticket_process_successfully'), 'success');
                 $this->emit('$refresh');
                 $this->emit('closeModal');
             } else {
-                $this->emit('show-toast', 'El registro aun presenta problemas. Porfavor revisar nuevamente.', 'danger');
+                $this->emit('show-toast', __('site.quarantine.fix.ticket_process_error'), 'danger');
                 $this->emit('$refresh');
             }
         } catch (\Throwable $e) {
-            $this->addError('rawJson', 'El JSON se guardó pero el reproceso falló: ' . $e->getMessage());
+            Log::error("Ocurrio un error procesando un ticket en cuarentena. Error: {$e->getMessage()}");
+            $this->addError('rawJson', __('site.quarantine.fix.ticket_saved_fail_to_process', ['error' => $e->getMessage()]));
         }
     }
 
     public function descartar()
     {
         $this->registro->delete();
-        $this->emit('show-toast', 'Registro eliminado correctamente', 'success');
+        $this->emit('show-toast', __('site.quarantine.fix.register_delete_successfully'), 'success');
         $this->emit('$refresh');
         $this->emit('closeModal');
     }
@@ -359,7 +369,7 @@ class Fix extends Modal
     public function init()
     {
         if (user()->cannot('fix', $this->registro)) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }

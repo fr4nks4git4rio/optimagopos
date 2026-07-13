@@ -1,4 +1,4 @@
-@section('title', 'Facturas')
+@section('title', __('site.invoices.index.title'))
 
 <div wire:init="init">
     <div wire:loading.delay.longer>
@@ -10,49 +10,47 @@
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-end">
-        {{-- <div class="col-lg-auto mb-3"> --}}
-        {{-- <div class="input-group"> --}}
-        {{-- <span class="input-group-text"><x-icon name="search"/></span> --}}
-        {{-- <input type="search" placeholder="Buscar Facturas" --}}
-        {{-- class="form-control" wire:model.debounce.500ms="search"> --}}
-        {{-- </div> --}}
-        {{-- </div> --}}
         <div class="col-lg-auto mb-3">
             @can('createFacturaSistema', [App\Models\Factura::class])
                 <a href="{{ route('admin.pre-facturas.save') }}" class="btn btn-site-primary mr-1">
-                    Nueva Factura
+                    {{ __('site.invoices.index.new_invoice') }}
                 </a>
                 <a href="{{ route('admin.complementos.save') }}" class="btn btn-site-primary mr-1">
-                    Nuevo Complemento
+                    {{ __('site.invoices.index.new_complement') }}
                 </a>
                 <a href="{{ route('admin.notas-credito.save') }}" class="btn btn-site-primary mr-1">
-                    Nueva Nota de Crédito
+                    {{ __('site.invoices.index.new_credit_note') }}
                 </a>
             @endcan
             <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirFacturas()">
-                Imprimir
+                {{ __('site.invoices.index.print') }}
             </button>
-            <x-dropdown icon="eye" :label="__($perPage)">
+            <x-dropdown icon="eye" :label="$perPage">
                 @foreach ($perPages as $perPage)
-                    <x-dropdown-item label="{{ $perPage }}" click="$set('perPage', '{{ $perPage }}')" />
+                    @if ($perPage == $this->perPage)
+                        <x-dropdown-item label="{{ $perPage }}" class="active"
+                            click="$set('perPage', '{{ $perPage }}')" />
+                    @else
+                        <x-dropdown-item label="{{ $perPage }}" click="$set('perPage', '{{ $perPage }}')" />
+                    @endif
                 @endforeach
             </x-dropdown>
         </div>
     </div>
     <div class="row mb-1">
         <div class="col-sm-2">
-            <x-input label="Fecha Inicio" type="date" :lazy="true" model="fechaInicio" />
+            <x-input label="{{ __('site.invoices.index.start_date') }}" type="date" :lazy="true" model="fechaInicio" />
         </div>
         <div class="col-sm-2">
-            <x-input label="Fecha Fin" type="date" :lazy="true" model="fechaFin" />
+            <x-input label="{{ __('site.invoices.index.end_date') }}" type="date" :lazy="true" model="fechaFin" />
         </div>
         <div class="col-sm-4">
-            <x-select2-ajax label="Cliente" placeholder="Seleccione..." class="form-control"
+            <x-select2-ajax label="{{ __('site.invoices.index.client') }}" placeholder="{{ __('site.common.select') }}..." class="form-control"
                 url="{{ route('clientes.load-clientes') }}" model="cliente" />
         </div>
         <div class="col-sm-2">
             <div class="mb-1">
-                <label for="">Estado</label>
+                <label for="">{{ __('site.invoices.index.status') }}</label>
                 <select class="form-control" wire:model="estado">
                     @foreach ($estados as $estado)
                         <option value="{{ $estado }}">{{ $estado }}</option>
@@ -62,7 +60,7 @@
         </div>
         <div class="col-sm-2">
             <div class="mb-1">
-                <label for="">Moneda</label>
+                <label for="">{{ __('site.invoices.index.currency') }}</label>
                 <select class="form-control" wire:model="moneda">
                     @foreach ($monedas as $moneda)
                         <option value="{{ $moneda }}">{{ $moneda }}</option>
@@ -73,7 +71,7 @@
     </div>
     <div class="row">
         <div class="col-sm-2">
-            <x-input label="Importe" type="number" :lazy="true" model="importe" />
+            <x-input label="{{ __('site.invoices.index.import') }}" type="number" :lazy="true" model="importe" />
         </div>
     </div>
 
@@ -82,7 +80,7 @@
             <thead>
                 <tr>
                     @foreach ($sorts as $sort)
-                        <th class="text-center cursor-pointer" style="white-space: nowrap !important"
+                        <th class="text-center cursor-pointer text-uppercase" style="white-space: nowrap !important"
                             wire:click="changeSort('{{ $sort }}')">
                             <span>
                                 @if ($this->sort == $sort)
@@ -91,7 +89,7 @@
                             </span>
                         </th>
                     @endforeach
-                    <th class="text-center">Acciones</th>
+                    <th class="text-center text-uppercase">{{ __('site.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -114,7 +112,7 @@
                         <td>{{ $factura->fecha_emision_str }}</td>
                         <td>{{ $factura->receptor }}</td>
                         <td class="text-center">
-                            <span class="badge {{ $classEstado }}">{{ $factura->estado }}</span>
+                            <span class="badge {{ $classEstado }}">{{ __('site.statuses.invoices.' . $factura->estado) }}</span>
                         </td>
                         <td class="text-center">{{ $factura->moneda }}</td>
                         <td class="text-center">{{ number_format($factura->subtotal, 2) }}</td>
@@ -125,24 +123,24 @@
                                 @if ($factura->estado == 'PRECAPTURADA' || $factura->estado == 'CAPTURADA')
                                     @can('updateFacturaSistema', App\Models\Factura::find($factura->id))
                                         <li class="list-inline-item mb-1">
-                                            <x-action icon="pencil" title="Editar"
+                                            <x-action icon="pencil" title="{{ __('site.common.edit') }}"
                                                 href="{{ route('admin.pre-facturas.save', $factura->id) }}" />
                                         </li>
                                     @endcan
                                 @endif
                                 <li class="list-inline-item mb-1">
-                                    <x-action icon="file-pdf" title="Mostrar PDF"
+                                    <x-action icon="file-pdf" title="{{ __('site.common.download_pdf') }}"
                                         click="showPdf({{ $factura->id }})" />
                                 </li>
                                 @if ($factura->estado == 'CAPTURADA')
                                     <li class="list-inline-item mb-1">
-                                        <x-action icon="bell" title="Timbrar"
-                                            click="timbrar('{{ $factura->id }}')" />
+                                        <x-action icon="bell" title="{{ __('site.common.stamp') }}"
+                                            click="$emit('openModal', 'facturas-sistema.timbrar', {'factura': '{{ $factura->id }}'})" />
                                     </li>
                                 @endif
                                 @can('deleteFacturaSistema', App\Models\Factura::find($factura->id))
                                     <li class="list-inline-item mb-1">
-                                        <x-action icon="trash" title="Eliminar"
+                                        <x-action icon="trash" title="{{ __('site.common.delete') }}"
                                             click="$emit('openModal', 'facturas-sistema.delete', {factura: '{{ $factura->id }}', scope: 'facturas-sistema.index-pre-facturas'})" />
                                     </li>
                                 @endcan
@@ -153,7 +151,7 @@
                     <tr>
                         <td colspan="8">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{ __('site.common.form_with_errors') }}
                             </div>
                         </td>
                     </tr>
@@ -181,7 +179,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')">{{ __('Cerrar') }}</button>
+                            wire:click="$set('iframeContainerClass', '')">{{ __('site.common.close') }}</button>
                     </div>
                 </div>
             </div>

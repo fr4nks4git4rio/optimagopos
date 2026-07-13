@@ -58,20 +58,19 @@
 
 <body>
     <div class="contenido">
-        <h1 style="text-align: center">Almacén de Facturas</h1>
+        <h1 style="text-align: center">{{__('site.invoices.index.title')}}</h1>
         <br>
         <br>
         <table class="table table-styled">
             <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>F. Int.</th>
-                    <th>Receptor</th>
-                    <th>Estado</th>
-                    <th>Moneda</th>
-                    <th>Subtotal</th>
-                    <th>IVA</th>
-                    <th>Total</th>
+                    <th>{{__('site.invoices.index.date')}}</th>
+                    <th>{{__('site.invoices.index.receiver')}}</th>
+                    <th>{{__('site.invoices.index.status')}}</th>
+                    <th>{{__('site.invoices.index.currency')}}</th>
+                    <th>{{__('site.invoices.index.subtotal')}}</th>
+                    <th>{{__('site.invoices.index.iva')}}</th>
+                    <th>{{__('site.invoices.index.total')}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,11 +82,8 @@
                     $tipo = 'FACT';
                 ?>
                 <tr>
-                    <td>{{$factura->fecha_certificacion}}</td>
-                    <td>
-                        {{$factura->folio_interno}}
-                    </td>
-                    <td>{{\Illuminate\Support\Facades\Crypt::decrypt($factura->receptor)}}</td>
+                    <td>{{$factura->fecha_emision_str}}</td>
+                    <td>{{$factura->receptor}}</td>
                     <td>{{$factura->estado}}</td>
                     <td>{{$factura->moneda}}</td>
                     <td>{{number_format($factura->subtotal, 2)}}</td>
@@ -97,7 +93,7 @@
                 @if($factura->estado == 'CANCELADA')
                 <tr>
                     <td colspan="12" style="background-color: #fff; padding-top: 2px; padding-bottom: 2px; text-align: left;">
-                        <p><strong>Motivo de Cancelación: </strong> {{ $factura->motivo_cancelacion }}</p>
+                        <p><strong>{{__('site.invoices.index.cancellation_motive')}}: </strong> {{ $factura->motivo_cancelacion }}</p>
                     </td>
                 </tr>
                 @endif

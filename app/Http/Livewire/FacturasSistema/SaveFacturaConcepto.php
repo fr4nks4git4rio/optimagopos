@@ -55,7 +55,7 @@ class SaveFacturaConcepto extends Component
     public function nuevoConcepto($scope = null)
     {
         $this->scope = $scope;
-        $this->title = 'Nuevo Concepto';
+        $this->title = __('site.invoices.invoice_concept.new_concept') ;
         $this->index = null;
         $this->id_concepto = null;
         $this->cantidad = 1;
@@ -72,7 +72,7 @@ class SaveFacturaConcepto extends Component
     public function editarConcepto($index, $concepto, $scope = null)
     {
         $this->scope = $scope;
-        $this->title = 'Editar Concepto';
+        $this->title = __('site.invoices.invoice_concept.edit_concept') ;
         $this->index = $index;
         $this->id_concepto = $concepto['id'];
         $this->cantidad = $concepto['cantidad'];

@@ -7,9 +7,11 @@ use App\Http\Libraries\Pdf;
 use App\Models\Facturador;
 use App\Models\Cliente;
 use App\Models\Factura;
+use App\Models\Moneda;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -24,16 +26,16 @@ class IndexAlmacen extends Component
     public $perPages;
     public $order;
     public $search;
-    public $sort = 'Fecha';
+    public $sort;
     public $sorts;
     public $fechaInicio;
     public $fechaFin;
     public $cliente;
-    public $estado = 'Todos';
-    public $estados = ['Todos', 'TIMBRADA', 'CANCELADA'];
+    public $estado;
+    public $estados = [];
     public $folioInterno;
     public $moneda;
-    public $monedas = ['Todas', 'MXN', 'USD'];
+    public $monedas = [];
     public $importe;
     public $iframeContainerClass = '';
     public $iframeSrc = '';
@@ -60,16 +62,20 @@ class IndexAlmacen extends Component
         $this->perPage = $this->perPage ?? 10;
         $this->order = $this->order ?? 'desc';
         $this->search = $this->search ?? null;
-        $this->sort = $this->sort ?? 'Fecha';
+        $this->sort = $this->sort ?? __('site.invoices.index_storage.date');
         $this->fechaInicio = $this->fechaInicio ?? null;
         $this->fechaFin = $this->fechaFin ?? null;
         $this->cliente = $this->cliente ?? null;
-        $this->estado = $this->estado ?? 'Todos';
+        $this->estado = $this->estado ?? __('site.common.all');
         $this->folioInterno = $this->folioInterno ?? null;
-        $this->moneda = $this->moneda ?? 'Todas';
+        $this->moneda = $this->moneda ?? __('site.common.all');
         $this->importe = $this->importe ?? null;
 
-        $this->sorts = ['Fecha', 'F. Int.', 'Tipo', 'Receptor', 'Estado', 'Moneda', 'Subtotal', 'IVA', 'Total'];
+        $this->monedas = Moneda::pluck('acronimo')->toArray();
+        $this->monedas = Arr::prepend($this->monedas, __('site.common.all'));
+
+        $this->estados = [__('site.common.all'), __('site.statuses.invoices.TIMBRADA'), __('site.statuses.invoices.CANCELADA')];
+        $this->sorts = [__('site.invoices.index_storage.date'), __('site.invoices.index_storage.f_int'), __('site.invoices.index_storage.type'), __('site.invoices.index_storage.receiver'), __('site.invoices.index_storage.status'), __('site.invoices.index_storage.currency'), __('site.invoices.index_storage.subtotal'), __('site.invoices.index_storage.iva'), __('site.invoices.index_storage.total')];
         $this->perPages = [10, 25, 50, 100];
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
@@ -93,7 +99,7 @@ class IndexAlmacen extends Component
     public function init()
     {
         if (user()->cannot('viewAnyFacturaSistema', [Factura::class])) {
-            $this->emit('show-toast', 'No tiene permisos para visualizar los registros.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
 
@@ -147,13 +153,13 @@ class IndexAlmacen extends Component
         if ($this->cliente) {
             $query->where('factura.cliente_id', $this->cliente);
         }
-        if ($this->estado && $this->estado != 'Todos') {
+        if ($this->estado && $this->estado != __('site.common.all')) {
             $query->where('factura.estado', $this->estado);
         }
         if ($this->folioInterno) {
             $query->where('factura.folio_interno', 'like', "%$this->folioInterno%");
         }
-        if ($this->moneda && $this->moneda != 'Todas') {
+        if ($this->moneda && $this->moneda != __('site.common.all')) {
             $query->where('factura.moneda', $this->moneda);
         }
         if ($this->importe) {
@@ -261,16 +267,16 @@ class IndexAlmacen extends Component
         if ($factura->direccion_xml && Storage::disk('public')->exists($factura->direccion_xml))
             return Storage::download("public/$factura->direccion_xml");
         else
-            $this->emit('show-toast', 'No se encontró el archivo XML', 'danger');
+            $this->emit('show-toast', __('site.invoices.index_storage.no_xml_file_found'), 'danger');
     }
 
     public function imprimirFacturas()
     {
         $facturas = $this->query();
 
-        activity('Almacén de Facturas')
+        activity(__('site.invoices.index_storage.printing_log_name'))
             ->causedBy(auth()->user())
-            ->log('Impreso Listado de Almacén de Factura.');
+            ->log(__('site.invoices.index_storage.printing_log_detail'));
 
         $name = "AlmFAct_" . date('YmdHis') . ".pdf";
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.factura.index_almacen_pdf', [
@@ -286,6 +292,6 @@ class IndexAlmacen extends Component
     {
         $facturas = $this->query();
 
-        return (new FacturaEmitidaExport($facturas))->download("Facturas Emitidas.xls");
+        return (new FacturaEmitidaExport($facturas))->download(__('site.invoices.index_storage.download_xml_name') . ".xls");
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Cfdi;
 use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\FormaPago;
+use App\Models\Moneda;
 use App\Models\Serie;
 use App\Rules\DataClientRule;
 use App\Services\Timbrado\Facturador;
@@ -238,7 +239,9 @@ class SaveComplemento extends Component
 
     public function render()
     {
-        return view('livewire.facturas-sistema.save-complemento');
+        return view('livewire.facturas-sistema.save-complemento', [
+            'monedas' => Moneda::pluck('acronimo')->toArray()
+        ]);
     }
 
     public function getTotalProperty()
@@ -320,7 +323,7 @@ class SaveComplemento extends Component
                     $import_to_pay = round($this->facturas[$index]['balance_previo_temp'] / $this->tipo_cambio, 2);
             }
             $this->facturas[$index]['importe_pagado'] = $import_to_pay;
-            $this->emit('show-toast', 'La factura no permite pago en varias parcialidades. Es necesario pagarla en su totalidad.', 'warning');
+            $this->emit('show-toast', __('site.invoices.save_complement.several_partialities_not_allowed'), 'warning');
         }
         $this->emit('$refresh');
     }
@@ -379,6 +382,7 @@ class SaveComplemento extends Component
         $data['subtotal'] = $this->subtotal;
         $data['cantidad_letras'] = convertir_numero_a_letras($this->total, $this->moneda);
         $data['del_sistema'] = 1;
+        $data['propietario_type'] = Cliente::class;
         $data['es_complemento'] = 1;
 
         $this->complemento->fill(Arr::except($data, ['facturas']))->save();
@@ -397,13 +401,17 @@ class SaveComplemento extends Component
             ]);
         }
 
-        activity('Complementos')
+        if ($this->complemento->wasRecentlyCreated)
+            $log_detail = __('site.invoices.save_complement.create_log_detail', ['id' => $this->complemento->id]);
+        else
+            $log_detail = __('site.invoices.save_complement.edit_log_detail', ['id' => $this->complemento->id]);
+        activity(__('site.invoices.save_complement.save_log'))
             ->performedOn($this->complemento)
             ->causedBy(auth()->user())
             ->withProperties(['complemento_id' => $this->complemento->id])
-            ->log(($this->complemento->wasRecentlyCreated ? 'Creado' : 'Modificado') . " Complemento con id: " . $this->complemento->id);
+            ->log($log_detail);
 
-        $this->emit('show-toast', 'Complemento guardado.');
+        $this->emit('show-toast', __('site.invoices.save_complement.complement_saved'));
         if (!$timbrando)
             $this->redirect(route('admin.complementos.save', $this->complemento->id));
     }
@@ -438,7 +446,7 @@ class SaveComplemento extends Component
             });
             $this->emit('unselect-factura', $id);
         } else {
-            $this->emit('show-toast', 'La factura no puede ser eliminada. Ha sido utilizada en otro(s) complemento(s) posterior al actual.', 'danger');
+            $this->emit('show-toast', __('site.invoices.save_complement.cant_delete_related_invoice'), 'danger');
         }
     }
 

@@ -19,7 +19,7 @@ class Timbrar extends Modal
     public function mount()
     {
         $this->type = 'Factura';
-        $this->folio = $this->factura->serie->descripcion . '-' . Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion($this->factura->propietario_id) == 1);
+        $this->folio = Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion($this->factura->propietario_id) == 1);
     }
 
     public static function modalMaxWidthClass(): string

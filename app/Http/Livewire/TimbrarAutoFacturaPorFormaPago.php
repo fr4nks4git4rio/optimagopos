@@ -352,7 +352,7 @@ class TimbrarAutoFacturaPorFormaPago extends Component
             }
 
             $facturador = new Facturador(Sucursal::find($factura['propietario_id']));
-            $folio_interno = $factura['serie'] . '-' . Factura::internalSheetGenerator($factura['serie_id'], modo_facturacion($factura['propietario_id']) == 1);
+            $folio_interno = Factura::internalSheetGenerator($factura['serie_id'], modo_facturacion($factura['propietario_id']) == 1);
             $res = $facturador->timbrarFactura($factura['id'], $folio_interno);
             if ($res['success']) {
                 $this->facturas[$index]['factura_timbrada'] = true;

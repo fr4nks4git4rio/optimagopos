@@ -63,13 +63,13 @@ class IndexPreFacturas extends Component
         $this->fechaInicio = $this->fechaInicio ?? null;
         $this->fechaFin = $this->fechaFin ?? null;
         $this->cliente = $this->cliente ?? null;
-        $this->estado = $this->estado ?? 'Todos';
-        $this->moneda = $this->moneda ?? 'Todas';
+        $this->estado = $this->estado ?? __('site.common.all');
+        $this->moneda = $this->moneda ?? __('site.common.all');
         $this->importe = $this->importe ?? null;
-        $this->sorts = ['Fecha', 'Receptor', 'Estado', 'Moneda', 'Subtotal', 'IVA', 'Total'];
+        $this->sorts = [__('site.invoices.index.date'), __('site.invoices.index.receiver'), __('site.invoices.index.status'), __('site.invoices.index.currency'), __('site.invoices.index.subtotal'), __('site.invoices.index.iva'), __('site.invoices.index.total')];
         $this->perPages = [10, 25, 50, 100];
-        $this->estados = ['Todos', 'PRECAPTURADA', 'CAPTURADA'];
-        $this->monedas = Moneda::all()->pluck('acronimo')->prepend('Todas');
+        $this->estados = [__('site.common.all'), 'PRECAPTURADA', 'CAPTURADA'];
+        $this->monedas = Moneda::all()->pluck('acronimo')->prepend(__('site.common.all'));
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
 
@@ -92,7 +92,7 @@ class IndexPreFacturas extends Component
     public function init()
     {
         if (user()->cannot('viewAnyFacturaSistema', [Factura::class])) {
-            $this->emit('show-toast', 'No tiene permisos para visualizar los registros.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
 
@@ -119,6 +119,8 @@ class IndexPreFacturas extends Component
                 'factura.subtotal',
                 'factura.iva',
                 'factura.total',
+                'factura.es_complemento',
+                'factura.es_nota_credito',
                 DB::raw("(SELECT GROUP_CONCAT(fc.descripcion SEPARATOR '
                 ') FROM tb_factura_conceptos as fc WHERE fc.factura_id = factura.id) as conceptos")
             )
@@ -135,12 +137,12 @@ class IndexPreFacturas extends Component
         if ($this->cliente) {
             $query->where('factura.cliente_id', $this->cliente);
         }
-        if ($this->estado && $this->estado != 'Todos') {
+        if ($this->estado && $this->estado != __('site.common.all')) {
             $query->where('factura.estado', $this->estado);
         } else {
             $query->whereIn('factura.estado', ['PRECAPTURADA', 'CAPTURADA']);
         }
-        if ($this->moneda && $this->moneda != 'Todas') {
+        if ($this->moneda && $this->moneda != __('site.common.all')) {
             $query->where('factura.moneda', $this->moneda);
         }
         if ($this->importe) {
@@ -228,11 +230,11 @@ class IndexPreFacturas extends Component
     public function timbrar($id)
     {
         $factura = Factura::find($id);
-        $folio_interno = $factura->serie->descripcion . '-' . Factura::internalSheetGenerator($factura->serie_id, modo_facturacion($factura->propietario_id) == 1);
+        $folio_interno = Factura::internalSheetGenerator($factura->serie_id, modo_facturacion($factura->propietario_id) == 1);
         $facturador = new Facturador($factura->propietario);
         $res = $facturador->timbrarFactura($id, $folio_interno);
         if ($res['success']) {
-            $this->emit('show-toast', "Factura timbrada satisfactoriamente.");
+            $this->emit('show-toast', __('site.invoices.index.stamp_invoice_successfully'));
         } else {
             $this->emit('show-toast', pretty_message($res['message'], 'danger'), 'danger');
         }
@@ -250,9 +252,9 @@ class IndexPreFacturas extends Component
     {
         $facturas = $this->query();
 
-        activity('Pre-Facturas')
+        activity(__('site.invoices.index.print_log_name'))
             ->causedBy(auth()->user())
-            ->log('Impreso Listado de Pre-Factura.');
+            ->log(__('site.invoices.index.print_log_detail'));
 
         $name = "PreFact_" . date('YmdHis') . ".pdf";
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.factura.index_pre_facturas_pdf', [

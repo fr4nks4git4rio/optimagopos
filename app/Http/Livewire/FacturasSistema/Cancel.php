@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\FacturasSistema;
 
 use App\Http\Livewire\Layouts\Modal;
+use App\Models\Cliente;
 use App\Models\MotivoCancelacionFactura;
 use App\Models\Factura;
 use App\Services\Timbrado\Facturador;
@@ -24,9 +25,21 @@ class Cancel extends Modal
         $this->factura = $factura;
         $this->scope = $scope;
 
-        $this->type = 'Factura';
+        if ($this->factura->es_complemento)
+            $this->type = __('site.common.complement');
+        else if ($this->factura->es_nota_credito)
+            $this->type = __('site.common.credit_note');
+        else
+            $this->type = __('site.common.invoice');
+
         $this->motivos = MotivoCancelacionFactura::all()->map->only(['label', 'value'])->toArray();
-        $this->facturas = Factura::where('estado', 'TIMBRADA')->get();
+        $this->facturas = Factura::where('estado', 'TIMBRADA')->lazy()->map(function (Factura $factura) {
+            $factura->cliente = Cliente::decryptInfo($factura->cliente);
+            return [
+                'value' => $factura->id,
+                'label' => $factura->label
+            ];
+        })->toArray();
     }
 
     public static function modalMaxWidthClass(): string
@@ -46,12 +59,12 @@ class Cancel extends Modal
 
     public function getModoProperty()
     {
-        return $this->factura->modo_prueba_cfdi ? 'PRUEBA' : 'PRODUCCION';
+        return $this->factura->modo_prueba_cfdi ? __('site.common.testing') : __('site.common.production');
     }
 
     public function getTextAlertProperty()
     {
-        return 'La Factura será cancelada';
+        return __('site.invoices.cancel.invoice_to_cancel', ['type' => $this->type, 'folio' => $this->factura->folio_interno]);
     }
 
     public function render()
@@ -62,7 +75,7 @@ class Cancel extends Modal
     public function init()
     {
         if (user()->cannot('cancelFacturaSistema', $this->factura)) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -70,16 +83,17 @@ class Cancel extends Modal
 
     public function cancel()
     {
-        $data = $this->validate([
-            'motivo' => ['required', 'exists:tb_motivos_cancelacion_factura,id'],
-            'factura_sustituta' => ['required_if:motivo,1'],
-        ],
-        // [
-        //     'motivo.required' => 'Campo requerido!',
-        //     'motivo.exists' => 'Motivo no encontrado!',
-        //     'factura_sustituta.exists' => 'Factura no encontrada!',
-        //     'factura_sustituta.required_if' => 'Campo requerido!'
-        // ]
+        $data = $this->validate(
+            [
+                'motivo' => ['required', 'exists:tb_motivos_cancelacion_factura,id'],
+                'factura_sustituta' => ['required_if:motivo,1'],
+            ],
+            // [
+            //     'motivo.required' => 'Campo requerido!',
+            //     'motivo.exists' => 'Motivo no encontrado!',
+            //     'factura_sustituta.exists' => 'Factura no encontrada!',
+            //     'factura_sustituta.required_if' => 'Campo requerido!'
+            // ]
         );
 
         $facturador = new Facturador($this->factura->propietario);

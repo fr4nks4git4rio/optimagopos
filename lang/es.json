@@ -220,5 +220,10 @@
     "days_number_next_month": "Cantidad de días posteriores al inicio del siguiente mes",
     "subscription_branches_exceeded": "Cantidad de sucursales excedido",
     "subscription_terminals_exceeded": "Cantidad de terminales excedido",
-    "subscription_users_exceeded": "Cantidad de usuarios excedido"
+    "subscription_users_exceeded": "Cantidad de usuarios excedido",
+    "MENSUAL": "MENSUAL",
+    "BIMESTRAL": "BIMESTRAL",
+    "TRIMESTRAL":  "TRIMESTRAL",
+    "SEMESTRAL": "SEMESTRAL",
+    "ANUAL": "ANUAL"
 }

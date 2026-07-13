@@ -39,7 +39,7 @@ class Index extends Component
     {
         $this->page = $this->page ?? 1;
         $this->perPage = $this->perPage ?? 10;
-        $this->sorts = ['Fecha', 'Texto', 'Ip', 'Cliente', 'Sucursal', 'Terminal'];
+        $this->sorts = [__('site.quarantine.index.date'), __('site.quarantine.index.text'), __('site.quarantine.index.ip'), __('site.quarantine.index.client'), __('site.quarantine.index.branch'), __('site.quarantine.index.terminal')];
         $this->search = $this->search ?? '';
         $this->sort = $this->sort ?? '';
         $this->order = $this->order ?? 'asc';
@@ -89,37 +89,37 @@ class Index extends Component
         });
 
         switch ($this->sort) {
-            case 'Fecha':
+            case __('site.quarantine.index.date'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('fecha', SORT_NATURAL)->values();
                 else
                     $records = $records->sortByDesc('fecha', SORT_NATURAL)->values();
                 break;
-            case 'Texto':
+            case __('site.quarantine.index.text'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('texto', SORT_NATURAL)->values();
                 else
                     $records = $records->sortByDesc('texto', SORT_NATURAL)->values();
                 break;
-            case 'Ip':
+            case __('site.quarantine.index.ip'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('ip', SORT_NUMERIC)->values();
                 else
                     $records = $records->sortByDesc('ip', SORT_NUMERIC)->values();
                 break;
-            case 'Cliente':
+            case __('site.quarantine.index.client'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('cliente', SORT_NATURAL)->values();
                 else
                     $records = $records->sortByDesc('cliente', SORT_NATURAL)->values();
                 break;
-            case 'Sucursal':
+            case __('site.quarantine.index.branch'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('sucursal', SORT_NATURAL)->values();
                 else
                     $records = $records->sortByDesc('sucursal', SORT_NATURAL)->values();
                 break;
-            case 'Terminal':
+            case __('site.quarantine.index.terminal'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('terminal', SORT_NATURAL)->values();
                 else

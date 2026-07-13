@@ -633,7 +633,7 @@ class Save extends Component
 
     public function timbrar()
     {
-        $folio_interno = $this->factura->serie->descripcion . '-' . Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion($this->factura->propietario_id) == 1);
+        $folio_interno = Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion($this->factura->propietario_id) == 1);
         $facturador = new Facturador($this->factura->propietario);
         $res = $facturador->timbrarFactura($this->factura->id, $folio_interno);
         if ($res['success']) {

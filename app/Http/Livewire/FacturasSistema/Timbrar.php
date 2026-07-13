@@ -18,8 +18,14 @@ class Timbrar extends Modal
 
     public function mount()
     {
-        $this->type = 'Factura';
-        $this->folio = $this->factura->serie->descripcion . '-' . Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion($this->factura->propietario_id) == 1);
+        if ($this->factura->es_complemento)
+            $this->type = __('site.common.complement');
+        else if ($this->factura->es_nota_credito)
+            $this->type = __('site.common.credit_note');
+        else
+            $this->type = __('site.common.invoice');
+
+        $this->folio = Factura::internalSheetGenerator($this->factura->serie_id, modo_facturacion($this->factura->propietario_id) == 1);
     }
 
     public static function modalMaxWidthClass(): string
@@ -29,17 +35,17 @@ class Timbrar extends Modal
 
     public function getModoProperty()
     {
-        return $this->factura->propietario->cfdi_timbrado_productivo ? 'PRODUCCION' : 'PRUEBA';
+        return $this->factura->propietario->cfdi_timbrado_productivo ? __('site.common.production') : __('site.common.testing');
     }
 
     public function getTextAlertProperty()
     {
-        return 'La Factura con folio <b>' . $this->folio . '</b> será timbrada';
+        return __('site.invoices.stamp.invoice_to_stamp', ['type' => $this->type, 'folio' => $this->folio]);
     }
 
     public function render()
     {
-        return view('livewire.facturas.timbrar');
+        return view('livewire.facturas-sistema.timbrar');
     }
 
     public function timbrar()

@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\DB;
  * @property float $precio_total
  * @property float $descuento
  * @property float $total
+ * @property string $motivo_desactivacion
  * @property string $estado
  * @property integer $cliente_id
  * @property integer $paquete_id
@@ -46,6 +47,7 @@ class Suscripcion extends Model
         'precio_total',
         'descuento',
         'total',
+        'motivo_desactivacion',
         'estado',
         'cliente_id',
         'paquete_id'

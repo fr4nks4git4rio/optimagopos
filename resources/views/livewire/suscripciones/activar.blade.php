@@ -22,7 +22,7 @@
             <div class="card bg-light border-0 rounded-3 p-3 text-start mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="text-muted small text-uppercase tracking-wider fw-semibold"
-                        style="font-size: 0.7rem;">{{ __('site.subscription.activate.subscription') }}</span>
+                        style="font-size: 0.7rem;">{{ __('site.subscriptions.activate.subscription') }}</span>
                     <span class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 0.75rem;">
                         #{{ $selectedSubscriptionData['id'] }}
                     </span>

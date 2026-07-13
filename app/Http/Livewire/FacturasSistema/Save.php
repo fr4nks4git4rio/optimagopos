@@ -7,6 +7,7 @@ use App\Models\ClaveUnidad;
 use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\FacturaConcepto;
+use App\Models\Moneda;
 use App\Models\ObjetoImpuesto;
 use App\Models\Suscripcion;
 use App\Models\TipoRelacionFactura;
@@ -143,7 +144,6 @@ class Save extends Component
             $this->fecha_emision_str = (string)$factura->fecha_emision_str;
             $this->comentarios = (string)$factura->comentarios;
             $this->cantidad_letras = (string)$factura->cantidad_letras;
-            $this->estado = (string)$factura->estado;
             $this->moneda = (string)$factura->moneda;
             $this->porciento_iva = (float)$factura->porciento_iva;
 
@@ -334,7 +334,7 @@ class Save extends Component
     {
         $withErrors = $this->getErrorBag()->isNotEmpty();
         if ($withErrors)
-            $this->emit('show-toast', 'Existen errores en el formulario.', 'danger');
+            $this->emit('show-toast', __('site.invoices.save_invoice.errors_in_form'), 'danger');
         return $withErrors;
     }
 
@@ -347,7 +347,7 @@ class Save extends Component
         };
         return view('livewire.facturas-sistema.save', [
             'factura' => $this->getFactura(),
-
+            'monedas' => Moneda::pluck('acronimo')->toArray(),
             'series' => $cleanArray(DB::table('tb_series')->where('activo', 1)->select('id as value', 'descripcion as label')),
             'metodosPago' => $cleanArray(DB::table('tb_metodo_pagos')->where('activo', 1)->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
             'formasPago' => $cleanArray(DB::table('tb_forma_pagos')->where('activo', 1)->select('id as value', DB::raw("CONCAT_WS(' | ', codigo, descripcion) as label"))),
@@ -498,6 +498,7 @@ class Save extends Component
         $data['iva'] = $this->iva;
         $data['total'] = $this->total;
         $data['del_sistema'] = 1;
+        $data['propietario_type'] = Cliente::class;
         $data['tipo_relacion_factura_id'] = $data['tipo_relacion_factura_id'] ?: null;
         $data['user_id'] = user()->id;
 

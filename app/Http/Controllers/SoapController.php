@@ -37,7 +37,6 @@ class SoapController extends BaseSoapController
             $modo_productivo = system_config('cfdi_timbrado_productivo');
         }
 
-        Log::info("Obteniendo Timbres Disponibles para el RFC: {$rfc}, Modo Productivo: {$modo_productivo}");
         if ($modo_productivo == 1) {
             $this->setRfcEmisor($rfc);
             $this->setUsuarioIntegrador($owner->usuario_integrador_sat);
@@ -75,7 +74,6 @@ class SoapController extends BaseSoapController
             $response = ['success' => false, 'message' => $msg];
         }
 
-        Log::info("Resultado de la consulta de timbres disponibles: " . json_encode($response));
         return $response;
     }
 }

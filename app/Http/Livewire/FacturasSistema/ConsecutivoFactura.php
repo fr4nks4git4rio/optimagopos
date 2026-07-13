@@ -10,7 +10,6 @@ class ConsecutivoFactura extends Component
 {
     public $scope;
     public $show = '';
-    public $title = 'Confirmar Consecutivo';
     public $factura;
     public $consecutivo;
     public $modal_id = 'consecutivo-factura';

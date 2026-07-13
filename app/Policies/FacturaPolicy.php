@@ -25,6 +25,8 @@ class FacturaPolicy
      */
     public function view(User $user, Factura $factura): bool
     {
+        if ($factura->del_sistema)
+            return false;
         if (
             $user->is_admin
             && $user->cliente_id == $factura->propietario_id
@@ -51,6 +53,8 @@ class FacturaPolicy
      */
     public function update(User $user, Factura $factura): bool
     {
+        if ($factura->del_sistema)
+            return false;
         if (
             $user->is_admin
             && $user->cliente_id ==  $factura->propietario_id
@@ -66,6 +70,8 @@ class FacturaPolicy
      */
     public function delete(User $user, Factura $factura): bool
     {
+        if ($factura->del_sistema)
+            return false;
         if (
             $user->is_admin
             && $user->cliente_id ==  $factura->propietario_id
@@ -94,6 +100,8 @@ class FacturaPolicy
 
     public function cancel(User $user, Factura $factura): bool
     {
+        if ($factura->del_sistema)
+            return false;
         if (
             $user->is_admin
             && $user->cliente_id ==  $factura->propietario_id
@@ -137,6 +145,8 @@ class FacturaPolicy
      */
     public function viewFacturaSistema(User $user, Factura $factura): bool
     {
+        if (!$factura->del_sistema)
+            return false;
         if ($user->is_super_admin || $user->is_contabilidad)
             return true;
 
@@ -159,6 +169,8 @@ class FacturaPolicy
      */
     public function updateFacturaSistema(User $user, Factura $factura): bool
     {
+        if (!$factura->del_sistema)
+            return false;
         if ($user->is_super_admin || $user->is_contabilidad)
             return true;
 
@@ -170,6 +182,8 @@ class FacturaPolicy
      */
     public function deleteFacturaSistema(User $user, Factura $factura): bool
     {
+        if (!$factura->del_sistema)
+            return false;
         if ($user->is_super_admin || $user->is_contabilidad)
             return true;
 
@@ -194,6 +208,8 @@ class FacturaPolicy
 
     public function cancelFacturaSistema(User $user, Factura $factura): bool
     {
+        if (!$factura->del_sistema)
+            return false;
         if ($user->is_super_admin || $user->is_contabilidad)
             return true;
 

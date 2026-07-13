@@ -50,14 +50,14 @@ class PanelPac extends Modal
     public function init()
     {
         if (user()->cannot('setPanelPacFacturaSistema', [Factura::class])) {
-            $this->emit('show-toast', 'No tiene permisos para realizar estar acción.', 'danger');
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->emit('closeModal');
             return;
         }
 
         $owner = get_system_owner();
         if (!$owner) {
-            $this->emit('show-toast', 'Primero debe guardar la Cabecera de Factura.', 'danger');
+            $this->emit('show-toast', __('site.panel_pac.save_invoice_header_first'), 'danger');
             $this->emit('closeModal');
             return;
         }
@@ -67,7 +67,7 @@ class PanelPac extends Modal
     {
         system_config('cfdi_timbrado_productivo', $this->cfdi_timbrado_productivo);
         $this->emit('cfdi_timbrado_productivo_updated', $this->cfdi_timbrado_productivo);
-        $this->emit('show-toast', 'Modo de Timbrado cambiado.');
+        $this->emit('show-toast', __('site.panel_pac.stamping_method_saved'));
         $this->emit('$refresh');
     }
 }

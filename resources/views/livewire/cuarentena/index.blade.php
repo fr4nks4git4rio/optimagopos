@@ -1,4 +1,4 @@
-@section('title', 'Cuarentena')
+@section('title', __('site.quarantine.index.title'))
 
 <div>
     <h1 class="fs-1 mb-2 text-capitalize">@yield('title')</h1>
@@ -7,7 +7,7 @@
         <div class="col-lg-auto mb-3">
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Ticket" class="form-control text-capitalize"
+                <input type="search" placeholder="{{ __('site.quarantine.index.search_ticket') }}" class="form-control text-capitalize"
                     wire:model.debounce.500ms="search">
             </div>
         </div>

@@ -9,6 +9,7 @@ use App\Models\ClaveUnidad;
 use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\FormaPago;
+use App\Models\Moneda;
 use App\Models\Serie;
 use App\Rules\DataClientRule;
 use App\Rules\FacturaConeptosRule;
@@ -193,7 +194,9 @@ class SaveNotaCredito extends Component
 
     public function render()
     {
-        return view('livewire.facturas-sistema.save-nota-credito');
+        return view('livewire.facturas-sistema.save-nota-credito', [
+            'monedas' => Moneda::pluck('acronimo')->toArray()
+        ]);
     }
 
     public function getSubtotalProperty()
@@ -288,6 +291,7 @@ class SaveNotaCredito extends Component
             $data['propietario_id'] = get_system_owner()->id;
             $data['es_nota_credito'] = 1;
             $data['del_sistema'] = 1;
+            $data['propietario_type'] = Cliente::class;
             $data['estado'] = 'CAPTURADA';
             $data['tipo_comprobante_id'] = 2;
             $data['tipo_relacion_factura_id'] = 1;
@@ -322,13 +326,18 @@ class SaveNotaCredito extends Component
             $this->notaCredito->facturas_fiscales()->detach();
         }
 
-        activity('Notas de Crédito')
+        if ($this->notaCredito->wasRecentlyCreated)
+            $log_detail = __('site.invoices.save_credit_note.save_log_detail_create', ['id' => $this->notaCredito->id]);
+        else
+            $log_detail = __('site.invoices.save_credit_note.save_log_detail_edit', ['id' => $this->notaCredito->id]);
+
+        activity(__('site.invoices.save_credit_note.save_log_name'))
             ->performedOn($this->notaCredito)
             ->causedBy(auth()->user())
             ->withProperties($this->notaCredito->toArray())
-            ->log(($this->notaCredito->wasRecentlyCreated ? 'Creada' : 'Modificada') . " Nota de Crédito con id: " . $this->notaCredito->id);
+            ->log($log_detail);
 
-        $this->emit('show-toast', 'Nota de Crédito guardada.');
+        $this->emit('show-toast', __('site.invoices.save_credit_note.credit_note_saved'));
         $this->redirect(route('admin.pre-facturas.index'));
     }
 

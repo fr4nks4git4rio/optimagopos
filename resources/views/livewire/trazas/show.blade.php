@@ -1,6 +1,6 @@
 <x-modal>
     <x-slot:title>
-        Detalles de Traza
+        {{ __('site.logs.show.title') }}
     </x-slot:title>
 
     <x-slot:content>
@@ -16,17 +16,17 @@
                 @if ($hasOld && $hasAttributes)
                     <div class="d-flex align-items-center mb-3 gap-2">
                         <i class="bi bi-arrow-left-right text-primary fs-5"></i>
-                        <h4 class="h5 fw-bold text-dark mb-0">{{ __('Cambios Realizados') }}</h4>
+                        <h4 class="h5 fw-bold text-dark mb-0">{{ __('site.logs.show.changes_made') }}</h4>
                     </div>
 
                     <div class="table-responsive rounded-3 border">
                         <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
                             <thead class="table-light text-uppercase tracking-wider" style="font-size: 0.75rem;">
                                 <tr>
-                                    <th class="ps-4 text-muted fw-semibold" style="width: 30%;">{{ __('Propiedad') }}
+                                    <th class="ps-4 text-muted fw-semibold" style="width: 30%;">{{ __('site.logs.show.property') }}
                                     </th>
-                                    <th class="text-danger fw-semibold" style="width: 35%;">{{ __('Antes') }}</th>
-                                    <th class="text-success fw-semibold" style="width: 35%;">{{ __('Después') }}</th>
+                                    <th class="text-danger fw-semibold" style="width: 35%;">{{ __('site.logs.show.before') }}</th>
+                                    <th class="text-success fw-semibold" style="width: 35%;">{{ __('site.logs.show.after') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,16 +65,16 @@
 
                     <div class="d-flex align-items-center mb-3 gap-2">
                         <i class="bi bi-info-circle text-primary fs-5"></i>
-                        <h4 class="h5 fw-bold text-dark mb-0">{{ __('Detalles del Registro') }}</h4>
+                        <h4 class="h5 fw-bold text-dark mb-0">{{ __('site.logs.show.register_details') }}</h4>
                     </div>
 
                     <div class="table-responsive rounded-3 border">
                         <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
                             <thead class="table-light text-uppercase tracking-wider" style="font-size: 0.75rem;">
                                 <tr>
-                                    <th class="ps-4 text-muted fw-semibold" style="width: 40%;">{{ __('Propiedad') }}
+                                    <th class="ps-4 text-muted fw-semibold" style="width: 40%;">{{ __('site.logs.show.property') }}
                                     </th>
-                                    <th class="text-muted fw-semibold" style="width: 60%;">{{ __('Valor') }}</th>
+                                    <th class="text-muted fw-semibold" style="width: 60%;">{{ __('site.logs.show.value') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -97,7 +97,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
-            Cerrar
+            {{__('site.common.close')}}
         </button>
     </x-slot:buttons>
 </x-modal>

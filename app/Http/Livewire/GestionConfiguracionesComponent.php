@@ -148,7 +148,7 @@ class GestionConfiguracionesComponent extends Component
 
         system_config($field, $value);
 
-        $this->emit('show-toast', 'Configuración global guardada correctamente', 'success');
+        $this->emit('show-toast', __('site.system_configs.config_save_successfully'), 'success');
     }
 
     public function render()

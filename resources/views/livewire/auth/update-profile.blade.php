@@ -1,12 +1,12 @@
 <x-modal form-action="update">
     <x-slot:title>
-        Modificar Perfil
+        {{__('site.update_profile.title')}}
     </x-slot:title>
     <x-slot:content>
         <div class="row">
             <div x-data="{ avatar_uploaded: false }" class="col-sm-3 text-center"
                 x-on:livewire-upload-finish="avatar_uploaded=true;$wire.avatar_src = URL.createObjectURL(document.getElementById('avatar').files[0])">
-                <label for="">Foto</label>
+                <label for="">{{__('site.update_profile.picture')}}</label>
                 @if (!$this->has_avatar)
                     <img src="{{ asset('img/avatars/no_avatar.png') }}" alt="" class="img-thumbnail rounded-4"
                         id="avatar_image">
@@ -21,34 +21,35 @@
 
                 <input type="file" style="display: none" id="avatar" wire:model="avatar" accept=".jpg,.jpeg,.png">
                 <button type="button" class="btn btn-site-primary mt-2"
-                    onclick="document.getElementById('avatar').click()">Subir Avatar
+                    onclick="document.getElementById('avatar').click()">
+                    {{__('site.update_profile.upload_picture')}}
                 </button>
                 @if ($this->has_avatar)
-                    <button type="button" class="btn btn-secondary mt-2" wire:click="$emit('removePhoto')">Quitar
-                        Avatar
+                    <button type="button" class="btn btn-secondary mt-2" wire:click="$emit('removePhoto')">
+                        {{__('site.update_profile.remove_picture')}}
                     </button>
                 @endif
             </div>
             <div class="col-sm-9">
                 <div class="row mb-2">
                     <div class="col-sm-12">
-                        <x-input label="Correo" type="email" model="email" disabled />
+                        <x-input label="{{__('site.update_profile.email')}}" type="email" model="email" disabled />
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-sm-12">
                         <div class="mb-1">
-                            <label for="">Rol:</label>
+                            <label for="">{{__('site.update_profile.rol')}}:</label>
                             <input type="text" class="form-control" value="{{ $this->rol }}" disabled>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <x-input label="Nombre" type="text" model="nombre" />
+                        <x-input label="{{__('site.update_profile.first_name')}}" type="text" model="nombre" />
                     </div>
                     <div class="col-sm-6">
-                        <x-input label="Apellidos" type="text" model="apellidos" />
+                        <x-input label="{{__('site.update_profile.last_name')}}" type="text" model="apellidos" />
                     </div>
                 </div>
             </div>
@@ -57,8 +58,8 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
-            Cerrar
+            {{__('site.common.close')}}
         </button>
-        <button type="submit" class="btn btn-site-primary">Guardar Perfil</button>
+        <button type="submit" class="btn btn-site-primary">{{__('site.update_profile.save_profile')}}</button>
     </x-slot:buttons>
 </x-modal>

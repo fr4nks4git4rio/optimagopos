@@ -14,28 +14,35 @@ class Index extends Component
     use WithPagination;
 
     public $search;
+    public $order;
     public $sort;
-    public $sorts;
-    public $filter;
-    public $filters;
+    public $sorts = [];
+    public $perPage;
+    public $perPages = [10, 25, 50, 100];
 
-    protected $queryString = ['search', 'sort'];
+    protected $queryString = ['search', 'sort', 'order', 'perPage'];
 
     protected $listeners = ['$refresh'];
 
     public function mount()
     {
-        $this->sort = 'Más Actuales';
-        $this->sorts = ['Más Actuales', 'Descripción', 'Más Antiguos'];
-        $this->filter = __('All');
-        $this->filters = [__('All')];
+        $this->sorts = [__('site.logs.index.name_log'), __('site.logs.index.description'), __('site.logs.index.performed_by'), __('site.logs.index.date')];
+        $this->search = $this->search ?? '';
+        $this->perPage = $this->perPage ?? 10;
+        $this->order = $this->sort ?? 'desc';
+        $this->sort = $this->sort ?? __('site.logs.index.date');
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
     public function render()
     {
         //        dd($this->query()->get());
         return view('livewire.trazas.index', [
-            'trazas' => $this->query()->orderBy('created_at', 'desc')->paginate(),
+            'trazas' => $this->query()->orderBy('created_at', 'desc')->paginate($this->perPage),
         ]);
     }
 
@@ -52,7 +59,7 @@ class Index extends Component
                 'log.subject_id',
                 'log.subject_type',
                 'log.created_at',
-                DB::raw('CONCAT(user.nombre, " ", user.apellidos, " (", user.email, ")") as causer_name'),
+                DB::raw('CONCAT(CONCAT_WS(" ", user.nombre, user.apellidos), " (", user.email, ")") as causer_name'),
                 'user.email as causer_username'
             )
             ->leftJoin('tb_usuarios as user', 'log.causer_id', '=', 'user.id');
@@ -67,28 +74,42 @@ class Index extends Component
                     ->orWhere('log.log_name', 'like', '%' . $this->search . '%')
                     ->orWhere('log.created_at', 'like', '%' . $this->search . '%')
                     ->orWhere('user.email', 'like', '%' . $this->search . '%')
-                    ->orWhereRaw('CONCAT(user.first_name, " ", user.last_name) like ?', ['%' . $this->search . '%']);
+                    ->orWhereRaw('CONCAT_WS(" ", user.first_name, user.last_name) like ?', ['%' . $this->search . '%']);
             });
         }
 
         switch ($this->sort) {
-            case 'Más Actuales':
-                $query->orderBy('log.created_at', 'desc');
+            case __('site.logs.index.name_log'):
+                if ($this->order == 'asc')
+                    $query->orderBy('log.log_name');
+                else
+                    $query->orderByDesc('log.log_name');
                 break;
-            case 'Descripción':
-                $query->orderBy('log.description');
+            case __('site.logs.index.description'):
+                if ($this->order == 'asc')
+                    $query->orderBy('log.description');
+                else
+                    $query->orderByDesc('log.description');
                 break;
-            case 'Más Antiguos':
-                $query->orderBy('log.created_at', 'asc');
+            case __('site.logs.index.performed_by'):
+                if ($this->order == 'asc')
+                    $query->orderByRaw("CONCAT_WS(' ', user.first_name, user.last_name) asc");
+                else
+                    $query->orderByRaw("CONCAT_WS(' ', user.first_name, user.last_name) desc");
+                break;
+            case __('site.logs.index.date'):
+                if ($this->order == 'asc')
+                    $query->orderBy('log.created_at');
+                else
+                    $query->orderByDesc('log.created_at');
                 break;
         }
-
-        switch ($this->filter) {
-            case __('All'):
-                $query->whereNotNull('log.id');
-                break;
-        }
-
         return $query;
+    }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
     }
 }

@@ -6,16 +6,20 @@
     <div class="row justify-content-between">
         <div class="col-lg-auto mb-3">
             <div class="input-group">
-                <span class="input-group-text"><x-icon name="search"/></span>
-                <input type="search" placeholder="Buscar Trazas"
-                       class="form-control" wire:model.debounce.500ms="search">
+                <span class="input-group-text"><x-icon name="search" /></span>
+                <input type="search" placeholder="Buscar Trazas" class="form-control" wire:model.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
 
-            <x-dropdown icon="sort" :label="__($sort)">
-                @foreach($sorts as $sort)
-                    <x-dropdown-item :label="__($sort)" click="$set('sort', '{{ $sort }}')"/>
+            <x-dropdown icon="eye" :label="$perPage">
+                @foreach ($perPages as $perPage)
+                    @if ($perPage == $this->perPage)
+                        <x-dropdown-item label="{{ $perPage }}" class="active"
+                            click="$set('perPage', '{{ $perPage }}')" />
+                    @else
+                        <x-dropdown-item label="{{ $perPage }}" click="$set('perPage', '{{ $perPage }}')" />
+                    @endif
                 @endforeach
             </x-dropdown>
         </div>
@@ -24,42 +28,48 @@
     <div class="list-group mb-3 table-responsive">
         <table class="table table-striped">
             <thead>
-            <tr>
-                <th>Nombre Log</th>
-                <th>Descripción</th>
-                <th>Realizado por</th>
-                <th>Fecha</th>
-                <th class="text-center">Acciones</th>
-            </tr>
+                <tr>
+                    @foreach ($sorts as $sort)
+                        <th class="text-left cursor-pointer text-uppercase" style="white-space: nowrap !important"
+                            wire:click="changeSort('{{ $sort }}')">
+                            <span>
+                                @if ($this->sort == $sort)
+                                    <i class="{{ $this->class_sort }}"></i>
+                                @endif {{ $sort }}
+                            </span>
+                        </th>
+                    @endforeach
+                    <th class="text-center text-uppercase">{{ __('site.common.actions') }}</th>
+                </tr>
             </thead>
             <tbody>
-            @forelse($trazas as $log)
-                <tr>
-                    <td>{!! $log->log_name !!}</td>
-                    <td>{!! $log->description !!}</td>
-                    <td>{!! $log->causer_name !!}</td>
-                    <td>{{$log->created_at}}</td>
-                    <td class="text-center">
-                        <ul class="list-unstyled mb-0">
-                            <li class="list-inline-item">
-                                <x-action icon="eye" :title="'Detalles'"
-                                              click="$emit('openModal', 'trazas.show', {log: {{ $log->id }}})"/>
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5">
-                        <div class="list-group-item">
-                            No se encontraron resultados...
-                        </div>
-                    </td>
-                </tr>
-            @endforelse
+                @forelse($trazas as $log)
+                    <tr>
+                        <td>{!! $log->log_name !!}</td>
+                        <td>{!! $log->description !!}</td>
+                        <td>{!! $log->causer_name !!}</td>
+                        <td>{{ $log->created_at }}</td>
+                        <td class="text-center">
+                            <ul class="list-unstyled mb-0">
+                                <li class="list-inline-item">
+                                    <x-action icon="eye" title="{{ __('site.common.details') }}"
+                                        click="$emit('openModal', 'trazas.show', {log: {{ $log->id }}})" />
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5">
+                            <div class="list-group-item">
+                                {{ __('site.common.results_not_found') }}
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
-    <x-pagination :links="$trazas" :count="true"/>
+    <x-pagination :links="$trazas" :count="true" />
 </div>

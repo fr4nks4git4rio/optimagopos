@@ -1,4 +1,4 @@
-@section('title', 'Cuentas por Cobrar')
+@section('title', __('site.accounts_receivable.index.title'))
 
 <div x-data="{
     page: 1,
@@ -166,41 +166,41 @@
             <div class="row">
                 <div class="col-sm-2">
                     <div class="mb-1">
-                        <label for="">Fecha Inicio:</label>
+                        <label for="">{{ __('site.accounts_receivable.index.start_date') }}:</label>
                         <input x-model="fecha_inicio" type="date" class="form-control form-control">
                     </div>
                 </div>
                 <div class="col-sm-2">
                     <div class="mb-1">
-                        <label for="">Fecha Fin:</label>
+                        <label for="">{{ __('site.accounts_receivable.index.end_date') }}:</label>
                         <input x-model="fecha_fin" type="date" class="form-control form-control">
                     </div>
                 </div>
                 <div class="col-sm-2">
-                    <label for="">Tipo:</label>
+                    <label for="">{{ __('site.accounts_receivable.index.type') }}:</label>
                     <select class="form-control form-control" x-model="tipo">
-                        <option value="-1">Todas</option>
+                        <option value="-1">{{ __('site.common.all') }}</option>
                         @foreach ($tipos as $index => $tipo)
                             <option value="{{ $index }}">{{ $tipo }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-sm-4">
-                    <x-select2-ajax label="Cliente" placeholder="Seleccione..." class="form-control" :is_alpine="true"
+                    <x-select2-ajax label="{{ __('site.accounts_receivable.index.client') }}" placeholder="Seleccione..." class="form-control" :is_alpine="true"
                         model="cliente" url="{{ route('clientes.load-clientes') }}" />
                 </div>
                 <div class="col-sm-2">
                     <div class="mb-1">
-                        <label for="">Folio Interno:</label>
+                        <label for="">{{ __('site.accounts_receivable.index.internal_folio') }}:</label>
                         <input x-model="folio_interno" class="form-control form-control" type="text">
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-2">
-                    <label for="">Moneda:</label>
+                    <label for="">{{ __('site.accounts_receivable.index.currency') }}:</label>
                     <select class="form-control form-control" x-model="moneda">
-                        <option value="-1">Todas</option>
+                        <option value="-1">{{ __('site.common.all') }}</option>
                         @foreach ($monedas as $moneda)
                             <option value="{{ $moneda }}">{{ $moneda }}</option>
                         @endforeach
@@ -208,7 +208,7 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="mb-1">
-                        <label for="">Total</label>
+                        <label for="">{{ __('site.accounts_receivable.index.total') }}</label>
                         <input x-model="importe" class="form-control form-control" type="number">
                     </div>
                 </div>
@@ -217,11 +217,11 @@
         <div class="col-sm-12 mb-3 d-flex justify-content-between">
             <button type="button" class="btn btn-site-primary mr-1" @click="ingresarFacturas()"
                 x-bind:disabled="facturasSeleccionadas().length < 2">
-                Ingresar Facturas
+                {{__('site.accounts_receivable.index.enter_invoices')}}
             </button>
             <div>
                 <button type="button" class="btn btn-site-primary mr-1" @click="printListado()">
-                    Imprimir
+                    {{ __('site.common.print') }}
                 </button>
                 <x-dropdown icon="eye">
                     <x-slot name="slot_label">

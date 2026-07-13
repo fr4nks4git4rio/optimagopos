@@ -51,7 +51,7 @@ class GestionSuscripciones extends Component
     protected $queryString = [
         'clienteId' => ['except' => '']
     ];
-    protected $listeners = ['$refresh', 'sucursal-created' => 'AddSucursal', 'terminal-created' => 'AddTerminal', 'usuario-created' => 'AddUsuario', 'suscripcion-activated' => 'SuscripcionActivada'];
+    protected $listeners = ['$refresh', 'sucursal-created' => 'AddSucursal', 'terminal-created' => 'AddTerminal', 'usuario-created' => 'AddUsuario', 'suscripcion-activated' => 'SuscripcionActivada', 'suscripcion-deactivated' => 'SuscripcionDesactivada'];
 
     protected function rules()
     {
@@ -191,6 +191,19 @@ class GestionSuscripciones extends Component
         }
 
         return ($this->descuento / $subtotal) * 100;
+    }
+
+    public function getCanEditSubscriptionProperty()
+    {
+        return in_array($this->estado, ['PENDIENTE', 'ACTIVA']);
+    }
+
+    public function init()
+    {
+        if (user()->cannot($this->suscripcion->id ? 'update' : 'create', $this->suscripcion->id ? $this->suscripcion : [Suscripcion::class])) {
+            $this->emit('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return redirect()->to('/');
+        }
     }
 
     public function calculatePricing()
@@ -364,9 +377,9 @@ class GestionSuscripciones extends Component
     {
         return redirect()->route('admin.suscripciones.save', $id);
     }
-    public function SuscripcionDesactivada()
+    public function SuscripcionDesactivada($id)
     {
-        return redirect()->route('admin.suscripciones.index');
+        return redirect()->route('admin.suscripciones.save', $id);
     }
 
     public function submit()
@@ -409,7 +422,7 @@ class GestionSuscripciones extends Component
         $this->suscripcion->terminales()->update(['suscripcion_id' => null]);
         Terminal::whereIn('id', $this->terminales)->update(['suscripcion_id' => $this->suscripcion->id]);
 
-        $this->emit('show-toast', 'Subscripción guardada correctamente.', 'success');
+        $this->emit('show-toast', __('site.subscriptions.manage_subscription.subscription_save_successfully'), 'success');
     }
 
     public function render()

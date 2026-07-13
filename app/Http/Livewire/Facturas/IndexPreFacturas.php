@@ -234,7 +234,7 @@ class IndexPreFacturas extends Component
     public function timbrar($id)
     {
         $factura = Factura::find($id);
-        $folio_interno = $factura->serie->descripcion . '-' . Factura::internalSheetGenerator($factura->serie_id, modo_facturacion($factura->propietario_id) == 1);
+        $folio_interno = Factura::internalSheetGenerator($factura->serie_id, modo_facturacion($factura->propietario_id) == 1);
         $facturador = new Facturador($factura->propietario);
         $res = $facturador->timbrarFactura($id, $folio_interno);
         if ($res['success']) {

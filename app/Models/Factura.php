@@ -49,7 +49,10 @@ use Illuminate\Support\Facades\Storage;
  * @property float $tipo_cambio
  * @property float $anio
  * @property string $cfdis_relacionados
+ * @property boolean $es_complemento
+ * @property boolean $es_nota_credito
  * @property boolean $del_sistema
+ * @property string  $propietario_type
  * @property integer $cfdi_id
  * @property integer $metodo_pago_id
  * @property integer $forma_pago_id
@@ -99,7 +102,10 @@ class Factura extends Model
         'tipo_cambio',
         'anio',
         'cfdis_relacionados',
+        'es_complemento',
+        'es_nota_credito',
         'del_sistema',
+        'propietario_type',
         'cfdi_id',
         'metodo_pago_id',
         'forma_pago_id',
@@ -437,9 +443,7 @@ class Factura extends Model
 
     public function propietario()
     {
-        if ($this->del_sistema)
-            return $this->belongsTo(Cliente::class, 'propietario_id');
-        return $this->belongsTo(Sucursal::class, 'propietario_id');
+        return $this->morphTo();
     }
     public function periodicidad()
     {
@@ -920,14 +924,17 @@ class Factura extends Model
     /**
      * @param integer $serie_id
      * @param boolean $modo_productivo
-     * @return int
+     * @return string
      */
-    public static function internalSheetGenerator($serie_id, bool $modo_productivo = false)
+    public static function internalSheetGenerator($serie_id, bool $modo_productivo = false, bool $del_sistema = false)
     {
+        $del_sistema = $del_sistema ? 1 : 0;
         $query = Factura::query();
-        $query->whereIn('estado', ['TIMBRADA', 'CANCELADA'])
+        $serie = Serie::find($serie_id);
+        $query->whereIn('estado', ['TIMBRADA', 'PROCESO CANCELACION', 'CANCELADA'])
             ->where('serie_id', $serie_id)
-            ->where('folio_interno', '!=', null);
+            ->where('folio_interno', '!=', null)
+            ->where('del_sistema', $del_sistema);
 
         if ($modo_productivo) {
             $facturas = $query->where(function ($q) {
@@ -957,6 +964,6 @@ class Factura extends Model
             }
             $folio .= '-TEST';
         }
-        return $folio;
+        return "$serie->descripcion-$folio";
     }
 }
