@@ -453,8 +453,6 @@ class HomeController
         if (
             !$decoded
             || !isset($decoded['TerminalId'])
-            || !isset($decoded['APIUserName'])
-            || !isset($decoded['APIPassword'])
             || !isset($decoded['Data'])
             || !isset($decoded['Data']['items'])
             || !isset($decoded['Data']['OrderStatus'])
