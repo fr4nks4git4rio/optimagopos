@@ -13,6 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         '/parse-ticket-json',
+        '/parse-ticket-vk-json',
         '/consumir_clientes_service',
     ];
 }
