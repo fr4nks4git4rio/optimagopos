@@ -3,15 +3,17 @@
 namespace App\Http\Livewire\Cuarentena;
 
 use App\Actions\ProcesarTicketCuarentena;
+use App\Actions\ProcesarTicketVkCuarentena;
 use App\Http\Livewire\Layouts\Modal;
 use App\Models\Cliente;
 use App\Models\Cuarentena;
 use App\Models\Sucursal;
 use App\Models\Terminal;
+use Exception;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 
-class Fix extends Modal
+class FixVk extends Modal
 {
     public Cuarentena $registro;
 
@@ -62,8 +64,8 @@ class Fix extends Modal
             $this->modoAvanzado = true;
         }
 
-        $this->items = $decoded['Items'] ?? [];
-        unset($decoded['Items']);
+        $this->items = $decoded['Data']['items'] ?? [];
+        unset($decoded['Data']['items']);
         $this->formData = $decoded;
 
         $this->rawJson = $this->registro->data;
@@ -85,20 +87,24 @@ class Fix extends Modal
     protected function estructuraVacia(): array
     {
         return [
-            'Items' => [],
-            'PosId' => '',
-            'ClerkId' => '',
-            'ClerkName' => '',
-            'APIPassword' => '',
-            'APIUserName' => '',
-            'FiscalInvoice' => 'No',
-            'PrinterHeader' => null,
-            'TransactionId' => '',
             'TerminalId' => '',
-            'CustomerFiscalId' => '',
-            'MerchantFiscalId' => '',
-            'TransactionEndTime' => '',
-            'TransactionStartTime' => '',
+            'APIUserName' => '',
+            'APIPassword' => '',
+            'Data' => [
+                'pos' => '',
+                'operator' => '',
+                'items' => [],
+                'table' => '',
+                'seat' => '',
+                'location' => '',
+                'locationId' => '',
+                'timestamp' => '',
+                'OrderStatus' => '',
+                'orderNumber' => '',
+                'PosIpAddress' => '',
+                'TimeToResolve'  => '',
+                'WarningStatusThresholdInPercent' => ''
+            ]
         ];
     }
 
@@ -121,10 +127,6 @@ class Fix extends Modal
             $this->modoAvanzado = false;
             if (isset($this->formData['TerminalId']))
                 $this->formData['TerminalId'] = Terminal::find($value)->identificador;
-            elseif (isset($this->formData['MerchantFiscalId']))
-                $this->formData['MerchantFiscalId'] = Terminal::find($value)->identificador;
-            elseif (isset($this->formData['APIUserName']))
-                $this->formData['APIUserName'] = Terminal::find($value)->identificador;
         }
     }
 
@@ -143,7 +145,7 @@ class Fix extends Modal
     protected function cargarTerminales()
     {
         $this->terminalesDisponibles = $this->sucursal_id
-            ? Terminal::where('sucursal_id', $this->sucursal_id)->where('es_vk', 0)->orderBy('nombre')->lazy()->map(function ($value) {
+            ? Terminal::where('sucursal_id', $this->sucursal_id)->where('es_vk', 1)->orderBy('nombre')->lazy()->map(function ($value) {
                 return [
                     'value' => $value->id,
                     'label' => $value->nombre ? ("$value->nombre - $value->identificador") : $value->identificador
@@ -155,28 +157,26 @@ class Fix extends Modal
     public function agregarItem()
     {
         $this->items[] = [
-            'Id' => '',
-            'Qty' => '1',
-            'SKU' => '',
-            'Tip' => '0',
-            'Name' => '',
-            'Type' => 'Product',
-            'Amount' => '0',
-            'Taxable' => '0',
-            'Discount' => '0',
-            'Surcharge' => '0',
-            'PriceLevel' => '1',
-            'MerchantFee' => '0',
-            'DepartmentId' => '0',
-            'DepartmentName' => '',
-            'ExemptedTaxAmount' => '0',
+            'id' => '',
+            'name' => '',
+            'seat' => '',
+            'modifiers' => []
         ];
+    }
+    public function agregarModifier($index)
+    {
+        $this->items[$index]['modifiers'][] = '';
     }
 
     public function eliminarItem($index)
     {
         unset($this->items[$index]);
         $this->items = array_values($this->items);
+    }
+    public function eliminarModifier($indexItem,  $indexModifier)
+    {
+        unset($this->items[$indexItem]['modifiers'][$indexModifier]);
+        $this->items[$indexItem]['modifiers'] = array_values($this->items[$indexItem]['modifiers']);
     }
 
     public function toggleModoAvanzado()
@@ -201,8 +201,8 @@ class Fix extends Modal
             return;
         }
 
-        $this->items = $decoded['Items'] ?? [];
-        unset($decoded['Items']);
+        $this->items = $decoded['Data']['items'] ?? [];
+        unset($decoded['Data']['items']);
         $this->formData = $decoded;
     }
 
@@ -221,7 +221,7 @@ class Fix extends Modal
     protected function jsonReconstruido(bool $prettyPrint = false): string
     {
         $data = $this->formData;
-        $data['Items'] = $this->items;
+        $data['Data']['items'] = $this->items;
 
         $flags = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
         if ($prettyPrint) {
@@ -257,10 +257,11 @@ class Fix extends Modal
         if ($this->modoAvanzado) {
             $rules['rawJson'] = 'required|string';
         } else {
-            $rules['formData.PosId'] = 'required|string';
-            $rules['formData.TransactionId'] = 'required|string';
-            $rules['formData.TransactionStartTime'] = 'nullable|date_format:d/m/Y H:i:s';
-            $rules['formData.TransactionEndTime'] = 'nullable|date_format:d/m/Y H:i:s';
+            $rules['formData.Data.pos'] = 'nullable|string';
+            $rules['formData.Data.operator'] = 'nullable|integer';
+            $rules['formData.Data.timestamp'] = 'required|string|date_format:Y-m-d H:i:s';
+            $rules['formData.Data.OrderStatus'] = 'required|integer';
+            $rules['formData.Data.orderNumber'] = 'required|string';
             $rules['items'] = 'array|min:1';
         }
 
@@ -287,7 +288,7 @@ class Fix extends Modal
 
         $json = $this->jsonFinal();
         if ($json === null) {
-            return; // ya se agregó el error de validación
+            return;
         }
 
         $this->registro->update([
@@ -323,7 +324,7 @@ class Fix extends Modal
         try {
             // TODO: reemplazar por la llamada real a tu servicio/job de procesamiento de tickets
             // Ejemplo: app(ProcesadorTicketsService::class)->procesar($this->registro);
-            $procesador = new ProcesarTicketCuarentena($this->registro);
+            $procesador = new ProcesarTicketVkCuarentena($this->registro);
             $res = $procesador->execute();
 
             if ($res) {
@@ -342,8 +343,8 @@ class Fix extends Modal
                 $this->emit('show-toast', __('site.quarantine.fix.ticket_process_error'), 'danger');
                 $this->emit('$refresh');
             }
-        } catch (\Throwable $e) {
-            Log::error("Ocurrio un error procesando un ticket en cuarentena. Error: {$e->getMessage()}");
+        } catch (Exception $e) {
+            Log::error("Ocurrio un error procesando un ticket vk en cuarentena. Error: {$e->getMessage()}");
             $this->addError('rawJson', __('site.quarantine.fix.ticket_saved_fail_to_process', ['error' => $e->getMessage()]));
         }
     }
@@ -363,7 +364,7 @@ class Fix extends Modal
 
     public function render()
     {
-        return view('livewire.cuarentena.fix');
+        return view('livewire.cuarentena.fix-vk');
     }
 
     public function init()

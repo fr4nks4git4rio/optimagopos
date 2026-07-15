@@ -16,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $texto
  * @property string $ip
  * @property string $data
+ * @property boolean $es_vk
  * @property integer $terminal_id
  * @property integer $sucursal_id
  * @property integer $cliente_id
@@ -29,6 +30,7 @@ class Cuarentena extends Model
         'texto',
         'ip',
         'data',
+        'es_vk',
         'terminal_id',
         'sucursal_id',
         'cliente_id'
@@ -44,6 +46,7 @@ class Cuarentena extends Model
         'texto' => 'string',
         'ip' => 'string',
         'data' => 'string',
+        'es_vk' => 'boolean',
         'terminal_id' => 'integer',
         'sucursal_id' => 'integer',
         'cliente_id' => 'integer',

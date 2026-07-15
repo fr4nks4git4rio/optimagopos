@@ -58,36 +58,61 @@
             {{-- CONTENIDO PRINCIPAL --}}
             <div class="flex-grow-1" style="min-width: 0;">
 
-                <div class="row justify-content-start gap-3 px-3 mb-3">
-                    <a href="{{ route('home', ['seccion' => 'resumen', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
-                        class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'resumen') active @endif">
-                        Resumen
-                    </a>
-                    <a href="{{ route('home', ['seccion' => 'operaciones', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
-                        class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'operaciones') active @endif">
-                        Operaciones
-                    </a>
-                    <a href="{{ route('home', ['seccion' => 'productos', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
-                        class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'productos') active @endif">
-                        Productos
-                    </a>
-                    <a href="{{ route('home', ['seccion' => 'pagos', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
-                        class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'pagos') active @endif">
-                        Pagos
-                    </a>
-                    <a href="{{ route('home', ['seccion' => 'correcciones', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
-                        class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'correcciones') active @endif">
-                        Correcciones
-                    </a>
-                    {{-- <a href="{{ route('home', ['seccion' => 'cuarentena', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button wire:click="$set('tab', 'foh')"
+                            class="nav-link @if ($tab == 'foh') active @endif" id="foh-tab"
+                            data-bs-toggle="tab" data-bs-target="#foh-tab-pane" type="button" role="tab"
+                            aria-controls="foh-tab-pane"
+                            aria-selected="true">{{ __('site.dashboard.front_of_house') }}</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button wire:click="$set('tab', 'boh')"
+                            class="nav-link @if ($tab == 'boh') active @endif" id="boh-tab"
+                            data-bs-toggle="tab" data-bs-target="#boh-tab-pane" type="button" role="tab"
+                            aria-controls="boh-tab-pane"
+                            aria-selected="false">{{ __('site.dashboard.video_kitchen') }}</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade @if ($tab == 'foh') show active @endif p-2"
+                        id="foh-tab-pane" role="tabpanel" aria-labelledby="foh-tab" tabindex="0">
+                        <div class="row justify-content-start gap-3 px-3 mb-3">
+                            <a href="{{ route('home', ['seccion' => 'resumen', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                                class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'resumen') active @endif">
+                                Resumen
+                            </a>
+                            <a href="{{ route('home', ['seccion' => 'operaciones', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                                class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'operaciones') active @endif">
+                                Operaciones
+                            </a>
+                            <a href="{{ route('home', ['seccion' => 'productos', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                                class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'productos') active @endif">
+                                Productos
+                            </a>
+                            <a href="{{ route('home', ['seccion' => 'pagos', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                                class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'pagos') active @endif">
+                                Pagos
+                            </a>
+                            <a href="{{ route('home', ['seccion' => 'correcciones', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                                class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'correcciones') active @endif">
+                                Correcciones
+                            </a>
+                            {{-- <a href="{{ route('home', ['seccion' => 'cuarentena', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
                         class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'cuarentena') active @endif">
                         Cuarentena
                     </a> --}}
+                        </div>
+
+                        @if ($seccion)
+                            @include("livewire.secciones-dashboard.$seccion")
+                        @endif
+                    </div>
+                    <div class="tab-pane fade @if ($tab == 'boh') show active @endif" id="boh-tab-pane"
+                        role="tabpanel" aria-labelledby="boh-tab" tabindex="0">...</div>
                 </div>
 
-                @if ($seccion)
-                    @include("livewire.secciones-dashboard.$seccion")
-                @endif
+
             </div>
 
         </div>

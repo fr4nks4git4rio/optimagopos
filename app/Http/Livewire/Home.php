@@ -17,6 +17,7 @@ use Livewire\Component;
 
 class Home extends Component
 {
+    public $tab;
     public $seccion;
 
     public $fecha_inicio;
@@ -82,9 +83,16 @@ class Home extends Component
         'grafica_correcciones_hora' => []
     ];
 
+    public $videoKitchenData = [
+        'cantidadOrdeneAbiertas' => '',
+        'cantidadOrdenesCerradas' => '',
+        ''
+    ];
+
     public $monedas = [];
 
     public $queryString = [
+        'tab',
         'seccion' => ['except' => null],
         'fecha_inicio' => ['except' => null],
         'fecha_fin' => ['except' => null],
@@ -94,6 +102,7 @@ class Home extends Component
 
     public function mount()
     {
+        $this->tab = in_array($this->tab, ['foh', 'boh']) ? $this->tab : 'foh';
         $this->seccion = $this->seccion ?? 'resumen';
         $this->monedas = DB::table('tb_monedas')->whereNull('deleted_at')->pluck('acronimo', 'id');
 

@@ -31,7 +31,7 @@ class Index extends Component
 
     public function mount()
     {
-        $this->sorts = [__('site.terminals.index.identifier'), __('site.terminals.index.name'), __('site.terminals.index.branch'), __('site.terminals.index.comments')];
+        $this->sorts = [__('site.terminals.index.identifier'), __('site.terminals.index.name'), __('site.terminals.index.is_vk'), __('site.terminals.index.branch'), __('site.terminals.index.comments')];
         $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
@@ -72,6 +72,7 @@ class Index extends Component
                 't.id',
                 't.identificador',
                 't.nombre',
+                't.es_vk',
                 't.comentarios',
                 't.deleted_at',
                 's.nombre_comercial as sucursal'
@@ -114,25 +115,31 @@ class Index extends Component
         }
 
         switch ($this->sort) {
-            case 'Identificador':
+            case __('site.terminals.index.identifier'):
                 if ($this->order == 'asc')
                     $records_final = $records_final->sortBy('identificador', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('identificador', SORT_NATURAL)->values();
                 break;
-            case 'Nombre':
+            case __('site.terminals.index.name'):
                 if ($this->order == 'asc')
                     $records_final = $records_final->sortBy('nombre', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('nombre', SORT_NATURAL)->values();
                 break;
-            case 'Sucursal':
+            case __('site.terminals.index.is_vk'):
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('es_vk', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('es_vk', SORT_NATURAL)->values();
+                break;
+            case __('site.terminals.index.branch'):
                 if ($this->order == 'asc')
                     $records_final = $records_final->sortBy('sucursal', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('sucursal', SORT_NATURAL)->values();
                 break;
-            case 'Comentarios':
+            case __('site.terminals.index.comments'):
                 if ($this->order == 'asc')
                     $records_final = $records_final->sortBy('comentarios', SORT_NATURAL)->values();
                 else

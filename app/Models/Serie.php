@@ -13,8 +13,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models\Administracion\CodificadoresFacturacion
  * @version January 12, 2021, 7:55 pm CST
  *
- * @property string descripcion
- * @property boolean activo
+ * @property string $descripcion
+ * @property boolean $activo
  */
 class Serie extends Model
 {

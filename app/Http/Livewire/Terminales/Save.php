@@ -20,6 +20,7 @@ class Save extends Modal
     public Terminal $terminal;
     public $nombre;
     public $identificador;
+    public $es_vk;
     public $comentarios;
     public $sucursal_id;
     public $cliente_id;
@@ -30,6 +31,7 @@ class Save extends Modal
     {
         $this->nombre = isset($this->terminal) ? $this->terminal->nombre : '';
         $this->identificador = isset($this->terminal) ? $this->terminal->identificador : str_shuffle(uniqid());
+        $this->es_vk = isset($this->terminal) ? $this->terminal->es_vk : false;
         $this->comentarios = isset($this->terminal) ? $this->terminal->comentarios : '';
         if (!isset($this->terminal)) {
             $this->terminal = new Terminal();
@@ -65,6 +67,7 @@ class Save extends Modal
             [
                 'nombre' => ['required'],
                 'identificador' => ['required'],
+                'es_vk' => ['nullable','boolean'],
                 'comentarios' => ['nullable'],
             ],
             // $messages

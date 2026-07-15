@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Cuarentena;
 
 use App\Models\Cliente;
+use App\Models\Cuarentena;
 use App\Models\Sucursal;
 use App\Models\Terminal;
 use Illuminate\Database\Query\Builder;
@@ -48,7 +49,7 @@ class Index extends Component
     {
         $this->page = $this->page ?? 1;
         $this->perPage = $this->perPage ?? 10;
-        $this->sorts = [__('site.quarantine.index.date'), __('site.quarantine.index.text'), __('site.quarantine.index.ip'), __('site.quarantine.index.client'), __('site.quarantine.index.branch'), __('site.quarantine.index.terminal')];
+        $this->sorts = [__('site.quarantine.index.date'), __('site.quarantine.index.text'), __('site.quarantine.index.ip'), __('site.quarantine.index.is_vk'), __('site.quarantine.index.client'), __('site.quarantine.index.branch'), __('site.quarantine.index.terminal')];
         $this->search = $this->search ?? '';
         $this->sort = $this->sort ?? __('site.quarantine.index.date');
         $this->order = $this->order ?? 'dec';
@@ -116,6 +117,12 @@ class Index extends Component
                 else
                     $records = $records->sortByDesc('ip', SORT_NUMERIC)->values();
                 break;
+            case __('site.quarantine.index.is_vk'):
+                if ($this->order == 'asc')
+                    $records = $records->sortBy('es_vk', SORT_NUMERIC)->values();
+                else
+                    $records = $records->sortByDesc('es_vk', SORT_NUMERIC)->values();
+                break;
             case __('site.quarantine.index.client'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('cliente', SORT_NATURAL)->values();
@@ -153,6 +160,7 @@ class Index extends Component
                 DB::raw("DATE_FORMAT(ticket.created_at, '%d/%m/%Y %H:%i:%s') as fecha"),
                 'ticket.texto',
                 'ticket.ip',
+                'ticket.es_vk',
                 'ticket.data as ticket',
                 'ticket.cliente_id',
                 'ticket.sucursal_id',
@@ -176,6 +184,17 @@ class Index extends Component
         }
 
         return $query;
+    }
+
+    public function changeIsVK($id)
+    {
+        $registro = Cuarentena::find($id);
+        $registro->es_vk = !$registro->es_vk;
+        $registro->save();
+
+        $this->emit('show-toast', 'Registro modificado.', 'success');
+
+        $this->emit('$refresh');
     }
 
     public function changeSort($sort)

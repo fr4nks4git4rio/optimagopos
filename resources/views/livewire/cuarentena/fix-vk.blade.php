@@ -115,68 +115,95 @@
                             </div>
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">PosId *</label>
+                                    <label class="form-label fw-bold text-dark small">TerminalId *</label>
                                     <input type="text"
-                                        class="form-control @error('formData.PosId') is-invalid @enderror"
-                                        wire:model="formData.PosId">
-                                    @error('formData.PosId')
+                                        class="form-control @error('formData.TerminalId') is-invalid @enderror"
+                                        wire:model="formData.TerminalId">
+                                    @error('formData.TerminalId')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">TransactionId *</label>
+                                    <label class="form-label fw-bold text-dark small">pos *</label>
                                     <input type="text"
-                                        class="form-control @error('formData.TransactionId') is-invalid @enderror"
-                                        wire:model="formData.TransactionId">
-                                    @error('formData.TransactionId')
+                                        class="form-control @error('formData.Data.pos') is-invalid @enderror"
+                                        wire:model="formData.Data.pos">
+                                    @error('formData.Data.pos')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">ClerkId</label>
-                                    <input type="text" class="form-control" wire:model="formData.ClerkId">
+                                    <label class="form-label fw-bold text-dark small">operator *</label>
+                                    <input type="number"
+                                        class="form-control @error('formData.Data.operator') is-invalid @enderror"
+                                        wire:model="formData.Data.operator">
+                                    @error('formData.Data.operator')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold text-dark small">ClerkName</label>
-                                    <input type="text" class="form-control" wire:model="formData.ClerkName">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark small">timestamp *</label>
+                                    <input type="text"
+                                        class="form-control @error('formData.Data.timestamp') is-invalid @enderror"
+                                        wire:model="formData.Data.timestamp">
+                                    @error('formData.Data.timestamp')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold text-dark small">FiscalInvoice</label>
-                                    <select class="form-select" wire:model="formData.FiscalInvoice">
-                                        <option value="Si">{{ __('site.common.yes') }}</option>
-                                        <option value="No">{{ __('site.common.no') }}</option>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-dark small">OrderStatus *</label>
+                                    <select class="form-select @error('formData.Data.OrderStatus') is-invalid @enderror"
+                                        wire:model="formData.Data.OrderStatus">
+                                        <option value="">{{ __('site.common.select') }}</option>
+                                        <option value="1">Open</option>
+                                        <option value="2">InProcess</option>
+                                        <option value="3">Done</option>
+                                        <option value="4">Delayed</option>
                                     </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold text-dark small">TransactionStartTime</label>
-                                    <input type="text"
-                                        class="form-control @error('formData.TransactionStartTime') is-invalid @enderror"
-                                        wire:model="formData.TransactionStartTime" placeholder="dd/mm/yyyy HH:mm:ss">
-                                    @error('formData.TransactionStartTime')
+                                    @error('formData.Data.OrderStatus')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold text-dark small">TransactionEndTime</label>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-dark small">orderNumber *</label>
                                     <input type="text"
-                                        class="form-control @error('formData.TransactionEndTime') is-invalid @enderror"
-                                        wire:model="formData.TransactionEndTime" placeholder="dd/mm/yyyy HH:mm:ss">
-                                    @error('formData.TransactionEndTime')
+                                        class="form-control @error('formData.Data.orderNumber') is-invalid @enderror"
+                                        wire:model="formData.Data.orderNumber">
+                                    @error('formData.Data.orderNumber')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">TerminalId</label>
-                                    <input type="text" class="form-control" wire:model="formData.TerminalId">
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-dark small">table</label>
+                                    <input type="text" class="form-control" wire:model="formData.Data.table">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-dark small">seat</label>
+                                    <input type="text" class="form-control" wire:model="formData.Data.seat">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">APIUserName</label>
-                                    <input type="text" class="form-control" wire:model="formData.APIUserName">
+                                    <label class="form-label fw-bold text-dark small">location</label>
+                                    <input type="text" class="form-control" wire:model="formData.Data.location">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-dark small">LocationId</label>
+                                    <input type="number" class="form-control" wire:model="formData.Data.LocationId">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark small">MerchantFiscalId</label>
-                                    <input type="text" class="form-control"
-                                        wire:model="formData.MerchantFiscalId">
+                                    <label class="form-label fw-bold text-dark small">PosIpAddress</label>
+                                    <input type="string" class="form-control"
+                                        wire:model="formData.Data.PosIpAddress">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold text-dark small">TimeToResolve</label>
+                                    <input type="number" step="0.01" class="form-control"
+                                        wire:model="formData.Data.TimeToResolve">
+                                </div>
+                                <div class="col-md-4">
+                                    <label
+                                        class="form-label fw-bold text-dark small">WarningStatusThresholdInPercent</label>
+                                    <input type="number" step="0.01" class="form-control"
+                                        wire:model="formData.Data.WarningStatusThresholdInPercent">
                                 </div>
                             </div>
                         </div>
@@ -194,67 +221,66 @@
                             </button>
                         </div>
                         <div class="card-body p-3">
-                            <div class="table-responsive">
+                            <div x-data="{
+                                newModifier(index, data) {
+                                    alert(data);
+                                }
+                            }" class="table-responsive">
                                 <table class="table table-sm align-middle">
                                     <thead class="table-light">
                                         <tr class="fs-8 text-uppercase text-muted">
-                                            <th style="width: 100px;">Type</th>
-                                            <th style="width: 150px">Name</th>
-                                            <th style="width: 70px">SKU</th>
-                                            <th style="width: 70px">Qty</th>
-                                            <th>Amount</th>
-                                            <th style="width: 70px">Tip</th>
-                                            <th>Discount</th>
-                                            <th>DepartmentId</th>
-                                            <th>{{__('site.common.actions')}}</th>
+                                            <th>name</th>
+                                            <th>seat</th>
+                                            <th>modifiers</th>
+                                            <th>{{ __('site.common.actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($items as $index => $item)
-                                            <tr wire:key="item-{{ $index }}">
+                                        @foreach ($items as $indexItem => $item)
+                                            <tr wire:key="item-{{ $indexItem }}">
                                                 <td>
-                                                    <select class="form-select form-select-sm"
-                                                        wire:model="items.{{ $index }}.Type">
-                                                        <option value="Product">Product</option>
-                                                        <option value="Tender">Tender</option>
-                                                        <option value="Correction">Correction</option>
-                                                        <option value="Tax">Tax</option>
-                                                    </select>
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        wire:model="items.{{ $indexItem }}.name">
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        wire:model="items.{{ $index }}.Name">
+                                                        wire:model="items.{{ $indexItem }}.seat">
                                                 </td>
-                                                <td>
-                                                    <input type="text" class="form-control form-control-sm"
-                                                        wire:model="items.{{ $index }}.SKU">
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-sm btn-success mb-1"
+                                                        wire:click="agregarModifier('{{ $indexItem }}')">
+                                                        <i class="bi bi-plus-lg me-1"></i>
+                                                        {{ __('site.quarantine.fix.add_modifier') }}
+                                                    </button>
+                                                    @if (count($item['modifiers']) > 0)
+                                                        <table class="table table-striped table-sm table-condensed">
+                                                            <tbody>
+                                                                @foreach ($item['modifiers'] as $indexModifier => $mod)
+                                                                    <tr>
+                                                                        <td class="text-center">
+                                                                            <button type="button"
+                                                                                class="btn btn-danger btn-sm p-1 py-0"><i
+                                                                                    class="bi bi-trash"></i></button>
+                                                                        </td>
+                                                                        <td>
+                                                                            @if ($mod)
+                                                                                <span
+                                                                                    class="badge bg-primary-subtle text-primary">{{ $mod }}</span>
+                                                                            @else
+                                                                                <input type="text"
+                                                                                    wire:model.lazy="items.{{ $indexItem }}.modifiers.{{ $indexModifier }}"
+                                                                                    class="form-control form-control-sm">
+                                                                            @endif
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    @endif
                                                 </td>
-                                                <td>
-                                                    <input type="number" class="form-control form-control-sm"
-                                                        wire:model="items.{{ $index }}.Qty">
-                                                </td>
-                                                <td>
-                                                    <input type="number" step="0.01"
-                                                        class="form-control form-control-sm"
-                                                        wire:model="items.{{ $index }}.Amount">
-                                                </td>
-                                                <td>
-                                                    <input type="number" step="0.01"
-                                                        class="form-control form-control-sm"
-                                                        wire:model="items.{{ $index }}.Tip">
-                                                </td>
-                                                <td>
-                                                    <input type="number" step="0.01"
-                                                        class="form-control form-control-sm"
-                                                        wire:model="items.{{ $index }}.Discount">
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control form-control-sm"
-                                                        wire:model="items.{{ $index }}.DepartmentId">
-                                                </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <button type="button" class="btn btn-sm btn-outline-danger"
-                                                        wire:click="eliminarItem({{ $index }})">
+                                                        wire:click="eliminarItem({{ $indexItem }})">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </td>

@@ -74,6 +74,13 @@
                     <tr>
                         <td>{{ $terminal['identificador'] }}</td>
                         <td>{{ $terminal['nombre'] }}</td>
+                        <td>
+                            @if ($terminal['es_vk'])
+                                <span class="badge bg-primary-subtle text-primary text-uppercase">{{ __('site.common.yes') }}</span>
+                            @else
+                                <span class="badge bg-danger-subtle text-danger text-uppercase">{{ __('site.common.no') }}</span>
+                            @endif
+                        </td>
                         <td>{{ $terminal['sucursal'] }}</td>
                         <td>{{ $terminal['comentarios'] }}</td>
                         <td class="text-center">
@@ -113,7 +120,7 @@
                     <tr>
                         <td colspan="5">
                             <div class="list-group-item">
-                                {{__('site.common.results_not_found')}}
+                                {{ __('site.common.results_not_found') }}
                             </div>
                         </td>
                     </tr>

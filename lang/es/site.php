@@ -162,6 +162,10 @@ return [
         'phone' => 'Teléfono',
         'position' => 'Cargo'
     ],
+    'dashboard' => [
+        'front_of_house' => 'Salón',
+        'video_kitchen' => 'Video Kitchen',
+    ],
     'users' => [
         'list' => [
             'users' => 'usuarios',
@@ -492,6 +496,7 @@ return [
             'search_terminals' => 'Buscar Terminales',
             'identifier' => 'identificador',
             'name' => 'Nombre',
+            'is_vk' => 'Es Video Kitchen',
             'branch' => 'Sucursal',
             'comments' => 'Comentarios',
         ],
@@ -504,6 +509,7 @@ return [
             'name' => 'Nombre',
             'identifier' => 'Identificador',
             'comments' => 'Comentarios',
+            'is_vk' => 'Es Video Kitchen',
             'save_terminal' => 'Guardar Terminal',
             'terminal_saved' => 'Terminal guardada.'
         ],
@@ -648,13 +654,14 @@ return [
             'date' => 'fecha',
             'text' => 'Texto',
             'ip' => 'IP',
+            'is_vk' => 'Es Video Kitchen',
             'client' => 'Cliente',
             'branch' => 'Sucursal',
             'terminal' => 'Terminal'
         ],
         'fix' => [
             'title' => 'Reparar Ticket en cuarentena',
-            'regisrter_id' => 'Registro en Cuarentena',
+            'register_id' => 'Registro en Cuarentena',
             'ticket_repair' => 'Reparación de Ticket',
             'received' => 'Recibido el',
             'pending_repair' => 'Pendiente de Reparar',
@@ -691,7 +698,8 @@ return [
             'delete_are_you_sure' => '¿Seguro que deseas descartar este registro de cuarentena? <b>Esta acción no se puede deshacer.</b>',
             'save_fix' => 'Guardar Reparación',
             'save_and_process' => 'Guardar y Procesar',
-            'delete_register' => 'Eliminar Registro'
+            'delete_register' => 'Eliminar Registro',
+            'add_modifier' => 'Agregar Modificador'
         ]
     ],
     'logs' => [

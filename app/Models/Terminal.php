@@ -19,6 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $nombre
  * @property string $identificador
  * @property string $comentarios
+ * @property boolean $es_vk
  * @property integer $sucursal_id
  * @property integer $suscripcion_id
  */
@@ -38,6 +39,7 @@ class Terminal extends Model
         'nombre',
         'identificador',
         'comentarios',
+        'es_vk',
         'sucursal_id',
         'suscripcion_id'
     ];
@@ -49,6 +51,7 @@ class Terminal extends Model
         return [
             'nombre' => ['required'],
             'identificador' => ['required'],
+            'es_vk' => ['nullable', 'boolean'],
             'comentarios' => ['nullable'],
             'sucursal_id' => ['required', 'exists:tb_sucursales,id'],
             'suscripcion_id' => 'nullable|exists:tb_suscripciones,id'

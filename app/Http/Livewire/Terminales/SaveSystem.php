@@ -20,6 +20,7 @@ class SaveSystem extends Modal
     public Terminal $terminal;
     public $nombre;
     public $identificador;
+    public $es_vk;
     public $comentarios;
     public $sucursal_id;
     public $cliente_id;
@@ -36,6 +37,7 @@ class SaveSystem extends Modal
         $this->nombre = isset($this->terminal) ? $this->terminal->nombre : '';
         $this->identificador = isset($this->terminal) ? $this->terminal->identificador : str_shuffle(uniqid());
         $this->comentarios = isset($this->terminal) ? $this->terminal->comentarios : '';
+        $this->es_vk = isset($this->terminal) ? $this->terminal->es_vk : false;
         $this->suscripcion_id = isset($this->terminal) ? $this->terminal->suscripcion_id : '';
         if (!$this->sucursal_id)
             $this->sucursal_id = isset($this->terminal) ? $this->terminal->sucursal_id : '';

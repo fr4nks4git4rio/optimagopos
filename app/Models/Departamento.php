@@ -14,9 +14,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models
  * @version January 12, 2021, 7:46 pm CST
  *
- * @property integer id_departamento
- * @property string nombre
- * @property integer sucursal_id
+ * @property integer $id_departamento
+ * @property string $nombre
+ * @property integer $sucursal_id
  */
 class Departamento extends Model
 {
@@ -73,7 +73,7 @@ class Departamento extends Model
     {
         return [
             'id_departamento' => ['required'],
-            'nombre' => 'required',
+            'nombre' => 'nullable',
             'sucursal_id' => ['required', 'exists:tb_sucursales,id']
         ];
     }

@@ -61,6 +61,20 @@ class ProcesarTicketCuarentena
             return false;
         }
 
+        if ($terminal->es_vk) {
+            $this->registro->update([
+                'texto' => 'La Terminal está reconocida como dispositivo de Video Kitchen.'
+            ]);
+            return false;
+        }
+
+        if ($terminal->suscripcion->estado != 'ACTIVA') {
+            $this->registro->update([
+                'texto' => 'La Terminal no pertenece a una Suscripción ACTIVA.'
+            ]);
+            return false;
+        }
+
         $terminal->id_pos = $decoded['PosId'];
         $terminal->save();
 
@@ -194,7 +208,7 @@ class ProcesarTicketCuarentena
                 }
 
                 if ($type === 'Product') {
-                    if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty']) || !$item['DepartmentId'] || !$item['DepartmentName']) {
+                    if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
                         $this->registro->update([
                             'texto' => 'Propiedad no recibida en ítem Product. Propiedades esperadas: Id, Name, Amount, Qty, DepartmentId y DepartmentName.'
                         ]);
@@ -213,26 +227,29 @@ class ProcesarTicketCuarentena
                             'sucursal_id' => $terminal->sucursal_id
                         ]);
                     }
-                    $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
-                        ->where('id_departamento', $item['DepartmentId'])
-                        ->first();
-                    if (!$departamento) {
-                        $departamento = Departamento::create([
-                            'id_departamento' => $item['DepartmentId'],
-                            'nombre' => $item['DepartmentName'],
-                            'sucursal_id' => $terminal->sucursal_id
-                        ]);
+                    $departamento = null;
+                    if($item['DepartmentId']){
+                        $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
+                            ->where('id_departamento', $item['DepartmentId'])
+                            ->first();
+                        if (!$departamento) {
+                            $departamento = Departamento::create([
+                                'id_departamento' => $item['DepartmentId'],
+                                'nombre' => $item['DepartmentName'],
+                                'sucursal_id' => $terminal->sucursal_id
+                            ]);
+                        }
                     }
 
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
                     $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
                     $discount = $item['Discount'] ? (float)$item['Discount'] : 0;
-                    $ticketProducto = TicketProducto::where('ticket_id', $ticket->id)->where('producto_id', $producto->id)->where('departamento_id', $departamento->id)->first();
+                    $ticketProducto = TicketProducto::where('ticket_id', $ticket->id)->where('producto_id', $producto->id)->where('departamento_id', $departamento?->id)->first();
                     if (!$ticketProducto) {
                         $ticketProducto = new TicketProducto();
                         $ticketProducto->ticket_id = $ticket->id;
                         $ticketProducto->producto_id = $producto->id;
-                        $ticketProducto->departamento_id = $departamento->id;
+                        $ticketProducto->departamento_id = $departamento?->id;
                         $ticketProducto->precio = 0;
                         $ticketProducto->cantidad = 0;
                         $ticketProducto->descuento = 0;
