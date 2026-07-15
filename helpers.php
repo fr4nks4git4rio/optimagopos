@@ -439,4 +439,16 @@ if (!function_exists('extraer_datos_fiscales')) {
 
         return $datos;
     }
+
+    if (!function_exists('ticket_vk_status_str')) {
+        function ticket_vk_status_str(int $status)
+        {
+            return [
+                1 => 'Open',
+                2 => 'InProcess',
+                3 => 'Done',
+                4 => 'Delayed'
+            ][$status];
+        }
+    }
 }

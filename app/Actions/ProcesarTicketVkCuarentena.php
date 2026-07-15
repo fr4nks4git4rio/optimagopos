@@ -75,7 +75,8 @@ class ProcesarTicketVkCuarentena
         $ticket_vk = TicketVK::where('terminal_id', $terminal->id)->where('id_transaccion', $decoded['Data']['orderNumber'])->first();
         if ($ticket_vk) {
             $ticket_vk->update([
-                'estado' => $decoded['Data']['OrderStatus']
+                'estado' => $decoded['Data']['OrderStatus'],
+                'fecha_transaccion' => $decoded['Data']['timestamp']
             ]);
             return true;
         }

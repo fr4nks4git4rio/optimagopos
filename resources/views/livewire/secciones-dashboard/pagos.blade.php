@@ -1,17 +1,17 @@
 <div class="grid-cols-4 px-1 mb-3">
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold">VENTA NETA</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale') }}</span>
             <span class="fs-3 text-primary m-auto">${{ number_format(max($pagosData['ventas_netas'], 0), 2) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold">VENTAS POR FORMA DE PAGO</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale_by_payment_form') }}</span>
             @if (count($pagosData['ventas_formas_pago']) == 0)
                 <div class="text-center py-4 text-muted">
                     <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
-                    No hay pagos registrados para los filtros seleccionados
+                    {{ __('site.dashboard.no_data') }}
                 </div>
             @endif
             @foreach ($pagosData['ventas_formas_pago'] as $index => $venta_forma_pago)
@@ -22,11 +22,11 @@
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold">CANTIDAD POR FORMA DE PAGO</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.quantity_by_payment_form') }}</span>
             @if (count($pagosData['cantidad_formas_pago']) == 0)
                 <div class="text-center py-4 text-muted">
                     <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
-                    No hay pagos registrados para los filtros seleccionados
+                    {{ __('site.dashboard.no_data') }}
                 </div>
             @endif
             @foreach ($pagosData['cantidad_formas_pago'] as $index => $cantidad_forma_pago)
@@ -36,7 +36,7 @@
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold">MÉTODO DOMINANTE</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.dominant_method') }}</span>
             <span class="fs-3 text-primary m-auto">{{ $pagosData['metodo_pago_dominante'] }}</span>
         </div>
     </div>
@@ -117,7 +117,7 @@
                                                 show: true,
                                                 total: {
                                                     show: true,
-                                                    label: 'Formas de pago',
+                                                    label: '{{ __('site.dashboard.payment_forms') }}',
                                                     color: '#2D3142',
                                                     formatter: function(w) {
                                                         // Suma todos los valores para mostrar el total en el centro
@@ -171,17 +171,17 @@
             }
         }" class="card shadow-sm bg-site-primary-subtle">
             <div class="card-body">
-                <span class="fs-5 fw-bold">Comportamiento de Pagos</span>
+                <span class="fs-5 fw-bold">{{ __('site.dashboard.sales_behavior') }}</span>
                 <template x-if="!chart && !sinDatos">
                     <div class="text-center py-3 text-muted">
                         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                        Cargando datos...
+                        {{ __('site.dashboard.loading_data') }}...
                     </div>
                 </template>
                 <template x-if="sinDatos">
                     <div class="text-center py-4 text-muted">
                         <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
-                        Sin pagos registrados para los filtros seleccionados
+                        {{ __('site.dashboard.no_data') }}
                     </div>
                 </template>
                 <div id="contenedor-metodos-pagos" wire:ignore x-show="!sinDatos">
@@ -249,7 +249,7 @@
                                         }
                                     },
                                 },
-                                series: [{ name: 'Operaciones', data: serie24Horas }],
+                                series: [{ name: '{{ __('site.dashboard.operations') }}', data: serie24Horas }],
                                 colors: ['#065F46'],
                                 xaxis: {
                                     type: 'category',
@@ -306,17 +306,17 @@
             }
         }" class="card shadow-sm bg-site-primary-subtle">
             <div class="card-body">
-                <span class="fs-5 fw-bold">Pagos por Hora</span>
+                <span class="fs-5 fw-bold">{{ __('site.dashboard.hourly_payments') }}</span>
                 <template x-if="!chart && !sinDatos">
                     <div class="text-center py-3 text-muted">
                         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                        Cargando datos...
+                        {{ __('site.dashboard.loading_data') }}...
                     </div>
                 </template>
                 <template x-if="sinDatos">
                     <div class="text-center py-4 text-muted">
                         <i class="bi bi-graph-down fs-3 d-block mb-1"></i>
-                        Sin pagos registrados para los filtros seleccionados
+                        {{ __('site.dashboard.no_data') }}
                     </div>
                 </template>
                 <div id="contenedor-grafica-pagos-hora" wire:ignore x-show="!sinDatos">

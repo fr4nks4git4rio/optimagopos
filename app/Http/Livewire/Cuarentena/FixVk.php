@@ -257,8 +257,8 @@ class FixVk extends Modal
         if ($this->modoAvanzado) {
             $rules['rawJson'] = 'required|string';
         } else {
-            $rules['formData.Data.pos'] = 'nullable|string';
-            $rules['formData.Data.operator'] = 'nullable|integer';
+            $rules['formData.Data.pos'] = 'nullable';
+            $rules['formData.Data.operator'] = 'nullable';
             $rules['formData.Data.timestamp'] = 'required|string|date_format:Y-m-d H:i:s';
             $rules['formData.Data.OrderStatus'] = 'required|integer';
             $rules['formData.Data.orderNumber'] = 'required|string';

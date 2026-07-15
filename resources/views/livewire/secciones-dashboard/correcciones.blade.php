@@ -1,25 +1,25 @@
 <div class="grid-cols-4 px-1 mb-3">
     <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold">CORRECCIONES</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.corrections') }}</span>
             <span class="fs-3 text-danger m-auto">{{ max($correccionesData['correcciones'], 0) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold">DELETES</span>
+            <span class="fs-5 fw-bold text-uppercase">DELETES</span>
             <span class="fs-3 text-danger m-auto">{{ max($correccionesData['deletes'], 0) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold">CANCELS</span>
+            <span class="fs-5 fw-bold text-uppercase">CANCELS</span>
             <span class="fs-3 text-danger m-auto">{{ max($correccionesData['cancels'], 0) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold">INFLUENCIA</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.influence') }}</span>
             <span class="fs-3 text-danger m-auto">{{ $correccionesData['influencia_correcciones'] }}%</span>
         </div>
     </div>
@@ -76,7 +76,7 @@
                                         }
                                     },
                                 },
-                                series: [{ name: 'Cantidad', data: importesCorrecciones }],
+                                series: [{ name: '{{ __('site.dashboard.quantity') }}', data: importesCorrecciones }],
                                 plotOptions: {
                                     bar: {
                                         horizontal: true, // Barras de izquierda a derecha 👈 👉
@@ -165,18 +165,18 @@
         }" class="card shadow-sm bg-site-primary-subtle">
             <div class="card-body">
                 <span class="fs-5 fw-bold">
-                    Correcciones por operador
+                    {{ __('site.dashboard.operator_corrections') }}
                 </span>
                 <template x-if="!chart && !sinDatos">
                     <div class="text-center py-3 text-muted">
                         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                        Cargando datos...
+                        {{ __('site.dashboard.loading_data') }}...
                     </div>
                 </template>
                 <template x-if="sinDatos">
                     <div class="text-center py-4 text-muted">
                         <i class="bi bi-tools fs-3 d-block mb-1"></i>
-                        Sin correcciones registradas para los filtros seleccionados
+                        {{ __('site.dashboard.no_data') }}
                     </div>
                 </template>
                 <div id="contenedor-grafica-top-correcciones-operador" wire:ignore x-show="!sinDatos">
@@ -244,7 +244,7 @@
                                         }
                                     },
                                 },
-                                series: [{ name: 'Correcciones por hora', data: serie24Horas }],
+                                series: [{ name: '{{ __('site.dashboard.hourly_corrections') }}', data: serie24Horas }],
                                 colors: ['#065F46'],
                                 xaxis: {
                                     type: 'category',
@@ -301,17 +301,17 @@
             }
         }" class="card shadow-sm bg-site-primary-subtle">
             <div class="card-body">
-                <span class="fs-5 fw-bold">Correcciones por hora</span>
+                <span class="fs-5 fw-bold">{{ __('site.dashboard.hourly_corrections') }}</span>
                 <template x-if="!chart && !sinDatos">
                     <div class="text-center py-3 text-muted">
                         <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                        Cargando datos...
+                        {{ __('site.dashboard.loading_data') }}...
                     </div>
                 </template>
                 <template x-if="sinDatos">
                     <div class="text-center py-4 text-muted">
                         <i class="bi bi-tools fs-3 d-block mb-1"></i>
-                        Sin correcciones registradas para los filtros seleccionados
+                        {{ __('site.dashboard.no_data') }}
                     </div>
                 </template>
                 <div id="contenedor-grafica-correcciones-hora" wire:ignore x-show="!sinDatos">

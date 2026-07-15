@@ -30,7 +30,7 @@ class Nav extends Component
     public $is_admin;
     public $is_staff;
     public $is_guest;
-    public $langs = ['es' => 'ES', 'en' => 'EN'];
+    public $langs = ['es' => 'ES', 'en' => 'EN', 'fr' => 'FR'];
     protected $profile = '';
     protected $listeners = [
         '$refresh',
