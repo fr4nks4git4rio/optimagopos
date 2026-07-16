@@ -88,7 +88,7 @@ class ProductosMasVendidos extends Component
             ->select(
                 'p.id',
                 'p.nombre',
-                DB::raw('SUM(tp.cantidad) as total_vendido'),
+                DB::raw('ROUND(SUM(tp.cantidad), 2) as total_vendido'),
                 DB::raw("DATE(t.fecha_transaccion) as fecha_transaccion")
             )
             ->groupBy('p.id', 'p.nombre')
