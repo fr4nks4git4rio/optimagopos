@@ -163,9 +163,9 @@ class Home extends Component
     private function commonWhere($query)
     {
         if ($this->fecha_inicio)
-            $query->whereDate('ticket.fecha_transaccion', '>=', $this->fecha_inicio);
+            $query->whereDate('ticket.fecha_transaccion', '>=', "$this->fecha_inicio 00:00:00");
         if ($this->fecha_fin)
-            $query->whereDate('ticket.fecha_transaccion', '<=', $this->fecha_fin);
+            $query->whereDate('ticket.fecha_transaccion', '<=', "$this->fecha_fin 23:59:59");
         if (count(Arr::wrap($this->sucursales)) > 0)
             $query->whereIn('sucursal.id', $this->sucursales);
         else
@@ -272,11 +272,17 @@ class Home extends Component
 
                         $datos_grafica_actividad = [];
                         $datos_grafica_actividad_q = DB::table('tb_tickets as ticket')
-                            ->selectRaw("HOUR(ticket.fecha_transaccion) as hora, COUNT(ticket.id) as cantidad")
+                            ->selectRaw("
+                            DATE(ticket.fecha_transaccion) as fecha,
+                            HOUR(ticket.fecha_transaccion) as hora,
+                            COUNT(ticket.id) as cantidad
+                            ")
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
-                            ->groupBy('hora');
+                            ->groupBy(DB::raw('DATE(ticket.fecha_transaccion)'), DB::raw('HOUR(ticket.fecha_transaccion)'))
+                            ->orderBy('fecha', 'ASC')
+                            ->orderBy('hora', 'ASC');
 
                         $datos_grafica_actividad_q = $this->commonWhere($datos_grafica_actividad_q);
                         $datos_grafica_actividad_q->get()->map(function ($value, $key) use (&$datos_grafica_actividad) {
@@ -691,11 +697,17 @@ class Home extends Component
 
                 $datos_grafica_actividad = [];
                 $datos_grafica_actividad_q = DB::table('tb_tickets_vk as ticket')
-                    ->selectRaw("HOUR(ticket.fecha_transaccion) as hora, COUNT(ticket.id) as cantidad")
+                    ->selectRaw("
+                    DATE(ticket.fecha_transaccion) as fecha,
+                    HOUR(ticket.fecha_transaccion) as hora,
+                    COUNT(ticket.id) as cantidad
+                    ")
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                     ->where('sucursal.cliente_id', user()->cliente_id)
-                    ->groupBy('hora');
+                    ->groupBy(DB::raw('DATE(ticket.fecha_transaccion)'), DB::raw('HOUR(ticket.fecha_transaccion)'))
+                    ->orderBy('fecha', 'ASC')
+                    ->orderBy('hora', 'ASC');
 
                 $datos_grafica_actividad_q = $this->commonWhere($datos_grafica_actividad_q);
                 $datos_grafica_actividad_q->get()->map(function ($value, $key) use (&$datos_grafica_actividad) {
