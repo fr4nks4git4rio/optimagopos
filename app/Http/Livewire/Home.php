@@ -720,7 +720,8 @@ class Home extends Component
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                     ->leftJoin('tb_departamentos as depa', 'depa.id', 'ticket.departamento_id')
-                    ->where('sucursal.cliente_id', user()->cliente_id);
+                    ->where('sucursal.cliente_id', user()->cliente_id)
+                    ->where('ticket.estado', '!=', 3);
 
                 $groups = [];
                 $this->commonWhere($ordenes_q)
