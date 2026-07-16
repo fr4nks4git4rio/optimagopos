@@ -348,7 +348,7 @@ class GestionSuscripciones extends Component
 
     public function loadUsuarios()
     {
-        $this->usuariosDisponibles = User::whereNotNull('cliente_id')->lazy()->map->only(['value', 'label'])->toArray();
+        $this->usuariosDisponibles = User::where('cliente_id', $this->cliente_id)->lazy()->map->only(['value', 'label'])->toArray();
     }
 
     public function AddSucursal($id)

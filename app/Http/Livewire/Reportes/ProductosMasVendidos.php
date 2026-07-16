@@ -70,11 +70,12 @@ class ProductosMasVendidos extends Component
             ->where('cliente_id', user()->cliente_id)
             ->get()
             ->map(function ($value, $key) {
-                $value->nombre_comercial = Crypt::decrypt($value->nombre_comercial);
-                $value->razon_social = Crypt::decrypt($value->razon_social);
+                $nombre_comercial = Crypt::decrypt($value->nombre_comercial);
+                $razon_social = $value->razon_social ? Crypt::decrypt($value->razon_social) : '';
+                $label = $nombre_comercial . ($razon_social ? (" | $razon_social") : '');
                 return [
                     'value' => $value->id,
-                    'label' => "$value->nombre_comercial | $value->razon_social"
+                    'label' => $label
                 ];
             })->toArray();
     }
