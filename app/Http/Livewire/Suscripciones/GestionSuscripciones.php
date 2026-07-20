@@ -149,7 +149,7 @@ class GestionSuscripciones extends Component
             $this->terminalesDisponibles = [];
             $this->usuariosDisponibles = [];
             $this->loadSucursales();
-            $this->loadTerminales();
+            // $this->loadTerminales();
         }
 
         if ($propertyName == 'sucursales') {
