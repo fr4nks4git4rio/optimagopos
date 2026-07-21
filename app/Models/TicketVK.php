@@ -22,6 +22,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $pos_ip
  * @property float $tiempo_resolver
  * @property float $porciento_alerta_estado
+ * @property boolean $tuvo_demora
  * @property integer $empleado_id
  * @property integer $sucursal_id
  * @property integer $terminal_id
@@ -42,6 +43,7 @@ class TicketVK extends Model
         'pos_ip',
         'tiempo_resolver',
         'porciento_alerta_estado',
+        'tuvo_demora',
         'empleado_id',
         'sucursal_id',
         'terminal_id',
@@ -62,6 +64,7 @@ class TicketVK extends Model
         'pos_ip' => 'string',
         'tiempo_resolver' => 'float',
         'porciento_alerta_estado' => 'float',
+        'tuvo_demora' => 'boolean',
         'empleado_id' => 'integer',
         'sucursal_id' => 'integer',
         'terminal_id' => 'integer',

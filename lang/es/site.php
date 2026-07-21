@@ -653,6 +653,8 @@ return [
             'branches' => 'Sucursales',
             'terminals' => 'Terminales',
             'users' => 'Usuarios',
+            'stamps' => 'Timbres Facturación',
+            'analytic_basic_months' => "Meses de analítica básica",
             'resources'  => 'Recursos vinculados a la suscripción',
             'resources_message' => 'La cantidad de recursos vinculados no puede exceder la capacidad contratada. Al alcanzar
                                 el límite, el selector bloqueará nuevas selecciones automáticamente.',
@@ -709,6 +711,8 @@ return [
         'periodic_unitary_cost' => 'Costo unitario periódico',
         'additional_terminal' => 'Terminal / Caja Adicional',
         'additional_user' => 'Usuario Adicional',
+        'additional_stamp' => 'Timbre Adicional',
+        'additional_basic_analytic_month' => 'Mes adicional de analítica básica',
         'operative_info' => '<strong>Nota operativa:</strong> Estas tarifas se aplican automáticamente de forma global cuando la cotización de licenciamiento de un cliente se marca como un <em>Plan Personalizado (Custom)</em> o cuando excede los límites incluidos en su paquete base.',
         'config_save_successfully' => 'Configuración global guardada correctamente'
     ],

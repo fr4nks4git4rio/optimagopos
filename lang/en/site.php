@@ -652,6 +652,8 @@ return [
             'branches' => 'Branches',
             'terminals' => 'Terminals',
             'users' => 'Users',
+            'stamps' => 'Billing Stamps',
+            'analytic_basic_months' => 'Months of basic analytics',
             'resources'  => 'Resources linked to the subscription',
             'resources_message' => 'The amount of linked resources cannot exceed the contracted capacity. Once the
                                 limit is reached, the selector will automatically block new selections.',
@@ -707,6 +709,8 @@ return [
         'periodic_unitary_cost' => 'Periodic unit cost',
         'additional_terminal' => 'Additional Terminal / Register',
         'additional_user' => 'Additional User',
+        'additional_stamp' => 'Additional Stamp',
+        'additional_basic_analytic_month' => 'Additional month of basic analytics',
         'operative_info' => '<strong>Operational note:</strong> These rates are applied automatically and globally when a client\'s licensing quote is marked as a <em>Custom Plan</em> or when it exceeds the limits included in their base package.',
         'config_save_successfully' => 'Global configuration saved successfully'
     ],

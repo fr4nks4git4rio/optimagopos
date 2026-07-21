@@ -109,6 +109,9 @@ class Home extends Component
     {
         $this->tab = in_array($this->tab, ['foh', 'boh']) ? $this->tab : 'foh';
         $this->seccion = $this->seccion ?? 'resumen';
+        $this->fecha_inicio ??= today()->format('Y-m-d');
+        $this->fecha_fin ??= today()->format('Y-m-d');
+        
         $this->monedas = DB::table('tb_monedas')->whereNull('deleted_at')->pluck('acronimo', 'id');
 
         if ($this->sucursales_query) {
@@ -740,7 +743,7 @@ class Home extends Component
                     ->orderBy('ticket.fecha_transaccion')
                     ->get()->each(function ($element) use (&$groups) {
                         $element->sucursal = Crypt::decrypt($element->sucursal);
-                        $element->fecha_transaccion = SupportCarbon::parse($element->fecha_transaccion)->format('d M Y H:i:s');
+                        $element->fecha_transaccion = Carbon::parse($element->fecha_transaccion)->format('d M Y H:i:s');
                         if (!key_exists($element->sucursal_id,  $groups)) {
                             $groups[$element->sucursal_id]['label'] = $element->sucursal;
                         }

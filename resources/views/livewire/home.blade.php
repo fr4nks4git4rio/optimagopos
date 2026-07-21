@@ -190,7 +190,7 @@
                                                         break;
                                                 }
                                             @endphp
-                                            <div class="col-auto">
+                                            <div class="col-auto mb-2">
                                                 <div class="card border-{{ $primaryClassOrdenEstado }} shadow-sm">
                                                     <div class="card-header py-0 fs-4 bg-{{ $primaryClassOrdenEstado }}"
                                                         style="color: {{ $textColor }}">

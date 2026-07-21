@@ -16,6 +16,8 @@ class GestionConfiguracionesComponent extends Component
     public $precio_sucursal_adicional;
     public $precio_terminal_adicional;
     public $precio_usuario_adicional;
+    public $precio_timbre_adicional;
+    public $precio_mes_analitica_basica_adicional;
     public $moneda_sistema;
 
     public $monedas = [];
@@ -26,6 +28,8 @@ class GestionConfiguracionesComponent extends Component
         'precio_sucursal_adicional' => 'required|numeric|min:0',
         'precio_terminal_adicional' => 'required|numeric|min:0',
         'precio_usuario_adicional' => 'required|numeric|min:0',
+        'precio_timbre_adicional' => 'required|numeric|min:0',
+        'precio_mes_analitica_basica_adicional' => 'required|numeric|min:0',
         'moneda_sistema' => 'required|string|size:3',
     ];
 
@@ -36,6 +40,8 @@ class GestionConfiguracionesComponent extends Component
         $this->precio_sucursal_adicional = system_config('precio_sucursal_adicional');
         $this->precio_terminal_adicional = system_config('precio_terminal_adicional');
         $this->precio_usuario_adicional = system_config('precio_usuario_adicional');
+        $this->precio_timbre_adicional = system_config('precio_timbre_adicional');
+        $this->precio_mes_analitica_basica_adicional = system_config('precio_mes_analitica_basica_adicional');
         $this->moneda_sistema = system_config('moneda_sistema');
 
         $this->monedas = Moneda::all()->pluck('acronimo', 'nombre')->toArray();
@@ -135,6 +141,80 @@ class GestionConfiguracionesComponent extends Component
                             $suc_extras = $suscripcion->cant_usuarios - $suscripcion->paquete->cant_usuarios;
                             $precio_extra = $suscripcion->precio_extra - ($suc_extras * $oldValue);
                             $precio_extra += $suc_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                }
+                break;
+            case 'precio_timbre_adicional':
+                if ($value < $oldValue) {
+                    Suscripcion::whereHas('modulos', function ($query) {
+                        $query->where('id', 3);
+                    })->with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_timbres > $suscripcion->paquete->cant_timbres) {
+
+                            $tim_extras = $suscripcion->cant_timbres - $suscripcion->paquete->cant_timbres;
+                            $precio_extra = $suscripcion->precio_extra - ($tim_extras * $oldValue);
+                            $precio_extra += $tim_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                } elseif ($value > $oldValue) {
+                    Suscripcion::whereHas('modulos', function ($query) {
+                        $query->where('id', 3);
+                    })->whereHas('cliente', function ($query) {
+                        $query->where('es_cliente_fiel', 0);
+                    })->with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_timbres > $suscripcion->paquete->cant_timbres) {
+
+                            $tim_extras = $suscripcion->cant_timbres - $suscripcion->paquete->cant_timbres;
+                            $precio_extra = $suscripcion->precio_extra - ($tim_extras * $oldValue);
+                            $precio_extra += $tim_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                }
+                break;
+            case 'precio_mes_analitica_basica_adicional':
+                if ($value < $oldValue) {
+                    Suscripcion::whereHas('modulos', function ($query) {
+                        $query->where('id', 4);
+                    })->with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_meses_analitica_basica > $suscripcion->paquete->cant_meses_analitica_basica) {
+
+                            $meses_extras = $suscripcion->cant_meses_analitica_basica - $suscripcion->paquete->cant_meses_analitica_basica;
+                            $precio_extra = $suscripcion->precio_extra - ($meses_extras * $oldValue);
+                            $precio_extra += $meses_extras * $value;
+
+                            $suscripcion->precio_extra = $precio_extra;
+                            $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
+                            $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
+                            $suscripcion->save();
+                        }
+                    });
+                } elseif ($value > $oldValue) {
+                    Suscripcion::whereHas('modulos', function ($query) {
+                        $query->where('id', 4);
+                    })->whereHas('cliente', function ($query) {
+                        $query->where('es_cliente_fiel', 0);
+                    })->with('paquete')->lazy()->each(function (Suscripcion $suscripcion) use ($value, $oldValue) {
+                        if ($suscripcion->cant_meses_analitica_basica > $suscripcion->paquete->cant_meses_analitica_basica) {
+
+                            $meses_extras = $suscripcion->cant_meses_analitica_basica - $suscripcion->paquete->cant_meses_analitica_basicacant_meses_analitica_basica;
+                            $precio_extra = $suscripcion->precio_extra - ($meses_extras * $oldValue);
+                            $precio_extra += $meses_extras * $value;
 
                             $suscripcion->precio_extra = $precio_extra;
                             $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;

@@ -28,6 +28,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -539,7 +540,8 @@ class HomeController
         $ticket_vk = TicketVK::where('terminal_id', $terminal->id)->where('id_transaccion', $decoded['Data']['orderNumber'])->first();
         if ($ticket_vk) {
             $ticket_vk->update([
-                'estado' => $decoded['Data']['OrderStatus']
+                'estado' => $decoded['Data']['OrderStatus'],
+                'tuvo_demora' => (((int)$decoded['Data']['OrderStatus']) == 4) ? 1 : $ticket_vk->tuvo_demora
             ]);
             return response()->json(['success' => true]);
         }
@@ -578,7 +580,7 @@ class HomeController
             $ticketVK = TicketVK::create([
                 'mesa' => isset($data['table']) && $data['table'] ? $data['table'] : '',
                 'asiento' => isset($data['seat']) && $data['seat'] ? $data['seat'] : '',
-                'fecha_transaccion' => $data['timestamp'],
+                'fecha_transaccion' => SupportCarbon::parse(Str::replace("Hora:", "", $data['timestamp'])),
                 'estado' => $data['OrderStatus'],
                 'id_transaccion' => $data['orderNumber'],
                 'pos_ip' => $data['PosIpAddress'],

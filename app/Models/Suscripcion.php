@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
  * @property integer $cant_sucursales
  * @property integer $cant_terminales
  * @property integer $cant_usuario
+ * @property integer $cant_timbres
+ * @property integer $cant_meses_analitica_basica
  * @property date $fecha_inicio_operaciones
  * @property date $fecha_inicio_pagos
  * @property string $periodicidad_pagos
@@ -39,6 +41,8 @@ class Suscripcion extends Model
         'cant_sucursales',
         'cant_terminales',
         'cant_usuarios',
+        'cant_timbres',
+        'cant_meses_analitica_basica',
         'fecha_inicio_operaciones',
         'fecha_inicio_pagos',
         'periodicidad_pagos',

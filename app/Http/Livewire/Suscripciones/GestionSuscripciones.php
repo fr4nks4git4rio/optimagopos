@@ -26,6 +26,8 @@ class GestionSuscripciones extends Component
     public $cant_sucursales = 1;
     public $cant_terminales = 1;
     public $cant_usuarios = 1;
+    public $cant_timbres = 0;
+    public $cant_meses_analitica_basica = 0;
     public $fecha_inicio_operaciones;
     public $fecha_inicio_pagos;
     public $periodicidad_pagos = 'MENSUAL';
@@ -102,6 +104,8 @@ class GestionSuscripciones extends Component
             $this->cant_sucursales = $this->suscripcion->cant_sucursales;
             $this->cant_terminales = $this->suscripcion->cant_terminales;
             $this->cant_usuarios = $this->suscripcion->cant_usuarios;
+            $this->cant_timbres = $this->suscripcion->cant_timbres;
+            $this->cant_meses_analitica_basica = $this->suscripcion->cant_meses_analitica_basica;
             $this->fecha_inicio_operaciones = $this->suscripcion->fecha_inicio_operaciones ? $this->suscripcion->fecha_inicio_operaciones->format('Y-m-d') : today()->format('Y-m-d');
             $this->fecha_inicio_pagos = $this->suscripcion->fecha_inicio_pagos ? $this->suscripcion->fecha_inicio_pagos->format('Y-m-d') : today()->format('Y-m-d');
             $this->periodicidad_pagos = $this->suscripcion->periodicidad_pagos ?? 'MENSUAL';
@@ -149,7 +153,7 @@ class GestionSuscripciones extends Component
             $this->terminalesDisponibles = [];
             $this->usuariosDisponibles = [];
             $this->loadSucursales();
-            // $this->loadTerminales();
+            $this->loadUsuarios();
         }
 
         if ($propertyName == 'sucursales') {
@@ -198,6 +202,15 @@ class GestionSuscripciones extends Component
         return in_array($this->estado, ['PENDIENTE', 'ACTIVA']);
     }
 
+    public function getBillingIncludedProperty()
+    {
+        return in_array(3, $this->modulos);
+    }
+    public function getBasicAnalyticIncludedProperty()
+    {
+        return in_array(4, $this->modulos);
+    }
+
     public function init()
     {
         if (user()->cannot($this->suscripcion->id ? 'update' : 'create', $this->suscripcion->id ? $this->suscripcion : [Suscripcion::class])) {
@@ -230,6 +243,12 @@ class GestionSuscripciones extends Component
                 if ($this->cant_usuarios > $package->cant_usuarios) {
                     $this->precio_extra += ($this->cant_usuarios - $package->cant_usuarios) * $this->globalSettings['precio_usuario_adicional'];
                 }
+                if ($this->billing_included  && $this->cant_timbres > $package->cant_timbres) {
+                    $this->precio_extra += ($this->cant_timbres - $package->cant_timbres) * $this->globalSettings['precio_timbre_adicional'];
+                }
+                if ($this->basic_analytic_included  && $this->cant_meses_analitica_basica > $package->cant_meses_analitica_basica) {
+                    $this->precio_extra += ($this->cant_meses_analitica_basica - $package->cant_meses_analitica_basica) * $this->globalSettings['precio_mes_analitica_basica_adicional'];
+                }
 
                 $this->precio_extra += Modulo::whereIn('id', array_values(array_diff($this->modulos, $this->modulos_paquete)))->sum('costo_base');
             }
@@ -242,6 +261,8 @@ class GestionSuscripciones extends Component
             $this->precio_extra += $this->cant_sucursales * $this->globalSettings['precio_sucursal_adicional'];
             $this->precio_extra += $this->cant_terminales * $this->globalSettings['precio_terminal_adicional'];
             $this->precio_extra += $this->cant_usuarios * $this->globalSettings['precio_usuario_adicional'];
+            $this->precio_extra += $this->cant_timbres * $this->globalSettings['precio_timbre_adicional'];
+            $this->precio_extra += $this->cant_meses_analitica_basica * $this->globalSettings['precio_mes_analitica_basica_adicional'];
 
             // Sumamos los costos bases individuales de cada módulo encendido
             $this->precio_extra += Modulo::whereIn('id', $this->modulos)->sum('costo_base');
@@ -267,6 +288,16 @@ class GestionSuscripciones extends Component
     {
         $this->cant_usuarios += 1;
         $this->dispatchBrowserEvent('reApplySelect2');
+        $this->calculatePricing();
+    }
+    public function incrementTimbres()
+    {
+        $this->cant_timbres += 1;
+        $this->calculatePricing();
+    }
+    public function incrementMesesAnaliticaBasica()
+    {
+        $this->cant_meses_analitica_basica += 1;
         $this->calculatePricing();
     }
 
@@ -300,6 +331,24 @@ class GestionSuscripciones extends Component
         $this->dispatchBrowserEvent('reApplySelect2');
         $this->calculatePricing();
     }
+    public function decrementTimbres()
+    {
+        if ($this->paquete_id) {
+            $paquete = Paquete::find($this->paquete_id);
+            if ($this->cant_timbres > $paquete->cant_timbres)
+                $this->cant_timbres -= 1;
+        }
+        $this->calculatePricing();
+    }
+    public function decrementMesesAnaliticaBasica()
+    {
+        if ($this->paquete_id) {
+            $paquete = Paquete::find($this->paquete_id);
+            if ($this->cant_meses_analitica_basica > $paquete->cant_meses_analitica_basica)
+                $this->cant_meses_analitica_basica -= 1;
+        }
+        $this->calculatePricing();
+    }
     public function resetSucursales()
     {
         if ($this->paquete_id) {
@@ -325,6 +374,22 @@ class GestionSuscripciones extends Component
             $this->cant_usuarios = $paquete->cant_usuarios;
         }
         $this->dispatchBrowserEvent('reApplySelect2');
+        $this->calculatePricing();
+    }
+    public function resetTimbres()
+    {
+        if ($this->paquete_id) {
+            $paquete = Paquete::find($this->paquete_id);
+            $this->cant_timbres = $paquete->cant_timbres;
+        }
+        $this->calculatePricing();
+    }
+    public function resetMesesAnaliticaBasica()
+    {
+        if ($this->paquete_id) {
+            $paquete = Paquete::find($this->paquete_id);
+            $this->cant_meses_analitica_basica = $paquete->cant_meses_analitica_basica;
+        }
         $this->calculatePricing();
     }
 

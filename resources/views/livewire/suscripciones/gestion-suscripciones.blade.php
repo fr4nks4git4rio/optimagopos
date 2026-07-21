@@ -361,7 +361,13 @@
                                 {{ __('site.subscriptions.manage_subscription.capacity_infrastructure') }}
                             </h6>
                             <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
-                                @foreach ([['label' => __('site.subscriptions.manage_subscription.branches'), 'model' => 'cant_sucursales', 'icon' => 'bi-building', 'inc' => 'incrementSucursales', 'dec' => 'decrementSucursales', 'res' => 'resetSucursales'], ['label' => __('site.subscriptions.manage_subscription.terminals'), 'model' => 'cant_terminales', 'icon' => 'bi-display', 'inc' => 'incrementTerminales', 'dec' => 'decrementTerminales', 'res' => 'resetTerminales'], ['label' => __('site.subscriptions.manage_subscription.users'), 'model' => 'cant_usuarios', 'icon' => 'bi-people', 'inc' => 'incrementUsuarios', 'dec' => 'decrementUsuarios', 'res' => 'resetUsuarios']] as $infra)
+                                @foreach ([
+                                    ['label' => __('site.subscriptions.manage_subscription.branches'), 'model' => 'cant_sucursales', 'icon' => 'bi-building', 'inc' => 'incrementSucursales', 'dec' => 'decrementSucursales', 'res' => 'resetSucursales'],
+                                    ['label' => __('site.subscriptions.manage_subscription.terminals'), 'model' => 'cant_terminales', 'icon' => 'bi-display', 'inc' => 'incrementTerminales', 'dec' => 'decrementTerminales', 'res' => 'resetTerminales'],
+                                    ['label' => __('site.subscriptions.manage_subscription.users'), 'model' => 'cant_usuarios', 'icon' => 'bi-people', 'inc' => 'incrementUsuarios', 'dec' => 'decrementUsuarios', 'res' => 'resetUsuarios'],
+                                    ['label' => __('site.subscriptions.manage_subscription.stamps'), 'model' => 'cant_timbres', 'icon' => 'bi-file-pdf', 'inc' => 'incrementTimbres', 'dec' => 'decrementTimbres', 'res' => 'resetTimbres'],
+                                    ['label' => __('site.subscriptions.manage_subscription.analytic_basic_months'), 'model' => 'cant_meses_analitica_basica', 'icon' => 'bi-graph-up', 'inc' => 'incrementMesesAnaliticaBasica', 'dec' => 'decrementMesesAnaliticaBasica', 'res' => 'resetMesesAnaliticaBasica'],
+                                    ] as $infra)
                                     <div class="col-md-4">
                                         <label
                                             class="form-label fw-bold text-dark small">{{ $infra['label'] }}</label>

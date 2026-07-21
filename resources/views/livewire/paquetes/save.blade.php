@@ -42,7 +42,7 @@
                                 @enderror
                             </div>
 
-                            <div class="row bg-light rounded p-3 mb-4 g-3 border mx-0">
+                            <div class="row bg-light rounded p-3 mb-4 border mx-0">
                                 <div class="col-sm-4 mt-0">
                                     <label class="form-label fw-bold text-secondary small"><i
                                             class="bi bi-building me-1"></i>Sucursales Permitidas *</label>
@@ -75,6 +75,32 @@
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+                                @if ($this->billing_included)
+                                    <div class="col-sm-4 mt-2">
+                                        <label class="form-label fw-bold text-secondary small"><i
+                                                class="bi bi-file-pdf me-1"></i>Timbres Permitidos *</label>
+                                        <input type="number"
+                                            class="form-control @error('cant_timbres') is-invalid @enderror"
+                                            wire:model="cant_timbres" min="1" step="1">
+                                        @error('cant_timbres')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                @endif
+
+                                @if ($this->basic_analytic_included)
+                                    <div class="col-sm-4 mt-2">
+                                        <label class="form-label fw-bold text-secondary small"><i
+                                                class="bi bi-graph-up me-1"></i>Meses de Analítica Básica Permitidos *</label>
+                                        <input type="number"
+                                            class="form-control @error('cant_meses_analitica_basica') is-invalid @enderror"
+                                            wire:model="cant_meses_analitica_basica" min="1" step="1">
+                                        @error('cant_meses_analitica_basica')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                @endif
                             </div>
 
                             <div class="mb-3">

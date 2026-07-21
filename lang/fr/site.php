@@ -653,6 +653,8 @@ return [
             'branches' => 'Succursales',
             'terminals' => 'Terminaux',
             'users' => 'Utilisateurs',
+            'stamps' => 'Timbres de facturation',
+            'analytic_basic_months' => "des mois d'analyses de base",
             'resources'  => 'Ressources liées à l\'abonnement',
             'resources_message' => 'Le nombre de ressources liées ne peut pas dépasser la capacité contractée. Une fois la
                                 limite atteinte, le sélecteur bloquera automatiquement les nouvelles sélections.',
@@ -708,6 +710,8 @@ return [
         'periodic_unitary_cost' => 'Coût unitaire périodique',
         'additional_terminal' => 'Terminal / Caisse Supplémentaire',
         'additional_user' => 'Utilisateur Supplémentaire',
+        'additional_stamp' => 'Timbre supplémentaire',
+        'additional_basic_analytic_month' => "Un mois supplémentaire d'analyses de base",
         'operative_info' => '<strong>Note opérationnelle :</strong> Ces tarifs s\'appliquent automatiquement de façon globale lorsque le devis de licence d\'un client est marqué comme un <em>Plan Personnalisé</em> ou lorsqu\'il dépasse les limites incluses dans son forfait de base.',
         'config_save_successfully' => 'Configuration globale enregistrée avec succès'
     ],

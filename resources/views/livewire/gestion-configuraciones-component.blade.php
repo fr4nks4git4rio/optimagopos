@@ -66,7 +66,7 @@
                         </h6>
 
                         <div class="row g-3 mb-4 p-3 bg-light rounded border">
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label fw-bold small">{{ __('site.system_configs.additional_branch') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text">{{ $moneda_sistema }}</span>
@@ -82,7 +82,7 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label fw-bold small">{{ __('site.system_configs.additional_terminal') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text">{{ $moneda_sistema }}</span>
@@ -98,7 +98,7 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label fw-bold small">{{ __('site.system_configs.additional_user') }}</label>
                                 <div class="input-group">
                                     <span class="input-group-text">{{ $moneda_sistema }}</span>
@@ -110,6 +110,38 @@
                                     {{ __('site.system_configs.periodic_unitary_cost') }}
                                 </small>
                                 @error('precio_usuario_adicional')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold small">{{ __('site.system_configs.additional_stamp') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ $moneda_sistema }}</span>
+                                    <input type="number" step="0.01"
+                                        class="form-control @error('precio_timbre_adicional') is-invalid @enderror"
+                                        wire:model="precio_timbre_adicional" min="0">
+                                </div>
+                                <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
+                                    {{ __('site.system_configs.periodic_unitary_cost') }}
+                                </small>
+                                @error('precio_timbre_adicional')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold small">{{ __('site.system_configs.additional_basic_analytic_month') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ $moneda_sistema }}</span>
+                                    <input type="number" step="0.01"
+                                        class="form-control @error('precio_mes_analitica_basica_adicional') is-invalid @enderror"
+                                        wire:model="precio_mes_analitica_basica_adicional" min="0">
+                                </div>
+                                <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
+                                    {{ __('site.system_configs.periodic_unitary_cost') }}
+                                </small>
+                                @error('precio_mes_analitica_basica_adicional')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>

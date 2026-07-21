@@ -57,11 +57,13 @@ use App\Models\Cliente;
 use App\Models\Cuarentena;
 use App\Models\Log;
 use App\Models\Suscripcion;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 //use App\Http\Livewire\Cotizador\Catalogos\Productos\SaveV2 as SaveProductos;
@@ -79,15 +81,8 @@ use Illuminate\View\View;
 
 // Auth::routes();
 
-Route::get('/populate_quarantine', function () {
-    Log::where('status', 400)->lazy()->each(function ($log) {
-        Cuarentena::create([
-            'texto' => $log->log,
-            'data' => $log->data,
-        ]);
-    });
-
-    echo "ECHO!!!";
+Route::get('/test', function () {
+    echo Carbon::parse(Str::replace("Hora:", "", "30 nov. 2022 Hora: 12:22 a. m."));
 });
 
 Route::domain(config('app.facturacion_url'))->group(function () {

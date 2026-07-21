@@ -37,14 +37,14 @@ class PaqueteObserver
 
         if (key_exists('precio', $attributes)) {
             if ($attributes['precio'] < $paquete->getOriginal('precio')) {
-                Suscripcion::lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
+                Suscripcion::where('paquete_id', $paquete->id)->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
                     $suscripcion->precio_paquete = $attributes['precio'];
                     $suscripcion->precio_total = $suscripcion->precio_paquete + $suscripcion->precio_extra;
                     $suscripcion->total = $suscripcion->precio_total - $suscripcion->descuento;
                     $suscripcion->save();
                 });
             } else {
-                Suscripcion::whereHas('cliente', function ($query) {
+                Suscripcion::where('paquete_id', $paquete->id)->whereHas('cliente', function ($query) {
                     $query->where('es_cliente_fiel', 0);
                 })->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
                     $suscripcion->precio_paquete = $attributes['precio'];
@@ -57,53 +57,51 @@ class PaqueteObserver
 
         if (key_exists('cant_sucursales', $attributes)) {
             if ($attributes['cant_sucursales'] > $paquete->getOriginal('cant_sucursales')) {
-                Suscripcion::lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
+                Suscripcion::where('paquete_id', $paquete->id)->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
                     $suscripcion->cant_sucursales = $attributes['cant_sucursales'];
                     $suscripcion->save();
                 });
             }
-            // else {
-            //     Suscripcion::whereHas('cliente', function ($query) {
-            //         $query->where('es_cliente_fiel', 0);
-            //     })->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
-            //         $suscripcion->cant_sucursales = $attributes['cant_sucursales'];
-            //         $suscripcion->save();
-            //     });
-            // }
         }
 
         if (key_exists('cant_terminales', $attributes)) {
             if ($attributes['cant_terminales'] > $paquete->getOriginal('cant_terminales')) {
-                Suscripcion::lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
+                Suscripcion::where('paquete_id', $paquete->id)->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
                     $suscripcion->cant_terminales = $attributes['cant_terminales'];
                     $suscripcion->save();
                 });
             }
-            // else {
-            //     Suscripcion::whereHas('cliente', function ($query) {
-            //         $query->where('es_cliente_fiel', 0);
-            //     })->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
-            //         $suscripcion->cant_terminales = $attributes['cant_terminales'];
-            //         $suscripcion->save();
-            //     });
-            // }
         }
 
         if (key_exists('cant_usuarios', $attributes)) {
             if ($attributes['cant_usuarios'] > $paquete->getOriginal('cant_usuarios')) {
-                Suscripcion::lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
+                Suscripcion::where('paquete_id', $paquete->id)->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
                     $suscripcion->cant_usuarios = $attributes['cant_usuarios'];
                     $suscripcion->save();
                 });
             }
-            // else {
-            //     Suscripcion::whereHas('cliente', function ($query) {
-            //         $query->where('es_cliente_fiel', 0);
-            //     })->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
-            //         $suscripcion->cant_usuarios = $attributes['cant_usuarios'];
-            //         $suscripcion->save();
-            //     });
-            // }
+        }
+
+        if (key_exists('cant_timbres', $attributes)) {
+            if ($attributes['cant_timbres'] > $paquete->getOriginal('cant_timbres')) {
+                Suscripcion::where('paquete_id', $paquete->id)->whereHas('modulos',  function ($query) {
+                    $query->where('id',  3);
+                })->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
+                    $suscripcion->cant_timbres = $attributes['cant_timbres'];
+                    $suscripcion->save();
+                });
+            }
+        }
+
+        if (key_exists('cant_meses_analitica_basica', $attributes)) {
+            if ($attributes['cant_meses_analitica_basica'] > $paquete->getOriginal('cant_meses_analitica_basica')) {
+                Suscripcion::where('paquete_id', $paquete->id)->whereHas('modulos',  function ($query) {
+                    $query->where('id',  4);
+                })->lazy()->each(function (Suscripcion $suscripcion) use ($attributes) {
+                    $suscripcion->cant_meses_analitica_basica = $attributes['cant_meses_analitica_basica'];
+                    $suscripcion->save();
+                });
+            }
         }
 
         if (count($attributes) > 0) {
