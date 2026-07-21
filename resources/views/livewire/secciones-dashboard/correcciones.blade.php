@@ -7,13 +7,13 @@
     </div>
     <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold text-uppercase">DELETES</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.deletes') }}</span>
             <span class="fs-3 text-danger m-auto">{{ max($correccionesData['deletes'], 0) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold text-uppercase">CANCELS</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.cancels') }}</span>
             <span class="fs-3 text-danger m-auto">{{ max($correccionesData['cancels'], 0) }}</span>
         </div>
     </div>

@@ -33,7 +33,7 @@ class TerminalPolicy
         if (
             $user->is_admin
             && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-            && in_array($terminal->id, $user->terminales->pluck('id')->toArray())
+            && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
         )
             return true;
 
@@ -62,7 +62,7 @@ class TerminalPolicy
         if (
             $user->is_admin
             && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-            && in_array($terminal->id, $user->terminales->pluck('id')->toArray())
+            && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
         )
             return true;
 
@@ -80,7 +80,7 @@ class TerminalPolicy
         if (
             $user->is_admin
             && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-            && in_array($terminal->id, $user->terminales->pluck('id')->toArray())
+            && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
         )
             return true;
 
@@ -98,7 +98,7 @@ class TerminalPolicy
         if (
             $user->is_admin
             && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-            && in_array($terminal->id, $user->terminales->pluck('id')->toArray())
+            && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
         )
             return true;
 

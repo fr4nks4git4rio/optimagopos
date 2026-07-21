@@ -14,12 +14,6 @@
                     <i class="bi bi-person fs-6"></i> <span class="d-sm-inline px-2">{{ __('site.sidebar.users') }}</span></a>
             </li>
         @endcan
-        @can('viewAnyComensal', [App\Models\Cliente::class])
-            <li class="w-100 li-item {{ active_route('cliente/comensales*') }}">
-                <a href="{{ route('cliente.comensales.index') }}" class="nav-link submenu">
-                    <i class="bi bi-people fs-6"></i> <span class="d-sm-inline px-2">{{ __('site.sidebar.clients') }}</span></a>
-            </li>
-        @endcan
         @can('viewAny', [App\Models\Sucursal::class])
             <li class="w-100 li-item {{ active_route('cliente/sucursales*') }}">
                 <a href="{{ route('cliente.sucursales.index') }}" class="nav-link submenu">

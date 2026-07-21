@@ -82,10 +82,10 @@ class Index extends Component
             ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id');
 
         switch ($this->filter) {
-            case 'Activos':
+            case __('site.common.actives'):
                 $query->where('s.deleted_at', null);
                 break;
-            case 'Inactivos':
+            case __('site.common.inactives'):
                 $query->where('s.deleted_at', '!=', null);
                 break;
             default:

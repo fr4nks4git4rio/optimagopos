@@ -31,7 +31,7 @@ class SucursalPolicy
             if (
                 $user->is_admin
                 && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-                && in_array($sucursal->id, $user->suscripciones_activas->pluck('id')->toArray())
+                && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
@@ -65,7 +65,7 @@ class SucursalPolicy
             if (
                 $user->is_admin
                 && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-                && in_array($sucursal->id, $user->suscripciones_activas->pluck('id')->toArray())
+                && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
@@ -85,7 +85,7 @@ class SucursalPolicy
             if (
                 $user->is_admin
                 && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-                && in_array($sucursal->id, $user->suscripciones_activas->pluck('id')->toArray())
+                && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
@@ -105,7 +105,7 @@ class SucursalPolicy
             if (
                 $user->is_admin
                 && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-                && in_array($sucursal->id, $user->suscripciones_activas->pluck('id')->toArray())
+                && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
@@ -130,7 +130,7 @@ class SucursalPolicy
             if (
                 $user->is_admin
                 && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-                && in_array($sucursal->id, $user->suscripciones_activas->pluck('id')->toArray())
+                && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
@@ -146,7 +146,7 @@ class SucursalPolicy
             if (
                 $user->is_admin
                 && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-                && in_array($sucursal->id, $user->suscripciones_activas->pluck('id')->toArray())
+                && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;

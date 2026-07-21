@@ -39,13 +39,13 @@
     </div>
     <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold">DELETES</p>
+            <p class="fs-5 fw-bold text-uppercase">{{__('site.dashboard.deletes')}}</p>
             <p class="fs-3 text-danger m-auto">{{ max($resumenData['deletes'], 0) }}</p>
         </div>
     </div>
     <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold">CANCELS</p>
+            <p class="fs-5 fw-bold text-uppercase">{{__('site.dashboard.cancels')}}</p>
             <p class="fs-3 text-danger m-auto">{{ max($resumenData['cancels'], 0) }}</p>
         </div>
     </div>
@@ -322,7 +322,7 @@
                         {{ $resumenData['ultimo_ticket']['empleado'] ? Illuminate\Support\Facades\Crypt::decrypt($resumenData['ultimo_ticket']['empleado']) : '' }}
                     </p>
                     <p class="fs-5 text-center">
-                        {{ __('site.dashboard.status') }}: <span class="badge bg-success-subtle text-success">OK</span>
+                        {{ __('site.dashboard.status') }}: <span class="badge bg-success-subtle text-success">{{ __('site.dashboard.ok') }}</span>
                     </p>
                 </div>
             </div>

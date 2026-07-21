@@ -157,7 +157,7 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
     Route::middleware(['hasRole:2'])->prefix('cliente')->group(function () {
         Route::get('/usuarios', IndexUsuarios::class)->name('cliente.usuarios.index');
         Route::get('/trazas', IndexTrazas::class)->name('cliente.trazas.index');
-        Route::get('/comensales', IndexComensales::class)->name('cliente.comensales.index');
+        // Route::get('/comensales', IndexComensales::class)->name('cliente.comensales.index');
         Route::get('/sucursales', IndexSucursales::class)->name('cliente.sucursales.index');
         Route::get('/terminales', IndexTerminales::class)->name('cliente.terminales.index');
 
