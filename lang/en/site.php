@@ -218,7 +218,7 @@ return [
         'net_sale_by_payment_form' => 'Net Sales by Payment Method',
         'quantity_by_payment_form' => 'Quantity by Payment Method',
         'dominant_method' => 'Dominant Method',
-        'payments_form' => 'Payment Methods',
+        'payment_forms' => 'Payment Methods',
         'sales_behavior' => 'Payment Behavior',
         'hourly_payments' => 'Payments by hour',
         'influence' => 'Influence',

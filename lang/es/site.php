@@ -218,7 +218,7 @@ return [
         'net_sale_by_payment_form' => 'Venta Neta por Formas de Pago',
         'quantity_by_payment_form' => 'Cantidad por Formas de Pago',
         'dominant_method' => 'Método Dominante',
-        'payments_form' => 'Formas de Pago',
+        'payment_forms' => 'Formas de Pago',
         'sales_behavior' => 'Comportamiento de Pagos',
         'hourly_payments' => 'Pagos por hora',
         'influence' => 'Influencia',

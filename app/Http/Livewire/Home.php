@@ -99,19 +99,20 @@ class Home extends Component
     public $queryString = [
         'tab',
         'seccion' => ['except' => null],
-        'fecha_inicio' => ['except' => null],
-        'fecha_fin' => ['except' => null],
+        'fecha_inicio',
+        'fecha_fin',
         'sucursales_query' => ['except' => null],
         'terminales_query' => ['except' => null],
     ];
 
     public function mount()
     {
+        $input = request()->input();
         $this->tab = in_array($this->tab, ['foh', 'boh']) ? $this->tab : 'foh';
         $this->seccion = $this->seccion ?? 'resumen';
-        $this->fecha_inicio ??= today()->format('Y-m-d');
-        $this->fecha_fin ??= today()->format('Y-m-d');
-        
+        $this->fecha_inicio = !key_exists('fecha_inicio', $input) ? today()->format('Y-m-d') : $input['fecha_inicio'];
+        $this->fecha_fin = !key_exists('fecha_fin', $input) ? today()->format('Y-m-d') : $input['fecha_fin'];
+
         $this->monedas = DB::table('tb_monedas')->whereNull('deleted_at')->pluck('acronimo', 'id');
 
         if ($this->sucursales_query) {

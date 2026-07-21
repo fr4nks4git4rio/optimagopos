@@ -78,23 +78,23 @@
                     <div class="tab-pane fade @if ($tab == 'foh') show active @endif p-2"
                         id="foh-tab-pane" role="tabpanel" aria-labelledby="foh-tab" tabindex="0">
                         <div class="row justify-content-start gap-3 px-3 mb-3">
-                            <a href="{{ route('home', ['seccion' => 'resumen', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                            <a href="{{ route('home', ['seccion' => 'resumen', 'fecha_inicio' => $fecha_inicio ?? '', 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
                                 class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'resumen') active @endif">
                                 {{ __('site.dashboard.summary') }}
                             </a>
-                            <a href="{{ route('home', ['seccion' => 'operaciones', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                            <a href="{{ route('home', ['seccion' => 'operaciones', 'fecha_inicio' => $fecha_inicio ?? '', 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
                                 class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'operaciones') active @endif">
                                 {{ __('site.dashboard.operations') }}
                             </a>
-                            <a href="{{ route('home', ['seccion' => 'productos', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                            <a href="{{ route('home', ['seccion' => 'productos', 'fecha_inicio' => $fecha_inicio ?? '', 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
                                 class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'productos') active @endif">
                                 {{ __('site.dashboard.products') }}
                             </a>
-                            <a href="{{ route('home', ['seccion' => 'pagos', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                            <a href="{{ route('home', ['seccion' => 'pagos', 'fecha_inicio' => $fecha_inicio ?? '', 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
                                 class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'pagos') active @endif">
                                 {{ __('site.dashboard.payments') }}
                             </a>
-                            <a href="{{ route('home', ['seccion' => 'correcciones', 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
+                            <a href="{{ route('home', ['seccion' => 'correcciones', 'fecha_inicio' => $fecha_inicio ?? '', 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
                                 class="btn btn-outline-site-primary bt-lg w-auto @if ($seccion == 'correcciones') active @endif">
                                 {{ __('site.dashboard.corrections') }}
                             </a>
