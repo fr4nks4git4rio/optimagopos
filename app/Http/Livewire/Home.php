@@ -408,8 +408,8 @@ class Home extends Component
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id)
-                            ->whereNotNull('tp.producto_id');
+                            ->whereNotNull('tp.producto_id')
+                            ->where('sucursal.cliente_id', user()->cliente_id);
 
                         $articulos_vencidos_q = $this->commonWhere($articulos_vencidos_q);
                         $this->productosData['articulos_vendidos'] = $articulos_vencidos_q->value('cantidad');
