@@ -233,7 +233,7 @@ class Home extends Component
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->join('tb_terminales as terminal', 'terminal.id', '=', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
-                            ->whereNotNull('producto_id');
+                            ->whereNotNull('tp.producto_id');
 
                         $articulos_vendidos_q = $this->commonWhere($articulos_vendidos_q);
                         $this->resumenData['articulos_vendidos'] = $articulos_vendidos_q->value('cantidad');
@@ -408,7 +408,8 @@ class Home extends Component
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id);
+                            ->where('sucursal.cliente_id', user()->cliente_id)
+                            ->whereNotNull('tp.producto_id');
 
                         $articulos_vencidos_q = $this->commonWhere($articulos_vencidos_q);
                         $this->productosData['articulos_vendidos'] = $articulos_vencidos_q->value('cantidad');
@@ -419,6 +420,7 @@ class Home extends Component
                             ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
+                            ->whereNotNull('tp.producto_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
                             ->groupBy('p.nombre')
                             ->orderByDesc('cantidad');
@@ -433,6 +435,7 @@ class Home extends Component
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
+                            ->whereNotNull('tp.producto_id')
                             ->groupBy('p.nombre')
                             ->orderByDesc('presencia');
 
@@ -446,6 +449,7 @@ class Home extends Component
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
+                            ->whereNotNull('tp.producto_id')
                             ->groupBy('p.nombre')
                             ->orderByDesc('ingreso');
 
@@ -459,6 +463,7 @@ class Home extends Component
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
+                            ->whereNotNull('tp.producto_id')
                             ->groupBy('p.nombre')
                             ->orderByDesc('cantidad');
 
@@ -473,6 +478,7 @@ class Home extends Component
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
+                            ->whereNotNull('tp.producto_id')
                             ->groupBy('p.nombre')
                             ->orderByDesc('ingreso');
 
