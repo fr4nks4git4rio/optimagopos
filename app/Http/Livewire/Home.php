@@ -219,8 +219,8 @@ class Home extends Component
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id)
-                            ->where('tp.precio', '>', 0);
+                            ->where('sucursal.cliente_id', user()->cliente_id);
+                            // ->where('tp.precio', '>', 0);
 
                         $ventas_totales_q = $this->commonWhere($ventas_totales_q);
                         $this->resumenData['ventas_totales'] = $ventas_totales_q->value('total');
