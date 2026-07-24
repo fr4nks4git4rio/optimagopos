@@ -206,7 +206,7 @@
                                             <th style="width: 70px">Tip</th>
                                             <th>Discount</th>
                                             <th>DepartmentId</th>
-                                            <th>{{__('site.common.actions')}}</th>
+                                            <th>{{ __('site.common.actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -216,6 +216,7 @@
                                                     <select class="form-select form-select-sm"
                                                         wire:model="items.{{ $index }}.Type">
                                                         <option value="Product">Product</option>
+                                                        <option value="Department">Department</option>
                                                         <option value="Tender">Tender</option>
                                                         <option value="Correction">Correction</option>
                                                         <option value="Tax">Tax</option>

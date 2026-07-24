@@ -222,7 +222,6 @@ class HomeController
             foreach ($items as $item) {
                 $type = $item['Type'] ?? 'Product';
 
-
                 if ($type === 'Tax') {
                     if (!isset($item['Name']) || !isset($item['Amount'])) {
                         ModelsLog::create([
@@ -381,6 +380,58 @@ class HomeController
                     $importe += $amount - $discount;
 
                     $prevProduct = $producto;
+                }
+
+                if ($type === 'Department') {
+                    if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        ModelsLog::create([
+                            'log' => 'Propiedad no recibida en ítem Department. Propiedades esperadas: Id, Name, Amount y Qty.',
+                            'data' => $decoded ? json_encode($decoded) : '',
+                            'status' => 400,
+                            'sucursal_id' => $terminal->sucursal_id
+                        ]);
+                        Cuarentena::create([
+                            'texto' => 'Propiedad no recibida en ítem Department. Propiedades esperadas: Id, Name, Amount y Qty.',
+                            'ip' => $request->ip(),
+                            'data' => $decoded ? json_encode($decoded) : '',
+                            'terminal_id' => $terminal->id,
+                            'sucursal_id' => $terminal->sucursal_id,
+                            'cliente_id' => $terminal->sucursal->cliente_id,
+                            'es_vk' => 0
+                        ]);
+                        DB::rollBack();
+                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Department'], 400);
+                    }
+
+                    $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
+                        ->where('id_departamento', $item['Id'])
+                        ->first();
+                    if (!$departamento) {
+                        $departamento = Departamento::create([
+                            'id_departamento' => $item['Id'],
+                            'nombre' => $item['Name'],
+                            'sucursal_id' => $terminal->sucursal_id
+                        ]);
+                    }
+
+                    $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
+                    $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
+                    $discount = $item['Discount'] ? (float)$item['Discount'] : 0;
+                    $ticketDepartamento = TicketProducto::where('ticket_id', $ticket->id)->where('departamento_id', $departamento->id)->whereNull('producto_id')->first();
+                    if (!$ticketDepartamento) {
+                        $ticketDepartamento = new TicketProducto();
+                        $ticketDepartamento->ticket_id = $ticket->id;
+                        $ticketDepartamento->departamento_id = $departamento->id;
+                        $ticketDepartamento->precio = 0;
+                        $ticketDepartamento->cantidad = 0;
+                        $ticketDepartamento->descuento = 0;
+                    }
+                    $ticketDepartamento->precio += $amount;
+                    $ticketDepartamento->cantidad += $qty;
+                    $ticketDepartamento->descuento += $discount;
+                    $ticketDepartamento->save();
+
+                    $importe += $amount - $discount;
                 }
 
                 if ($type === 'Correction') {

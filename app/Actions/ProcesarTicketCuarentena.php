@@ -228,7 +228,7 @@ class ProcesarTicketCuarentena
                         ]);
                     }
                     $departamento = null;
-                    if($item['DepartmentId']){
+                    if ($item['DepartmentId']) {
                         $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
                             ->where('id_departamento', $item['DepartmentId'])
                             ->first();
@@ -262,6 +262,46 @@ class ProcesarTicketCuarentena
                     $importe += $amount - $discount;
 
                     $prevProduct = $producto;
+                }
+
+                if ($type === 'Department') {
+                    if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        $this->registro->update([
+                            'texto' => 'Propiedad no recibida en ítem Department. Propiedades esperadas: Id, Name, Amount y Qty.'
+                        ]);
+                        DB::rollBack();
+                        return false;
+                    }
+
+                    $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
+                        ->where('id_departamento', $item['Id'])
+                        ->first();
+                    if (!$departamento) {
+                        $departamento = Departamento::create([
+                            'id_departamento' => $item['Id'],
+                            'nombre' => $item['Name'],
+                            'sucursal_id' => $terminal->sucursal_id
+                        ]);
+                    }
+
+                    $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
+                    $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
+                    $discount = $item['Discount'] ? (float)$item['Discount'] : 0;
+                    $ticketDepartamento = TicketProducto::where('ticket_id', $ticket->id)->where('departamento_id', $departamento->id)->whereNull('producto_id')->first();
+                    if (!$ticketDepartamento) {
+                        $ticketDepartamento = new TicketProducto();
+                        $ticketDepartamento->ticket_id = $ticket->id;
+                        $ticketDepartamento->departamento_id = $departamento->id;
+                        $ticketDepartamento->precio = 0;
+                        $ticketDepartamento->cantidad = 0;
+                        $ticketDepartamento->descuento = 0;
+                    }
+                    $ticketDepartamento->precio += $amount;
+                    $ticketDepartamento->cantidad += $qty;
+                    $ticketDepartamento->descuento += $discount;
+                    $ticketDepartamento->save();
+
+                    $importe += $amount - $discount;
                 }
 
                 if ($type === 'Correction') {
