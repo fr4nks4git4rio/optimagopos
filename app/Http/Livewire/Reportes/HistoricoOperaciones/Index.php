@@ -103,7 +103,7 @@ class Index extends Component
                 DB::raw("DATE_FORMAT(t.fecha_transaccion, '%d/%m/%Y %H:%i') as fecha_transaccion_str"),
                 'c.razon_social as cliente',
                 's.razon_social as sucursal',
-                'ter.identificador as terminal',
+                'ter.nombre as terminal',
                 'e.nombre as empleado',
                 't.importe',
                 DB::raw("(SELECT GROUP_CONCAT(CONCAT(p.nombre, ' (', tp.cantidad, ')')) from tb_ticket_productos as tp left join tb_productos as p on p.id = tp.producto_id where tp.ticket_id = t.id) as productos"),
