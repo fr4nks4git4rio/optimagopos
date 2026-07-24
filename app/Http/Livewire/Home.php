@@ -429,13 +429,13 @@ class Home extends Component
                         $this->productosData['producto_estrella'] = $producto_estrella_q->first()->nombre ?? '';
 
                         $mas_popular_q = DB::table('tb_ticket_productos as tp')
-                            ->select('p.nombre', DB::raw("COUNT(DISTINCT tp.ticket_id) as presencia"))
+                            ->select('p.nombre', DB::raw("COUNT(DISTINCT tp.producto_id) as presencia"))
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id)
                             ->whereNotNull('tp.producto_id')
+                            ->where('sucursal.cliente_id', user()->cliente_id)
                             ->groupBy('p.nombre')
                             ->orderByDesc('presencia');
 
@@ -448,8 +448,8 @@ class Home extends Component
                             ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id)
                             ->whereNotNull('tp.producto_id')
+                            ->where('sucursal.cliente_id', user()->cliente_id)
                             ->groupBy('p.nombre')
                             ->orderByDesc('ingreso');
 
