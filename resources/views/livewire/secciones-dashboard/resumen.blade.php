@@ -317,7 +317,7 @@
                         - {{ __('site.dashboard.time') }}:
                         {{ Illuminate\Support\Carbon::parse($resumenData['ultimo_ticket']['fecha_transaccion'])->format('H:i:s') }}
                     </p>
-                    <p class="fs-5 text-center">{{ __('site.dashboard.dlpos') }}: {{ $resumenData['ultimo_ticket']['id_pos'] }}
+                    <p class="fs-5 text-center">{{ __('site.dashboard.dlpos') }}: {{ $resumenData['ultimo_ticket']['nombre'] }}
                         - {{ __('site.dashboard.cashier') }}:
                         {{ $resumenData['ultimo_ticket']['empleado'] ? Illuminate\Support\Facades\Crypt::decrypt($resumenData['ultimo_ticket']['empleado']) : '' }}
                     </p>

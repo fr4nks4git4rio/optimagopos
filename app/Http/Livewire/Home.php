@@ -295,7 +295,7 @@ class Home extends Component
                         $this->resumenData['grafica_actividad'] = $datos_grafica_actividad;
 
                         $ultimo_ticket_q = DB::table('tb_tickets as ticket')
-                            ->select('ticket.*', 'terminal.id_pos', 'empleado.nombre as empleado')
+                            ->select('ticket.*', 'terminal.nombre', 'empleado.nombre as empleado')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->leftJoin('tb_empleados as empleado', 'empleado.id', 'ticket.empleado_id')
