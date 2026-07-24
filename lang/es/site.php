@@ -187,6 +187,7 @@ return [
         'corrections' => 'Corrections',
         'net_sale' => 'Venta Neta',
         'total_sale' => 'Venta Total',
+        'department_sale' => 'Ventas por Departamento',
         'multi_currency' => 'Multimoneda',
         'items_sold' => 'Arículos Vendidos',
         'amount_refunded' => 'Importe Devuelto',

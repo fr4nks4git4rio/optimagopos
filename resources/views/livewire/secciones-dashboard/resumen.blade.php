@@ -7,14 +7,14 @@
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale') }}</span>
-            <span class="fs-3  text-primary">${{ number_format(max($resumenData['ventas_netas'], 0), 2) }}</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.total_sale') }}</span>
+            <span class="fs-3 text-primary">${{ number_format(max($resumenData['ventas_totales'], 0), 2) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.total_sale') }}</span>
-            <span class="fs-3 text-primary">${{ number_format(max($resumenData['ventas_totales'], 0), 2) }}</span>
+            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.department_sale') }}</span>
+            <span class="fs-3  text-primary">${{ number_format(max($resumenData['ventas_departamento'], 0), 2) }}</span>
         </div>
     </div>
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">

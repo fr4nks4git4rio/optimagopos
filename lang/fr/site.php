@@ -187,6 +187,7 @@ return [
         'corrections' => 'Corrections',
         'net_sale' => 'Vente Nette',
         'total_sale' => 'Vente Totale',
+        'department_sale' => 'Ventes par Rayon',
         'multi_currency' => 'Multidevise',
         'items_sold' => 'Articles Vendus',
         'amount_refunded' => 'Montant Remboursé',
