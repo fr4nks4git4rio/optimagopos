@@ -10,22 +10,22 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
- * Class Departamento
+ * Class UbicacionVk
  * @package App\Models
  * @version January 12, 2021, 7:46 pm CST
  *
- * @property integer $id_departamento
+ * @property integer $id_ubicacion
  * @property string $nombre
  * @property integer $sucursal_id
  */
-class Departamento extends Model
+class UbicacionVk extends Model
 {
     use LogsActivity, SoftDeletes;
 
-    public $table = 'tb_departamentos';
+    public $table = 'tb_ubicaciones_vk';
 
     public $fillable = [
-        'id_departamento',
+        'id_ubicacion',
         'nombre',
         'sucursal_id'
     ];
@@ -37,7 +37,7 @@ class Departamento extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'id_departamento' => 'string',
+        'id_ubicacion' => 'string',
         'nombre' => 'string',
         'sucursal_id' => 'integer'
     ];
@@ -51,15 +51,15 @@ class Departamento extends Model
             ->logFillable()
             ->setDescriptionForEvent(function (string $eventName) {
                 return match ($eventName) {
-                    'created' => 'El Departamento ha sido creado.',
-                    'updated' => 'El Departamento ha sido actualizado.',
-                    'deleted' => 'El Departamento ha sido eliminado.',
-                    'restored' => 'El Departamento ha sido restaurado.',
-                    'forceDeleted' => 'El Departamento ha sido eliminado permanentemente.',
+                    'created' => 'La Ubicación Video Kitchen ha sido creado.',
+                    'updated' => 'La Ubicación Video Kitchen ha sido actualizado.',
+                    'deleted' => 'La Ubicación Video Kitchen ha sido eliminado.',
+                    'restored' => 'La Ubicación Video Kitchen ha sido restaurado.',
+                    'forceDeleted' => 'La Ubicación Video Kitchen ha sido eliminado permanentemente.',
                     default => $eventName,
                 };
             })
-            ->useLogName('Departamentos')
+            ->useLogName('Ubicaciones Video Kitchen')
             ->logExcept(['created_at', 'updated_at', 'deleted_at'])
             ->logOnlyDirty(); // Registra solo los campos que han cambiado
     }
@@ -72,7 +72,7 @@ class Departamento extends Model
     public function rules()
     {
         return [
-            'id_departamento' => ['required'],
+            'id_ubicacion' => ['required'],
             'nombre' => 'nullable',
             'sucursal_id' => ['required', 'exists:tb_sucursales,id']
         ];
@@ -81,7 +81,7 @@ class Departamento extends Model
     public function messages()
     {
         return [
-            'id_departamento.required' => 'Campo requerido.',
+            'id_ubicacion.required' => 'Campo requerido.',
             'nombre.required' => 'Campo requerido.',
             'sucursal_id.required' => 'Campo requerido',
             'sucursal_id.exists' => 'Sucursal no encontrado',

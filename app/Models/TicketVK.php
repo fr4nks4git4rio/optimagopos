@@ -26,7 +26,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property integer $empleado_id
  * @property integer $sucursal_id
  * @property integer $terminal_id
- * @property integer $departamento_id
+ * @property integer $ubicacion_id
  */
 class TicketVK extends Model
 {
@@ -47,7 +47,7 @@ class TicketVK extends Model
         'empleado_id',
         'sucursal_id',
         'terminal_id',
-        'departamento_id',
+        'ubicacion_id',
     ];
 
     /**
@@ -68,7 +68,7 @@ class TicketVK extends Model
         'empleado_id' => 'integer',
         'sucursal_id' => 'integer',
         'terminal_id' => 'integer',
-        'departamento_id' => 'integer',
+        'ubicacion_id' => 'integer',
     ];
 
     /**
@@ -93,9 +93,9 @@ class TicketVK extends Model
             ->logOnlyDirty(); // Registra solo los campos que han cambiado
     }
 
-    public function Departamento()
+    public function Ubicacion()
     {
-        return $this->belongsTo(Departamento::class);
+        return $this->belongsTo(UbicacionVk::class, 'ubicacion_id');
     }
     public function empleado()
     {

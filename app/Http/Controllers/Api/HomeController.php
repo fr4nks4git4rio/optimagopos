@@ -18,15 +18,9 @@ use App\Models\Ticket;
 use App\Models\TicketProducto;
 use App\Models\TicketProductoCorreccion;
 use App\Models\TicketVK;
-use App\Models\TipoCambio;
-use App\Models\User;
-use App\Models\Ventas\OrdenServicio;
-use App\Models\Ventas\OrdenServicioEvidencia;
-use App\Models\Ventas\OrdenServicioImagen;
-use App\Notifications\SiteNotification;
+use App\Models\UbicacionVk;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Facades\Crypt;
@@ -614,14 +608,14 @@ class HomeController
                 }
             }
 
-            $departamento = null;
+            $ubicacion = null;
             if ($data['LocationId']) {
-                $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
-                    ->where('id_departamento', $data['LocationId'])
+                $ubicacion = UbicacionVk::where('sucursal_id', $terminal->sucursal_id)
+                    ->where('id_ubicacion', $data['LocationId'])
                     ->first();
-                if (!$departamento) {
-                    $departamento = Departamento::create([
-                        'id_departamento' => $data['LocationId'],
+                if (!$ubicacion) {
+                    $ubicacion = UbicacionVk::create([
+                        'id_ubicacion' => $data['LocationId'],
                         'nombre' => $data['location'],
                         'sucursal_id' => $terminal->sucursal_id
                     ]);
@@ -640,7 +634,7 @@ class HomeController
                 'empleado_id' => $empleado?->id,
                 'sucursal_id' => $terminal->sucursal_id,
                 'terminal_id' => $terminal->id,
-                'departamento_id' => $departamento?->id,
+                'ubicacion_id' => $ubicacion?->id,
             ]);
 
             $items = $data['items'] ?? [];

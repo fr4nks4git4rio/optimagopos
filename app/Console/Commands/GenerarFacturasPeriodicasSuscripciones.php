@@ -4,20 +4,10 @@ namespace App\Console\Commands;
 
 use App\Models\ClaveProdServ;
 use App\Models\Cliente;
-use App\Models\Departamento;
-use App\Models\Empleado;
 use App\Models\Factura;
-use App\Models\Log;
-use App\Models\Producto;
 use App\Models\Suscripcion;
-use App\Models\Terminal;
-use App\Models\Ticket;
-use App\Models\TicketProducto;
-use App\Models\TicketProductoCorreccion;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
 class GenerarFacturasPeriodicasSuscripciones extends Command
