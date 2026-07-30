@@ -495,8 +495,9 @@ class Home extends Component
                             ->get()->pluck('ingreso', 'nombre');
                         break;
                     case 'pagos':
-                        $ventas_netas_q = DB::table('tb_tickets as ticket')
-                            ->selectRaw("SUM(ticket.importe) as total")
+                        $ventas_netas_q = DB::table('tb_ticket_operaciones as to')
+                            ->selectRaw("SUM(ROUND(to.monto, 2)) as total")
+                            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id);
