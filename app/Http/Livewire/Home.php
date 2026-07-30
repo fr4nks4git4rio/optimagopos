@@ -190,7 +190,17 @@ class Home extends Component
 
                 switch ($this->seccion) {
                     case 'resumen':
-                        $resumen1_q = DB::table('tb_ticket_productos as tp')
+                        $operaciones_q = DB::table('tb_ticket_operaciones as to')
+                            ->select('to.*')
+                            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                            ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                            ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
+                            ->where('sucursal.cliente_id', user()->cliente_id);
+
+                        $operaciones_q = $this->commonWhere($operaciones_q);
+                        $this->resumenData['operaciones'] = $operaciones_q->count();
+
+                        $ventas_departamento_q = DB::table('tb_ticket_productos as tp')
                             ->selectRaw("SUM(tp.precio) as total")
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
@@ -198,10 +208,9 @@ class Home extends Component
                             ->where('sucursal.cliente_id', user()->cliente_id)
                             ->whereNull('tp.producto_id');
 
-                        $resumen1_q = $this->commonWhere($resumen1_q);
-                        $resumen1 = $resumen1_q->first();
-                        $this->resumenData['operaciones'] = $resumen1->cantidad ?? 0;
-                        $ventas_departamento = $resumen1->total ?? 0;
+                        $ventas_departamento_q = $this->commonWhere($ventas_departamento_q);
+                        $ventas_departamento = $ventas_departamento_q->first();
+                        $this->resumenData['ventas_departamento'] = $ventas_departamento->total ?? 0;
 
                         $importes_devueltos_q = DB::table('tb_ticket_producto_correcciones as tpc')
                             ->selectRaw("SUM(tpc.precio) as total")
@@ -214,7 +223,6 @@ class Home extends Component
                         $importes_devueltos_q = $this->commonWhere($importes_devueltos_q);
                         $importes_devueltos = $importes_devueltos_q->value('total') ?? 0;
                         $this->resumenData['importes_devueltos'] = abs($importes_devueltos);
-                        $this->resumenData['ventas_departamento'] = $ventas_departamento;
 
                         $ventas_totales_q = DB::table('tb_ticket_productos as tp')
                             ->selectRaw('SUM(tp.precio) as total')
