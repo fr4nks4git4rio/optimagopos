@@ -584,9 +584,21 @@ class HomeController
 
         $ticket_vk = TicketVK::where('terminal_id', $terminal->id)->where('id_transaccion', $decoded['Data']['orderNumber'])->first();
         if ($ticket_vk) {
-            $ticket_vk->update([
+            $update = [
                 'estado' => $decoded['Data']['OrderStatus']
-            ]);
+            ];
+            switch ($decoded['Data']['OrderStatus']) {
+                case 2:
+                    $update['fecha_en_proceso'] = now();
+                    break;
+                case 3:
+                    $update['fecha_termninado'] = now();
+                    break;
+                case 4:
+                    $update['fecha_demorado'] = now();
+                    break;
+            }
+            $ticket_vk->update($update);
             return response()->json(['success' => true]);
         }
 
