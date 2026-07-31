@@ -17,12 +17,14 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property string $mesa
  * @property string $asiento
  * @property string $fecha_transaccion
+ * @property string $fecha_en_proceso
+ * @property string $fecha_demorado
+ * @property string $fecha_terminado
  * @property integer $estado
  * @property string $id_transaccion
  * @property string $pos_ip
  * @property float $tiempo_resolver
  * @property float $porciento_alerta_estado
- * @property boolean $tuvo_demora
  * @property integer $empleado_id
  * @property integer $sucursal_id
  * @property integer $terminal_id
@@ -38,12 +40,14 @@ class TicketVK extends Model
         'mesa',
         'asiento',
         'fecha_transaccion',
+        'fecha_en_proceso',
+        'fecha_demorado',
+        'fecha_terminado',
         'estado',
         'id_transaccion',
         'pos_ip',
         'tiempo_resolver',
         'porciento_alerta_estado',
-        'tuvo_demora',
         'empleado_id',
         'sucursal_id',
         'terminal_id',
@@ -59,12 +63,14 @@ class TicketVK extends Model
         'mesa' => 'string',
         'asiento' => 'string',
         'fecha_transaccion' => 'string',
+        'fecha_en_proceso' => 'string',
+        'fecha_demorado' => 'string',
+        'fecha_terminado' => 'string',
         'estado' => 'integer',
         'id_transaccion' => 'string',
         'pos_ip' => 'string',
         'tiempo_resolver' => 'float',
         'porciento_alerta_estado' => 'float',
-        'tuvo_demora' => 'boolean',
         'empleado_id' => 'integer',
         'sucursal_id' => 'integer',
         'terminal_id' => 'integer',

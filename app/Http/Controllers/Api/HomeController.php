@@ -585,8 +585,7 @@ class HomeController
         $ticket_vk = TicketVK::where('terminal_id', $terminal->id)->where('id_transaccion', $decoded['Data']['orderNumber'])->first();
         if ($ticket_vk) {
             $ticket_vk->update([
-                'estado' => $decoded['Data']['OrderStatus'],
-                'tuvo_demora' => (((int)$decoded['Data']['OrderStatus']) == 4) ? 1 : $ticket_vk->tuvo_demora
+                'estado' => $decoded['Data']['OrderStatus']
             ]);
             return response()->json(['success' => true]);
         }
