@@ -76,7 +76,7 @@ class ProcesarTicketVkCuarentena
         if ($ticket_vk) {
             $ticket_vk->update([
                 'estado' => $decoded['Data']['OrderStatus'],
-                'fecha_transaccion' => $decoded['Data']['timestamp']
+                'fecha_transaccion' => parse_fecha_espanol($decoded['Data']['timestamp'])->format('Y-m-d H:i:s')
             ]);
             return true;
         }
@@ -114,7 +114,7 @@ class ProcesarTicketVkCuarentena
             $ticketVK = TicketVK::create([
                 'mesa' => isset($data['table']) && $data['table'] ? $data['table'] : '',
                 'asiento' => isset($data['seat']) && $data['seat'] ? $data['seat'] : '',
-                'fecha_transaccion' => $data['timestamp'],
+                'fecha_transaccion' => parse_fecha_espanol($data['timestamp'])->format('Y-m-d H:i:s'),
                 'estado' => $data['OrderStatus'],
                 'id_transaccion' => $data['orderNumber'],
                 'pos_ip' => $data['PosIpAddress'],

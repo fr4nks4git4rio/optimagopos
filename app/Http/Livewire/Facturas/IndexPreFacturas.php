@@ -119,6 +119,7 @@ class IndexPreFacturas extends Component
                 'factura.subtotal',
                 'factura.iva',
                 'factura.total',
+                'factura.es_complemento',
                 DB::raw("(SELECT GROUP_CONCAT(fc.descripcion SEPARATOR '
                 ') FROM tb_factura_conceptos as fc WHERE fc.factura_id = factura.id) as conceptos")
             )

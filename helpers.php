@@ -451,4 +451,45 @@ if (!function_exists('extraer_datos_fiscales')) {
             ][$status];
         }
     }
+
+    if (!function_exists('parse_fecha_espanol')) {
+        function parse_fecha_espanol(string $valor): Carbon
+        {
+            $meses = [
+                'ene' => 1,
+                'feb' => 2,
+                'mar' => 3,
+                'abr' => 4,
+                'may' => 5,
+                'jun' => 6,
+                'jul' => 7,
+                'ago' => 8,
+                'sep' => 9,
+                'oct' => 10,
+                'nov' => 11,
+                'dic' => 12,
+            ];
+
+            // Ej: "03 ago. 2026 Hora: 10:14 a. m."
+            preg_match(
+                '/(\d{1,2})\s+([a-záéíóú]+)\.?\s+(\d{4})\s+Hora:\s*(\d{1,2}):(\d{2})\s*(a\.\s?m\.|p\.\s?m\.)/iu',
+                $valor,
+                $m
+            );
+
+            [, $dia, $mesTexto, $anio, $hora, $minuto, $meridiano] = $m;
+
+            $mes  = $meses[mb_strtolower(rtrim($mesTexto, '.'))] ?? null;
+            $hora = (int) $hora;
+            $esPM = stripos($meridiano, 'p') === 0;
+
+            if ($esPM && $hora < 12) {
+                $hora += 12;
+            } elseif (!$esPM && $hora === 12) {
+                $hora = 0;
+            }
+
+            return Carbon::create((int) $anio, $mes, (int) $dia, $hora, (int) $minuto, 0);
+        }
+    }
 }

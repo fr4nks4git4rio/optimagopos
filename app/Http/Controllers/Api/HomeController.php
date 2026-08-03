@@ -589,13 +589,13 @@ class HomeController
             ];
             switch ($decoded['Data']['OrderStatus']) {
                 case 2:
-                    $update['fecha_en_proceso'] = now();
+                    $update['fecha_en_proceso'] = parse_fecha_espanol($decoded['Data']['timestamp'])->format('Y-m-d H:i:s');
                     break;
                 case 3:
-                    $update['fecha_termninado'] = now();
+                    $update['fecha_termninado'] = parse_fecha_espanol($decoded['Data']['timestamp'])->format('Y-m-d H:i:s');
                     break;
                 case 4:
-                    $update['fecha_demorado'] = now();
+                    $update['fecha_demorado'] = parse_fecha_espanol($decoded['Data']['timestamp'])->format('Y-m-d H:i:s');
                     break;
             }
             $ticket_vk->update($update);
@@ -636,7 +636,7 @@ class HomeController
             $ticketVK = TicketVK::create([
                 'mesa' => isset($data['table']) && $data['table'] ? $data['table'] : '',
                 'asiento' => isset($data['seat']) && $data['seat'] ? $data['seat'] : '',
-                'fecha_transaccion' => SupportCarbon::parse(Str::replace("Hora:", "", $data['timestamp'])),
+                'fecha_transaccion' => parse_fecha_espanol($data['timestamp'])->format('Y-m-d H:i:s'),
                 'estado' => $data['OrderStatus'],
                 'id_transaccion' => $data['orderNumber'],
                 'pos_ip' => $data['PosIpAddress'],

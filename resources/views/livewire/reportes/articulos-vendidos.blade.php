@@ -9,16 +9,28 @@
 
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
-    <div class="row mb-1">
-        <div class="col-sm-2">
-            <x-input label="Fecha Inicio" type="date" :lazy="true" model="fechaInicio" />
+    <div class="row justify-content-between">
+        <div class="row mb-1 col-md-10">
+            <div class="col-sm-2">
+                <x-input label="Fecha Inicio" type="date" :lazy="true" model="fechaInicio" />
+            </div>
+            <div class="col-sm-2">
+                <x-input label="Fecha Fin" type="date" :lazy="true" model="fechaFin" />
+            </div>
+            <div class="col-sm-8">
+                <x-select2-multiple label="Sucursal" placeholder="Seleccione..." class="form-control" :options="$sucursalesAll"
+                    model="sucursal" :lazy="true" :dynamic="true" />
+            </div>
         </div>
-        <div class="col-sm-2">
-            <x-input label="Fecha Fin" type="date" :lazy="true" model="fechaFin" />
-        </div>
-        <div class="col-sm-8">
-            <x-select2-multiple label="Sucursal" placeholder="Seleccione..." class="form-control" :options="$sucursalesAll"
-                model="sucursal" :lazy="true" :dynamic="true" />
+        <div class="mb-1 col-md-2 text-end">
+            <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
+                <span class="bi bi-file-pdf"></span>
+                Imprimir
+            </button>
+            <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
+                <span class="bi bi-file-excel"></span>
+                Exportar
+            </button>
         </div>
     </div>
 
@@ -93,7 +105,7 @@
                     <div class="modal-body pb-0 text-center">
                         <div class="row">
                             <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
-                                height="500px"></iframe>
+                                style="width: 100%; height: 80dvh;"></iframe>
                         </div>
                     </div>
                     <div class="modal-footer">
