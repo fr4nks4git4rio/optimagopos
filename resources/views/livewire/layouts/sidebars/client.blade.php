@@ -1,7 +1,8 @@
 <li class="w-100 pb-2" :class="menu_absolute">
     <a href="#submenu_admin" data-bs-toggle="collapse" class="nav-link align-middle"
         @if ($this->admin_routes_active) aria-expanded="true" @endif>
-        <i class="bi bi-gear fs-6 float-end border border-2 border-dark" title="{{ __('site.sidebar.administration') }}"></i>
+        <i class="bi bi-gear fs-6 float-end border border-2 border-dark"
+            title="{{ __('site.sidebar.administration') }}"></i>
         <span class="ms-1 d-none text-uppercase fw-semibold fs-6" :class="display">
             {{ __('site.sidebar.administration') }}
         </span>
@@ -11,7 +12,8 @@
         @can('viewAny', [App\Models\User::class])
             <li class="w-100 li-item {{ active_route('cliente/usuarios*') }}">
                 <a href="{{ route('cliente.usuarios.index') }}" class="nav-link submenu">
-                    <i class="bi bi-person fs-6"></i> <span class="d-sm-inline px-2">{{ __('site.sidebar.users') }}</span></a>
+                    <i class="bi bi-person fs-6"></i> <span
+                        class="d-sm-inline px-2">{{ __('site.sidebar.users') }}</span></a>
             </li>
         @endcan
         @can('viewAny', [App\Models\Sucursal::class])
@@ -81,16 +83,30 @@
 <li class="w-100 pb-2" :class="menu_absolute">
     <a href="#submenu_reportes" data-bs-toggle="collapse" class="nav-link align-middle"
         @if ($this->reportes_routes_active) aria-expanded="true" @endif>
-        <i class="bi bi-file-earmark-code fs-6 float-end border border-2 border-dark" title="{{ __('site.sidebar.reports') }}"></i>
-        <span class="ms-1 d-none text-uppercase fw-semibold fs-6" :class="display"> {{ __('site.sidebar.reports') }}
+        <i class="bi bi-file-earmark-code fs-6 float-end border border-2 border-dark"
+            title="{{ __('site.sidebar.reports') }}"></i>
+        <span class="ms-1 d-none text-uppercase fw-semibold fs-6" :class="display">
+            {{ __('site.sidebar.reports') }}
         </span>
     </a>
     <ul class="collapse nav flex-column ms-1 @if ($this->reportes_routes_active) show @endif" :class="submenu_absolute"
         id="submenu_reportes" data-bs-parent="#submenu_reportes">
-        <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-periodo*') }}">
-            <a href="{{ route('cliente.reportes.ventas-periodo') }}" class="nav-link submenu">
+        <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-diarias*') }}">
+            <a href="{{ route('cliente.reportes.ventas-diarias') }}" class="nav-link submenu">
                 <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
-                    {{ __('site.sidebar.sales_by_period') }}
+                    {{ __('site.sidebar.daily_sales') }}
+                </span></a>
+        </li>
+        <li class="w-100 li-item {{ active_route('cliente/reportes/articulos-vendidos*') }}">
+            <a href="{{ route('cliente.reportes.articulos-vendidos') }}" class="nav-link submenu">
+                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                    {{ __('site.sidebar.articles_sold') }}
+                </span></a>
+        </li>
+        <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-operador*') }}">
+            <a href="{{ route('cliente.reportes.ventas-operador') }}" class="nav-link submenu">
+                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                    {{ __('site.sidebar.sales_by_operator') }}
                 </span></a>
         </li>
         <li class="w-100 li-item {{ active_route('cliente/reportes/productos-mas-vendidos*') }}">

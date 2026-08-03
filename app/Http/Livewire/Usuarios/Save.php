@@ -41,7 +41,6 @@ class Save extends Modal
 
     public function mount()
     {
-
         $this->avatar = isset($this->user) ? $this->user->avatar_uri : '';
         $this->email = isset($this->user) ? $this->user->email : '';
         $this->nombre = isset($this->user) ? $this->user->nombre : '';
@@ -110,6 +109,7 @@ class Save extends Modal
         $this->user->save();
 
         $this->emit('show-toast', __('site.users.save.user_saved'));
+
         $this->emit('$refresh');
         $this->emit('closeModal');
     }

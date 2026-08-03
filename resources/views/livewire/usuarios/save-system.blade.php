@@ -5,7 +5,7 @@
     </x-slot:title>
 
     <x-slot:content>
-        <div class="row" wire:init="init()">
+        <div class="row" wire:init="init">
             <div x-data="{ avatar_uploaded: false }" class="col-12 col-md-3 text-center mb-2"
                 x-on:livewire-upload-finish="avatar_uploaded=true;$wire.avatar_src = URL.createObjectURL(document.getElementById('avatar').files[0])">
                 <div class="card shadow-sm border-0">
@@ -52,16 +52,28 @@
                         @if (!in_array($rol_id, [1, 3]))
                             <div class="row mb-2">
                                 <div class="col-sm-6">
-                                    <x-select2-ajax-component-modals label="{{ __('site.users.save.client') }}"
-                                        placeholder="{{ __('site.common.select') }}" class="form-control"
-                                        url="{{ route('clientes.load-clientes') }}" model="cliente_id"
-                                        :dynamic="true" />
+                                    @if ($from_subscription)
+                                        <x-select2-component-modals label="{{ __('site.users.save.client') }}"
+                                            placeholder="{{ __('site.common.select') }}" class="form-control"
+                                            :options="$clientes" model="cliente_id" :dynamic="true" disabled />
+                                    @else
+                                        <x-select2-component-modals label="{{ __('site.users.save.client') }}"
+                                            placeholder="{{ __('site.common.select') }}" class="form-control"
+                                            :options="$clientes" model="cliente_id" :dynamic="true" />
+                                    @endif
                                 </div>
                                 <div class="col-sm-6">
-                                    <x-select2-multiple-component-modals
-                                        label="{{ __('site.users.save.subscriptions') }}"
-                                        placeholder="{{ __('site.common.select') }}" :options="$suscripcionesAll"
-                                        class="form-control" model="suscripciones" :dynamic="true" />
+                                    @if ($from_subscription)
+                                        <x-select2-multiple-component-modals
+                                            label="{{ __('site.users.save.subscriptions') }}"
+                                            placeholder="{{ __('site.common.select') }}" :options="$suscripcionesAll"
+                                            class="form-control" model="suscripciones" :dynamic="true" disabled />
+                                    @else
+                                        <x-select2-multiple-component-modals
+                                            label="{{ __('site.users.save.subscriptions') }}"
+                                            placeholder="{{ __('site.common.select') }}" :options="$suscripcionesAll"
+                                            class="form-control" model="suscripciones" :dynamic="true" />
+                                    @endif
                                 </div>
                             </div>
                         @endif

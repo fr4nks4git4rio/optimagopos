@@ -1,6 +1,6 @@
 <x-modal form-action="save">
     <x-slot:title>
-        {{ $sucursal->exists ? __('site.branches.save.create_branch') : __('site.branches.save.edit_branch') }}
+        {{ $sucursal->id ? __('site.branches.save.edit_branch') : __('site.branches.save.create_branch') }}
     </x-slot:title>
 
     <x-slot:content>
@@ -37,12 +37,12 @@
                     <div class="row mb-3">
                         <div class="col-md-6 col-12">
                             @if ($from_subscription)
-                                <x-select2-ajax-component-modals label="{{ __('site.branches.save.client') }}" placeholder="{{ __('site.common.select') }}..."
-                                    class="form-control" url="{{ route('clientes.load-clientes') }}" model="cliente_id"
+                                <x-select2-component-modals label="{{ __('site.branches.save.client') }}" placeholder="{{ __('site.common.select') }}..."
+                                    class="form-control" :options="$clientes" model="cliente_id"
                                     :dynamic="true" disabled />
                             @else
-                                <x-select2-ajax-component-modals label="{{ __('site.branches.save.client') }}" placeholder="{{__('site.common.select')}}..."
-                                    class="form-control" url="{{ route('clientes.load-clientes') }}" model="cliente_id"
+                                <x-select2-component-modals label="{{ __('site.branches.save.client') }}" placeholder="{{__('site.common.select')}}..."
+                                    class="form-control" :options="$clientes" model="cliente_id"
                                     :dynamic="true" />
                             @endif
                         </div>

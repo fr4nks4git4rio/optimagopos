@@ -1,4 +1,4 @@
-<div class="mb-3 grid-cols-5 sm:grid-cols-2 px-1">
+<div class="mb-3 grid-cols-5 px-1">
     <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
         <div class="card-body align-items-center d-flex flex-column">
             <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.operations') }}</p>

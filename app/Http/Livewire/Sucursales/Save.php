@@ -153,7 +153,17 @@ class Save extends Modal
 
     public function render()
     {
-        return view('livewire.sucursales.save');
+        return view(
+            'livewire.sucursales.save',
+            [
+                'clientes' => Cliente::where('es_cliente', 1)->get()->map(function ($element) {
+                    return [
+                        'value' => $element->id,
+                        'label' => Crypt::decrypt($element->label)
+                    ];
+                })->toArray(),
+            ]
+        );
     }
 
     public function getWithScopeProperty()
@@ -386,11 +396,11 @@ class Save extends Modal
             return;
         }
 
-        if ($this->cliente_id) {
-            $cliente = Cliente::find($this->cliente_id);
-            $nombre = Crypt::decrypt($cliente->nombre_comercial);
-            $this->dispatchBrowserEvent("set-data-cliente_id", ['data' => [['id' => $cliente->id, 'text' => $nombre]], 'term' => '', 'value' => $cliente->id]);
-        }
+        // if ($this->cliente_id) {
+        //     $cliente = Cliente::find($this->cliente_id);
+        //     $nombre = Crypt::decrypt($cliente->nombre_comercial);
+        //     $this->dispatchBrowserEvent("set-data-cliente_id", ['data' => [['id' => $cliente->id, 'text' => $nombre]], 'term' => '', 'value' => $cliente->id]);
+        // }
         if ($this->direccion_fiscal['estado_id']) {
             $estado = Estado::find($this->direccion_fiscal['estado_id']);
             $this->dispatchBrowserEvent("set-data-direccion_fiscal-estado_id", ['data' => [$estado->only('id', 'text')], 'term' => '', 'value' => $estado->id]);

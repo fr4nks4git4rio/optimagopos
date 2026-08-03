@@ -53,7 +53,14 @@ class GestionSuscripciones extends Component
     protected $queryString = [
         'clienteId' => ['except' => '']
     ];
-    protected $listeners = ['$refresh', 'sucursal-created' => 'AddSucursal', 'terminal-created' => 'AddTerminal', 'usuario-created' => 'AddUsuario', 'suscripcion-activated' => 'SuscripcionActivada', 'suscripcion-deactivated' => 'SuscripcionDesactivada'];
+    protected $listeners = [
+        '$refresh',
+        'sucursal-created' => 'AddSucursal',
+        'terminal-created' => 'AddTerminal',
+        'usuario-created' => 'AddUsuario',
+        'suscripcion-activated' => 'SuscripcionActivada',
+        'suscripcion-deactivated' => 'SuscripcionDesactivada'
+    ];
 
     protected function rules()
     {
@@ -169,6 +176,8 @@ class GestionSuscripciones extends Component
                 $this->cant_sucursales = $package->cant_sucursales;
                 $this->cant_terminales = $package->cant_terminales;
                 $this->cant_usuarios = $package->cant_usuarios;
+                $this->cant_meses_analitica_basica = $package->cant_meses_analitica_basica;
+                $this->cant_timbres = $package->cant_timbres;
                 $this->modulos = $package->modulos->pluck('id')->map(fn($id) => (string)$id)->toArray();
             }
         }
@@ -292,7 +301,7 @@ class GestionSuscripciones extends Component
     }
     public function incrementTimbres()
     {
-        $this->cant_timbres += 1;
+        $this->cant_timbres += 10;
         $this->calculatePricing();
     }
     public function incrementMesesAnaliticaBasica()
@@ -336,7 +345,7 @@ class GestionSuscripciones extends Component
         if ($this->paquete_id) {
             $paquete = Paquete::find($this->paquete_id);
             if ($this->cant_timbres > $paquete->cant_timbres)
-                $this->cant_timbres -= 1;
+                $this->cant_timbres -= 10;
         }
         $this->calculatePricing();
     }

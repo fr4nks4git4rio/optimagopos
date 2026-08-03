@@ -417,9 +417,9 @@
                                                 {{ count($sucursales) }}/{{ $cant_sucursales }}
                                             </span>
                                         </label>
-                                        @if (count($sucursales) < $cant_sucursales && $this->cliente_id && $this->can_edit_subscription)
+                                        @if (count($sucursales) < $cant_sucursales && $cliente_id && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
-                                                wire:click="$emit('openModal', 'sucursales.save', { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $this->cliente_id }}, from_subscription: true })">
+                                                wire:click="$emit('openModal', 'sucursales.save', { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $cliente_id }}, from_subscription: true })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif
@@ -471,9 +471,9 @@
                                                 {{ count($usuarios) }}/{{ $cant_usuarios }}
                                             </span>
                                         </label>
-                                        @if (count($usuarios) < $cant_usuarios && $this->can_edit_subscription)
+                                        @if (count($usuarios) < $cant_usuarios && $cliente_id && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
-                                                wire:click="$dispatch('abrirModalCreacion', { tipo: 'usuario', cliente_id: {{ $this->cliente->id ?? 'null' }} })">
+                                                wire:click="$emit('openModal', 'usuarios.save-system', { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $cliente_id }}, from_subscription: true })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif

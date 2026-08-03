@@ -46,25 +46,17 @@ use App\Http\Livewire\FacturasSistema\SaveComplemento as SaveComplementoSistema;
 use App\Http\Livewire\FacturasSistema\SaveNotaCredito as SaveNotaCreditoSistema;
 use App\Http\Livewire\FacturasSistema\CabeceraFactura as CabeceraFacturaSistema;
 use App\Http\Livewire\Reportes\HistoricoOperaciones\Index as IndexHistoricoOperaciones;
-use App\Http\Livewire\Reportes\VentasPeriodo;
 use App\Http\Livewire\Reportes\ProductosMasVendidos;
 use App\Http\Livewire\Reportes\Logs;
 use App\Http\Livewire\Reportes\Ingresos as ReporteIngresos;
 use App\Http\Livewire\TimbrarAutoFactura;
 use App\Http\Livewire\Auth\TwoFactorChallenge;
-use App\Jobs\SendEmailJob;
-use App\Models\Cliente;
-use App\Models\Cuarentena;
-use App\Models\Log;
-use App\Models\Suscripcion;
+use App\Http\Livewire\Reportes\ArticulosVendidos;
+use App\Http\Livewire\Reportes\VentasDiarias;
+use App\Http\Livewire\Reportes\VentasOperador;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use Illuminate\View\View;
 
 //use App\Http\Livewire\Cotizador\Catalogos\Productos\SaveV2 as SaveProductos;
 
@@ -173,7 +165,9 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
 
         Route::prefix('reportes')->group(function () {
 
-            Route::get('/ventas-periodo', VentasPeriodo::class)->name('cliente.reportes.ventas-periodo');
+            Route::get('/ventas-diarias', VentasDiarias::class)->name('cliente.reportes.ventas-diarias');
+            Route::get('/articulos-vendidos', ArticulosVendidos::class)->name('cliente.reportes.articulos-vendidos');
+            Route::get('/ventas-operador', VentasOperador::class)->name('cliente.reportes.ventas-operador');
             Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('cliente.reportes.productos-mas-vendidos');
             Route::get('/historico-operaciones', IndexHistoricoOperaciones::class)->name('cliente.reportes.historico-operaciones');
             Route::get('/logs', Logs::class)->name('cliente.reportes.logs');
