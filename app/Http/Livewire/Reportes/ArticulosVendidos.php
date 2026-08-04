@@ -130,9 +130,8 @@ class ArticulosVendidos extends Component
         }
 
         $sucursales = [];
-        $records = $query->get()->map(function ($value, $key) use (&$sucursales) {
+        $records = $query->get()->each(function ($value, $key) use (&$sucursales) {
             $sucursales[$value->sucursal_id] = Crypt::decrypt($value->sucursal);
-            return $value;
         });
 
         switch ($this->sort) {

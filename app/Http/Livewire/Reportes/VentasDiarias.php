@@ -136,11 +136,10 @@ class VentasDiarias extends Component
         }
 
         $formasPago = [];
-        $records = $query->get()->map(function ($value, $key) use (&$formasPago) {
+        $records = $query->get()->each(function ($value, $key) use (&$formasPago) {
             $value->sucursal = Crypt::decrypt($value->sucursal);
             if (isset($formasPago[$value->forma_pago_id]) == false)
                 $formasPago[$value->forma_pago_id] = $value->forma_pago_nombre;
-            return $value;
         });
 
         switch ($this->sort) {

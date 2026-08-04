@@ -1,48 +1,63 @@
-<div class="grid-cols-4 px-1 mb-3">
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale') }}</span>
-            <span class="fs-3 text-primary m-auto">${{ number_format(max($pagosData['ventas_netas'], 0), 2) }}</span>
+<div class="row g-3 mb-3 px-1">
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale') }}</span>
+                <span class="fs-3 text-primary m-auto">${{ number_format(max($pagosData['ventas_netas'], 0), 2) }}</span>
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale_by_payment_form') }}</span>
-            @if (count($pagosData['ventas_formas_pago']) == 0)
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
-                    {{ __('site.dashboard.no_data') }}
-                </div>
-            @endif
-            @foreach ($pagosData['ventas_formas_pago'] as $index => $venta_forma_pago)
-                <span class="fs-3 text-primary">${{ number_format(max($venta_forma_pago, 0), 2) }} -
-                    {{ $index }}</span>
-            @endforeach
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale_by_payment_form') }}</span>
+                @if (count($pagosData['ventas_formas_pago']) == 0)
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
+                        {{ __('site.dashboard.no_data') }}
+                    </div>
+                @endif
+                @foreach ($pagosData['ventas_formas_pago'] as $index => $venta_forma_pago)
+                    <span class="fs-3 text-primary">${{ number_format(max($venta_forma_pago, 0), 2) }} -
+                        {{ $index }}</span>
+                @endforeach
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.quantity_by_payment_form') }}</span>
-            @if (count($pagosData['cantidad_formas_pago']) == 0)
-                <div class="text-center py-4 text-muted">
-                    <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
-                    {{ __('site.dashboard.no_data') }}
-                </div>
-            @endif
-            @foreach ($pagosData['cantidad_formas_pago'] as $index => $cantidad_forma_pago)
-                <span class="fs-3 text-primary">{{ max($cantidad_forma_pago, 0) }} - {{ $index }}</span>
-            @endforeach
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.quantity_by_payment_form') }}</span>
+                @if (count($pagosData['cantidad_formas_pago']) == 0)
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
+                        {{ __('site.dashboard.no_data') }}
+                    </div>
+                @endif
+                @foreach ($pagosData['cantidad_formas_pago'] as $index => $cantidad_forma_pago)
+                    <span class="fs-3 text-primary">{{ max($cantidad_forma_pago, 0) }} - {{ $index }}</span>
+                @endforeach
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.dominant_method') }}</span>
-            <span class="fs-3 text-primary m-auto">{{ $pagosData['metodo_pago_dominante'] }}</span>
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.dominant_method') }}</span>
+                @if (!$pagosData['metodo_pago_dominante'])
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
+                        {{ __('site.dashboard.no_data') }}
+                    </div>
+                @else
+                    <span class="fs-3 text-primary m-auto">{{ $pagosData['metodo_pago_dominante'] }}</span>
+                @endif
+            </div>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-lg-6">
         <div x-data="{
             datosMetodosPagos: @entangle('pagosData.grafica_metodos_pago'), // Tu objeto de Livewire con los datos
             chart: null,
@@ -190,7 +205,7 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-md-6 mb-3">
+    <div class="col-12 col-lg-6 mb-3">
         <div x-data="{
             datosPagosHora: @entangle('pagosData.grafica_comportamiento_pagos_hora'), // Tu objeto de Livewire con los datos
             chart: null,

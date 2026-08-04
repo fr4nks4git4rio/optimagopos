@@ -136,6 +136,60 @@
             background: rgb(0, 0, 0, 0.5);
         }
 
+        .sidebar-menu {
+
+            background: #065F46;
+
+            z-index: 1045;
+
+        }
+
+        @media (min-width:992px) {
+
+            .sidebar-menu {
+
+                position: relative;
+
+                transform: none !important;
+
+                width: auto;
+
+                transition: none;
+
+            }
+
+        }
+
+        @media (max-width:991.98px) {
+
+            .sidebar-menu {
+
+                position: fixed;
+
+                left: 0;
+
+                top: 0;
+
+                width: 280px;
+
+                height: 100vh;
+
+                transform: translateX(-100%);
+
+                transition: transform .25s ease;
+
+                box-shadow: 0 0 20px rgba(0, 0, 0, .35);
+
+            }
+
+            .sidebar-menu.show {
+
+                transform: translateX(0);
+
+            }
+
+        }
+
         @media (max-width: 640px) {
             .notifications-dropdown .dropdown-menu {
                 top: 50px;
@@ -169,6 +223,7 @@
 <body x-data="{
     display: 'd-sm-inline',
     sidebar_with: 'sidebar-width',
+    sidebar_mobile: '',
     appbar_user_menu: 'justify-content-end',
     class_logo: '',
     movile_menu_hidden: 'left-hidden',
@@ -177,6 +232,12 @@
     submenu_absolute: 'w-100',
     is_mobile_screen: false,
     toggleClicked() {
+        if (this.is_mobile_screen) {
+            // En móvil: SOLO abre/cierra el flyout, no toca el ancho de escritorio
+            this.sidebar_mobile = this.sidebar_mobile === 'show' ? '' : 'show';
+            return;
+        }
+        // En desktop: colapsa/expande el ancho del sidebar
         this.sidebar_with = !this.sidebar_with ? 'sidebar-width' : '';
         this.display = !this.display ? 'd-sm-inline' : '';
         this.show_title = !this.show_title;
@@ -185,31 +246,31 @@
         this.menu_absolute = !this.menu_absolute ? 'menu-absolute' : '';
         this.submenu_absolute = this.submenu_absolute == 'w-100' ? 'submenu-absolute' : 'w-100';
     },
+    closeMobileSidebar() {
+        this.sidebar_mobile = '';
+    },
     setModeScreen() {
-        this.is_mobile_screen = window.screen.width < 992;
+        this.is_mobile_screen = window.innerWidth < 992;
         if (this.is_mobile_screen) {
-            this.appbar_user_menu = 'justify-content-between mt-2'
+            this.appbar_user_menu = 'justify-content-between mt-2';
+            this.sidebar_mobile = ''; // asegura que no quede abierto al reducir pantalla
         }
-        $.get('https://6do9tah.localto.net/api/clientes_service', function(data) {
-            $.post('/consumir_clientes_service', { data }, function(data) {
-                console.log(data);
-            });
-        });
-        $.get('https://6do9tah.localto.net/api/operadores_service', function(data) {
-            $.post('/consumir_operadores_service', { data }, function(data) {
-                console.log(data);
-            });
-        })
     }
-}" x-init="setModeScreen()">
+}" x-init="setModeScreen();
+window.addEventListener('resize', () => setModeScreen());" x-on:keydown.escape.window="closeMobileSidebar()">
     <div id="app">
         <livewire:layouts.toast />
         @if (auth()->user())
             @livewire('layouts.nav')
         @endif
         <div class="container-fluid">
-            <div class="row flex-nowrap">
+            <div class="row flex-nowrap position-relative">
                 @if (auth()->user())
+                    {{-- Backdrop: solo visible en móvil cuando el menú está abierto --}}
+                    <div x-show="is_mobile_screen && sidebar_mobile === 'show'" x-cloak @click="closeMobileSidebar()"
+                        class="position-fixed top-0 start-0 w-100 h-100"
+                        style="background: rgba(0,0,0,0.5); z-index: 1040;">
+                    </div>
                     @livewire('layouts.sidebar')
                 @endif
                 <main class="py-4 col">

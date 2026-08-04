@@ -47,9 +47,9 @@
                     Total {{ $sucursalData['sucursal'] }}</td>
                 @foreach ($formasPago as $i => $formaPago)
                     @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
-                    <td style="text-align: right">
+                    <td style="text-align: right; font-weight: bold;">
                         {{ number_format($totalCelda['monto'], 2) }}</td>
-                    <td style="text-align: center">
+                    <td style="text-align: center; font-weight: bold;">
                         {{ $totalCelda['operaciones'] }}</td>
                 @endforeach
             </tr>
@@ -66,11 +66,11 @@
     @if (count($records) > 0)
         <tfoot>
             <tr>
-                <td colspan="2" style="text-align: right">Total General</td>
+                <td colspan="2" style="text-align: right; font-weight: bold;">Total General</td>
                 @foreach ($formasPago as $i => $formaPago)
                     @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
-                    <td style="text-align: right">{{ number_format($totalGeneral['monto'], 2) }}</td>
-                    <td style="text-align: center">{{ $totalGeneral['operaciones'] }}</td>
+                    <td style="text-align: right; font-weight: bold;">{{ number_format($totalGeneral['monto'], 2) }}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ $totalGeneral['operaciones'] }}</td>
                 @endforeach
             </tr>
         </tfoot>

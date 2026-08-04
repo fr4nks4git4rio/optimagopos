@@ -11,8 +11,7 @@
             </div>
         </a>
         <!-- Mobile Menu Toggle Button -->
-        <button @click="toggleClicked()" class="navbar-toggler d-block" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false"
+        <button @click="toggleClicked()" class="navbar-toggler d-block" type="button"
             aria-label="Toggle navigation" style="margin-left: 7px">
             <div style="transform: rotate(90deg)">
                 <span class="bi bi-bar-chart text-white"></span>
@@ -20,7 +19,8 @@
         </button>
 
         <div id="nav" class="navbar-collapse">
-            <div class="d-flex gap-3 w-100" :class="appbar_user_menu">
+            <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 gap-lg-3 w-100"
+                :class="appbar_user_menu">
                 @guest
                     @if (Route::has('login'))
                         <a href="{{ route('login') }}" class="nav-link">{{ __('Login') }}</a>
@@ -41,21 +41,24 @@
                     {{-- </a> --}}
                     {{-- </div> --}}
                     @if (!user()->cliente_id)
-                        <div class="nav-item mr-2">
+                        <div class="nav-item flex-shrink-0 mr-2">
                             <livewire:layouts.tipo-cambio-sistema />
                         </div>
                     @endif
-                    <div class="nav-item dropdown notifications-dropdown mr-2">
-                        <a href="#" class="nav-link dropdown-toggle notifications me-2" data-bs-toggle="dropdown">
-                            <i
-                                class="pt-1 bi @if (count($notifications) > 0) bi-bell text-warning @else bi-bell-slash @endif fs-5"></i>
-                            @if (count($notifications) > 0)
-                                <span class="badge bg-danger rounded-circle position-absolute"
-                                    style="top: 16px; font-size: 9px">{{ count($notifications) }}</span>
+                    <div class="nav-item flex-shrink-0 dropdown notifications-dropdown mr-2">
+                        <a class="nav-link position-relative px-2" data-bs-toggle="dropdown">
+
+                            <i class="bi bi-bell fs-4"></i>
+
+                            @if (count($notifications))
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ count($notifications) }}
+                                </span>
                             @endif
                         </a>
                         @if (count($notifications) > 0)
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu dropdown-menu-end shadow notification-menu">
                                 <li class="head text-light bg-site-primary">
                                     <div class="row">
                                         <div class="col-lg-12 col-sm-12 col-12">
@@ -72,8 +75,7 @@
                                                 <img src="{{ isset($notification->data['img']) && $notification->data['img'] != ''
                                                     ? asset($notification->data['img'])
                                                     : asset('img/no_avatar.png') }}"
-                                                    class="rounded-circle img-thumbnail"
-                                                    style="height: 80px; width: 80px; object-fit: cover">
+                                                    class="rounded-circle img-thumbnail notification-avatar">
                                             </div>
                                             <div class="col-lg-10 col-sm-10 col-10 no-padding-right">
                                                 <strong
@@ -102,9 +104,9 @@
                         @endif
                     </div>
 
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle fs-5" data-bs-toggle="dropdown">
-                            <span class="text-uppercase">{{ user()->lang ?? config('app.locale') }}</span>
+                    <div class="nav-item flex-shrink-0 dropdown">
+                        <a class="nav-link dropdown-toggle px-2" data-bs-toggle="dropdown">
+                            {{ strtoupper(user()->lang ?? config('app.locale')) }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
                             @foreach ($langs as $index => $lang)
@@ -112,11 +114,16 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle fs-5" data-bs-toggle="dropdown">
+                    <div class="nav-item flex-shrink-0 dropdown">
+                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center gap-2 px-2"
+                            data-bs-toggle="dropdown">
+
                             <img src="{{ user()->avatar_uri ? asset(user()->avatar_uri) : '/img/avatars/no_avatar.png' }}"
-                                class="user-image" style="object-fit: cover" alt="User Image"><span
-                                class="hidden-xs">{{ user()->nombre_completo }}</span>
+                                class="rounded-circle" width="36" height="36" style="object-fit:cover">
+
+                            <span class="d-none d-lg-inline text-truncate nav-user-name" style="max-width:160px;">
+                                {{ user()->nombre_completo }}
+                            </span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">
                             <x-dropdown-item label="{{ __('site.nav.update-profile') }}"
@@ -135,25 +142,6 @@
                     </div>
                 @endguest
             </div>
-        </div>
-    </div>
-    {{-- MOVILE MENU --}}
-    {{-- {{$movile_menu_hidden}} --}}
-    <div id="header-menu-mobile" class="header-menu-mobile hidden-lg bg-custom-light col-auto px-2 sidebar-menu pt-2"
-        :class="movile_menu_hidden">
-        <div class="d-flex flex-column align-items-center align-items-sm-start pt-2 text-white min-vh-100">
-            <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100"
-                id="menu_principal">
-                {{-- //TODO implementar menu lateral --}}
-                {{-- <li class="w-100 li-item {{ active_route('usuarios*') }}">
-                    <a href="{{ route('usuarios.index') }}" class="nav-link submenu">
-                        <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Usuarios</span></a>
-                </li>
-                <li class="w-100 li-item {{ active_route('trazas*') }}">
-                    <a href="{{ route('trazas.index') }}" class="nav-link submenu">
-                        <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">Trazas</span></a>
-                </li> --}}
-            </ul>
         </div>
     </div>
 </nav>

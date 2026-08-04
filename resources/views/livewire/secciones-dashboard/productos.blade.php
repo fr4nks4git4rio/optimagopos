@@ -1,31 +1,60 @@
-<div class="grid-cols-4 px-1 mb-3">
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.items_sold') }}</p>
-            <p class="fs-3 text-primary m-auto">{{ max($productosData['articulos_vendidos'], 0) }}</p>
+<div class="row g-3 mb-3 px-1">
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.items_sold') }}</p>
+                <p class="fs-3 text-primary m-auto">{{ $productosData['articulos_vendidos'] ?? 0 }}</p>
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.flagship_product') }}</p>
-            <p class="fs-3 text-primary m-auto">{{ $productosData['producto_estrella'] }}</p>
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.flagship_product') }}</p>
+                @if (!$productosData['producto_estrella'])
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-box-seam fs-3 d-block mb-1"></i>
+                        {{ __('site.dashboard.no_data') }}
+                    </div>
+                @else
+                    <p class="fs-3 text-primary m-auto">{{ $productosData['producto_estrella'] }}</p>
+                @endif
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.most_popular') }}</p>
-            <p class="fs-3 text-primary m-auto">{{ $productosData['mas_popular'] }}</p>
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.most_popular') }}</p>
+                @if (!$productosData['mas_popular'])
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-box-seam fs-3 d-block mb-1"></i>
+                        {{ __('site.dashboard.no_data') }}
+                    </div>
+                @else
+                    <p class="fs-3 text-primary m-auto">{{ $productosData['mas_popular'] }}</p>
+                @endif
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.higher_income') }}</p>
-            <p class="fs-3 text-primary m-auto">{{ $productosData['mayor_ingreso'] }}</p>
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.higher_income') }}</p>
+                @if (!$productosData['mayor_ingreso'])
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-box-seam fs-3 d-block mb-1"></i>
+                        {{ __('site.dashboard.no_data') }}
+                    </div>
+                @else
+                    <p class="fs-3 text-primary m-auto">{{ $productosData['mayor_ingreso'] ?: 'N/A' }}</p>
+                @endif
+            </div>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-12 col-md-6 mb-3">
+    <div class="col-12 col-lg-6 mb-3">
         <div x-data="{
             datosProductosCantidad: @entangle('productosData.top_productos_cantidad'),
             chart: null,

@@ -136,6 +136,11 @@ class Home extends Component
         if ($field == 'terminales') {
             $this->terminales_query = implode(',', $this->terminales);
         }
+
+        if ($field == 'tab' && $this->tab == 'boh') {
+            $this->fecha_inicio = today()->format('Y-m-d');
+            $this->fecha_fin = today()->format('Y-m-d');
+        }
         $this->loadData();
         $this->dispatchBrowserEvent('reApplySelect2');
     }
@@ -230,7 +235,7 @@ class Home extends Component
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id);
-                            // ->where('tp.precio', '>', 0);
+                        // ->where('tp.precio', '>', 0);
 
                         $ventas_totales_q = $this->commonWhere($ventas_totales_q);
                         $this->resumenData['ventas_totales'] = $ventas_totales_q->value('total');

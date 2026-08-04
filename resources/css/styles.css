@@ -343,16 +343,19 @@ textarea:not([disabled]).form-control {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
 }
+
 .grid-cols-3 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
 }
+
 .grid-cols-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
 }
+
 .grid-cols-5 {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -362,6 +365,44 @@ textarea:not([disabled]).form-control {
 li.nav-item.text-danger.fw-bold>button {
     color: red !important;
     font-weight: bold !important;
+}
+
+.apexcharts-canvas {
+    max-width: 100% !important;
+}
+
+.notification-menu {
+    width: 380px;
+    max-width: 95vw;
+}
+
+.notification-avatar {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+
+.nav-user-name {
+    max-width: 170px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 576px) {
+    .dashboard-card-title {
+        font-size: .9rem !important;
+        line-height: 1.2;
+    }
+
+    .dashboard-card-value {
+        font-size: 1.5rem !important;
+    }
+
+    .notification-avatar {
+        width: 45px;
+        height: 45px;
+    }
 }
 
 @media (max-width: 991px) {
@@ -382,4 +423,26 @@ li.nav-item.text-danger.fw-bold>button {
     .hidden-lg {
         display: none !important;
     }
+}
+
+@media (max-width: 991.98px) {
+
+    #nav .navbar-collapse {
+        width: 100%;
+    }
+
+    #nav .nav-link {
+        padding: .45rem .6rem;
+    }
+
+    .notification-menu {
+        width: 95vw;
+        max-width: 95vw;
+    }
+
+    .user-image {
+        width: 36px;
+        height: 36px;
+    }
+
 }

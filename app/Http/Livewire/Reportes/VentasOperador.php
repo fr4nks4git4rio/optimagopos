@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Reportes;
 
 use App\Exports\FacturaEmitidaExport;
+use App\Exports\VentasOperadorExport;
 use App\Http\Libraries\Pdf;
 use App\Models\Facturador;
 use App\Models\Cliente;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -69,72 +71,10 @@ class VentasOperador extends Component
 
     public function render()
     {
-        $records = $this->query()->get()->map(function ($value, $key) {
-            $value->sucursal = Crypt::decrypt($value->sucursal);
-            $value->empleado = Crypt::decrypt($value->empleado);
-            return $value;
-        });
+        $res = $this->query();
 
-        switch ($this->sort) {
-            case 'Sucursal':
-                if ($this->order == 'asc')
-                    $records = $records->sortBy('sucursal', SORT_NATURAL)->values();
-                else
-                    $records = $records->sortByDesc('sucursal', SORT_NATURAL)->values();
-                break;
-            case 'Operador':
-                if ($this->order == 'asc')
-                    $records = $records->sortBy('empleado', SORT_NATURAL)->values();
-                else
-                    $records = $records->sortByDesc('empleado', SORT_NATURAL)->values();
-                break;
-        }
-
-        $finalRecords = [];
-        $grandTotal = null;
-        // dd($records);
-
-        foreach ($records as $record) {
-            $sucursalId = $record->sucursal_id;
-            $empleado = $record->empleado;
-            $empleado_id = $record->empleado_id;
-
-            if (!isset($finalRecords[$sucursalId])) {
-                $finalRecords[$sucursalId] = [
-                    'sucursal' => $record->sucursal,
-                    'operadores' => [],
-                    'totales' => null,
-                ];
-            }
-
-            if (!isset($finalRecords[$sucursalId]['operadores'][$empleado_id])) {
-                $finalRecords[$sucursalId]['operadores'][$empleado_id] = (object) [
-                    'nombre' => "$empleado (ID: $record->id_empleado)",
-                    'ventas_cant' => $record->ventas_cant,
-                    'ventas_importe' => $record->ventas_importe,
-                    'correcciones_cant' => $record->correcciones_cant,
-                    'correcciones_importe' => $record->correcciones_importe,
-                ];
-            }
-
-            // Totalizador por sucursal
-            $actualSucursal = $finalRecords[$sucursalId]['totales'] ?? ['ventas_cant' => 0, 'ventas_importe' => 0, 'correcciones_cant' => 0, 'correcciones_importe' => 0];
-            $finalRecords[$sucursalId]['totales'] = [
-                'ventas_cant'          => $actualSucursal['ventas_cant'] + $record->ventas_cant,
-                'ventas_importe'       => $actualSucursal['ventas_importe'] + $record->ventas_importe,
-                'correcciones_cant'    => $actualSucursal['correcciones_cant'] + $record->correcciones_cant,
-                'correcciones_importe' => $actualSucursal['correcciones_importe'] + $record->correcciones_importe,
-            ];
-
-            // Totalizador general
-            $actualGeneral = $grandTotal ?? ['ventas_cant' => 0, 'ventas_importe' => 0, 'correcciones_cant' => 0, 'correcciones_importe' => 0];
-            $grandTotal = [
-                'ventas_cant'          => $actualGeneral['ventas_cant'] + $record->ventas_cant,
-                'ventas_importe'       => $actualGeneral['ventas_importe'] + $record->ventas_importe,
-                'correcciones_cant'    => $actualGeneral['correcciones_cant'] + $record->correcciones_cant,
-                'correcciones_importe' => $actualGeneral['correcciones_importe'] + $record->correcciones_importe,
-            ];
-        }
+        $finalRecords = $res['finalRecords'];
+        $grandTotal = $res['grandTotal'];
 
         return view('livewire.reportes.ventas-operador', [
             'records' => $finalRecords,
@@ -205,12 +145,112 @@ class VentasOperador extends Component
             $query->whereIn('ticket.sucursal_id', user()->sucursales->pluck('id')->toArray());
         }
 
-        return $query;
+        $records = $query->get()->each(function ($value, $key) {
+            $value->sucursal = Crypt::decrypt($value->sucursal);
+            $value->empleado = Crypt::decrypt($value->empleado);
+        });
+
+        switch ($this->sort) {
+            case 'Sucursal':
+                if ($this->order == 'asc')
+                    $records = $records->sortBy('sucursal', SORT_NATURAL)->values();
+                else
+                    $records = $records->sortByDesc('sucursal', SORT_NATURAL)->values();
+                break;
+            case 'Operador':
+                if ($this->order == 'asc')
+                    $records = $records->sortBy('empleado', SORT_NATURAL)->values();
+                else
+                    $records = $records->sortByDesc('empleado', SORT_NATURAL)->values();
+                break;
+        }
+
+        $finalRecords = [];
+        $grandTotal = null;
+        // dd($records);
+
+        foreach ($records as $record) {
+            $sucursalId = $record->sucursal_id;
+            $empleado = $record->empleado;
+            $empleado_id = $record->empleado_id;
+
+            if (!isset($finalRecords[$sucursalId])) {
+                $finalRecords[$sucursalId] = [
+                    'sucursal' => $record->sucursal,
+                    'operadores' => [],
+                    'totales' => null,
+                ];
+            }
+
+            if (!isset($finalRecords[$sucursalId]['operadores'][$empleado_id])) {
+                $finalRecords[$sucursalId]['operadores'][$empleado_id] = (object) [
+                    'nombre' => "$empleado (ID: $record->id_empleado)",
+                    'ventas_cant' => $record->ventas_cant,
+                    'ventas_importe' => $record->ventas_importe,
+                    'correcciones_cant' => $record->correcciones_cant,
+                    'correcciones_importe' => $record->correcciones_importe,
+                ];
+            }
+
+            // Totalizador por sucursal
+            $actualSucursal = $finalRecords[$sucursalId]['totales'] ?? ['ventas_cant' => 0, 'ventas_importe' => 0, 'correcciones_cant' => 0, 'correcciones_importe' => 0];
+            $finalRecords[$sucursalId]['totales'] = [
+                'ventas_cant'          => $actualSucursal['ventas_cant'] + $record->ventas_cant,
+                'ventas_importe'       => $actualSucursal['ventas_importe'] + $record->ventas_importe,
+                'correcciones_cant'    => $actualSucursal['correcciones_cant'] + $record->correcciones_cant,
+                'correcciones_importe' => $actualSucursal['correcciones_importe'] + $record->correcciones_importe,
+            ];
+
+            // Totalizador general
+            $actualGeneral = $grandTotal ?? ['ventas_cant' => 0, 'ventas_importe' => 0, 'correcciones_cant' => 0, 'correcciones_importe' => 0];
+            $grandTotal = [
+                'ventas_cant'          => $actualGeneral['ventas_cant'] + $record->ventas_cant,
+                'ventas_importe'       => $actualGeneral['ventas_importe'] + $record->ventas_importe,
+                'correcciones_cant'    => $actualGeneral['correcciones_cant'] + $record->correcciones_cant,
+                'correcciones_importe' => $actualGeneral['correcciones_importe'] + $record->correcciones_importe,
+            ];
+        }
+
+        return [
+            'finalRecords' => $finalRecords,
+            'grandTotal' => $grandTotal,
+        ];
     }
 
     public function changeSort($sort)
     {
         $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
         $this->sort = !$this->order ? '' : $sort;
+    }
+
+    public function imprimirPdf()
+    {
+        if (File::exists(public_path('Ventas por Operador.pdf'))) {
+            File::delete(public_path('Ventas por Operador.pdf'));
+        }
+        $name = 'Ventas por Operador';
+        $view = 'reports.reportes.ventas-operador.pdf';
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, [
+            'name' => $name,
+            'sorts' => $this->sorts,
+            'records' => $this->query()['finalRecords'],
+            'grandTotal' => $this->query()['grandTotal'],
+        ]);
+        $pdf->save("$name.pdf");
+
+        $this->iframeSrc = \Illuminate\Support\Facades\Request::root() . "/$name.pdf?" . time();
+        $this->iframeContainerClass = 'show';
+    }
+
+    public function exportarExcel()
+    {
+        $name = 'Ventas por Operador';
+        $fileName = "$name.xlsx";
+
+        $res = $this->query();
+
+        return (new VentasOperadorExport($name, $this->sorts, $res['finalRecords'], $res['grandTotal']))
+            ->download($fileName);
     }
 }

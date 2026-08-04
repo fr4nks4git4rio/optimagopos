@@ -51,8 +51,8 @@
     color: var(--color-primary);
 }
 
-li.li-item:hover > a,
-li.li-item.active > a {
+li.li-item:hover>a,
+li.li-item.active>a {
     font-weight: 700;
     background-color: var(--color-primary) !important;
     color: var(--color-primary-subtle) !important;
@@ -64,8 +64,8 @@ li.li-item.active {
 
 .header-menu-mobile {
     position: absolute;
-    height: 100vh;
-    top: 91px;
+    height: 100dvh;
+    top: 0;
     transition: left 0.4s;
     z-index: 999999;
 }
@@ -85,18 +85,18 @@ li.li-item.active {
     border-color: var(--color-primary) !important;
 }
 
-#sidebar-menu .nav .nav-link[aria-expanded="true"]:not(.submenu) > .bi,
-#sidebar-menu .nav .nav-link:not(.submenu):hover > .bi {
+#sidebar-menu .nav .nav-link[aria-expanded="true"]:not(.submenu)>.bi,
+#sidebar-menu .nav .nav-link:not(.submenu):hover>.bi {
     background-color: var(--color-primary) !important;
     color: var(--color-primary-subtle) !important;
 }
 
-#sidebar-menu .nav .nav-link.submenu[aria-expanded="true"] > .bi.float-end {
+#sidebar-menu .nav .nav-link.submenu[aria-expanded="true"]>.bi.float-end {
     color: var(--color-primary) !important;
     font-weight: 700;
 }
 
-#sidebar-menu .nav .nav-link.submenu[aria-expanded="true"] + ul.show {
+#sidebar-menu .nav .nav-link.submenu[aria-expanded="true"]+ul.show {
     background: var(--color-primary-subtle) !important;
 }
 
@@ -124,7 +124,7 @@ ul.submenu-absolute {
     background: var(--color-primary-subtle) !important;
 }
 
-li.menu-absolute:hover > ul.submenu-absolute,
+li.menu-absolute:hover>ul.submenu-absolute,
 ul.submenu-absolute:hover {
     display: flex !important;
 }
@@ -134,10 +134,11 @@ ul.submenu-absolute:hover {
 }
 
 .sidebar-menu>div::-webkit-scrollbar:vertical {
-    width:5px;
+    width: 5px;
 }
 
-.sidebar-menu>div::-webkit-scrollbar-button:increment,.contenedor::-webkit-scrollbar-button {
+.sidebar-menu>div::-webkit-scrollbar-button:increment,
+.contenedor::-webkit-scrollbar-button {
     display: none;
 }
 
@@ -155,8 +156,44 @@ ul.submenu-absolute:hover {
     border-radius: 10px;
 }
 
-@media (max-width: 361px) {
-    .header-menu-mobile {
-        top: 83px;
+.sidebar-menu {
+    background: var(--bs-body-bg);
+    z-index: 1045;
+}
+
+/* Desktop */
+@media (min-width: 992px) {
+
+    .sidebar-menu {
+        position: relative;
+        transform: none !important;
+        transition: width .2s ease;
     }
+
+}
+
+/* Mobile */
+@media (max-width: 991.98px) {
+
+    .sidebar-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px !important;
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        z-index: 1060;
+    }
+
+    .sidebar-menu.show {
+        transform: translateX(0);
+    }
+
+}
+
+@media (max-width: 361px) {
+    /* .header-menu-mobile {
+        top: 83px;
+    } */
 }

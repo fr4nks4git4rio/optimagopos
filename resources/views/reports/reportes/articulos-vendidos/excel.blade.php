@@ -46,12 +46,12 @@
     </tbody>
     @if (count($records) > 0)
         <tfoot>
-            <tr class="table-dark fw-bold">
-                <td style="text-align: end;">Total General</td>
+            <tr>
+                <td style="text-align: end; font-weight: bold;">Total General</td>
                 @foreach ($sucursales as $i => $sucursal)
                     @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'vendidos' => 0]; @endphp
-                    <td style="text-align: end;">{{ number_format($totalGeneral['monto'], 2) }}</td>
-                    <td style="text-align: center;">{{ $totalGeneral['vendidos'] }}</td>
+                    <td style="text-align: end; font-weight: bold;">{{ number_format($totalGeneral['monto'], 2) }}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ $totalGeneral['vendidos'] }}</td>
                 @endforeach
             </tr>
         </tfoot>

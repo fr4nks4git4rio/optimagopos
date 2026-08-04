@@ -1,48 +1,60 @@
-<div class="grid-cols-5 px-1 mb-3">
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.operations') }}</p>
-            <p class="fs-3 text-primary m-auto">{{ max($operacionesData['operaciones'], 0) }}</p>
+<div class="row g-3 mb-3 px-1">
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.operations') }}</p>
+                <p class="fs-3 text-primary m-auto">{{ max($operacionesData['operaciones'], 0) }}</p>
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.average_ticket') }}</p>
-            <p class="fs-3 text-primary m-auto">
-                ${{ number_format(max($operacionesData['ticket_promedio'], 0), 2) }}</p>
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.average_ticket') }}</p>
+                <p class="fs-3 text-primary m-auto">
+                    ${{ number_format(max($operacionesData['ticket_promedio'], 0), 2) }}</p>
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.higher_ticket') }}</p>
-            <p class="fs-3 text-primary m-auto">
-                ${{ number_format(max($operacionesData['mayor_ticket'], 0), 2) }}</p>
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.higher_ticket') }}</p>
+                <p class="fs-3 text-primary m-auto">
+                    ${{ number_format(max($operacionesData['mayor_ticket'], 0), 2) }}</p>
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.lower_ticket') }}</p>
-            <p class="fs-3 text-primary m-auto">
-                ${{ number_format(max($operacionesData['menor_ticket'], 0), 2) }}</p>
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.lower_ticket') }}</p>
+                <p class="fs-3 text-primary m-auto">
+                    ${{ number_format(max($operacionesData['menor_ticket'], 0), 2) }}</p>
+            </div>
         </div>
     </div>
-    <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.multi_currency') }}</p>
-            <p class="fs-3 text-primary m-auto">{{ $operacionesData['multimoneda'] }}</p>
+    <div class="col-12 col-sm-6 col-lg">
+        <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.multi_currency') }}</p>
+                <p class="fs-3 text-primary m-auto">{{ $operacionesData['multimoneda'] }}</p>
+            </div>
         </div>
     </div>
 </div>
-<div class="grid-cols-5 px-1 mb-3">
-    <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center">
-        <div class="card-body align-items-center d-flex flex-column">
-            <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.corrections') }}</p>
-            <p class="fs-3 text-danger m-auto">{{ $operacionesData['correcciones'] }}</p>
+<div class="row g-3 mb-3 px-1">
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center h-100">
+            <div class="card-body align-items-center d-flex flex-column">
+                <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.corrections') }}</p>
+                <p class="fs-3 text-danger m-auto">{{ $operacionesData['correcciones'] }}</p>
+            </div>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-12 col-md-4 mb-3">
+    <div class="col-12 col-lg-4 mb-3">
         <div x-data="{
             datosVentasHora: @entangle('operacionesData.grafica_ventas_hora'),
             chart: null,
@@ -177,7 +189,7 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-md-4 mb-3">
+    <div class="col-12 col-lg-4 mb-3">
         <div x-data="{
             datosOperacionesHora: @entangle('operacionesData.grafica_operaciones_hora'),
             chart: null,
@@ -312,7 +324,7 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-md-4 mb-3">
+    <div class="col-12 col-lg-4 mb-3">
         <div x-data="{
             datosTopTickets: @entangle('operacionesData.top_tickets'),
             chart: null,
