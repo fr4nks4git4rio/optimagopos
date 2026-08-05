@@ -45,6 +45,7 @@ class Sidebar extends Component
         return Request::is($prefix . '/reportes/historico-operaciones*')
             || Request::is($prefix . '/reportes/logs*')
             || Request::is($prefix . '/reportes/ingresos*')
+            || Request::is($prefix . '/reportes/historico-tickets-vk*')
             || Request::is($prefix . '/reportes/ventas-diarias*')
             || Request::is($prefix . '/reportes/articulos-vendidos*')
             || Request::is($prefix . '/reportes/ventas-operador*')
