@@ -195,9 +195,8 @@ class Home extends Component
 
                 switch ($this->seccion) {
                     case 'resumen':
-                        $operaciones_q = DB::table('tb_ticket_operaciones as to')
-                            ->select('to.*')
-                            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                        $operaciones_q = DB::table('tb_tickets as ticket')
+                            ->select('ticket.*')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id);
@@ -324,9 +323,8 @@ class Home extends Component
                         break;
                     case 'operaciones':
                         // Similar lógica para cargar datos específicos de la sección de operaciones
-                        $operaciones_q = DB::table('tb_ticket_operaciones as to')
-                            ->select('to.*')
-                            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
+                        $operaciones_q = DB::table('tb_tickets as ticket')
+                            ->select('ticket.*')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id);
