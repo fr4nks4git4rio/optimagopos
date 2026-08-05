@@ -592,7 +592,7 @@ class HomeController
                     $update['fecha_en_proceso'] = parse_fecha_espanol($decoded['Data']['timestamp'])->format('Y-m-d H:i:s');
                     break;
                 case 3:
-                    $update['fecha_termninado'] = parse_fecha_espanol($decoded['Data']['timestamp'])->format('Y-m-d H:i:s');
+                    $update['fecha_terminado'] = parse_fecha_espanol($decoded['Data']['timestamp'])->format('Y-m-d H:i:s');
                     break;
                 case 4:
                     $update['fecha_demorado'] = parse_fecha_espanol($decoded['Data']['timestamp'])->format('Y-m-d H:i:s');
