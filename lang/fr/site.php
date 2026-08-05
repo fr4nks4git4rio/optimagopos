@@ -137,6 +137,7 @@ return [
         'incomes' => 'Revenus',
         'logs' => 'Journaux',
         'quarantine' => 'Quarantaine',
+        'vk_ticket_history' => 'Historique des billets de la cuisine vidéo',
         'daily_sales' => 'Ventes Quotidiennes',
         'articles_sold' => 'Articles Vendus',
         'sales_by_operator' => 'Ventes par Opérateur',

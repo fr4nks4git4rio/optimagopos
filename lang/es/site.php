@@ -134,6 +134,7 @@ return [
         'subscriptions' => 'Suscripciones',
         'accounts-receivable' => 'Cuentas por Cobrar',
         'reports' => 'Reportes',
+        'vk_ticket_history' => 'Histórico de Tickets Video Kitchen',
         'daily_sales' => 'Ventas Diarias',
         'articles_sold' => 'Artículos Vendidos',
         'sales_by_operator' => 'Ventas por Operador',

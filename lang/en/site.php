@@ -138,6 +138,7 @@ return [
         'incomes' => 'Income',
         'logs' => 'Logs',
         'quarantine' => 'Quarantine',
+        'vk_ticket_history' => 'Video Kitchen Ticket History',
         'daily_sales' => 'Daily Sales',
         'articles_sold' => 'Articles Sold',
         'sales_by_operator' => 'Sales by Operator',

@@ -23,6 +23,7 @@ use App\Http\Livewire\Auth\Passwords\ForgotPassword;
 use App\Http\Livewire\Auth\Passwords\ResetPassword;
 use App\Http\Livewire\AutoFacturacion;
 use App\Http\Livewire\CabeceraFactura;
+use App\Http\Livewire\Reportes\HistoricoTicketsVk;
 use App\Http\Livewire\Trazas\Index as IndexTrazas;
 use App\Http\Livewire\Usuarios\Index as IndexUsuarios;
 use App\Http\Livewire\GestionConfiguracionesComponent as IndexConfiguraciones;
@@ -165,6 +166,7 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
 
         Route::prefix('reportes')->group(function () {
 
+            Route::get('/historico-tickets-vk', HistoricoTicketsVk::class)->name('cliente.reportes.historico-tickets-vk');
             Route::get('/ventas-diarias', VentasDiarias::class)->name('cliente.reportes.ventas-diarias');
             Route::get('/articulos-vendidos', ArticulosVendidos::class)->name('cliente.reportes.articulos-vendidos');
             Route::get('/ventas-operador', VentasOperador::class)->name('cliente.reportes.ventas-operador');

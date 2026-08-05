@@ -272,7 +272,8 @@ class Home extends Component
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
                             ->orderByRaw("HOUR(ticket.fecha_transaccion) asc")
-                            ->where('ticket.importe', '>', 0);
+                            ->where('ticket.importe', '>', 0)
+                            ->groupBy('ticket.id');
 
                         $ventas_neta_operacion_q = $this->commonWhere($ventas_neta_operacion_q);
                         $this->resumenData['ventas_netas_operacion'] = $ventas_neta_operacion_q->take(15)

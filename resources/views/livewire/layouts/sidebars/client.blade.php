@@ -91,6 +91,12 @@
     </a>
     <ul class="collapse nav flex-column ms-1 @if ($this->reportes_routes_active) show @endif" :class="submenu_absolute"
         id="submenu_reportes" data-bs-parent="#submenu_reportes">
+        <li class="w-100 li-item {{ active_route('cliente/reportes/historico-tickets-vk*') }}">
+            <a href="{{ route('cliente.reportes.historico-tickets-vk') }}" class="nav-link submenu">
+                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                    {{ __('site.sidebar.vk_ticket_history') }}
+                </span></a>
+        </li>
         <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-diarias*') }}">
             <a href="{{ route('cliente.reportes.ventas-diarias') }}" class="nav-link submenu">
                 <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
