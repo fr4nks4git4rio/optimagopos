@@ -15,14 +15,28 @@ class ArticulosVendidosExport implements FromView
     private $records;
     private $sucursales;
     private $grandTotal;
+    private $fechaInicio;
+    private $fechaFin;
+    private $sucursalesSeleccionadas;
 
-    public function __construct($name, $sorts, $records, $sucursales, $grandTotal)
-    {
+    public function __construct(
+        $name,
+        $sorts,
+        $records,
+        $sucursales,
+        $grandTotal,
+        $fechaInicio,
+        $fechaFin,
+        $sucursalesSeleccionadas
+    ) {
         $this->name = $name;
         $this->sorts = $sorts;
         $this->records = $records;
         $this->sucursales = $sucursales;
         $this->grandTotal = $grandTotal;
+        $this->fechaInicio = $fechaInicio;
+        $this->fechaFin = $fechaFin;
+        $this->sucursalesSeleccionadas = $sucursalesSeleccionadas;
     }
 
     public function view(): View
@@ -32,7 +46,10 @@ class ArticulosVendidosExport implements FromView
             'sorts' => $this->sorts,
             'records' => $this->records,
             'sucursales' => $this->sucursales,
-            'grandTotal' => $this->grandTotal
+            'grandTotal' => $this->grandTotal,
+            'fechaInicio' => $this->fechaInicio,
+            'fechaFin' => $this->fechaFin,
+            'sucursalesSeleccionadas' => $this->sucursalesSeleccionadas,
         ]);
     }
 }

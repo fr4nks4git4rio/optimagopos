@@ -5,14 +5,14 @@
             <div class="topbar-left hidden-xs " :class="class_logo">
                 <div class="text-center">
                     <a href="{{ url('/') }}" class="logo">
-                        <h1 class="fs-3">OGP</h1>
+                        <h1 class="fs-3">NEXORA</h1>
                     </a>
                 </div>
             </div>
         </a>
         <!-- Mobile Menu Toggle Button -->
-        <button @click="toggleClicked()" class="navbar-toggler d-block" type="button"
-            aria-label="Toggle navigation" style="margin-left: 7px">
+        <button @click="toggleClicked()" class="navbar-toggler d-block" type="button" aria-label="Toggle navigation"
+            style="margin-left: 7px">
             <div style="transform: rotate(90deg)">
                 <span class="bi bi-bar-chart text-white"></span>
             </div>
@@ -102,6 +102,12 @@
                                 {{-- </li> --}}
                             </ul>
                         @endif
+                    </div>
+
+                    <div class="nav-item flex-shrink-0">
+                        <a href="javascript:void(0)" class="nav-link position-relative" @click="openHelp = !openHelp">
+                            <span class="bi bi-book text-white fs-4"></span>
+                        </a>
                     </div>
 
                     <div class="nav-item flex-shrink-0 dropdown">

@@ -191,6 +191,11 @@ class ArticulosVendidos extends Component
             'records' => $this->query()['records'],
             'sucursales' => $this->query()['sucursales'],
             'grandTotal' => $this->query()['grandTotal'],
+            'fechaInicio' => $this->fechaInicio,
+            'fechaFin' => $this->fechaFin,
+            'sucursalesSeleccionadas' => Sucursal::whereIn('id', $this->sucursal)->get()->each(function ($element) {
+                $element->nombre_comercial = Crypt::decrypt($element->nombre_comercial);
+            })->pluck('nombre_comercial')->toArray()
         ]);
         $pdf->save("$name.pdf");
 
@@ -205,7 +210,10 @@ class ArticulosVendidos extends Component
 
         $res = $this->query();
 
-        return (new ArticulosVendidosExport($name, $this->sorts, $res['records'], $res['sucursales'], $res['grandTotal']))
+        $sucursalesSeleccionadas = Sucursal::whereIn('id', $this->sucursal)->get()->each(function ($element) {
+            $element->nombre_comercial = Crypt::decrypt($element->nombre_comercial);
+        })->pluck('nombre_comercial')->toArray();
+        return (new ArticulosVendidosExport($name, $this->sorts, $res['records'], $res['sucursales'], $res['grandTotal'], $this->fechaInicio, $this->fechaFin, $sucursalesSeleccionadas))
             ->download($fileName);
     }
 }

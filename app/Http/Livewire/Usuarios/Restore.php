@@ -26,8 +26,14 @@ class Restore extends Modal
 
     public function restore()
     {
-        $this->usuario = User::onlyTrashed()->find($this->usuario);
+        $this->usuario = User::withTrashed()->find($this->usuario);
         $this->usuario->restore();
+
+        activity(__('site.users.restore.log_restored'))
+            ->on($this->usuario)
+            ->event('restored')
+            ->withProperties(User::parseData($this->usuario->getAttributes()))
+            ->log(__('site.users.restore.log_restored_detail',  ['email' => $this->usuario->email]));
 
         $this->emit('show-toast', __('site.users.restore.user_activated'));
         $this->emit('$refresh');

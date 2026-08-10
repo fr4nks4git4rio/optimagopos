@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Sucursales;
 
 use App\Http\Livewire\Layouts\Modal;
 use App\Models\Sucursal;
+use Illuminate\Support\Facades\Crypt;
 
 class Restore extends Modal
 {
@@ -32,6 +33,14 @@ class Restore extends Modal
             return;
         }
         $sucursal->restore();
+
+        $attributes = $sucursal->getAttributes();
+
+        activity(__('site.branches.delete.log_restored'))
+            ->on($sucursal)
+            ->event('restored')
+            ->withProperties(Sucursal::parseData($attributes))
+            ->log(__('site.branches.delete.log_restored_detail',  ['nombre_comercial' => Crypt::decrypt($attributes['nombre_comercial'])]));
 
         $this->emit('show-toast', __('site.branches.restore.branch_restore_success'));
         $this->emit('$refresh');

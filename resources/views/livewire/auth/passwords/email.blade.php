@@ -2,6 +2,11 @@
     <div class="col-12 col-sm-10 col-md-6 col-lg-4">
 
         <div class="text-center mb-4">
+            <a href="{{ url('/') }}" class="d-inline-block mb-4">
+                <img src="{{ asset('images/logo_transparent_' . config('app.locale') . '.png') }}"
+                    alt="{{ config('app.name') }}"style="height: 120px; width: auto;">
+            </a>
+            <br>
             <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle mb-3 shadow-sm"
                 style="width: 56px; height: 56px;">
                 <i class="bi bi-key-fill" style="font-size: 1.5rem;"></i>

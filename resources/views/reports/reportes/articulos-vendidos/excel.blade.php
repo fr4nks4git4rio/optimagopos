@@ -6,6 +6,17 @@
         </tr>
         <tr></tr>
         <tr>
+            <td colspan="{{ 1 + count($sucursales) * 2 }}">
+                Período:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+                @if (!empty($sucursalesSeleccionadas))
+                    &nbsp;|&nbsp;
+                    Sucursal(es): &nbsp;
+                    {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+                @endif
+            </td>
+        </tr>
+        <tr></tr>
+        <tr>
             @foreach ($sorts as $sort)
                 <th rowspan="2" style="text-align: center; vertical-align: middle; white-space: nowrap !important">
                     {{ $sort }}

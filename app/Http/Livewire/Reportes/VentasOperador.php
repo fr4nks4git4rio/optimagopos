@@ -236,6 +236,11 @@ class VentasOperador extends Component
             'sorts' => $this->sorts,
             'records' => $this->query()['finalRecords'],
             'grandTotal' => $this->query()['grandTotal'],
+            'fechaInicio' => $this->fechaInicio,
+            'fechaFin' => $this->fechaFin,
+            'sucursalesSeleccionadas' => Sucursal::whereIn('id', $this->sucursal)->get()->each(function ($element) {
+                $element->nombre_comercial = Crypt::decrypt($element->nombre_comercial);
+            })->pluck('nombre_comercial')->toArray()
         ]);
         $pdf->save("$name.pdf");
 
@@ -250,7 +255,10 @@ class VentasOperador extends Component
 
         $res = $this->query();
 
-        return (new VentasOperadorExport($name, $this->sorts, $res['finalRecords'], $res['grandTotal']))
+        $sucursalesSeleccionadas = Sucursal::whereIn('id', $this->sucursal)->get()->each(function ($element) {
+            $element->nombre_comercial = Crypt::decrypt($element->nombre_comercial);
+        })->pluck('nombre_comercial')->toArray();
+        return (new VentasOperadorExport($name, $this->sorts, $res['finalRecords'], $res['grandTotal'], $this->fechaInicio, $this->fechaFin, $sucursalesSeleccionadas))
             ->download($fileName);
     }
 }

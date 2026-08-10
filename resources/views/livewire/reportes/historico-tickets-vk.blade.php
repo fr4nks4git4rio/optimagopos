@@ -10,7 +10,7 @@
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
-        <div class="row mb-1 col-md-12">
+        <div class="row mb-1 col-md-10">
             <div class="col-sm-2">
                 <x-input label="Fecha Inicio" type="date" :lazy="true" model="fechaInicio" />
             </div>
@@ -30,7 +30,7 @@
                     model="terminal" :lazy="true" :dynamic="true" />
             </div>
         </div>
-        {{-- <div class="mb-1 col-md-2 text-end">
+        <div class="mb-1 col-md-2 text-end">
             <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
                 <span class="bi bi-file-pdf"></span>
                 Imprimir
@@ -39,7 +39,7 @@
                 <span class="bi bi-file-excel"></span>
                 Exportar
             </button>
-        </div> --}}
+        </div>
     </div>
 
 
@@ -86,8 +86,7 @@
                     @foreach ($sucursalData['records'] as $record)
                         <tr>
                             @if ($loop->first)
-                                <td class="text-center align-middle"
-                                    rowspan="{{ count($sucursalData['records']) + 1 }}">
+                                <td class="text-center align-middle" rowspan="{{ count($sucursalData['records']) }}">
                                     {{ $sucursalData['sucursal'] }}
                                 </td>
                             @endif
@@ -120,6 +119,19 @@
                             <td class="text-center">{{ $record->fecha_terminado_str ?? '-' }}</td>
                         </tr>
                     @endforeach
+                    <tr class="table-success fw-bold">
+                        <td colspan="3" class="text-end">Totales</td>
+                        <td class="text-center" colspan="2">
+                            {{ $sucursalData['totales']['tickets_abiertos'] }}
+                            (Tiempo promedio: {{ $sucursalData['totales']['promedio_tickets_abiertos'] }})
+                        </td>
+                        <td colspan="2"></td>
+                        <td class="text-center" colspan="2">
+                            {{ $sucursalData['totales']['tickets_demorados'] }}
+                            (Tiempo promedio: {{ $sucursalData['totales']['promedio_tickets_demorados'] }})
+                        </td>
+                        <td></td>
+                    </tr>
                 @empty
                     <tr>
                         <td colspan="{{ count($this->sorts) + 7 }}" class="text-center">
@@ -130,12 +142,28 @@
                     </tr>
                 @endforelse
             </tbody>
+            @if (count($records) > 0)
+                <tfoot>
+                    <tr class="table-dark fw-bold">
+                        <td colspan="3" class="text-end">Totales</td>
+                        <td class="text-center" colspan="2">
+                            {{ $totalGeneral['tickets_abiertos'] }}
+                            (Tiempo promedio: {{ $totalGeneral['promedio_tickets_abiertos'] }})
+                        </td>
+                        <td colspan="2"></td>
+                        <td class="text-center" colspan="2">
+                            {{ $totalGeneral['tickets_demorados'] }}
+                            (Tiempo promedio: {{ $totalGeneral['promedio_tickets_demorados'] }})</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            @endif
         </table>
     </div>
 
     @if ($iframeContainerClass)
         <div class="modal {{ $iframeContainerClass }}">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">PDF</h5>

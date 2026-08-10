@@ -1,7 +1,19 @@
 <table>
     <thead>
         <tr>
-            <td colspan="{{ 2 + count($formasPago) * 2 }}" style="font-weight: bold; font-size: 16px; text-align: center;">{{ $name }}</td>
+            <td colspan="{{ 2 + count($formasPago) * 2 }}"
+                style="font-weight: bold; font-size: 16px; text-align: center;">{{ $name }}</td>
+        </tr>
+        <tr></tr>
+        <tr>
+            <td colspan="{{ 2 + count($formasPago) * 2 }}">
+                Período:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+                @if (!empty($sucursalesSeleccionadas))
+                    &nbsp;|&nbsp;
+                    Sucursal(es): &nbsp;
+                    {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+                @endif
+            </td>
         </tr>
         <tr></tr>
         <tr>
@@ -28,7 +40,8 @@
             @foreach ($sucursalData['fechas'] as $record)
                 <tr>
                     @if ($loop->first)
-                        <td style="text-align: center; vertical-align: middle;" rowspan="{{ count($sucursalData['fechas']) + 1 }}">
+                        <td style="text-align: center; vertical-align: middle;"
+                            rowspan="{{ count($sucursalData['fechas']) + 1 }}">
                             {{ $sucursalData['sucursal'] }}
                         </td>
                     @endif
@@ -69,7 +82,8 @@
                 <td colspan="2" style="text-align: right; font-weight: bold;">Total General</td>
                 @foreach ($formasPago as $i => $formaPago)
                     @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
-                    <td style="text-align: right; font-weight: bold;">{{ number_format($totalGeneral['monto'], 2) }}</td>
+                    <td style="text-align: right; font-weight: bold;">{{ number_format($totalGeneral['monto'], 2) }}
+                    </td>
                     <td style="text-align: center; font-weight: bold;">{{ $totalGeneral['operaciones'] }}</td>
                 @endforeach
             </tr>

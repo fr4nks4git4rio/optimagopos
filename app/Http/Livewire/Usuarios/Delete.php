@@ -29,8 +29,16 @@ class Delete extends Modal
 
     public function delete()
     {
-        $this->usuario->suscripciones()->detach();
-        $this->usuario->delete();
+        $user = $this->usuario;
+        $attributes = $user->getAttributes();
+        $user->suscripciones()->detach();
+        $user->delete();
+
+        activity(__('site.users.delete.log_deleted'))
+            ->on($user)
+            ->event('deleted')
+            ->withProperties(User::parseData($attributes))
+            ->log(__('site.users.delete.log_deleted_detail',  ['email' => $attributes['email']]));
 
         $this->emit('show-toast', __('site.users.delete.user_deactivated'));
         $this->emit('$refresh');

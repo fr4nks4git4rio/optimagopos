@@ -231,6 +231,7 @@
     menu_absolute: '',
     submenu_absolute: 'w-100',
     is_mobile_screen: false,
+    openHelp: false,
     toggleClicked() {
         if (this.is_mobile_screen) {
             // En móvil: SOLO abre/cierra el flyout, no toca el ancho de escritorio
@@ -275,6 +276,26 @@ window.addEventListener('resize', () => setModeScreen());" x-on:keydown.escape.w
                 @endif
                 <main class="py-4 col">
                     {{ $slot }}
+                    <!-- Columna lateral flotante (Drawer) -->
+                    <!-- Backdrop (Fondo oscuro opcional detrás del panel) -->
+                    <div x-show="openHelp" x-transition.opacity class="offcanvas-backdrop fade show"
+                        @click="openHelp = false" style="display: none;"></div>
+
+                    <!-- Panel Lateral Offcanvas de Bootstrap 5 (Alineado a la derecha con 'offcanvas-end') -->
+                    <div class="offcanvas offcanvas-end" tabindex="-1" :class="{ 'show': openHelp }"
+                        :style="openHelp ? 'visibility: visible;' : ''" style="visibility: hidden;">
+
+                        <div class="offcanvas-header border-bottom">
+                            <h5 class="offcanvas-title">Glosario de Ayuda</h5>
+                            <button type="button" @click="openHelp = false" class="btn-close"
+                                aria-label="Close"></button>
+                        </div>
+
+                        <div class="offcanvas-body">
+                            <!-- Componente Livewire para cargar el contenido de la vista actual -->
+                            @livewire('contextual-help', ['currentRoute' => request()->route()->getName()])
+                        </div>
+                    </div>
                 </main>
             </div>
         </div>

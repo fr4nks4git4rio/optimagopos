@@ -22,7 +22,7 @@ use App\Http\Livewire\Auth\Login;
 use App\Http\Livewire\Auth\Passwords\ForgotPassword;
 use App\Http\Livewire\Auth\Passwords\ResetPassword;
 use App\Http\Livewire\AutoFacturacion;
-use App\Http\Livewire\CabeceraFactura;
+use App\Http\Livewire\Facturas\CabeceraFactura;
 use App\Http\Livewire\Reportes\HistoricoTicketsVk;
 use App\Http\Livewire\Trazas\Index as IndexTrazas;
 use App\Http\Livewire\Usuarios\Index as IndexUsuarios;

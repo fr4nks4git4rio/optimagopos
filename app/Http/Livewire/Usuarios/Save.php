@@ -95,6 +95,24 @@ class Save extends Modal
         $this->user->fill(Arr::except($data, ['suscripciones']))->save();
         $this->user->suscripciones()->sync($data['suscripciones']);
 
+        $attributes = Arr::except($this->user->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+        if ($this->user->wasRecentlyCreated) {
+            $log = __('site.users.save.log_created_detail', ['email' => $this->user->email]);
+            activity(__('site.users.save.log_created'))
+                ->on($this->user)
+                ->event('created')
+                ->withProperties(User::parseData($attributes))
+                ->log($log);
+        } else {
+            $log = __('site.users.save.log_updated_detail', ['email' => $this->user->email]);
+            activity(__('site.users.save.log_updated'))
+                ->on($this->user)
+                ->event('updated')
+                ->withProperty('attributes', User::parseData($attributes))
+                ->withProperty('old', User::parseData(Arr::only($this->user->getOriginal(), array_keys($attributes))))
+                ->log($log);
+        }
+
         if ($this->avatar && !is_string($this->avatar)) {
             $ext = $this->avatar->extension();
             $nombre = Str::uuid() . ".$ext";

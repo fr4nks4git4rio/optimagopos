@@ -5,12 +5,14 @@ namespace App\Http\Livewire\Sucursales;
 use App\Http\Livewire\Layouts\Modal;
 use App\Models\Sucursal;
 use App\Models\SucursalFormaPago;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class FormasPago extends Modal
 {
+    public $scope;
     public Sucursal $sucursal;
     public $formas_pago = [];
     public $monedas = [];
@@ -127,6 +129,27 @@ class FormasPago extends Modal
             $sfp = new SucursalFormaPago();
         $sfp->fill(array_merge($data['forma_pago_activa'], ['sucursal_id' => $this->sucursal->id]))->save();
 
+        if ($sfp->wasRecentlyCreated) {
+            $attributes = Arr::except($sfp->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+            $log = __('site.branches.branch_payment_forms.log_created_detail', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial), 'payment_from' => $sfp->nombre]);
+            activity(__('site.branches.branch_payment_forms.log_created'))
+                ->on($sfp)
+                ->event('created')
+                ->withProperties(SucursalFormaPago::parseData($attributes))
+                ->log($log);
+            $this->emitTo($this->scope, 'sucursal-created', $this->sucursal->id);
+        } else {
+            $attributes = Arr::except($sfp->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+            $log = __('site.branches.branch_payment_forms.log_updated_detail', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial), 'payment_from' => $sfp->nombre]);
+            activity(__('site.branches.branch_payment_forms.log_updated'))
+                ->on($sfp)
+                ->event('updated')
+                ->withProperty('attributes', Sucursal::parseData($attributes))
+                ->withProperty('old', Sucursal::parseData(Arr::only($sfp->getOriginal(), array_keys($attributes))))
+                ->log($log);
+            $this->emitTo($this->scope, 'sucursal-updated', $this->sucursal->id);
+        }
+
         $this->loadFormasPago();
         $this->index_forma_pago_activa = null;
         $this->forma_pago_activa = [
@@ -147,7 +170,19 @@ class FormasPago extends Modal
     public function deleteFormaPago()
     {
         if ($this->index_forma_pago_activa !== null) {
-            SucursalFormaPago::where('id', $this->formas_pago[$this->index_forma_pago_activa]['id'])->delete();
+            $sfp = SucursalFormaPago::find($this->formas_pago[$this->index_forma_pago_activa]['id']);
+
+            $attributes = Arr::except($sfp->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+
+            $sfp->delete();
+
+            $log = __('site.branches.branch_payment_forms.log_deleted_detail', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial), 'payment_from' => $sfp->nombre]);
+            activity(__('site.branches.branch_payment_forms.log_deleted'))
+                ->on($sfp)
+                ->event('deleted')
+                ->withProperties(SucursalFormaPago::parseData($attributes))
+                ->log($log);
+
             $this->emit('show-toast', __('site.branches.branch_payment_forms.payment_form_deactivated'));
             $this->loadFormasPago();
         }

@@ -17,6 +17,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
 use Smalot\PdfParser\Parser;
 
@@ -40,6 +42,8 @@ class Save extends Modal
     public $regimen_fiscal_id;
     public $direccion_fiscal;
     public $constancia_fiscal;
+    public $logo;
+    public $logo_src;
 
     public $regimenesFiscales = [];
     public $estados = [];
@@ -67,6 +71,8 @@ class Save extends Modal
             $this->con_facturacion = $this->cliente->con_facturacion;
             $this->es_cliente_fiel = $this->cliente->es_cliente_fiel;
             $this->regimen_fiscal_id = $this->cliente->regimen_fiscal_id;
+            $this->logo = $this->cliente->logo_uri;
+            $this->logo_src = $this->logo;
         }
         $this->direccion_fiscal = $this->cliente->direccion_fiscal->toArray();
         $this->estados = get_estados_mexico();
@@ -291,6 +297,19 @@ class Save extends Modal
                     ->log($log);
             }
 
+            if ($this->logo && !is_string($this->logo)) {
+                $ext = $this->logo->extension();
+                $nombre = Str::uuid() . ".$ext";
+                $this->logo->storeAs('', $nombre, 'logos');
+                $this->cliente->logo = $nombre;
+            } else if ($this->logo == '' || $this->logo == null) {
+                if ($this->cliente->logo && Storage::disk('logos')->exists($this->cliente->logo)) {
+                    Storage::disk('logos')->delete($this->cliente->logo);
+                }
+                $this->cliente->logo = null;
+            }
+            $this->cliente->save();
+
             $this->emit('show-toast', __('site.clients.save.client_saved_successfully'));
             if ($this->scope) {
                 if ($clienteDB->wasRecentlyCreated) {
@@ -330,5 +349,15 @@ class Save extends Modal
             $municipio = Municipio::find($this->direccion_fiscal['municipio_id']);
             $this->dispatchBrowserEvent("set-data-direccion_fiscal-municipio_id", ['data' => [$municipio->only('id', 'text')], 'term' => '', 'value' => $municipio->id]);
         }
+    }
+
+    public function removeLogo()
+    {
+        $this->logo = '';
+    }
+
+    public function getHasLogoProperty()
+    {
+        return $this->logo != '';
     }
 }

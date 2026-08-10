@@ -261,19 +261,27 @@ return [
             'password' => 'password',
             'confirm_password' => 'confirm password',
             'save_user' => 'save user',
-            'user_saved' => 'User saved'
+            'user_saved' => 'User saved',
+            'log_created' => 'User created.',
+            'log_updated' => 'User updated.',
+            'log_created_detail' => 'The user with email :email has been created.',
+            'log_updated_detail' => 'The user with email :email has been updated.',
         ],
         'delete' => [
             'delete_user' => 'deactivate user',
             'are_you_sure' => 'Are you sure you want to deactivate this user?',
             'confirm_delete' => 'Confirm deactivation',
-            'user_deactivated' => 'User deactivated.'
+            'user_deactivated' => 'User deactivated.',
+            'log_deleted' => 'User deactivated',
+            'log_deleted_detail' => 'The user with email :email has been deactivated.',
         ],
         'restore' => [
             'restore_user' => 'restore user',
             'are_you_sure' => 'Are you sure you want to restore this user?',
             'confirm_restore' => 'Confirm restoration',
-            'user_activated' => 'User activated.'
+            'user_activated' => 'User restored.',
+            'log_restored' => 'Usuario restored.',
+            'log_restored_detail' => 'The user with email :email has been reactivated.',
         ]
     ],
     'modules' => [
@@ -415,6 +423,7 @@ return [
     'clients' => [
         'index' => [
             'title' => 'Clients',
+            'logo' => 'Logo',
             'search_clients' => 'Search Clients',
             'commercial_name' => 'Trade Name',
             'rfc' => 'Tax ID',
@@ -451,6 +460,9 @@ return [
             'client_save_failed' => 'An error occurred. The client could not be saved.',
             'fiscal_address_created' => 'Client Tax Address Created',
             'fiscal_address_updated' => 'Client Tax Address Updated',
+            'logo' => 'Logo',
+            'upload_logo' => 'Upload Logo',
+            'remove_logo' => 'Remove Logo',
         ],
         'delete' => [
             'delete_client' => 'Deactivate Client',
@@ -514,6 +526,10 @@ return [
             'branch_save_failed' => 'An error occurred. The branch could not be saved.',
             'fiscal_address_created' => 'Branch Tax Address Created',
             'fiscal_address_updated' => 'Branch Tax Address Updated',
+            'log_created' => 'Branch Created',
+            'log_updated' => 'Branch Updated',
+            'log_created_detail' => 'The Branch with trade name: :nombre_comercial, has been created.',
+            'log_updated_detail' => 'The Branch with trade name: :nombre_comercial, has been updated.',
         ],
         'configs' => [
             'title' => 'Branch Settings',
@@ -527,7 +543,13 @@ return [
             'exchange_rate' => 'Exchange Rate',
             'save_exchange_rate' => 'Save Rate',
             'others_configs' => 'Other Settings',
-            'branch_currency' => 'Branch Currency'
+            'branch_currency' => 'Branch Currency',
+            'branch_config_updated' => 'Branch configurations updated.',
+            'branch_config_updated_detail' => 'The settings for the :nombre_comercial branch have been updated.',
+            'branch_exchange_rate_created' => 'Exchange rate created',
+            'branch_exchange_rate_updated' => 'Exchange rate updated',
+            'branch_exchange_rate_created_detail' => 'The exchange rate for branch: :nombre_comercial has been created.',
+            'branch_exchange_rate_updated_detail' => 'The exchange rate for the branch :nombre_comercial has been updated.',
         ],
         'branch_payment_forms' => [
             'title' => 'Branch Payment Methods',
@@ -542,7 +564,13 @@ return [
             'edit_payment_form' => 'New Payment Method',
             'changes_alert' => '<strong>Important:</strong> Please note that any change to the
                                         <strong>name</strong> must also be applied to the Branch\'s terminals!',
-            'save_payment_form' => 'Save Payment Method'
+            'save_payment_form' => 'Save Payment Method',
+            'log_created' => 'Payment Form created.',
+            'log_updated' => 'Payment Form updated.',
+            'log_deleted' => 'Payment Form deactivated.',
+            'log_created_detail' => 'The payment form :payment_form has been created for the branch :nombre_comercial.',
+            'log_updated_detail' => 'The payment from :payment_form belonging to the branch :nombre_comercial has been updated.',
+            'log_deleted_detail' => 'The payment from :payment_form belonging to the branch :nombre_comercial has been deactivated.',
         ],
         'delete' => [
             'delete_branch' => 'Deactivate Branch',
@@ -550,6 +578,8 @@ return [
             'confirm_delete' => 'Confirm deactivation',
             'branch_delete_success' => 'Branch deactivated.',
             'branch_delete_failed' => 'An error occurred. The branch could not be deactivated.',
+            'log_deleted' => 'Branch deactivated',
+            'log_deleted_detail' => 'The branch :nombre_comercial has been deactivated.',
         ],
         'restore' => [
             'restore_branch' => 'Restore Branch',
@@ -557,7 +587,9 @@ return [
             'confirm_restore' => 'Confirm restoration',
             'branch_restore_success' => 'Branch restored.',
             'branch_restore_failed' => 'An error occurred. The branch could not be restored.',
-            'branch_not_found' => 'Branch not found.'
+            'branch_not_found' => 'Branch not found.',
+            'log_restored' => 'Branch restored.',
+            'log_restored_detail' => 'The branch :nombre_comercial has been restored.',
         ]
     ],
     'terminals' => [
@@ -581,7 +613,11 @@ return [
             'comments' => 'Comments',
             'is_vk' => 'Video Kitchen Enabled',
             'save_terminal' => 'Save Terminal',
-            'terminal_saved' => 'Terminal saved.'
+            'terminal_saved' => 'Terminal saved.',
+            'log_created' => 'Terminal created.',
+            'log_updated' => 'Terminal updated.',
+            'log_created_detail' => 'Terminal :name has been created.',
+            'log_updated_detail' => 'Terminal :name has been updated.',
         ],
         'delete' => [
             'delete_terminal' => 'Deactivate Terminal',
@@ -589,6 +625,8 @@ return [
             'confirm_delete' => 'Confirm deactivation',
             'terminal_delete_success' => 'Terminal deactivated.',
             'terminal_delete_failed' => 'An error occurred. The terminal could not be deactivated.',
+            'log_deleted' => 'Terminal deactivated.',
+            'log_deleted_detail' => 'Terminal :name has been deactivated.',
         ],
         'restore' => [
             'restore_terminal' => 'Restore Terminal',
@@ -596,7 +634,9 @@ return [
             'confirm_restore' => 'Confirm restoration',
             'terminal_restore_success' => 'Terminal restored.',
             'terminal_restore_failed' => 'An error occurred. The terminal could not be restored.',
-            'terminal_not_found' => 'Terminal not found.'
+            'terminal_not_found' => 'Terminal not found.',
+            'log_restored' => 'Terminal restored.',
+            'log_restored_detail' => 'Terminal :name has been restored.',
         ]
     ],
     'subscriptions' => [
@@ -806,7 +846,9 @@ return [
         'review_invoices' => 'Review Invoices',
         'visit_panel_pac_site' => 'Visit PAC portal',
         'save_inovice_header_first' => 'You must first save the Invoice Header.',
-        'stamping_method_saved' => 'Stamping Mode changed.'
+        'stamping_method_saved' => 'Stamping Mode changed.',
+        'log_updated' => 'Panel PAC updated.',
+        'log_updated_detail' => 'The PAC panel for Branch :nombre_comercial has been modified.'
     ],
     'invoice_header' => [
         'title' => 'Invoice Header',
@@ -828,6 +870,10 @@ return [
         'log_address_system_name' => 'System Invoice Header Address',
         'log_address_system_detail' => 'The system\'s Invoice Header data has been updated.',
         'address_saved' => 'Address saved.',
+        'log_payment_form_updated' => 'Branch payment method updated.',
+        'log_payment_form_updated_detail' => 'The payment method :payment_form belonging to the branch :nombre_comercial has been updated.',
+        'log_general_data_updated' => 'Updated branch invoice header general data.',
+        'log_general_data_updated_detail' => 'The general invoice header data for the branch with RFC :rfc have been updated.',
     ],
     'invoices' => [
         'index' => [

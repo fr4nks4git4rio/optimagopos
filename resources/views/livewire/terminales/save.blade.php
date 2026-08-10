@@ -8,7 +8,7 @@
 
             <x-input label="{{ __('site.terminals.save.name') }}" type="text" model="nombre" />
 
-            <x-input label="__('site.terminals.save.identifier')" disabled type="text" model="identificador" />
+            <x-input label="{{__('site.terminals.save.identifier')}}" disabled type="text" model="identificador" />
 
             <div class="form-check form-switch mb-2 mt-2">
                 <input class="form-check-input" type="checkbox" role="switch" id="chkAsociar" wire:model.lazy="es_vk">

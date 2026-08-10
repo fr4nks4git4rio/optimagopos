@@ -368,6 +368,24 @@ class Save extends Modal
             }
             $this->sucursal->save();
 
+            $attributes = Arr::except($this->sucursal->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+            if ($this->sucursal->wasRecentlyCreated) {
+                $log = __('site.branches.save.log_created_detail', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial)]);
+                activity(__('site.branches.save.log_created'))
+                    ->on($this->sucursal)
+                    ->event('created')
+                    ->withProperties(Sucursal::parseData($attributes))
+                    ->log($log);
+            } else {
+                $log = __('site.branches.save.log_updated_detail', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial)]);
+                activity(__('site.branches.save.log_updated'))
+                    ->on($this->sucursal)
+                    ->event('updated')
+                    ->withProperty('attributes', Sucursal::parseData($attributes))
+                    ->withProperty('old', Sucursal::parseData(Arr::only($this->sucursal->getOriginal(), array_keys($attributes))))
+                    ->log($log);
+            }
+
             $this->emit('show-toast', __('site.branches.save.branch_saved_successfully'));
             if ($this->scope) {
                 if ($this->sucursal->wasRecentlyCreated) {
@@ -396,11 +414,6 @@ class Save extends Modal
             return;
         }
 
-        // if ($this->cliente_id) {
-        //     $cliente = Cliente::find($this->cliente_id);
-        //     $nombre = Crypt::decrypt($cliente->nombre_comercial);
-        //     $this->dispatchBrowserEvent("set-data-cliente_id", ['data' => [['id' => $cliente->id, 'text' => $nombre]], 'term' => '', 'value' => $cliente->id]);
-        // }
         if ($this->direccion_fiscal['estado_id']) {
             $estado = Estado::find($this->direccion_fiscal['estado_id']);
             $this->dispatchBrowserEvent("set-data-direccion_fiscal-estado_id", ['data' => [$estado->only('id', 'text')], 'term' => '', 'value' => $estado->id]);

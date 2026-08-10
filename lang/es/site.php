@@ -65,6 +65,9 @@ return [
         'rfc_format' => 'El RFC no tiene un formato válido.',
         'rfc_fiscal_regimen_incoherent' => 'El RFC y el régimen fiscal no son coherentes.',
     ],
+    'contextual_help' => [
+        'no_data' => 'No hay ayudas disponibles para esta página.'
+    ],
     'login' => [
         'welcome'  => 'bienvenido',
         'welcome_detail' => 'Ingresa tus credenciales para acceder',
@@ -260,19 +263,27 @@ return [
             'password' => 'contraseña',
             'confirm_password' => 'confirmar contraseña',
             'save_user' => 'guardar usuario',
-            'user_saved' => 'Usuario guardado'
+            'user_saved' => 'Usuario guardado',
+            'log_created' => 'Usuario creado',
+            'log_updated' => 'Usuario actualizado',
+            'log_created_detail' => 'El usuario con email :email ha sido creado.',
+            'log_updated_detail' => 'El usuario con email :email ha sido modificado.',
         ],
         'delete' => [
             'delete_user' => 'desactivar usuario',
             'are_you_sure' => '¿Está seguro de desactivar este usuario?',
             'confirm_delete' => 'Confirmar desactivación',
-            'user_deactivated' => 'Usuario desactivado.'
+            'user_deactivated' => 'Usuario desactivado.',
+            'log_deleted' => 'Usuario desactivado.',
+            'log_deleted_detail' => 'El usuario con email :email ha sido desactivado.',
         ],
         'restore' => [
             'restore_user' => 'restaurar usuario',
             'are_you_sure' => '¿Está seguro de restaurar este usuario?',
-            'confirm_restore' => 'Confirmar restauración',
-            'user_activated' => 'Usuario activado.'
+            'confirm_restore' => 'Confirmar reactivación',
+            'user_activated' => 'Usuario reactivado.',
+            'log_restored' => 'Usuario reactivado.',
+            'log_restored_detail' => 'El usuario con email :email ha sido reactivado.',
         ]
     ],
     'modules' => [
@@ -414,6 +425,7 @@ return [
     'clients' => [
         'index' => [
             'title' => 'Clientes',
+            'logo' => 'Logo',
             'search_clients' => 'Buscar Clientes',
             'commercial_name' => 'Nombre Comercial',
             'rfc' => 'RFC',
@@ -450,6 +462,9 @@ return [
             'client_save_failed' => 'Ocurrio un error. No se pudo guardar el cliente.',
             'fiscal_address_created' => 'Dirección Fiscal de Cliente Creada',
             'fiscal_address_updated' => 'Dirección Fiscal de Cliente Actualizada',
+            'logo' => 'Logo',
+            'upload_logo' => 'Subir Logo',
+            'remove_logo' => 'Quitar Logo',
         ],
         'delete' => [
             'delete_client' => 'Desactivar Cliente',
@@ -513,6 +528,10 @@ return [
             'branch_save_failed' => 'Ocurrio un error. No se pudo guardar la sucursal.',
             'fiscal_address_created' => 'Dirección Fiscal de Sucursal Creada',
             'fiscal_address_updated' => 'Dirección Fiscal de Sucursal Actualizada',
+            'log_created' => 'Sucursal Creada',
+            'log_updated' => 'Sucursal Actualizada',
+            'log_created_detail' => 'La Sucursal con nombre comercial: :nombre_comercial, ha sido creada.',
+            'log_updated_detail' => 'La Sucursal con nombre comercial: :nombre_comercial, ha sido actualizada.',
         ],
         'configs' => [
             'title' => 'Configuraciones de Sucursal',
@@ -526,7 +545,13 @@ return [
             'exchange_rate' => 'Tasa de Cambio',
             'save_exchange_rate' => 'Guardar Tasa',
             'others_configs' => 'Otras Configuraciones',
-            'branch_currency' => 'Moneda de Sucursal'
+            'branch_currency' => 'Moneda de Sucursal',
+            'branch_config_updated' => 'Configuraciones de Sucursal actualizadas.',
+            'branch_config_updated_detail' => 'Las configuraciones de la Sucursal: :nombre_comercial han sido actualizadas.',
+            'branch_exchange_rate_created' => 'Tipo de Cambio creado.',
+            'branch_exchange_rate_updated' => 'Tipo de Cambio actualizado',
+            'branch_exchange_rate_created_detail' => 'Tipo de Cambio perteneciente a la Sucursal: :nombre_comercial ha sido creado.',
+            'branch_exchange_rate_updated_detail' => 'Tipo de Cambio perteneciente a la Sucursal: :nombre_comercial ha sido actualizado.',
         ],
         'branch_payment_forms' => [
             'title' => 'Formas de Pago de Sucursal',
@@ -542,7 +567,13 @@ return [
             'changes_alert' => '<strong>Importante:</strong> Tenga en cuenta que, cualquier cambio en el
                                         <strong>nombre</strong>, deberá también aplicarse en las terminales de la
                                         Sucursal!',
-            'save_payment_form' => 'Guardar Forma de Pago'
+            'save_payment_form' => 'Guardar Forma de Pago',
+            'log_created' => 'Forma de Pago creada.',
+            'log_updated' => 'Forma de Pago actualizada',
+            'log_deleted' => 'Forma de Pago desactivada',
+            'log_created_detail' => 'La Forma de Pago: :payment_form ha sido creada para la sucursal: :nombre_comercial.',
+            'log_updated_detail' => 'La Forma de Pago: :payment_form perteneciente a la sucursal: :nombre_comercial ha sido actualizada.',
+            'log_deleted_detail' => 'La Forma de Pago: :payment_form perteneciente a la sucursal: :nombre_comercial ha sido desactivada.',
         ],
         'delete' => [
             'delete_branch' => 'Desactivar Sucursal',
@@ -550,6 +581,8 @@ return [
             'confirm_delete' => 'Confirmar desactivación',
             'branch_delete_success' => 'Sucursal desactivada.',
             'branch_delete_failed' => 'Ocurrio un error. No se pudo desactivar la sucursal.',
+            'log_deleted' => 'Sucursal desactivada',
+            'log_deleted_detail' => 'La Sucursal: :nombre_comercial ha sido desactivada.',
         ],
         'restore' => [
             'restore_branch' => 'Restaurar Sucursal',
@@ -557,7 +590,9 @@ return [
             'confirm_restore' => 'Confirmar restauración',
             'branch_restore_success' => 'Sucursal restaurada.',
             'branch_restore_failed' => 'Ocurrio un error. No se pudo restaurar la sucursal.',
-            'branch_not_found' => 'Sucursal no encontrada.'
+            'branch_not_found' => 'Sucursal no encontrada.',
+            'log_restored' => 'Sucursal reactivada.',
+            'log_restored_detail' => 'La Sucursal :nombre_comercial ha sido reactivada.',
         ]
     ],
     'terminals' => [
@@ -581,7 +616,11 @@ return [
             'comments' => 'Comentarios',
             'is_vk' => 'Video Kitchen Habilitado',
             'save_terminal' => 'Guardar Terminal',
-            'terminal_saved' => 'Terminal guardada.'
+            'terminal_saved' => 'Terminal guardada.',
+            'log_created' => 'Terminal creada.',
+            'log_updated' => 'Terminal modificada.',
+            'log_created_detail' => 'La Terminal :name ha sido creada.',
+            'log_updated_detail' => 'La Terminal :name ha sido modificada.',
         ],
         'delete' => [
             'delete_terminal' => 'Desactivar Terminal',
@@ -589,14 +628,18 @@ return [
             'confirm_delete' => 'Confirmar desactivación',
             'terminal_delete_success' => 'Terminal desactivada.',
             'terminal_delete_failed' => 'Ocurrio un error. No se pudo desactivar la terminal.',
+            'log_deleted' => 'Terminal desactivada.',
+            'log_deleted_detail' => 'La Terminal :name ha sido desativada.',
         ],
         'restore' => [
-            'restore_terminal' => 'Restaurar Terminal',
-            'are_you_sure' => '¿Está seguro de restaurar esta terminal?',
-            'confirm_restore' => 'Confirmar restauración',
-            'terminal_restore_success' => 'Terminal restaurada.',
+            'restore_terminal' => 'Reactivar Terminal',
+            'are_you_sure' => '¿Está seguro de reactivar esta terminal?',
+            'confirm_restore' => 'Confirmar reactivación',
+            'terminal_restore_success' => 'Terminal reactivada.',
             'terminal_restore_failed' => 'Ocurrio un error. No se pudo restaurar la terminal.',
-            'terminal_not_found' => 'Terminal no encontrada.'
+            'terminal_not_found' => 'Terminal no encontrada.',
+            'log_restored' => 'Terminal reactivada.',
+            'log_restored_detail' => 'La Terminal :name ha sido reactivada.',
         ]
     ],
     'subscriptions' => [
@@ -807,7 +850,9 @@ return [
         'review_invoices' => 'Revisar Facturas',
         'visit_panel_pac_site' => 'Visitar portal del PAC',
         'save_inovice_header_first' => 'Primero debe guardar la Cabecera de Factura.',
-        'stamping_method_saved' => 'Modo de Timbrado cambiado.'
+        'stamping_method_saved' => 'Modo de Timbrado cambiado.',
+        'log_updated' => 'Panel PAC modificado.',
+        'log_updated_detail' => 'Panel PAC de Sucursal :nombre_comercial ha sido modificado.'
     ],
     'invoice_header' => [
         'title' => 'Cabecera Factura',
@@ -829,6 +874,14 @@ return [
         'log_address_system_name' => 'Dirección de Cabecera de Factura del Sistema',
         'log_address_system_detail' => 'Los datos de la Cabecera de Factura del sistema ha sido actualizada.',
         'address_saved' => 'Dirección guardada.',
+        'log_payment_form_updated' => 'Forma de Pago de Sucursal modificada.',
+        'log_payment_form_updated_detail' => 'La Forma de Pago :payment_form perteneciente a la Sucursal :nombre_comercial ha sido modificada.',
+        'log_general_data_updated' => 'Datos Generales de Cabecera de Factura de Sucursal modificada.',
+        'log_general_data_updated_detail' => 'Los datos generales de la cabecera de factura pertenecientes a la Sucursal con RFC :rfc han sido modificados.',
+        'log_fiscal_address_updated' => 'Dirección Fiscal de Cabecera de Factura de Sucursal modificada.',
+        'log_fiscal_address_updated_detail' => 'La dirección fiscal de la cabecera de factura pertenecientes a la Sucursal con RFC :rfc han sido modificada.',
+        'log_fiscal_address_created' => 'Dirección Fiscal de Cabecera de Factura de Sucursal modificada.',
+        'log_fiscal_address_created_detail' => 'La dirección fiscal de la cabecera de factura pertenecientes a la Sucursal con RFC :rfc han sido modificada.',
     ],
     'invoices' => [
         'index' => [

@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -94,6 +96,29 @@ class SucursalFormaPago extends Model
             'sucursal_id.required' => 'Campo requerido.',
             'sucursal_id.exists' => 'Sucursal no encontrada.',
         ];
+    }
+
+    public static function parseData($data = [])
+    {
+        foreach ($data as $key => $value) {
+            if (in_array($key, ['moneda_id', 'forma_pago_id', 'sucursal_id']) && $value) {
+                switch ($key) {
+                    case 'moneda_id':
+                        $data['moneda'] = DB::table('tb_monedas')
+                            ->selectRaw('id, CONCAT(codigo, " - ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'forma_pago_id':
+                        $data['forma_pago'] = DB::table('tb_forma_pagos')
+                            ->selectRaw('id, CONCAT(codigo, " - ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'sucursal_id':
+                        $data['sucursal'] = Crypt::decrypt(DB::table('tb_sucursales')->select('nombre_comercial')->where('id', $value)->first()->nombre_comercial);
+                        break;
+                }
+            }
+        }
+
+        return $data;
     }
 
     public function moneda()

@@ -223,6 +223,11 @@ class VentasDiarias extends Component
             'records' => $this->query()['finalRecords'],
             'formasPago' => $this->query()['formasPago'],
             'grandTotal' => $this->query()['grandTotal'],
+            'fechaInicio' => $this->fechaInicio,
+            'fechaFin' => $this->fechaFin,
+            'sucursalesSeleccionadas' => Sucursal::whereIn('id', $this->sucursal)->get()->each(function ($element) {
+                $element->nombre_comercial = Crypt::decrypt($element->nombre_comercial);
+            })->pluck('nombre_comercial')->toArray()
         ]);
         $pdf->save("$name.pdf");
 
@@ -236,8 +241,19 @@ class VentasDiarias extends Component
         $fileName = "$name.xlsx";
 
         $res = $this->query();
-
-        return (new VentasDiariasExport($name, $this->sorts, $res['finalRecords'], $res['formasPago'], $res['grandTotal']))
+        $sucursalesSeleccionadas = Sucursal::whereIn('id', $this->sucursal)->get()->each(function ($element) {
+            $element->nombre_comercial = Crypt::decrypt($element->nombre_comercial);
+        })->pluck('nombre_comercial')->toArray();
+        return (new VentasDiariasExport(
+            $name,
+            $this->sorts,
+            $res['finalRecords'],
+            $res['formasPago'],
+            $res['grandTotal'],
+            $this->fechaInicio,
+            $this->fechaFin,
+            $sucursalesSeleccionadas
+        ))
             ->download($fileName);
     }
 }

@@ -53,9 +53,9 @@
                         <th class="text-center" colspan="2" style="white-space: nowrap !important">Correcciones</th>
                     </tr>
                     <tr>
-                        <th class="text-center" style="white-space: nowrap !important">Monto</th>
+                        <th class="text-end" style="white-space: nowrap !important">Monto</th>
                         <th class="text-center" style="white-space: nowrap !important">Op.</th>
-                        <th class="text-center" style="white-space: nowrap !important">Monto</th>
+                        <th class="text-end" style="white-space: nowrap !important">Monto</th>
                         <th class="text-center" style="white-space: nowrap !important">Op.</th>
                     </tr>
                 </thead>
@@ -66,25 +66,25 @@
                         <tr>
                             @if ($loop->first)
                                 <td class="text-center align-middle"
-                                    rowspan="{{ count($sucursalData['operadores']) + 1 }}">
+                                    rowspan="{{ count($sucursalData['operadores']) }}">
                                     {{ $sucursalData['sucursal'] }}
                                 </td>
                             @endif
                             <td class="text-center">{{ $record->nombre }}</td>
                             <td class="text-end">{{ number_format($record->ventas_importe, 2) }}</td>
-                            <td class="text-end">{{ number_format($record->ventas_cant, 2) }}</td>
+                            <td class="text-center">{{ $record->ventas_cant }}</td>
                             <td class="text-end">{{ number_format($record->correcciones_importe, 2) }}</td>
-                            <td class="text-end">{{ number_format($record->correcciones_cant, 2) }}</td>
+                            <td class="text-center">{{ $record->correcciones_cant }}</td>
                         </tr>
                     @endforeach
 
                     {{-- Totalizador por sucursal --}}
                     <tr class="table-success fw-bold">
-                        <td class="text-end">Total {{ $sucursalData['sucursal'] }}</td>
+                        <td class="text-end" colspan="2">Total {{ $sucursalData['sucursal'] }}</td>
                         <td class="text-end">{{ number_format($sucursalData['totales']['ventas_importe'], 2) }}</td>
-                        <td class="text-end">{{ number_format($sucursalData['totales']['ventas_cant'], 2) }}</td>
+                        <td class="text-center">{{ $sucursalData['totales']['ventas_cant'] }}</td>
                         <td class="text-end">{{ number_format($sucursalData['totales']['correcciones_importe'], 2) }}</td>
-                        <td class="text-end">{{ number_format($sucursalData['totales']['correcciones_cant'], 2) }}
+                        <td class="text-center">{{ $sucursalData['totales']['correcciones_cant'] }}
                         </td>
                     </tr>
                 @empty
@@ -102,9 +102,9 @@
                     <tr class="table-dark fw-bold">
                         <td colspan="2" class="text-end">Total General</td>
                         <td class="text-end">{{ number_format($grandTotal['ventas_importe'], 2) }}</td>
-                        <td class="text-end">{{ $grandTotal['ventas_cant'] }}</td>
+                        <td class="text-center">{{ $grandTotal['ventas_cant'] }}</td>
                         <td class="text-end">{{ number_format($grandTotal['correcciones_importe'], 2) }}</td>
-                        <td class="text-end">{{ $grandTotal['correcciones_cant'] }}</td>
+                        <td class="text-center">{{ $grandTotal['correcciones_cant'] }}</td>
                     </tr>
                 </tfoot>
             @endif

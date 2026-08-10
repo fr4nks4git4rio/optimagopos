@@ -15,14 +15,20 @@ class VentasDiariasExport implements FromView
     private $records;
     private $formasPago;
     private $grandTotal;
+    private $fechaInicio;
+    private $fechaFin;
+    private $sucursalesSeleccionadas;
 
-    public function __construct($name, $sorts, $records, $formasPago, $grandTotal)
+    public function __construct($name, $sorts, $records, $formasPago, $grandTotal, $fechaInicio, $fechaFin, $sucursalesSeleccionadas)
     {
         $this->name = $name;
         $this->sorts = $sorts;
         $this->records = $records;
         $this->formasPago = $formasPago;
         $this->grandTotal = $grandTotal;
+        $this->fechaInicio = $fechaInicio;
+        $this->fechaFin = $fechaFin;
+        $this->sucursalesSeleccionadas = $sucursalesSeleccionadas;
     }
 
     public function view(): View
@@ -32,7 +38,10 @@ class VentasDiariasExport implements FromView
             'sorts' => $this->sorts,
             'records' => $this->records,
             'formasPago' => $this->formasPago,
-            'grandTotal' => $this->grandTotal
+            'grandTotal' => $this->grandTotal,
+            'fechaInicio' => $this->fechaInicio,
+            'fechaFin' => $this->fechaFin,
+            'sucursalesSeleccionadas' => $this->sucursalesSeleccionadas,
         ]);
     }
 }

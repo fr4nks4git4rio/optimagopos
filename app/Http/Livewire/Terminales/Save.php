@@ -67,13 +67,31 @@ class Save extends Modal
             [
                 'nombre' => ['required'],
                 'identificador' => ['required'],
-                'es_vk' => ['nullable','boolean'],
+                'es_vk' => ['nullable', 'boolean'],
                 'comentarios' => ['nullable'],
             ],
             // $messages
         );
 
         $this->terminal->fill($data)->save();
+
+        $attributes = Arr::except($this->terminal->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+        if ($this->terminal->wasRecentlyCreated) {
+            $log = __('site.terminals.save.log_created_detail', ['name' => $this->terminal->nombre]);
+            activity(__('site.terminals.save.log_created'))
+                ->on($this->terminal)
+                ->event('created')
+                ->withProperties(Terminal::parseData($attributes))
+                ->log($log);
+        } else {
+            $log = __('site.terminals.save.log_updated_detail', ['name' => $this->terminal->nombre]);
+            activity(__('site.terminals.save.log_updated'))
+                ->on($this->terminal)
+                ->event('updated')
+                ->withProperty('attributes', Terminal::parseData($attributes))
+                ->withProperty('old', Terminal::parseData(Arr::only($this->terminal->getOriginal(), array_keys($attributes))))
+                ->log($log);
+        }
 
         $this->emit('show-toast', __('site.terminals.save.terminal_saved'));
         $this->emit('$refresh');

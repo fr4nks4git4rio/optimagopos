@@ -5,6 +5,8 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -82,4 +84,30 @@ class TipoCambio extends Model
         'sucursal_id' => 'required',
         'cliente_id' => 'required',
     ];
+
+    public static function parseData($data = [])
+    {
+        foreach ($data as $key => $value) {
+            if (in_array($key, ['from_id', 'to_id', 'sucursal_id', 'cliente_id']) && $value) {
+                switch ($key) {
+                    case 'from_id':
+                        $data['from'] = DB::table('tb_monedas')
+                            ->selectRaw('id, CONCAT(codigo, " - ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'to_id':
+                        $data['to'] = DB::table('tb_monedas')
+                            ->selectRaw('id, CONCAT(codigo, " - ", descripcion) as nombre')->where('id', $value)->first()->nombre;
+                        break;
+                    case 'sucursal_id':
+                        $data['sucursal'] = Crypt::decrypt(DB::table('tb_sucursales')->select('nombre_comercial')->where('id', $value)->first()->nombre_comercial);
+                        break;
+                    case 'cliente_id':
+                        $data['cliente'] = Crypt::decrypt(DB::table('tb_clientes')->select('nombre_comercial')->where('id', $value)->first()->nombre_comercial);
+                        break;
+                }
+            }
+        }
+
+        return $data;
+    }
 }

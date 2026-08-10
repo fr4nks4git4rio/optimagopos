@@ -4,6 +4,10 @@
     <div class="col-12 col-sm-10 col-md-6 col-lg-4">
 
         <div class="text-center mb-4">
+            <a href="{{ url('/') }}" class="d-inline-block mb-4">
+                <img src="{{ asset('images/logo_transparent_' . config('app.locale') . '.png') }}"
+                    alt="{{ config('app.name') }}"style="height: 120px; width: auto;">
+            </a>
             <h2 class="fw-bold text-dark h3 mb-1 text-capitalize">{{ __('site.login.welcome') }}</h2>
             <p class="text-muted small">{{ __('site.login.welcome_detail') }}</p>
         </div>

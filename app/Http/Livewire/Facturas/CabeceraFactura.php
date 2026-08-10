@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire;
+namespace App\Http\Livewire\Facturas;
 
 use App\Models\RegimenFiscal;
 use App\Models\Direccion;
@@ -9,8 +9,10 @@ use App\Models\Localidad;
 use App\Models\Municipio;
 use App\Models\Cliente;
 use App\Models\Factura;
+use App\Models\FormaPago;
 use App\Models\Moneda;
 use App\Models\Sucursal;
+use App\Models\SucursalFormaPago;
 use App\Rules\RfcRule;
 use App\Rules\RfcYRegimenCoherentesRule;
 use App\Rules\RuleUnique;
@@ -70,9 +72,14 @@ class CabeceraFactura extends Component
             $sucursalIndex   = $matches[1]; // ej: 0
             $formaPagoIndex  = $matches[2]; // ej: 4
 
-            DB::table('tb_sucursal_forma_pagos as sfp')
-                ->where('id', $this->sucursales[$sucursalIndex]['formas_pago'][$formaPagoIndex]['id'])
-                ->update(['forma_pago_id' => $value ?? null]);
+            $sfp = SucursalFormaPago::find($this->sucursales[$sucursalIndex]['formas_pago'][$formaPagoIndex]['id']);
+            $sfp->update(['forma_pago_id' => $value ?? null]);
+
+            activity(__('site.invoice_header.log_payment_form_updated'))
+                ->on($sfp)
+                ->event('updated')
+                ->withProperty('forma_pago', $value ? FormaPago::find($value)->nombre : '')
+                ->log(__('site.invoice_header.log_payment_form_updated_detail', ['payment_form' => $sfp->nombre, 'nombre_comercial' => Crypt::decrypt($sfp->sucursal->nombre_comercial)]));
 
             $this->emit('show-toast', 'Forma de pago actualizada', 'success');
         }
@@ -82,7 +89,7 @@ class CabeceraFactura extends Component
 
     public function render()
     {
-        return view('livewire.cabecera-factura');
+        return view('livewire.facturas.cabecera-factura');
     }
 
     public function init()
@@ -237,13 +244,15 @@ class CabeceraFactura extends Component
             'moneda_facturacion_id' => $dataSucursal['moneda_facturacion_id']
         ])->save();
 
-        activity("Cabecera de Factura de Sucursal Actualizada")
+        $attributes = Arr::except($sucursal->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+        activity(__('site.invoice_header.log_general_data_updated'))
             ->on($sucursal)
             ->event('updated')
-            ->withProperties(Sucursal::parseData(Arr::except($sucursal->toArray(), ['created_at', 'updated_at', 'deleted_at'])))
-            ->log('Los datos de la Cabecera de Factura de la Sucursal con RFC: ' . $sucursal->rfc . ' ha sido actualizada.');
+            ->withProperty('attributes', Sucursal::parseData($attributes))
+            ->withProperty('old', Sucursal::parseData(Arr::only($sucursal->getOriginal(), array_keys($attributes))))
+            ->log(__('site.invoice_header.log_general_data_updated_detail', ['rfc' => $sucursal->rfc]));
 
-        $this->emit('show-toast', 'Datos Generales guardados.');
+        $this->emit('show-toast', __('site.invoice_header.general_data_saved'));
         //        $this->emit('$refresh');
     }
 
@@ -270,19 +279,19 @@ class CabeceraFactura extends Component
         if ($direccion->id) {
             if (count($direccion->getDirty()) > 0) {
                 $attributes = Arr::except($direccion->getDirty(), ['created_at', 'updated_at']);
-                activity('Dirección Fiscal de Sucursal Actualizada')
+                activity(__('site.invoice_header.log_fiscal_address_updated'))
                     ->on($direccion)
                     ->event('updated')
                     ->withProperty('attributes', Direccion::parseData($attributes))
                     ->withProperty('old', Direccion::parseData(Arr::only($direccion->getOriginal(), array_keys($attributes))))
-                    ->log('La Dirección Fiscal del Sucursal con RFC: ' . $sucursal->rfc . ' ha sido actualizada.');
+                    ->log(__('site.invoice_header.log_fiscal_address_updated_detail', ['rfc' => $sucursal->rfc]));
             }
         } else {
-            activity("Dirección Fiscal de Sucursal Creada")
+            activity(__('site.invoice_header.log_fiscal_address_created'))
                 ->on($direccion)
                 ->event('created')
                 ->withProperties(Direccion::parseData(Arr::except($direccion->toArray(), ['updated_at'])))
-                ->log('La Dirección Fiscal de la Sucursal con RFC: ' . $sucursal->rfc . ' ha sido creada.');
+                ->log(__('site.invoice_header.log_fiscal_address_created_detail', ['rfc' => $sucursal->rfc]));
         }
         $direccion->save();
 

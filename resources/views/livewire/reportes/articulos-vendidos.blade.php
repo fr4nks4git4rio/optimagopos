@@ -50,7 +50,7 @@
                     </tr>
                     <tr>
                         @foreach ($sucursales as $sucursal)
-                            <th class="text-center" style="white-space: nowrap !important">Monto</th>
+                            <th class="text-end" style="white-space: nowrap !important">Monto</th>
                             <th class="text-center" style="white-space: nowrap !important">Cant.</th>
                         @endforeach
                     </tr>

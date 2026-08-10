@@ -6,6 +6,7 @@ use App\Http\Livewire\Layouts\Modal;
 use App\Models\Sucursal;
 use App\Models\SucursalFormaPago;
 use App\Models\TipoCambio;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -100,6 +101,13 @@ class Configuraciones extends Modal
                 $this->{$key} = $this->sucursal->moneda_base_id;
                 return;
             }
+            $log = __('site.branches.save.branch_config_updated_detail', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial)]);
+            activity(__('site.branches.save.branch_config_updated'))
+                ->on($this->sucursal)
+                ->event('updated')
+                ->withProperty('attributes', [$key => $this->{$key}])
+                ->withProperty('old', [$key => $this->sucursal->moneda_base->codigo])
+                ->log($log);
             DB::table('tb_sucursales')->where('id', $this->sucursal->id)->update(['moneda_base_id' => $this->{$key}]);
         }
 
@@ -109,23 +117,26 @@ class Configuraciones extends Modal
 
     public function saveTasa()
     {
-        $data = $this->validate([
-            'tipo_cambio.tasa' => ['required', 'numeric', 'min:0.0001'],
-            'tipo_cambio.from_id' => ['required', 'exists:tb_monedas,id'],
-            'tipo_cambio.to_id' => ['required', 'exists:tb_monedas,id']
-        ],
-        // [
-        //     'tipo_cambio.tasa.required' => 'Campo obligatorio.',
-        //     'tipo_cambio.tasa.numeric' => 'El valor debe ser un número.',
-        //     'tipo_cambio.tasa.min' => 'El valor debe ser al menos :min.',
-        //     'tipo_cambio.from_id.required' => 'Campo obligatorio.',
-        //     'tipo_cambio.from_id.exists' => 'La moneda base seleccionada no es válida.',
-        //     'tipo_cambio.to_id.required' => 'Campo obligatorio.',
-        //     'tipo_cambio.to_id.exists' => 'La moneda destino seleccionada no es válida.'
-        // ]
+        $data = $this->validate(
+            [
+                'tipo_cambio.tasa' => ['required', 'numeric', 'min:0.0001'],
+                'tipo_cambio.from_id' => ['required', 'exists:tb_monedas,id'],
+                'tipo_cambio.to_id' => ['required', 'exists:tb_monedas,id']
+            ],
+            // [
+            //     'tipo_cambio.tasa.required' => 'Campo obligatorio.',
+            //     'tipo_cambio.tasa.numeric' => 'El valor debe ser un número.',
+            //     'tipo_cambio.tasa.min' => 'El valor debe ser al menos :min.',
+            //     'tipo_cambio.from_id.required' => 'Campo obligatorio.',
+            //     'tipo_cambio.from_id.exists' => 'La moneda base seleccionada no es válida.',
+            //     'tipo_cambio.to_id.required' => 'Campo obligatorio.',
+            //     'tipo_cambio.to_id.exists' => 'La moneda destino seleccionada no es válida.'
+            // ]
         );
 
-        TipoCambio::updateOrCreate(
+        $tcDB = TipoCambio::where('sucursal_id', $this->sucursal->id)->where('cliente_id', $this->sucursal->cliente_id)->where('from_id', $data['tipo_cambio']['from_id'])->where('to_id', $data['tipo_cambio']['to_id'])->first();
+
+        $tc = TipoCambio::updateOrCreate(
             [
                 'sucursal_id' => $this->sucursal->id,
                 'cliente_id' => $this->sucursal->cliente_id,
@@ -136,6 +147,25 @@ class Configuraciones extends Modal
                 'tasa' => $data['tipo_cambio']['tasa']
             ]
         );
+
+        if ($tcDB) {
+            $log = __('site.branches.save.branch_exchange_rate_updated_detail', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial)]);
+            activity(__('site.branches.save.branch_exchange_rate_updated'))
+                ->on($this->sucursal)
+                ->event('updated')
+                ->withProperty('attributes', ['tasa' => $tc->tasa])
+                ->withProperty('old', ['tasa' => $tcDB->tasa])
+                ->log($log);
+        } else {
+            $attributes = Arr::except($this->sucursal->getDirty(), ['created_at', 'updated_at']);
+            $log = __('site.branches.save.branch_exchange_rate_created_detail', ['nombre_comercial' => Crypt::decrypt($this->sucursal->nombre_comercial)]);
+            activity(__('site.branches.save.branch_exchange_rate_created'))
+                ->on($this->sucursal)
+                ->event('created')
+                ->withProperties(TipoCambio::parseData($attributes))
+                ->log($log);
+        }
+
         $this->loadTiposCambio();
         $this->emit('show-toast', __('site.branches.configs.exchange_rate_saved'));
         $this->emit('$refresh');

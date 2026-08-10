@@ -29,6 +29,12 @@ class Restore extends Modal
         $this->terminal = Terminal::withTrashed()->find($this->terminal);
         $this->terminal->restore();
 
+        activity(__('site.terminals.restore.log_restored'))
+            ->on($this->terminal)
+            ->event('restored')
+            ->withProperties(Terminal::parseData($this->terminal->getAttributes()))
+            ->log(__('site.terminals.restore.log_restored_detail',  ['name' => $this->terminal->nombre]));
+
         $this->emit('show-toast', __('site.terminals.restore.terminal_restore_success'));
         $this->emit('$refresh');
         $this->emit('closeModal');

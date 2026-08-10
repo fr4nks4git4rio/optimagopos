@@ -7,11 +7,12 @@
     <style>
         @page {
             margin: 90px 20px 60px 20px;
+            size: landscape;
         }
 
         body {
             font-family: 'Helvetica', Arial, sans-serif;
-            font-size: 10px;
+            font-size: 9px;
             color: #222;
         }
 
@@ -88,38 +89,69 @@
         table.data-table th,
         table.data-table td {
             border: 1px solid #ccc;
-            padding: 4px 6px;
+            padding: 4px 5px;
         }
 
         table.data-table thead th {
             background-color: #065f46;
             color: #ffffff;
             text-align: center;
-            font-size: 9px;
+            font-size: 8.5px;
             text-transform: uppercase;
             white-space: nowrap;
         }
 
         table.data-table thead tr.sub-header th {
             background-color: #065f46;
-            font-size: 8.5px;
+            font-size: 8px;
+        }
+
+        table.data-table thead th.th-abierto {
+            background-color: #b8860b;
+        }
+
+        table.data-table thead th.th-proceso {
+            background-color: #2e6da4;
+        }
+
+        table.data-table thead th.th-demorado {
+            background-color: #a94442;
+        }
+
+        table.data-table thead th.th-terminado {
+            background-color: #3c763d;
         }
 
         table.data-table tbody td {
             text-align: center;
-            font-size: 9px;
+            font-size: 8px;
         }
 
         table.data-table tbody td.text-left {
             text-align: left;
         }
 
-        table.data-table tbody td.text-right {
+        table.data-table tbody tr.row-even td {
+            background-color: #dee0e2;
+        }
+
+        .en-curso {
+            display: block;
+            font-size: 7px;
+            color: #888;
+            font-style: italic;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-end {
             text-align: right;
         }
 
-        table.data-table tbody tr.row-even td {
-            background-color: #dee0e2;
+        .align-middle {
+            vertical-align: middle;
         }
 
         /* Total por sucursal */
@@ -127,6 +159,7 @@
             background-color: #dfeee2;
             font-weight: bold;
             border-top: 1.5px solid #7fb894;
+            font-size: 8px;
         }
 
         /* Total general */
@@ -134,7 +167,7 @@
             background-color: #065f46;
             color: #ffffff;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 8.5px;
         }
 
         .no-results {
@@ -225,10 +258,20 @@
     {{-- ================= FILTROS APLICADOS ================= --}}
     <div class="filters-box">
         <strong>Periodo:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+        @if (!empty($estadosSeleccionados))
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <strong>Estado(s):</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $estadosSeleccionados)) }}
+        @endif
         @if (!empty($sucursalesSeleccionadas))
             &nbsp;&nbsp;|&nbsp;&nbsp;
             <strong>Sucursal(es):</strong>
             {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+        @endif
+        @if (!empty($terminalesSeleccionadas))
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <strong>Terminal(es):</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $terminalesSeleccionadas)) }}
         @endif
     </div>
 
@@ -238,58 +281,86 @@
             <thead>
                 <tr>
                     @foreach ($sorts as $sort)
-                        <th rowspan="2" style="text-align: center">{{ $sort }}</th>
+                        <th rowspan="2" class="text-center align-middle">{{ $sort }}</th>
                     @endforeach
-                    <th colspan="2" style="text-align: center">Ventas</th>
-                    <th colspan="2" style="text-align: center">Correcciones</th>
+                    <th colspan="2" class="th-abierto text-center">ABIERTO</th>
+                    <th colspan="2" class="th-proceso text-center">EN PROCESO</th>
+                    <th colspan="2" class="th-demorado text-center">DEMORADO</th>
+                    <th rowspan="2" class="th-terminado text-center align-middle">TERMINADO
+                    </th>
                 </tr>
                 <tr class="sub-header">
-                    <th style="text-align: right">Monto</th>
-                    <th style="text-align: center">Op.</th>
-                    <th style="text-align: right">Monto</th>
-                    <th style="text-align: center">Op.</th>
+                    <th class="text-center">Fecha/Hora</th>
+                    <th class="text-center">Duración</th>
+                    <th class="text-center">Fecha/Hora</th>
+                    <th class="text-center">Duración</th>
+                    <th class="text-center">Fecha/Hora</th>
+                    <th class="text-center">Duración</th>
                 </tr>
             </thead>
         @endif
 
         <tbody>
             @forelse($records as $sucursal_id => $sucursalData)
-                @php
-                    $totalFilas = count($sucursalData['operadores']);
-                    $pos = 0;
-                @endphp
+                @php $totalFilas = count($sucursalData['records']); @endphp
 
-                @foreach ($sucursalData['operadores'] as $index => $record)
-                    <tr class="{{ $pos % 2 == 1 ? 'row-even' : '' }}">
-                        @if ($pos == 0)
-                            <td style="text-align: center" rowspan="{{ $totalFilas }}">
+                @foreach ($sucursalData['records'] as $index => $record)
+                    <tr class="{{ $index % 2 == 1 ? 'row-even' : '' }}">
+                        @if ($index == 0)
+                            <td class="text-center align-middle" rowspan="{{ $totalFilas }}">
                                 {{ $sucursalData['sucursal'] }}
                             </td>
                         @endif
-                        <td>{{ $record->nombre }}</td>
-                        <td style="text-align: right">{{ number_format($record->ventas_importe, 2) }}</td>
-                        <td style="text-align: center">{{ $record->ventas_cant }}</td>
-                        <td style="text-align: right">{{ number_format($record->correcciones_importe, 2) }}</td>
-                        <td style="text-align: center">{{ $record->correcciones_cant }}</td>
+                        <td class="text-center">{{ $record->id_transaccion }}</td>
+                        <td class="text-center">{{ $record->terminal }}</td>
+
+                        <td class="text-center">{{ $record->fecha_transaccion_str ?? '-' }}</td>
+                        <td class="text-center">
+                            {{ $record->tiempo_abierto ?? '-' }}
+                            @if (!$record->fecha_terminado && $record->fecha_transaccion)
+                                <span class="en-curso">(en curso)</span>
+                            @endif
+                        </td>
+
+                        <td class="text-center">{{ $record->fecha_en_proceso_str ?? '-' }}</td>
+                        <td class="text-center">
+                            {{ $record->tiempo_en_proceso ?? '-' }}
+                            @if (!$record->fecha_terminado && $record->fecha_en_proceso)
+                                <span class="en-curso">(en curso)</span>
+                            @endif
+                        </td>
+
+                        <td class="text-center">{{ $record->fecha_demorado_str ?? '-' }}</td>
+                        <td class="text-center">
+                            {{ $record->tiempo_demorado ?? '-' }}
+                            @if (!$record->fecha_terminado && $record->fecha_demorado)
+                                <span class="en-curso">(en curso)</span>
+                            @endif
+                        </td>
+
+                        <td class="text-center">{{ $record->fecha_terminado_str ?? '-' }}</td>
                     </tr>
-                    @php $pos++; @endphp
                 @endforeach
 
                 {{-- Totalizador por sucursal --}}
                 <tr class="subtotal-row">
-                    <td colspan="2" style="text-align: right">Total {{ $sucursalData['sucursal'] }}</td>
-                    <td style="text-align: right">{{ number_format($sucursalData['totales']['ventas_importe'], 2) }}
+                    <td colspan="3" class="text-end">Totales {{ $sucursalData['sucursal'] }}</td>
+                    <td colspan="2" class="text-center">
+                        {{ $sucursalData['totales']['tickets_abiertos'] }}
+                        <span class="en-curso">(Prom:
+                            {{ $sucursalData['totales']['promedio_tickets_abiertos'] }})</span>
                     </td>
-                    <td style="text-align: center">{{ $sucursalData['totales']['ventas_cant'] }}</td>
-                    <td style="text-align: right">
-                        {{ number_format($sucursalData['totales']['correcciones_importe'], 2) }}
+                    <td colspan="2"></td>
+                    <td colspan="2" class="text-center">
+                        {{ $sucursalData['totales']['tickets_demorados'] }}
+                        <span class="en-curso">(Prom:
+                            {{ $sucursalData['totales']['promedio_tickets_demorados'] }})</span>
                     </td>
-                    <td style="text-align: center">
-                        {{ $sucursalData['totales']['correcciones_cant'] }}</td>
+                    <td></td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="no-results">
+                    <td colspan="{{ count($sorts) + 7 }}" class="no-results">
                         No se encontraron resultados para los filtros seleccionados.
                     </td>
                 </tr>
@@ -299,11 +370,17 @@
         @if (count($records) > 0)
             <tfoot>
                 <tr class="grand-total-row">
-                    <td colspan="2" style="text-align: right">TOTAL GENERAL</td>
-                    <td style="text-align: right">{{ number_format($grandTotal['ventas_importe'], 2) }}</td>
-                    <td style="text-align: center">{{ $grandTotal['ventas_cant'] }}</td>
-                    <td style="text-align: right">{{ number_format($grandTotal['correcciones_importe'], 2) }}</td>
-                    <td style="text-align: center">{{ $grandTotal['correcciones_cant'] }}</td>
+                    <td colspan="3" class="text-end">TOTAL GENERAL</td>
+                    <td colspan="2" class="text-center">
+                        {{ $totalGeneral['tickets_abiertos'] }}
+                        (Prom: {{ $totalGeneral['promedio_tickets_abiertos'] }})
+                    </td>
+                    <td colspan="2"></td>
+                    <td colspan="2" class="text-center">
+                        {{ $totalGeneral['tickets_demorados'] }}
+                        (Prom: {{ $totalGeneral['promedio_tickets_demorados'] }})
+                    </td>
+                    <td></td>
                 </tr>
             </tfoot>
         @endif
@@ -313,7 +390,7 @@
     <div class="footer">
         <table>
             <tr>
-                @if (file_exists($ownerLogoPath))
+                @if ($ownerLogoPath && file_exists($ownerLogoPath))
                     <td class="footer-logo">
                         <img src="{{ $ownerLogoPath }}" alt="Logo">
                     </td>
@@ -327,7 +404,7 @@
                             $text = "Página {PAGE_NUM} de {PAGE_COUNT}";
                             $font = $fontMetrics->get_font("Helvetica", "normal");
                             $size = 8;
-                            $pdf->page_text(480, 782, $text, $font, $size, array(0.53, 0.53, 0.53));
+                            $pdf->page_text(730, 555, $text, $font, $size, array(0.53, 0.53, 0.53));
                         }
                     </script>
                 </td>

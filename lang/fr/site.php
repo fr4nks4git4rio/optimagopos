@@ -260,19 +260,27 @@ return [
             'password' => 'mot de passe',
             'confirm_password' => 'confirmer le mot de passe',
             'save_user' => 'enregistrer l\'utilisateur',
-            'user_saved' => 'Utilisateur enregistré'
+            'user_saved' => 'Utilisateur enregistré',
+            'log_created' => 'Créé par l\'utilisateur.',
+            'log_updated' => 'Utilisateur mis à jour.',
+            'log_created_detail' => 'L\'utilisateur avec l\'adresse e-mail :email a été créé.',
+            'log_updated_detail' => 'L\'utilisateur avec l\'adresse e-mail :email a été mis à jour.',
         ],
         'delete' => [
             'delete_user' => 'désactiver l\'utilisateur',
             'are_you_sure' => 'Êtes-vous sûr de vouloir désactiver cet utilisateur ?',
             'confirm_delete' => 'Confirmer la désactivation',
-            'user_deactivated' => 'Utilisateur désactivé.'
+            'user_deactivated' => 'Utilisateur désactivé.',
+            'log_deleted' => 'Utilisateur désactivé.',
+            'log_deleted_detail' => 'L\'utilisateur avec l\'adresse e-mail :email a été désactivé.',
         ],
         'restore' => [
             'restore_user' => 'restaurer l\'utilisateur',
             'are_you_sure' => 'Êtes-vous sûr de vouloir restaurer cet utilisateur ?',
             'confirm_restore' => 'Confirmer la restauration',
-            'user_activated' => 'Utilisateur activé.'
+            'user_activated' => 'Utilisateur restauré.',
+            'log_restored' => 'Utilisateur restauré.',
+            'log_restored_detail' => 'L\'utilisateur avec l\'adresse e-mail :email a été réactivé.',
         ]
     ],
     'modules' => [
@@ -414,6 +422,7 @@ return [
     'clients' => [
         'index' => [
             'title' => 'Clients',
+            'logo' => 'Logo',
             'search_clients' => 'Rechercher des Clients',
             'commercial_name' => 'Nom Commercial',
             'rfc' => 'Identifiant Fiscal',
@@ -450,6 +459,9 @@ return [
             'client_save_failed' => 'Une erreur est survenue. Le client n\'a pas pu être enregistré.',
             'fiscal_address_created' => 'Adresse Fiscale du Client Créée',
             'fiscal_address_updated' => 'Adresse Fiscale du Client Mise à Jour',
+            'logo' => 'Logo',
+            'upload_logo' => 'Téléverser le Logo',
+            'remove_logo' => 'Supprimer le Logo',
         ],
         'delete' => [
             'delete_client' => 'Désactiver le Client',
@@ -513,6 +525,10 @@ return [
             'branch_save_failed' => 'Une erreur est survenue. La succursale n\'a pas pu être enregistrée.',
             'fiscal_address_created' => 'Adresse Fiscale de la Succursale Créée',
             'fiscal_address_updated' => 'Adresse Fiscale de la Succursale Mise à Jour',
+            'log_created' => 'Branche créée',
+            'log_updated' => 'Branche mise à jour',
+            'log_created_detail' => 'La succursale portant le nom commercial :nombre_comercial a été créée.',
+            'log_updated_detail' => 'La succursale portant le nom commercial :nombre_comercial a été mise à jour.',
         ],
         'configs' => [
             'title' => 'Paramètres de la Succursale',
@@ -526,7 +542,13 @@ return [
             'exchange_rate' => 'Taux de Change',
             'save_exchange_rate' => 'Enregistrer le Taux',
             'others_configs' => 'Autres Paramètres',
-            'branch_currency' => 'Devise de la Succursale'
+            'branch_currency' => 'Devise de la Succursale',
+            'branch_config_updated' => 'Configurations des succursales mises à jour.',
+            'branch_config_updated_detail' => 'Les paramètres de la branche: :nombre_comercial ont été mis à jour.',
+            'branch_exchange_rate_created' => 'Taux de change créé',
+            'branch_exchange_rate_updated' => 'Taux de change mis à jour',
+            'branch_exchange_rate_created_detail' => 'Le taux de change pour la succursale :nombre_comercial a été créé.',
+            'branch_exchange_rate_updated_detail' => 'Le taux de change pour la succursale :nombre_comercial a été mis à jour.',
         ],
         'branch_payment_forms' => [
             'title' => 'Modes de Paiement de la Succursale',
@@ -542,7 +564,13 @@ return [
             'changes_alert' => '<strong>Important :</strong> Notez que toute modification du
                                         <strong>nom</strong> devra également être appliquée aux terminaux de la
                                         Succursale !',
-            'save_payment_form' => 'Enregistrer le Mode de Paiement'
+            'save_payment_form' => 'Enregistrer le Mode de Paiement',
+            'log_created' => 'Formulaire de paiement créé.',
+            'log_updated' => 'Formulaire de paiement mis à jour.',
+            'log_deleted' => 'Formulaire de paiement désactivé.',
+            'log_created_detail' => 'Le mode de paiement :payment_form a été créé pour l\'agence :nombre_comercial.',
+            'log_updated_detail' => 'Le paiement provenant de :payment_form et rattaché à la succursale :nombre_comercial a été mis à jour.',
+            'log_deleted_detail' => 'Le paiement provenant de :payment_form et rattaché à la succursale :nombre_comercial a été désactivé.',
         ],
         'delete' => [
             'delete_branch' => 'Désactiver la Succursale',
@@ -550,6 +578,8 @@ return [
             'confirm_delete' => 'Confirmer la désactivation',
             'branch_delete_success' => 'Succursale désactivée.',
             'branch_delete_failed' => 'Une erreur est survenue. La succursale n\'a pas pu être désactivée.',
+            'log_deleted' => 'Branche désactivée',
+            'log_deleted_detail' => 'L\'agence :nombre_comercial a été désactivée.',
         ],
         'restore' => [
             'restore_branch' => 'Restaurer la Succursale',
@@ -557,7 +587,9 @@ return [
             'confirm_restore' => 'Confirmer la restauration',
             'branch_restore_success' => 'Succursale restaurée.',
             'branch_restore_failed' => 'Une erreur est survenue. La succursale n\'a pas pu être restaurée.',
-            'branch_not_found' => 'Succursale introuvable.'
+            'branch_not_found' => 'Succursale introuvable.',
+            'log_restored' => 'Branche rétablie.',
+            'log_restored_detail' => 'La branche :nombre_comercial a été restaurée.',
         ]
     ],
     'terminals' => [
@@ -581,7 +613,11 @@ return [
             'comments' => 'Commentaires',
             'is_vk' => 'Cuisine Vidéo Activée',
             'save_terminal' => 'Enregistrer le Terminal',
-            'terminal_saved' => 'Terminal enregistré.'
+            'terminal_saved' => 'Terminal enregistré.',
+            'log_created' => 'Terminal créé.',
+            'log_updated' => 'Terminal mis à jour.',
+            'log_created_detail' => 'Le terminal :name a été créé.',
+            'log_updated_detail' => 'Le terminal :name a été mis à jour.',
         ],
         'delete' => [
             'delete_terminal' => 'Désactiver le Terminal',
@@ -589,6 +625,8 @@ return [
             'confirm_delete' => 'Confirmer la désactivation',
             'terminal_delete_success' => 'Terminal désactivé.',
             'terminal_delete_failed' => 'Une erreur est survenue. Le terminal n\'a pas pu être désactivé.',
+            'log_deleted' => 'Terminal désactivé.',
+            'log_deleted_detail' => 'Le terminal :name a été désactivé.',
         ],
         'restore' => [
             'restore_terminal' => 'Restaurer le Terminal',
@@ -596,7 +634,9 @@ return [
             'confirm_restore' => 'Confirmer la restauration',
             'terminal_restore_success' => 'Terminal restauré.',
             'terminal_restore_failed' => 'Une erreur est survenue. Le terminal n\'a pas pu être restauré.',
-            'terminal_not_found' => 'Terminal introuvable.'
+            'terminal_not_found' => 'Terminal introuvable.',
+            'log_restored' => 'Terminal rétabli.',
+            'log_restored_detail' => 'Le terminal :name a été restauré.',
         ]
     ],
     'subscriptions' => [
@@ -806,7 +846,9 @@ return [
         'review_invoices' => 'Vérifier les Factures',
         'visit_panel_pac_site' => 'Visiter le portail du PAC',
         'save_inovice_header_first' => 'Vous devez d\'abord enregistrer l\'En-tête de Facture.',
-        'stamping_method_saved' => 'Mode de Certification modifié.'
+        'stamping_method_saved' => 'Mode de Certification modifié.',
+        'log_updated' => 'Panneau de la pompe à chaleur mis à jour.',
+        'log_updated_detail' => 'Le panneau PAC pour la succursale :nombre_comercial a été modifié.'
     ],
     'invoice_header' => [
         'title' => 'En-tête de Facture',
@@ -828,6 +870,10 @@ return [
         'log_address_system_name' => 'Adresse de l\'En-tête de Facture du Système',
         'log_address_system_detail' => 'Les données de l\'En-tête de Facture du système ont été mises à jour.',
         'address_saved' => 'Adresse enregistrée.',
+        'log_payment_form_updated' => 'Mode de paiement de l\'agence mis à jour.',
+        'log_payment_form_updated_detail' => 'Le mode de paiement :payment_form associé à la succursale :nombre_comercial a été mis à jour.',
+        'log_general_data_updated' => 'Données générales mises à jour de l\'en-tête de la facture de la succursale.',
+        'log_general_data_updated_detail' => 'Les données générales d\'en-tête de facture pour la succursale avec le RFC :rfc ont été mises à jour.',
     ],
     'invoices' => [
         'index' => [

@@ -58,7 +58,7 @@
                     </tr>
                     <tr>
                         @foreach ($formasPago as $formaPago)
-                            <th class="text-center" style="white-space: nowrap !important">Monto</th>
+                            <th class="text-end" style="white-space: nowrap !important">Monto</th>
                             <th class="text-center" style="white-space: nowrap !important">Op.</th>
                         @endforeach
                     </tr>
@@ -69,7 +69,7 @@
                     @foreach ($sucursalData['fechas'] as $record)
                         <tr>
                             @if ($loop->first)
-                                <td class="text-center align-middle" rowspan="{{ count($sucursalData['fechas']) + 1 }}">
+                                <td class="text-center align-middle" rowspan="{{ count($sucursalData['fechas']) }}">
                                     {{ $sucursalData['sucursal'] }}
                                 </td>
                             @endif
@@ -84,7 +84,7 @@
 
                     {{-- Totalizador por sucursal --}}
                     <tr class="table-success fw-bold">
-                        <td class="text-end">Total {{ $sucursalData['sucursal'] }}</td>
+                        <td class="text-end" colspan="2">Total {{ $sucursalData['sucursal'] }}</td>
                         @foreach ($formasPago as $i => $formaPago)
                             @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                             <td class="text-end">{{ number_format($totalCelda['monto'], 2) }}</td>

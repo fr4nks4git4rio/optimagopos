@@ -48,7 +48,7 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th>{{ __('site.branches.index.logo') }}</th>
+                    <th class="text-center">{{ __('site.branches.index.logo') }}</th>
                     @foreach ($sorts as $sort)
                         <th class="text-left cursor-pointer text-uppercase" style="white-space: nowrap !important"
                             wire:click="changeSort('{{ $sort }}')">
@@ -65,9 +65,9 @@
             <tbody>
                 @forelse($sucursales as $sucursal)
                     <tr>
-                        <td class="text-center">
+                        <td>
                             <img src="{{ $sucursal['logo'] ? asset("logos/{$sucursal['logo']}") : asset('img/no_image.png') }}"
-                                alt="Logo Sucursal" style="width: 80px" class="img-thumbnail">
+                                alt="Logo Sucursal" style="width: 80px" class="img-thumbnail m-auto">
                         </td>
                         <td>{{ $sucursal['nombre_comercial'] }}</td>
                         <td>{{ $sucursal['rfc'] }}</td>

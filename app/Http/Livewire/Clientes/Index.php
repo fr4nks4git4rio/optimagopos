@@ -70,7 +70,7 @@ class Index extends Component
             default => Cliente::withTrashed(),
         };
 
-        $clientes = $query->where('es_cliente', 1)->get()->map->only(['id', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at'])->toArray();
+        $clientes = $query->where('es_cliente', 1)->get()->map->only(['id', 'logo', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at'])->toArray();
         $records_final = collect();
 
         foreach ($clientes as $cliente) {
