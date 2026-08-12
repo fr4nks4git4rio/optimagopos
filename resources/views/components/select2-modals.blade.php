@@ -10,11 +10,7 @@
 @php
     //    $options = Arr::isAssoc($options) ? $options : array_combine($options, $options);
     $label = $label ? "$label:" : null;
-    if ($lazy) {
-        $bind = '.lazy';
-    } else {
-        $bind = '.defer';
-    }
+    $bind = $lazy ? '.live' : '';
 
     $id = \Illuminate\Support\Str::replace('.', '-', $model);
 

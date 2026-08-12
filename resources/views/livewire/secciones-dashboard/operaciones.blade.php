@@ -56,7 +56,7 @@
 <div class="row">
     <div class="col-12 col-lg-4 mb-3">
         <div x-data="{
-            datosVentasHora: @entangle('operacionesData.grafica_ventas_hora'),
+            datosVentasHora: @entangle('operacionesData.grafica_ventas_hora').live,
             chart: null,
             sinDatos: false,
             horasDelDia: [],
@@ -191,7 +191,7 @@
     </div>
     <div class="col-12 col-lg-4 mb-3">
         <div x-data="{
-            datosOperacionesHora: @entangle('operacionesData.grafica_operaciones_hora'),
+            datosOperacionesHora: @entangle('operacionesData.grafica_operaciones_hora').live,
             chart: null,
             sinDatos: false,
             horasDelDia: [],
@@ -326,7 +326,7 @@
     </div>
     <div class="col-12 col-lg-4 mb-3">
         <div x-data="{
-            datosTopTickets: @entangle('operacionesData.top_tickets'),
+            datosTopTickets: @entangle('operacionesData.top_tickets').live,
             chart: null,
             sinDatos: false,
 

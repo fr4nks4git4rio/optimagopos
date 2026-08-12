@@ -6,29 +6,30 @@
 
     <x-slot:content>
         <div class="row" wire:init="init()">
-            <div x-data="{ avatar_uploaded: false }" class="col-12 col-md-3 text-center mb-2"
-                x-on:livewire-upload-finish="avatar_uploaded=true;$wire.avatar_src = URL.createObjectURL(document.getElementById('avatar').files[0])">
+            <div class="col-12 col-md-3 text-center mb-2">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h2 class="h4 text-capitalize text-center">{{ __('site.users.save.picture') }}</h2>
-                        @if (!$this->has_avatar)
-                            <img src="{{ asset('img/avatars/no_avatar.png') }}" alt=""
-                                class="img-thumbnail rounded-4" id="avatar_image">
+                        <hr>
+                        @if ($avatar)
+                            <img src="{{ $avatar->temporaryUrl() }}" alt="Logo preview" class="img-thumbnail rounded-4">
+
+                            {{-- 2. Mostrar logo existente de la base de datos si existe --}}
+                        @elseif ($avatar_src)
+                            <img src="{{ asset($avatar_src) }}" alt="Avatar actual" class="img-thumbnail rounded-4">
+
+                            {{-- 3. Imagen por defecto si no hay nada --}}
                         @else
-                            <template x-if="avatar_uploaded">
-                                <img src="{{ $avatar_src }}" alt="" class="img-thumbnail rounded-4">
-                            </template>
-                            <template x-if="!avatar_uploaded">
-                                <img src="{{ asset($avatar_src) }}" alt="" class="img-thumbnail rounded-4">
-                            </template>
+                            <img src="{{ asset('img/avatars/no_avatar.png') }}" alt="Sin avatar"
+                                class="img-thumbnail rounded-4">
                         @endif
 
-                        <input type="file" style="display: none" id="avatar" wire:model="avatar"
+                        <input type="file" style="display: none" id="avatar" wire:model.live="avatar"
                             accept=".jpg,.jpeg,.png">
                         <button type="button" class="btn btn-site-primary mt-2 text-capitalize"
                             onclick="document.getElementById('avatar').click()">{{ __('site.users.save.upload_picture') }}
                         </button>
-                        @if ($this->has_avatar)
+                        @if ($avatar || $avatar_src)
                             <button type="button" class="btn btn-secondary mt-2 text-capitalize"
                                 wire:click="removePhoto()">{{ __('site.users.save.remove_picture') }}
                             </button>
@@ -84,7 +85,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary text-capitalize" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">
+            wire:click="$dispatch('closeModal')">
             {{ __('site.common.close') }}
         </button>
         <button type="submit" class="btn btn-site-primary text-capitalize">{{ __('site.common.save') }}</button>

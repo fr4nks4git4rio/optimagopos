@@ -8,7 +8,7 @@
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
                 <input type="search" placeholder="{{ __('site.quarantine.index.search_ticket') }}"
-                    class="form-control text-capitalize" wire:model.debounce.500ms="search">
+                    class="form-control text-capitalize" wire:model.live.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
@@ -65,10 +65,10 @@
                                     <li class="list-inline-item">
                                         @if ($ticket->es_vk)
                                             <x-action icon="tools" title="{{ __('site.common.edit') }}"
-                                                click="$emit('openModal', 'cuarentena.fix-vk', {registro: {{ $ticket->id }}})" />
+                                                click="$dispatch('openModal', { component: 'cuarentena.fix-vk', arguments: {registro: {{ $ticket->id }}} })" />
                                         @else
                                             <x-action icon="tools" title="{{ __('site.common.edit') }}"
-                                                click="$emit('openModal', 'cuarentena.fix', {registro: {{ $ticket->id }}})" />
+                                                click="$dispatch('openModal', { component: 'cuarentena.fix', arguments: {registro: {{ $ticket->id }}} })" />
                                         @endif
                                     </li>
                                 @endcan

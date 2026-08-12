@@ -13,7 +13,7 @@
                 statusClass: 'text-muted',
 
                 init() {
-                    window.livewire.on('cfdi_timbrado_productivo_updated', (value) => {
+                    Livewire.on('cfdi_timbrado_productivo_updated', (value) => {
                         this.$nextTick(() => {
                             this.buscarTimbres();
                         });
@@ -38,24 +38,24 @@
                             this.timbres = data.message || '{{ __('site.panel_pac.getting_data_error') }}';
                             this.statusClass = 'text-danger small';
                             if (!data.message) {
-                                $emit('show-toast', { message: '{{ __('site.panel_pac.error') }}', type: 'danger' });
+                                $dispatch('show-toast', { message: '{{ __('site.panel_pac.error') }}', type: 'danger' });
                             }
                         }
                     } catch (error) {
                         this.loading = false;
                         this.timbres = '{{__('site.panel_pac.connection_error')}}';
                         this.statusClass = 'text-danger small';
-                        $emit('show-toast', { message: error.message, type: 'danger' });
+                        $dispatch('show-toast', { message: error.message, type: 'danger' });
                     }
                 }
             }">
 
                 <div class="row g-4">
 
-                    <div class="col-md-12">
+                    <div class="col-12 col-md-4">
                         <div class="card h-100 shadow-sm border-0 rounded-3">
                             <div
-                                class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                                class="card-body p-4 text-center d-flex flex-column align-items-center">
                                 <div class="bg-primary-subtle text-primary rounded-circle p-3 mb-3">
                                     <i class="bi bi-toggle-on fs-4 p-1"></i>
                                 </div>
@@ -71,10 +71,10 @@
                         </div>
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-12 col-md-4">
                         <div class="card h-100 shadow-sm border-0 rounded-3">
                             <div
-                                class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                                class="card-body p-4 text-center d-flex flex-column align-items-center">
                                 <div class="rounded-circle p-3 mb-3"
                                     :class="loading ? 'bg-light text-muted' : 'bg-success-subtle text-success'">
                                     <template x-if="loading">
@@ -97,10 +97,10 @@
                         </div>
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-12 col-md-4">
                         <div class="card h-100 shadow-sm border-0 rounded-3">
                             <div
-                                class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                                class="card-body p-4 text-center d-flex flex-column align-items-center">
                                 <div class="bg-danger-subtle text-danger rounded-circle p-3 mb-3">
                                     <i class="bi bi-globe fs-4 p-1"></i>
                                 </div>
@@ -120,7 +120,7 @@
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
             {{__('site.common.close')}}
         </button>
     </x-slot:buttons>

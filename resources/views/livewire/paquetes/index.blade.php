@@ -8,13 +8,13 @@
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
                 <input type="search" placeholder="{{ __('site.packages.list.search_packages') }}" class="form-control text-capitalize"
-                    wire:model.debounce.500ms="search">
+                    wire:model.live.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
             @can('create', [App\Models\Paquete::class])
                 <button type="button" class="btn btn-site-primary btn-outline-warning text-capitalize"
-                    wire:click="$emit('openModal', 'paquetes.save')">
+                    wire:click="$dispatch('openModal', { component: 'paquetes.save' })">
                     <x-icon name="plus-lg" />
                     {{ __('site.packages.list.create_package') }}
                 </button>
@@ -74,20 +74,20 @@
                                     @can('update', App\Models\Paquete::find($paquete->id))
                                         <li class="list-inline-item">
                                             <x-action icon="pencil" title="{{ __('site.common.edit') }}"
-                                                click="$emit('openModal', 'paquetes.save', {paquete: {{ $paquete->id }}})" />
+                                                click="$dispatch('openModal', { component: 'paquetes.save', arguments: {paquete: {{ $paquete->id }}} })" />
                                         </li>
                                     @endcan
                                     @can('delete', App\Models\Paquete::find($paquete->id))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="{{ __('site.common.deactivate') }}"
-                                                click="$emit('openModal', 'paquetes.delete', {paquete: {{ $paquete->id }}})" />
+                                                click="$dispatch('openModal', { component: 'paquetes.delete', arguments: {paquete: {{ $paquete->id }}} })" />
                                         </li>
                                     @endcan
                                 @else
                                     @can('restore', App\Models\Paquete::withTrashed()->find($paquete->id))
                                         <li class="list-inline-item">
                                             <x-action icon="check-circle" title="{{ __('site.common.restore') }}"
-                                                click="$emit('openModal', 'paquetes.restore', {paquete_id: {{ $paquete->id }}})" />
+                                                click="$dispatch('openModal', { component: 'paquetes.restore', arguments: {paquete_id: {{ $paquete->id }}} })" />
                                         </li>
                                     @endcan
                                 @endif

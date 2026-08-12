@@ -75,7 +75,7 @@
                                             class="text-muted small fw-bold">{{ __('site.invoices.save_complement.issue_date') }}</label>
                                         <input type="text"
                                             class="form-control form-control bg-light font-monospace text-secondary fw-semibold"
-                                            wire:model="fecha_emision_str" disabled>
+                                            wire:model.live="fecha_emision_str" disabled>
                                     </div>
                                     <div class="col-sm-4">
                                         <label
@@ -168,7 +168,7 @@
                                     class="text-muted small fw-bold">{{ __('site.invoices.save_complement.payment_date') }}</label>
                                 <input type="date"
                                     class="form-control form-control @error('fecha_pago') is-invalid @enderror"
-                                    wire:model="fecha_pago">
+                                    wire:model.live="fecha_pago">
                                 @error('fecha_pago')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -197,7 +197,7 @@
                                 <label
                                     class="  text-muted small fw-bold">{{ __('site.invoices.save_complement.currency') }}</label>
                                 <select class="form-select form-select-sm @error('moneda') is-invalid @enderror"
-                                    wire:model="moneda" id="id_moneda">
+                                    wire:model.live="moneda" id="id_moneda">
                                     @foreach ($moendas as $moneda)
                                         <option value="{{ $moneda }}">{{ $moneda }}</option>
                                     @endforeach
@@ -210,7 +210,7 @@
                                 <label class="text-muted small fw-bold">{{__('site.invoices.save_complement.exchange_rate')}}</label>
                                 <input type="number" step="0.0001"
                                     class="form-control form-control font-monospace @error('tipo_cambio') is-invalid @enderror"
-                                    disabled wire:model="tipo_cambio">
+                                    disabled wire:model.live="tipo_cambio">
                                 @error('tipo_cambio')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -377,7 +377,7 @@
                     <div class="col-12">
                         <label class="text-muted small fw-bold">{{__('site.invoices.save_complement.quantity_in_words')}}</label>
                         <input type="text" class="form-control form-control bg-light fw-medium text-dark px-3 py-2"
-                            wire:model="cantidad_letras" disabled>
+                            wire:model.live="cantidad_letras" disabled>
                     </div>
                     <div class="col-12 mb-4">
                         <x-textarea label="{{__('site.invoices.save_complement.comments')}}"
@@ -389,7 +389,7 @@
         </div>
 
         <div class="modal fade {{ $iframeContainerClass ? 'show d-block bg-dark bg-opacity-50' : '' }}" tabindex="-1"
-            role="dialog" aria-hidden="true">
+            role="dialog" inert>
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
                     <div class="modal-header bg-light py-3 px-4 border-bottom">

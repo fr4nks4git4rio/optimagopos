@@ -59,7 +59,7 @@
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
                                                     click="editRate({{ $tc['id'] }})" />
                                                 <x-action icon="trash" title="{{ __('site.common.delete') }}"
-                                                    click="$emit('openModal', 'tipos-cambio.delete', {'tipoCambio': {{ $tc['id'] }}, 'scope': 'sucursales.configuraciones'})" />
+                                                    click="$dispatch('openModal', { component: 'tipos-cambio.delete', arguments: {'tipoCambio': {{ $tc['id'] }}, 'scope': 'sucursales.configuraciones'} })" />
                                             </td>
                                         </tr>
                                     @endforeach
@@ -86,6 +86,6 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
+            wire:click="$dispatch('closeModal')">{{ __('site.common.close') }}</button>
     </x-slot:buttons>
 </x-modal>

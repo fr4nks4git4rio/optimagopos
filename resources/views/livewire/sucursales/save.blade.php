@@ -5,29 +5,34 @@
 
     <x-slot:content>
         <div wire:init="init" class="row">
-            <div x-data="{ logo_uploaded: false }" class="col-12 col-md-3 text-center mb-2"
-                x-on:livewire-upload-finish="logo_uploaded=true;$wire.logo_src = URL.createObjectURL(document.getElementById('logo').files[0])">
-                <label for="">{{__('site.branches.save.logo')}}</label>
+            <div class="col-12 col-md-3 text-center mb-2">
+                <label for="">{{ __('site.branches.save.logo') }}</label>
                 <hr>
-                @if (!$this->has_logo)
-                    <img src="{{ asset('img/no_image.png') }}" alt="" class="img-thumbnail rounded-4"
-                        id="logo_image">
+                {{-- 1. Previsualización cuando hay un archivo recién subido --}}
+                @if ($logo)
+                    <img src="{{ $logo->temporaryUrl() }}" alt="Logo preview" class="img-thumbnail rounded-4">
+
+                    {{-- 2. Mostrar logo existente de la base de datos si existe --}}
+                @elseif ($logo_src)
+                    <img src="{{ asset($logo_src) }}" alt="Logo actual" class="img-thumbnail rounded-4">
+
+                    {{-- 3. Imagen por defecto si no hay nada --}}
                 @else
-                    <template x-if="logo_uploaded">
-                        <img src="{{ $logo_src }}" alt="" class="img-thumbnail rounded-4">
-                    </template>
-                    <template x-if="!logo_uploaded">
-                        <img src="{{ asset($logo_src) }}" alt="" class="img-thumbnail rounded-4">
-                    </template>
+                    <img src="{{ asset('img/no_image.png') }}" alt="Sin imagen" class="img-thumbnail rounded-4">
                 @endif
 
-                <input type="file" style="display: none" id="logo" wire:model="logo" accept=".jpg,.jpeg,.png">
+                {{-- Input oculto --}}
+                <input type="file" id="logo" class="d-none" wire:model="logo" accept=".jpg,.jpeg,.png">
+
+                {{-- Botón para disparar la selección de archivo --}}
                 <button type="button" class="btn btn-site-primary mt-2"
                     onclick="document.getElementById('logo').click()">
-                    {{ __('site.branches.save.upload_logo')  }}
+                    {{ __('site.branches.save.upload_logo') }}
                 </button>
-                @if ($this->has_logo)
-                    <button type="button" class="btn btn-secondary mt-2" wire:click="removeLogo()">
+
+                {{-- Botón para remover logo --}}
+                @if ($logo || $logo_src)
+                    <button type="button" class="btn btn-secondary mt-2" wire:click="removeLogo">
                         {{ __('site.branches.save.remove_logo') }}
                     </button>
                 @endif
@@ -37,19 +42,20 @@
                     <div class="row mb-3">
                         <div class="col-md-6 col-12">
                             @if ($from_subscription)
-                                <x-select2-component-modals label="{{ __('site.branches.save.client') }}" placeholder="{{ __('site.common.select') }}..."
-                                    class="form-control" :options="$clientes" model="cliente_id"
-                                    :dynamic="true" disabled />
+                                <x-select2-component-modals label="{{ __('site.branches.save.client') }}"
+                                    placeholder="{{ __('site.common.select') }}..." class="form-control"
+                                    :options="$clientes" model="cliente_id" :dynamic="true" disabled />
                             @else
-                                <x-select2-component-modals label="{{ __('site.branches.save.client') }}" placeholder="{{__('site.common.select')}}..."
-                                    class="form-control" :options="$clientes" model="cliente_id"
-                                    :dynamic="true" />
+                                <x-select2-component-modals label="{{ __('site.branches.save.client') }}"
+                                    placeholder="{{ __('site.common.select') }}..." class="form-control"
+                                    :options="$clientes" model="cliente_id" :dynamic="true" />
                             @endif
                         </div>
                         @if (!$from_subscription)
                             <div class="col-md-6 col-12">
-                                <x-select2-component-modals label="{{ __('site.branches.save.subscription') }}" placeholder="{{__('site.common.select')}}..."
-                                    class="form-control" :options="$suscripciones" model="suscripcion_id" :dynamic="true" />
+                                <x-select2-component-modals label="{{ __('site.branches.save.subscription') }}"
+                                    placeholder="{{ __('site.common.select') }}..." class="form-control"
+                                    :options="$suscripciones" model="suscripcion_id" :dynamic="true" />
                             </div>
                         @endif
                     </div>
@@ -57,7 +63,7 @@
                 <div class="row mb-2">
                     <div class="col-md-6 col-12">
                         <input type="file" style="display: none" accept=".pdf" id="file_constacia_fiscal"
-                            wire:model="constancia_fiscal">
+                            wire:model.live="constancia_fiscal">
                         <button type="button" class="btn btn-warning" wire:loading.attr="disabled"
                             onclick="document.getElementById('file_constacia_fiscal').click()">
                             {{ __('site.branches.save.load_fiscal_data') }}
@@ -65,20 +71,24 @@
                     </div>
                     @if ($this->con_facturacion)
                         <div class="col-md-6 col-12">
-                            <x-toggle-button :lazy="true" label="{{ __('site.branches.save.obtain_tax_data_from_company') }}" :inline="true"
+                            <x-toggle-button :lazy="true"
+                                label="{{ __('site.branches.save.obtain_tax_data_from_company') }}" :inline="true"
                                 model="tomar_datos_fiscales_de_empresa_matriz" />
                         </div>
                     @endif
                 </div>
                 <div class="row mb-3">
                     <div class="col-sm-4">
-                        <x-input label="{{ __('site.branches.save.commercial_name') }}" type="text" model="nombre_comercial" />
+                        <x-input label="{{ __('site.branches.save.commercial_name') }}" type="text"
+                            model="nombre_comercial" />
                     </div>
                     <div class="col-sm-5">
                         @if ($tomar_datos_fiscales_de_empresa_matriz)
-                            <x-input label="{{ __('site.branches.save.social_reason') }}" type="text" model="razon_social" disabled />
+                            <x-input label="{{ __('site.branches.save.social_reason') }}" type="text"
+                                model="razon_social" disabled />
                         @else
-                            <x-input label="{{ __('site.branches.save.social_reason') }}" type="text" model="razon_social" />
+                            <x-input label="{{ __('site.branches.save.social_reason') }}" type="text"
+                                model="razon_social" />
                         @endif
                     </div>
                     <div class="col-sm-3">
@@ -97,8 +107,8 @@
                         <x-input label="{{ __('site.branches.save.phone') }}" model="telefono" />
                     </div>
                     <div class="col-sm-4">
-                        <x-select2-component-modals label="{{ __('site.branches.save.fiscal_regime') }}" :options="$regimenesFiscales" model="regimen_fiscal_id"
-                            class="form-control" :dynamic="true" />
+                        <x-select2-component-modals label="{{ __('site.branches.save.fiscal_regime') }}"
+                            :options="$regimenesFiscales" model="regimen_fiscal_id" class="form-control" :dynamic="true" />
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -107,8 +117,8 @@
                             <label for="">{{ __('site.branches.save.ticket_validity_for_billing') }}:</label>
                             <select
                                 class="form-control  @error('tipo_vigencia_ticket_facturacion') is-invalid @enderror"
-                                wire:model="tipo_vigencia_ticket_facturacion">
-                                <option value="">{{__('site.common.select')}}...</option>
+                                wire:model.live="tipo_vigencia_ticket_facturacion">
+                                <option value="">{{ __('site.common.select') }}...</option>
                                 @foreach ($tiposVigenciaTicketFacturacion as $value)
                                     <option value="{{ $value }}">{{ __($value) }}</option>
                                 @endforeach
@@ -122,7 +132,8 @@
                     </div>
                     @if (in_array($tipo_vigencia_ticket_facturacion, ['days_number_after_emitted', 'days_number_next_month']))
                         <div class="col-sm-3">
-                            <x-input model="dias_vigencia" type="number" label="{{__('site.branches.save.number_of_days')}}" />
+                            <x-input model="dias_vigencia" type="number"
+                                label="{{ __('site.branches.save.number_of_days') }}" />
                         </div>
                     @endif
                 </div>
@@ -150,48 +161,49 @@
                                     aria-labelledby="direccion-fiscal-tab" tabindex="2">
                                     <div class="row">
                                         <div class="col-3">
-                                            <x-input label="{{__('site.address.street')}}" type="text" model="direccion_fiscal.calle" />
+                                            <x-input label="{{ __('site.address.street') }}" type="text"
+                                                model="direccion_fiscal.calle" />
                                         </div>
                                         <div class="col-3">
-                                            <x-input label="{{__('site.address.exterior_number')}}" type="text"
+                                            <x-input label="{{ __('site.address.exterior_number') }}" type="text"
                                                 model="direccion_fiscal.no_exterior" />
                                         </div>
                                         <div class="col-3">
-                                            <x-input label="{{__('site.address.interior_number')}}" type="text"
+                                            <x-input label="{{ __('site.address.interior_number') }}" type="text"
                                                 model="direccion_fiscal.no_interior" />
                                         </div>
                                         <div class="col-3">
-                                            <x-input label="{{__('site.address.postal_code')}}" type="text"
+                                            <x-input label="{{ __('site.address.postal_code') }}" type="text"
                                                 model="direccion_fiscal.codigo_postal" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-3">
-                                            <x-input label="{{__('site.address.colony')}}" type="text"
+                                            <x-input label="{{ __('site.address.colony') }}" type="text"
                                                 model="direccion_fiscal.colonia" />
                                         </div>
                                         <div class="col-3">
-                                            <x-select2-ajax-component-modals label="{{__('site.address.state')}}"
-                                                placeholder="{{__('site.common.select')}}..." class="form-control"
+                                            <x-select2-ajax-component-modals label="{{ __('site.address.state') }}"
+                                                placeholder="{{ __('site.common.select') }}..." class="form-control"
                                                 url="{{ route('estados.load-estados') }}"
                                                 model="direccion_fiscal.estado_id" :dynamic="true" />
                                         </div>
                                         <div class="col-3">
-                                            <x-select2-ajax-component-modals label="{{__('site.address.locality')}}"
-                                                placeholder="{{__('site.common.select')}}..." class="form-control"
+                                            <x-select2-ajax-component-modals label="{{ __('site.address.locality') }}"
+                                                placeholder="{{ __('site.common.select') }}..." class="form-control"
                                                 url="{{ route('localidades.load-localidades', ['estado_id' => $direccion_fiscal['estado_id']]) }}"
                                                 model="direccion_fiscal.localidad_id" :dynamic="true" />
                                         </div>
                                         <div class="col-3">
                                             <x-select2-ajax-component-modals label="Municipio"
-                                                placeholder="{{__('site.common.select')}}..." class="form-control"
+                                                placeholder="{{ __('site.common.select') }}..." class="form-control"
                                                 url="{{ route('municipios.load-municipios', ['estado_id' => $direccion_fiscal['estado_id']]) }}"
                                                 model="direccion_fiscal.municipio_id" :dynamic="true" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-12">
-                                            <x-input label="{{__('site.address.reference')}}" type="text"
+                                            <x-input label="{{ __('site.address.reference') }}" type="text"
                                                 model="direccion_fiscal.referencia" />
                                         </div>
                                     </div>
@@ -203,9 +215,10 @@
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
-            {{__('site.common.close')}}
+        <button type="button" class="btn btn-secondary mr-2" data-bs-dismiss="modal"
+            wire:click="$dispatch('closeModal')">
+            {{ __('site.common.close') }}
         </button>
-        <button type="submit" class="btn btn-primary">{{__('site.branches.save.save_branch')}}</button>
+        <button type="submit" class="btn btn-primary">{{ __('site.branches.save.save_branch') }}</button>
     </x-slot:buttons>
 </x-modal>

@@ -124,7 +124,7 @@
                                                 :lazy="true" class="float-end" model="agrupar_conceptos" />
                                         </div>
                                         <div class="col-12 col-md-4 mb-2">
-                                            <select class="form-control" wire:model="concepto_agrupado"
+                                            <select class="form-control" wire:model.live="concepto_agrupado"
                                                 @if (!$agrupar_conceptos) disabled @endif>
                                                 @foreach ($posiblesConceptos as $concepto)
                                                     <option value="{{ $concepto }}">
@@ -193,7 +193,7 @@
                                         placeholder="________-____-____-____-____________"
                                         aria-label="CFDI relacionado"
                                         aria-describedby="button-addon-cfdi{{ $index }}"
-                                        wire:model.lazy="cfdis_relacionados.{{ $index }}">
+                                        wire:model.blur="cfdis_relacionados.{{ $index }}">
                                     <button class="btn btn-danger" type="button"
                                         id="button-addon-cfdi{{ $index }}"
                                         wire:click="removeCfdiRelacionado('{{ $index }}')"><i

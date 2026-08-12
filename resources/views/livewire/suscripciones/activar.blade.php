@@ -61,13 +61,12 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
+            wire:click="$dispatch('closeModal')">{{ __('site.common.close') }}</button>
         <button wire:loading.attr="disabled" type="submit" class="btn btn-danger">
             <span wire:loading.remove wire:target="confirmarActivacion">
                 <i class="bi bi-check-circle-fill me-1"></i> {{ __('site.subscriptions.activate.activate_subscription') }}
             </span>
-            <span wire:loading wire:target="confirmarActivacion" class="spinner-border spinner-border-sm" role="status"
-                aria-hidden="true"></span>
+            <span wire:loading wire:target="confirmarActivacion" class="spinner-border spinner-border-sm" role="status"></span>
         </button>
     </x-slot:buttons>
 </x-modal>

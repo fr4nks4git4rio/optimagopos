@@ -213,7 +213,7 @@
                 <td>
                     <div class="report-title">{{ $name }}</div>
                     <div class="report-subtitle">
-                        Generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}
+                        {{ __('site.common.generated_on', ['date' => \Carbon\Carbon::now()->format('d/m/Y H:i')]) }}
                     </div>
                 </td>
             </tr>

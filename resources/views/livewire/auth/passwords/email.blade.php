@@ -37,7 +37,7 @@
                                 class="bi bi-envelope"></i></span>
                         <input id="email" type="email"
                             class="form-control bg-light border-start-0 ps-0 @error('email') is-invalid @enderror"
-                            name="email" value="{{ old('email') }}" wire:model="email" required autocomplete="email"
+                            name="email" value="{{ old('email') }}" wire:model.live="email" required autocomplete="email"
                             autofocus placeholder="{{ __('site.forgot_password.email_placeholder') }}">
                     </div>
 

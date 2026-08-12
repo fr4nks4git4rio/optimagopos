@@ -24,9 +24,12 @@ class ClienteController extends Controller
 
         $clientes = [];
         $query->get()->map(function ($cliente) use ($request, &$clientes, $label) {
-            $cliente->text = Crypt::decrypt($cliente->{$label});
-            if (str_contains(strtoupper($cliente->text), strtoupper($request->term))) {
-                $clientes[] = $cliente;
+            $text = Crypt::decrypt($cliente->{$label});
+            if (str_contains(strtoupper($text), strtoupper($request->term))) {
+                $clientes[] = [
+                    'id' => $cliente->id,
+                    'text' => $text
+                ];
             }
         });
 
@@ -42,16 +45,19 @@ class ClienteController extends Controller
         $label = $request->label ?: 'nombre_comercial';
 
         $cliente = Cliente::find(user()->cliente_id);
-        $query = $cliente->comensalescomensales_activos()->newQuery();
+        $query = $cliente->comensales_activos()->newQuery();
 
         $query->select('id', $label);
 
         if ($request->term) {
             $clientes = [];
-            $query->get()->map(function ($cliente) use ($request, &$clientes, $label) {
-                $cliente->text = Crypt::decrypt($cliente->{$label});
-                if (str_contains(strtoupper($cliente->text), strtoupper($request->term))) {
-                    $clientes[] = $cliente;
+            $query->get()->each(function ($cliente) use ($request, &$clientes, $label) {
+                $text = Crypt::decrypt($cliente->{$label});
+                if (str_contains(strtoupper($text), strtoupper($request->term))) {
+                    $clientes[] = [
+                        'id' => $cliente->id,
+                        'text' => $text
+                    ];
                 }
             });
         } else {

@@ -14,7 +14,7 @@
         {{-- <div class="input-group"> --}}
         {{-- <span class="input-group-text"><x-icon name="search"/></span> --}}
         {{-- <input type="search" placeholder="Buscar Facturas" --}}
-        {{-- class="form-control" wire:model.debounce.500ms="search"> --}}
+        {{-- class="form-control" wire:model.live.debounce.500ms="search"> --}}
         {{-- </div> --}}
         {{-- </div> --}}
         <div class="col-lg-auto mb-3">
@@ -47,7 +47,7 @@
         <div class="col-sm-2">
             <div class="mb-1">
                 <label for="">Estado</label>
-                <select class="form-control" wire:model="estado">
+                <select class="form-control" wire:model.live="estado">
                     @foreach ($estados as $estado)
                         <option value="{{ $estado }}">{{ $estado }}</option>
                     @endforeach
@@ -57,7 +57,7 @@
         <div class="col-sm-2">
             <div class="mb-1">
                 <label for="">Moneda</label>
-                <select class="form-control" wire:model="moneda">
+                <select class="form-control" wire:model.live="moneda">
                     @foreach ($monedas as $moneda)
                         <option value="{{ $moneda }}">{{ $moneda }}</option>
                     @endforeach
@@ -137,7 +137,7 @@
                                 @can('delete', App\Models\Factura::find($factura->id))
                                     <li class="list-inline-item mb-1">
                                         <x-action icon="trash" title="Eliminar"
-                                            click="$emit('openModal', 'facturas.delete', {factura: '{{ $factura->id }}', scope: 'facturas.index-pre-facturas'})" />
+                                            click="$dispatch('openModal', { component: 'facturas.delete', arguments: {factura: '{{ $factura->id }}', scope: 'facturas.index-pre-facturas'} })" />
                                     </li>
                                 @endcan
                             </ul>
@@ -158,27 +158,24 @@
 
     <x-pagination :links="$facturas" :count="true" />
 
-    @if ($iframeContainerClass)
-        <div class="modal {{ $iframeContainerClass }}">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">PDF</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')"></button>
+    <div class="modal fade" id="pdf-prefacturas">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">PDF</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pb-0 text-center">
+                    <div class="row">
+                        <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
+                            style="height: 80dvh"></iframe>
                     </div>
-                    <div class="modal-body pb-0 text-center">
-                        <div class="row">
-                            <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
-                                height="500px"></iframe>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')">{{ __('Cerrar') }}</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{{ __('Cerrar') }}</button>
                 </div>
             </div>
         </div>
-    @endif
+    </div>
 </div>

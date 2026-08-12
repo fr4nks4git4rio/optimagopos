@@ -22,10 +22,10 @@
                     </div>
                 @endif
 
-                <form wire:submit.prevent="verify">
+                <form wire:submit="verify">
                     <div class="mb-4">
                         <label for="code" class="form-label small fw-semibold text-uppercase text-muted tracking-wider">Código de Verificación</label>
-                        <input wire:model="code" id="code" type="text"
+                        <input wire:model.live="code" id="code" type="text"
                             class="form-control form-control-lg text-center font-monospace tracking-widest fw-bold @error('code') is-invalid @enderror"
                             placeholder="000000" maxlength="6" required autofocus autocomplete="off"
                             style="font-size: 1.5rem; letter-spacing: 0.3rem;">
@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="mb-4 form-check form-switch d-flex align-items-center gap-2 ps-0">
-                        <input wire:model="rememberDevice" id="rememberDevice" type="checkbox" class="form-check-input ms-0 mt-0" style="cursor: pointer;">
+                        <input wire:model.live="rememberDevice" id="rememberDevice" type="checkbox" class="form-check-input ms-0 mt-0" style="cursor: pointer;">
                         <label for="rememberDevice" class="form-check-label small text-secondary" style="cursor: pointer;">
                             Confiar en este dispositivo por 30 días
                         </label>
@@ -46,7 +46,7 @@
                         class="btn btn-dark w-100 py-2.5 fw-semibold mb-3 rounded-3 shadow-sm text-uppercase tracking-wide" style="font-size: 0.85rem;">
                         <span wire:loading.remove wire:target="verify">Verificar y Entrar</span>
                         <span wire:loading wire:target="verify">
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Verificando...
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>Verificando...
                         </span>
                     </button>
 

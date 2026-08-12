@@ -205,8 +205,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Suscripcion::class, 'tb_suscripciones_usuarios', 'usuario_id', 'suscripcion_id')->where('estado', 'ACTIVA');
     }
 
-    public function sucursales(): HasManyDeep
+    public function sucursales()
     {
+        // return DB::table('tb_sucursales')
+        //     ->whereNull('deleted_at')
+        //     ->whereIn('suscripcion_id', user()->suscripciones->pluck('id')->toArray())
+        //     ->get()->each(function ($value) {
+        //         $value = Sucursal::decryptInfo($value);
+        //     });
         return $this->hasManyDeep(
             Sucursal::class,
             ['tb_suscripciones_usuarios', Suscripcion::class],  // Tablas intermedias en orden

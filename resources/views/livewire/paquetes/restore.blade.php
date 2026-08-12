@@ -13,7 +13,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">Cerrar</button>
+            wire:click="$dispatch('closeModal')">Cerrar</button>
         <button type="submit" class="btn btn-site-primary">Reactivar Paquete</button>
     </x-slot:buttons>
 </x-modal>

@@ -64,14 +64,14 @@
         <table class="table table-styled">
             <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>F. Int.</th>
-                    <th>Receptor</th>
-                    <th>Estado</th>
-                    <th>Moneda</th>
-                    <th>Subtotal</th>
-                    <th>IVA</th>
-                    <th>Total</th>
+                    <th>{{ __('site.invoices.index_storage.date') }}</th>
+                    <th>{{ __('site.invoices.index_storage.f_int') }}</th>
+                    <th>{{ __('site.invoices.index_storage.receiver') }}</th>
+                    <th>{{ __('site.invoices.index_storage.status') }}</th>
+                    <th>{{ __('site.invoices.index_storage.currency') }}</th>
+                    <th>{{ __('site.invoices.index_storage.subtotal') }}</th>
+                    <th>{{ __('site.invoices.index_storage.iva') }}</th>
+                    <th>{{ __('site.invoices.index_storage.total') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -87,7 +87,7 @@
                     <td>
                         {{$factura->folio_interno}}
                     </td>
-                    <td>{{\Illuminate\Support\Facades\Crypt::decrypt($factura->receptor)}}</td>
+                    <td>{{$factura->receptor}}</td>
                     <td>{{$factura->estado}}</td>
                     <td>{{$factura->moneda}}</td>
                     <td>{{number_format($factura->subtotal, 2)}}</td>
@@ -97,7 +97,7 @@
                 @if($factura->estado == 'CANCELADA')
                 <tr>
                     <td colspan="12" style="background-color: #fff; padding-top: 2px; padding-bottom: 2px; text-align: left;">
-                        <p><strong>Motivo de Cancelación: </strong> {{ $factura->motivo_cancelacion }}</p>
+                        <p><strong>{{ __('site.invoices.index_storage.cancellation_motive') }}: </strong> {{ $factura->motivo_cancelacion }}</p>
                     </td>
                 </tr>
                 @endif

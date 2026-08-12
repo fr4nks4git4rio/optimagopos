@@ -9,12 +9,12 @@
                 class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
                 <div>
                     <span class="badge bg-danger-subtle text-danger text-uppercase px-2 py-1 mb-2 small fw-bold">
-                        {{ __('site.quarantine.fix.register_id') }} #{{ $registro->id }}
+                        {{ __('site.quarantine.fix.register_id') }} #{{ $registro }}
                     </span>
                     <h2 class="mb-1 fw-bold text-white h4">{{ __('site.quarantine.fix.ticket_repair') }}</h2>
                     <p class="mb-0 text-white-50 small">
                         <i class="bi bi-clock-history me-1"></i> {{ __('site.quarantine.fix.received') }}
-                        {{ $registro->created_at->format('d/m/Y H:i:s') }}
+                        {{ $this->registro_db->created_at?->format('d/m/Y H:i:s') }}
                     </p>
                 </div>
                 <div>
@@ -38,7 +38,7 @@
                             <h5 class="mb-0 text-dark fw-bold">{{ __('site.quarantine.fix.problem_detail') }}</h5>
                         </div>
                         <div class="alert alert-danger mb-3">
-                            <i class="bi bi-exclamation-circle me-1"></i> {{ $registro->texto }}
+                            <i class="bi bi-exclamation-circle me-1"></i> {{ $this->registro_db->texto }}
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -94,7 +94,7 @@
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" role="switch"
-                                style="width: 3em; height: 1.5em;" wire:model="modoAvanzado"
+                                style="width: 3em; height: 1.5em;" wire:model.live="modoAvanzado"
                                 wire:click="toggleModoAvanzado" id="switch-modo-avanzado">
                             <label class="form-check-label fw-bold small ms-2" for="switch-modo-avanzado">
                                 {{ $modoAvanzado ? __('site.quarantine.fix.json_edition_mode') : __('site.quarantine.fix.form_edition_mode') }}
@@ -118,7 +118,7 @@
                                     <label class="form-label fw-bold text-dark small">TerminalId *</label>
                                     <input type="text"
                                         class="form-control @error('formData.TerminalId') is-invalid @enderror"
-                                        wire:model="formData.TerminalId">
+                                        wire:model.live="formData.TerminalId">
                                     @error('formData.TerminalId')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -127,7 +127,7 @@
                                     <label class="form-label fw-bold text-dark small">pos *</label>
                                     <input type="text"
                                         class="form-control @error('formData.Data.pos') is-invalid @enderror"
-                                        wire:model="formData.Data.pos">
+                                        wire:model.live="formData.Data.pos">
                                     @error('formData.Data.pos')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -136,7 +136,7 @@
                                     <label class="form-label fw-bold text-dark small">operator *</label>
                                     <input type="number"
                                         class="form-control @error('formData.Data.operator') is-invalid @enderror"
-                                        wire:model="formData.Data.operator">
+                                        wire:model.live="formData.Data.operator">
                                     @error('formData.Data.operator')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -145,7 +145,7 @@
                                     <label class="form-label fw-bold text-dark small">timestamp *</label>
                                     <input type="text"
                                         class="form-control @error('formData.Data.timestamp') is-invalid @enderror"
-                                        wire:model="formData.Data.timestamp">
+                                        wire:model.live="formData.Data.timestamp">
                                     @error('formData.Data.timestamp')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -153,7 +153,7 @@
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold text-dark small">OrderStatus *</label>
                                     <select class="form-select @error('formData.Data.OrderStatus') is-invalid @enderror"
-                                        wire:model="formData.Data.OrderStatus">
+                                        wire:model.live="formData.Data.OrderStatus">
                                         <option value="">{{ __('site.common.select') }}</option>
                                         <option value="1">Open</option>
                                         <option value="2">InProcess</option>
@@ -168,42 +168,44 @@
                                     <label class="form-label fw-bold text-dark small">orderNumber *</label>
                                     <input type="text"
                                         class="form-control @error('formData.Data.orderNumber') is-invalid @enderror"
-                                        wire:model="formData.Data.orderNumber">
+                                        wire:model.live="formData.Data.orderNumber">
                                     @error('formData.Data.orderNumber')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold text-dark small">table</label>
-                                    <input type="text" class="form-control" wire:model="formData.Data.table">
+                                    <input type="text" class="form-control" wire:model.live="formData.Data.table">
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold text-dark small">seat</label>
-                                    <input type="text" class="form-control" wire:model="formData.Data.seat">
+                                    <input type="text" class="form-control" wire:model.live="formData.Data.seat">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold text-dark small">location</label>
-                                    <input type="text" class="form-control" wire:model="formData.Data.location">
+                                    <input type="text" class="form-control"
+                                        wire:model.live="formData.Data.location">
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold text-dark small">LocationId</label>
-                                    <input type="number" class="form-control" wire:model="formData.Data.LocationId">
+                                    <input type="number" class="form-control"
+                                        wire:model.live="formData.Data.LocationId">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label fw-bold text-dark small">PosIpAddress</label>
                                     <input type="string" class="form-control"
-                                        wire:model="formData.Data.PosIpAddress">
+                                        wire:model.live="formData.Data.PosIpAddress">
                                 </div>
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold text-dark small">TimeToResolve</label>
                                     <input type="number" step="0.01" class="form-control"
-                                        wire:model="formData.Data.TimeToResolve">
+                                        wire:model.live="formData.Data.TimeToResolve">
                                 </div>
                                 <div class="col-md-4">
                                     <label
                                         class="form-label fw-bold text-dark small">WarningStatusThresholdInPercent</label>
                                     <input type="number" step="0.01" class="form-control"
-                                        wire:model="formData.Data.WarningStatusThresholdInPercent">
+                                        wire:model.live="formData.Data.WarningStatusThresholdInPercent">
                                 </div>
                             </div>
                         </div>
@@ -240,11 +242,11 @@
                                             <tr wire:key="item-{{ $indexItem }}">
                                                 <td>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        wire:model="items.{{ $indexItem }}.name">
+                                                        wire:model.live="items.{{ $indexItem }}.name">
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control form-control-sm"
-                                                        wire:model="items.{{ $indexItem }}.seat">
+                                                        wire:model.live="items.{{ $indexItem }}.seat">
                                                 </td>
                                                 <td class="text-center">
                                                     <button type="button" class="btn btn-sm btn-success mb-1"
@@ -259,7 +261,8 @@
                                                                     <tr>
                                                                         <td class="text-center">
                                                                             <button type="button"
-                                                                                class="btn btn-danger btn-sm p-1 py-0"><i
+                                                                                class="btn btn-danger btn-sm p-1 py-0"
+                                                                                wire:click="eliminarModifier('{{ $indexItem }}', '{{ $indexModifier }}')"><i
                                                                                     class="bi bi-trash"></i></button>
                                                                         </td>
                                                                         <td>
@@ -268,7 +271,7 @@
                                                                                     class="badge bg-primary-subtle text-primary">{{ $mod }}</span>
                                                                             @else
                                                                                 <input type="text"
-                                                                                    wire:model.lazy="items.{{ $indexItem }}.modifiers.{{ $indexModifier }}"
+                                                                                    wire:model.blur="items.{{ $indexItem }}.modifiers.{{ $indexModifier }}"
                                                                                     class="form-control form-control-sm">
                                                                             @endif
                                                                         </td>
@@ -280,7 +283,7 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <button type="button" class="btn btn-sm btn-outline-danger"
-                                                        wire:click="eliminarItem({{ $indexItem }})">
+                                                        wire:click="eliminarItem('{{ $indexItem }}')">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </td>
@@ -315,7 +318,7 @@
                             </button>
                         </div>
                         <div class="card-body p-3">
-                            <textarea wire:model.lazy="rawJson" rows="20"
+                            <textarea wire:model.blur="rawJson" rows="20"
                                 class="form-control font-monospace @error('rawJson') is-invalid @enderror" style="font-size: 0.8rem;"
                                 spellcheck="false"></textarea>
                             @error('rawJson')
@@ -350,35 +353,11 @@
                 </div>
             </div>
         </div>
-        @if ($confirmDescartarRegistroClass)
-            <div class="modal {{ $confirmDescartarRegistroClass }}">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">{{ __('site.quarantine.fix.delete_confirm') }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                wire:click="$set('confirmDescartarRegistroClass', '')"></button>
-                        </div>
-                        <div class="modal-body pb-0 text-center">
-                            <x-alert :alert="'danger'" icon="exclamation-octagon">
-                                {!! __('site.quarantine.fix.delete_are_you_sure') !!}
-                            </x-alert>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                wire:click="$set('confirmDescartarRegistroClass', '')">{{ __('site.common.close') }}</button>
-                            <button type="button" class="btn btn-danger"
-                                wire:click="descartar">{{ __('site.common.delete') }}</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
     </x-slot:content>
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
+            wire:click="$dispatch('closeModal')">{{ __('site.common.close') }}</button>
 
         <button type="button" class="btn btn-primary" wire:click="guardar" wire:loading.attr="disabled"
             wire:target="guardar">
@@ -396,4 +375,29 @@
             {{ __('site.quarantine.fix.delete_register') }}
         </button>
     </x-slot:buttons>
+
+    <x-slot name="modals">
+        <div class="modal fade" id="modal-descartar-registro" tabindex="-1" wire:ignore.self>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ __('site.quarantine.fix.delete_confirm') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            wire:click="$set('confirmDescartarRegistroClass', '')"></button>
+                    </div>
+                    <div class="modal-body pb-0 text-center">
+                        <x-alert :alert="'danger'" icon="exclamation-octagon">
+                            {!! __('site.quarantine.fix.delete_are_you_sure') !!}
+                        </x-alert>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            wire:click="$set('confirmDescartarRegistroClass', '')">{{ __('site.common.close') }}</button>
+                        <button type="button" class="btn btn-danger"
+                            wire:click="descartar">{{ __('site.common.delete') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </x-slot>
 </x-modal>

@@ -13,7 +13,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-capitalize">{{ __('site.modules.save.name') }}</label>
                                 <input type="text" class="form-control @error('nombre') is-invalid @enderror"
-                                    wire:model="nombre" placeholder="Ej. Facturación Electrónica">
+                                    wire:model.live="nombre" placeholder="Ej. Facturación Electrónica">
                                 @error('nombre')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -21,7 +21,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-capitalize">{{ __('site.modules.save.description') }}</label>
-                                <textarea class="form-control @error('descripcion') is-invalid @enderror" wire:model="descripcion" rows="3"
+                                <textarea class="form-control @error('descripcion') is-invalid @enderror" wire:model.live="descripcion" rows="3"
                                     placeholder="Breve resumen de los alcances del módulo..."></textarea>
                                 @error('descripcion')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -35,7 +35,7 @@
                                         <span class="input-group-text bg-light"><i
                                                 class="bi {{ $icono }}"></i></span>
                                         <input type="text" class="form-control @error('icono') is-invalid @enderror"
-                                            wire:model="icono" placeholder="Ej. bi-currency-dollar">
+                                            wire:model.live="icono" placeholder="Ej. bi-currency-dollar">
                                     </div>
                                     <small class="text-muted d-block mt-1">{!! __('site.modules.save.icon_help') !!}</small>
                                     @error('icono')
@@ -47,10 +47,10 @@
                                     <label class="form-label fw-bold text-capitalize">{{ __('site.modules.save.icon_color') }}</label>
                                     <div class="d-flex align-items-center">
                                         <input type="color" class="form-control form-control-color me-2"
-                                            wire:model="icono_color" title="{{ __('site.modules.save.pick_color') }}">
+                                            wire:model.live="icono_color" title="{{ __('site.modules.save.pick_color') }}">
                                         <input type="text"
                                             class="form-control form-control-sm @error('icono_color') is-invalid @enderror"
-                                            wire:model="icono_color" placeholder="#000000">
+                                            wire:model.live="icono_color" placeholder="#000000">
                                     </div>
                                     @error('icono_color')
                                         <small class="text-danger d-block">{{ $message }}</small>
@@ -63,7 +63,7 @@
                                     <label class="form-label fw-bold text-capitalize">{{ __('site.modules.save.functions_count') }}</label>
                                     <input type="number"
                                         class="form-control @error('cant_funciones') is-invalid @enderror"
-                                        wire:model="cant_funciones" min="1">
+                                        wire:model.live="cant_funciones" min="1">
                                     @error('cant_funciones')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -75,7 +75,7 @@
                                         <span class="input-group-text">$</span>
                                         <input type="number" step="0.01"
                                             class="form-control @error('costo_base') is-invalid @enderror"
-                                            wire:model="costo_base" min="0">
+                                            wire:model.live="costo_base" min="0">
                                     </div>
                                     @error('costo_base')
                                         <small class="text-danger d-block">{{ $message }}</small>
@@ -126,7 +126,7 @@
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary text-capitalize" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
+        <button type="button" class="btn btn-secondary text-capitalize" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
             {{ __('site.common.close') }}
         </button>
         <button type="submit" class="btn btn-primary text-capitalize">{{ __('site.modules.save.save_module') }}</button>

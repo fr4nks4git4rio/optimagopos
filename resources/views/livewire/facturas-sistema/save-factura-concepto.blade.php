@@ -1,5 +1,5 @@
-<div class="modal fade {{ $show ? 'show d-block bg-dark bg-opacity-50' : '' }}" id="{{ $modal_id }}" tabindex="-1"
-    role="dialog" aria-labelledby="modalTitle-{{ $modal_id }}" aria-hidden="{{ $show ? 'false' : 'true' }}">
+<div class="modal fade" id="{{ $modal_id }}" tabindex="-1"
+    role="dialog" aria-labelledby="modalTitle-{{ $modal_id }}" wire:ignore.self>
 
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow-lg border-0">

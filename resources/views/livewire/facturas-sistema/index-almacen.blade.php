@@ -12,10 +12,10 @@
     <div class="row justify-content-end">
         <div class="col-lg-auto mb-3">
             <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirFacturas()">
-                {{__('site.invoices.index_storage.print')}}
+                {{ __('site.invoices.index_storage.print') }}
             </button>
             <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcelFacturas()">
-                {{__('site.invoices.index_storage.excel_export')}}
+                {{ __('site.invoices.index_storage.excel_export') }}
             </button>
             <x-dropdown icon="eye" :label="__($perPage)">
                 @foreach ($perPages as $perPage)
@@ -26,19 +26,22 @@
     </div>
     <div class="row mb-1">
         <div class="col-sm-2">
-            <x-input label="{{__('site.invoices.index_storage.start_date')}}" type="date" :lazy="true" model="fechaInicio" />
+            <x-input label="{{ __('site.invoices.index_storage.start_date') }}" type="date" :lazy="true"
+                model="fechaInicio" />
         </div>
         <div class="col-sm-2">
-            <x-input label="{{__('site.invoices.index_storage.enda_date')}}" type="date" :lazy="true" model="fechaFin" />
+            <x-input label="{{ __('site.invoices.index_storage.enda_date') }}" type="date" :lazy="true"
+                model="fechaFin" />
         </div>
         <div class="col-sm-4">
-            <x-select2-ajax label="{{__('site.invoices.index_storage.client')}}" placeholder="{{__('site.common.select')}}..." class="form-control"
+            <x-select2-ajax label="{{ __('site.invoices.index_storage.client') }}"
+                placeholder="{{ __('site.common.select') }}..." class="form-control"
                 url="{{ route('clientes.load-clientes') }}" model="cliente" />
         </div>
         <div class="col-sm-2">
             <div class="mb-1">
-                <label for="">{{__('site.invoices.index_storage.status')}}:</label>
-                <select class="form-control" wire:model="estado">
+                <label for="">{{ __('site.invoices.index_storage.status') }}:</label>
+                <select class="form-control" wire:model.live="estado">
                     @foreach ($estados as $estado)
                         <option value="{{ $estado }}">{{ $estado }}</option>
                     @endforeach
@@ -46,14 +49,15 @@
             </div>
         </div>
         <div class="col-sm-2">
-            <x-input label="{{__('site.invoices.index_storage.internal_folio')}}" type="text" :lazy="true" model="folioInterno" />
+            <x-input label="{{ __('site.invoices.index_storage.internal_folio') }}" type="text" :lazy="true"
+                model="folioInterno" />
         </div>
     </div>
     <div class="row">
         <div class="col-sm-2">
             <div class="mb-1">
-                <label for="">{{__('site.invoices.index_storage.currency')}}:</label>
-                <select class="form-control" wire:model="moneda">
+                <label for="">{{ __('site.invoices.index_storage.currency') }}:</label>
+                <select class="form-control" wire:model.live="moneda">
                     @foreach ($monedas as $moneda)
                         <option value="{{ $moneda }}">{{ $moneda }}</option>
                     @endforeach
@@ -61,7 +65,8 @@
             </div>
         </div>
         <div class="col-sm-2">
-            <x-input label="{{__('site.invoices.index_storage.import')}}" type="number" :lazy="true" model="importe" />
+            <x-input label="{{ __('site.invoices.index_storage.import') }}" type="number" :lazy="true"
+                model="importe" />
         </div>
     </div>
 
@@ -79,7 +84,7 @@
                             </span>
                         </th>
                     @endforeach
-                    <th class="text-center">{{__('site.common.actions')}}</th>
+                    <th class="text-center">{{ __('site.common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -128,7 +133,8 @@
                         </td>
                         <td>{{ $factura->receptor }}</td>
                         <td class="text-center">
-                            <span class="badge {{ $classEstado }}">{{ __('site.statuses.invoices.'.$factura->estado) }}</span>
+                            <span
+                                class="badge {{ $classEstado }}">{{ __('site.statuses.invoices.' . $factura->estado) }}</span>
                         </td>
                         <td class="text-center">{{ $factura->moneda }}</td>
                         <td class="text-center">{{ number_format($factura->subtotal, 2) }}</td>
@@ -137,26 +143,26 @@
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 <li class="list-inline-item mb-1">
-                                    <x-action icon="file-pdf" title="{{__('site.common.download_pdf')}}"
+                                    <x-action icon="file-pdf" title="{{ __('site.common.download_pdf') }}"
                                         click="showPdf({{ $factura->id }})" />
                                 </li>
                                 <li class="list-inline-item mb-1">
-                                    <x-action icon="download" title="{{__('site.common.download_xml')}}"
+                                    <x-action icon="download" title="{{ __('site.common.download_xml') }}"
                                         click="descargarXml({{ $factura->id }})" />
                                 </li>
                                 @if ($factura->estado == 'TIMBRADA')
                                     @can('cancelFacturaSistema', App\Models\Factura::find($factura->id))
                                         <li class="list-inline-item mb-1">
-                                            <x-action icon="x-octagon" title="{{__('site.common.cancel')}}"
-                                                click="$emit('openModal', 'facturas-sistema.cancel', {factura: '{{ $factura->id }}', scope: 'facturas-sistema.index-almacen'})" />
+                                            <x-action icon="x-octagon" title="{{ __('site.common.cancel') }}"
+                                                click="$dispatch('openModal', { component: 'facturas-sistema.cancel', arguments: {factura: '{{ $factura->id }}', scope: 'facturas-sistema.index-almacen'} })" />
                                         </li>
                                     @endcan
                                 @endif
                                 @if ($factura->estado == 'CANCELADA')
                                     @can('deleteFacturaSistema', App\Models\Factura::find($factura->id))
                                         <li class="list-inline-item mb-1">
-                                            <x-action icon="trash" title="{{__('site.common.delete')}}"
-                                                click="$emit('openModal', 'facturas-sistema.delete', {factura: '{{ $factura->id }}', scope: 'facturas-sistema.index-almacen'})" />
+                                            <x-action icon="trash" title="{{ __('site.common.delete') }}"
+                                                click="$dispatch('openModal', { component: 'facturas-sistema.delete', arguments: {factura: '{{ $factura->id }}', scope: 'facturas-sistema.index-almacen'} })" />
                                         </li>
                                     @endcan
                                 @endif
@@ -166,7 +172,8 @@
                     @if ($factura->estado == 'CANCELADA')
                         <tr>
                             <td colspan="10" class="bg-white p-1">
-                                <p><strong>{{__('site.invoices.index_storage.cancellation_motive')}}: </strong> {{ $factura->motivo_cancelacion }}</p>
+                                <p><strong>{{ __('site.invoices.index_storage.cancellation_motive') }}: </strong>
+                                    {{ $factura->motivo_cancelacion }}</p>
                             </td>
                         </tr>
                     @endif
@@ -174,7 +181,7 @@
                     <tr>
                         <td colspan="10">
                             <div class="list-group-item">
-                                {{__('site.common.results_not_found')}}...
+                                {{ __('site.common.results_not_found') }}...
                             </div>
                         </td>
                     </tr>
@@ -185,27 +192,25 @@
 
     <x-pagination :links="$facturas" :count="true" />
 
-    @if ($iframeContainerClass)
-        <div class="modal {{ $iframeContainerClass }}">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">PDF</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')"></button>
+    <div class="modal fade" id="pdf-index-almacen" tabindex="-1" wire:ignore.self>
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">PDF</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        wire:click="$set('iframeContainerClass', '')"></button>
+                </div>
+                <div class="modal-body pb-0 text-center">
+                    <div class="row">
+                        <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
+                            style="height: 80dvh"></iframe>
                     </div>
-                    <div class="modal-body pb-0 text-center">
-                        <div class="row">
-                            <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
-                                height="500px"></iframe>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')">{{__('site.common.close')}}</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{{ __('site.common.close') }}</button>
                 </div>
             </div>
         </div>
-    @endif
+    </div>
 </div>

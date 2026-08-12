@@ -12,10 +12,10 @@
     else if (in_array($type, ['tel', 'search', 'email', 'url'])) $inputmode = $type;
     else $inputmode = 'text';
 
-    if ($lazy) $bind = '.lazy';
+    if ($lazy) $bind = '.live';
     else if (ctype_digit($debounce)) $bind = '.debounce.' . $debounce . 'ms';
     else if ($debounce) $bind = '';
-    else $bind = '.defer';
+    else $bind = '';
 
     $attributes = $attributes->class([
         'form-control',

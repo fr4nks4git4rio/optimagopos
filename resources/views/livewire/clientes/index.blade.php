@@ -8,13 +8,13 @@
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
                 <input type="search" placeholder="{{ __('site.clients.index.search_clients') }}" class="form-control"
-                    wire:model.debounce.500ms="search">
+                    wire:model.live.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
             @can('createCliente', [App\Models\Cliente::class])
                 <button type="button" class="btn btn-site-primary btn-outline-warning"
-                    wire:click="$emit('openModal', 'clientes.save')">
+                    wire:click="$dispatch('openModal', { component: 'clientes.save' })">
                     <x-icon name="plus-lg" />
                     {{ __('site.common.create') }}
                 </button>
@@ -88,7 +88,7 @@
                                     @can('updateCliente', App\Models\Cliente::find($cliente['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="pencil" title="Modificar"
-                                                click="$emit('openModal', 'clientes.save', {cliente: {{ $cliente['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'clientes.save', arguments: {cliente: {{ $cliente['id'] }}} })" />
                                         </li>
                                     @endcan
                                     @can('manageClientSuscripcion', App\Models\Cliente::find($cliente['id']))
@@ -100,14 +100,14 @@
                                     @can('deleteCliente', App\Models\Cliente::find($cliente['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="Desactivar"
-                                                click="$emit('openModal', 'clientes.delete', {cliente: {{ $cliente['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'clientes.delete', arguments: {cliente: {{ $cliente['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @else
                                     @can('restoreCliente', App\Models\Cliente::withTrashed()->find($cliente['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="check-circle" title="Reactivar"
-                                                click="$emit('openModal', 'clientes.restore', {cliente_id: {{ $cliente['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'clientes.restore', arguments: {cliente_id: {{ $cliente['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @endif

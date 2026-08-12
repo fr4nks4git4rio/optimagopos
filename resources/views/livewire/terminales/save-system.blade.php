@@ -25,7 +25,7 @@
             <x-input label="{{ __('site.terminals.save.identifier') }}" disabled type="text" model="identificador" />
 
             <div class="form-check form-switch mb-2 mt-2">
-                <input class="form-check-input" type="checkbox" role="switch" id="chkAsociar" wire:model.lazy="es_vk">
+                <input class="form-check-input" type="checkbox" role="switch" id="chkAsociar" wire:model.blur="es_vk">
                 <label class="form-check-label fw-bold" style="cursor:pointer;" for="chkAsociar">
                     {{ __('site.terminals.save.is_vk') }}
                 </label>
@@ -33,13 +33,13 @@
 
             <div class="mb-1">
                 <label for="">{{ __('site.terminals.save.comments') }}:</label>
-                <textarea class="form-control" wire:model.defer="comentarios" rows="3"></textarea>
+                <textarea class="form-control" wire:model="comentarios" rows="3"></textarea>
             </div>
         </div>
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
             {{ __('site.common.close') }}
         </button>
         <button type="submit" class="btn btn-primary">{{ __('site.terminals.save.save_terminal') }}</button>

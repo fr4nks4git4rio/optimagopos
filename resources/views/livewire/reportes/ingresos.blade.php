@@ -6,11 +6,11 @@
     <div class="row mb-3">
         <div class="col-2">
             <label for="">Fecha Inicio</label>
-            <input type="date" class="form-control" wire:model="fechaInicio">
+            <input type="date" class="form-control" wire:model.live="fechaInicio">
         </div>
         <div class="col-2">
             <label for="">Fecha Fin</label>
-            <input type="date" class="form-control" wire:model="fechaFin">
+            <input type="date" class="form-control" wire:model.live="fechaFin">
         </div>
         <div class="col-4">
             <x-select2-ajax class="form-control" :label="'Cliente'" :placeholder="'Seleccione...'"
@@ -18,7 +18,7 @@
         </div>
         <div class="col-2">
             <label for="">Moneda:</label>
-            <select class="form-control " wire:model="moneda">
+            <select class="form-control " wire:model.live="moneda">
                 <option value="">Todas</option>
                 @foreach ($monedas as $moneda)
                     <option value="{{ $moneda }}">{{ $moneda }}</option>
@@ -27,7 +27,7 @@
         </div>
         <div class="col-2">
             <label for="">Importe</label>
-            <input type="text" class="form-control" wire:model="importe">
+            <input type="text" class="form-control" wire:model.live="importe">
         </div>
     </div>
     <div class="row justify-content-end">
@@ -99,7 +99,7 @@
                                 </li>
                                 <li class="list-inline-item">
                                     <x-action icon="eye" title="Detalles Ingreso"
-                                        click="$emit('openModal', 'facturacion.ingresos.show', {ingreso_id: '{{ $ingreso->id }}', factura_id: '{{ $ingreso->factura_id }}'})" />
+                                        click="$dispatch('openModal', { component: 'facturacion.ingresos.show', arguments: {ingreso_id: '{{ $ingreso->id }}', factura_id: '{{ $ingreso->factura_id }}'} })" />
                                 </li>
                                 <li class="list-inline-item">
                                     <x-action icon="file-earmark-post" title="Imprimir Ingreso"
@@ -139,8 +139,8 @@
 
     <x-pagination :links="$ingresos" :count="true" />
 
-    <div class="modal {{ $iframeContainerClass }}">
-        <div class="modal-dialog modal-lg">
+    <div class="modal fade" id="pdf-ingresos" tabindex="-1" wire:ignore.self>
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">PDF</h5>
@@ -154,8 +154,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        wire:click="$set('iframeContainerClass', '')">{{ __('Cerrar') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cerrar') }}</button>
                 </div>
             </div>
         </div>

@@ -8,20 +8,20 @@
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
                 <input type="search" placeholder="{{ __('site.terminals.index.search_terminals') }}" class="form-control"
-                    wire:model.debounce.500ms="search">
+                    wire:model.live.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
             @can('create', [App\Models\Terminal::class])
                 @if (user()->cliente_id)
                     <button type="button" class="btn btn-site-primary btn-outline-warning"
-                        wire:click="$emit('openModal', 'terminales.save')">
+                        wire:click="$dispatch('openModal', { component: 'terminales.save' })">
                         <x-icon name="plus-lg" />
                         {{ __('site.common.create') }}
                     </button>
                 @else
                     <button type="button" class="btn btn-site-primary btn-outline-warning"
-                        wire:click="$emit('openModal', 'terminales.save-system')">
+                        wire:click="$dispatch('openModal', { component: 'terminales.save-system' })">
                         <x-icon name="plus-lg" />
                         {{ __('site.common.create') }}
                     </button>
@@ -32,7 +32,7 @@
                 @foreach ($perPages as $perPage)
                     @if ($perPage == $this->perPage)
                         <x-dropdown-item label="{{ $perPage }}" class="active"
-                            click="$set('perPage', '{{ $perPage }}')" />
+                            click="$set('perPage', {{ $perPage }})" />
                     @else
                         <x-dropdown-item label="{{ $perPage }}" click="$set('perPage', '{{ $perPage }}')" />
                     @endif
@@ -90,26 +90,26 @@
                                         @if (user()->cliente_id)
                                             <li class="list-inline-item">
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
-                                                    click="$emit('openModal', 'terminales.save', {terminal: {{ $terminal['id'] }}})" />
+                                                    click="$dispatch('openModal', { component: 'terminales.save', arguments: {terminal: {{ $terminal['id'] }}} })" />
                                             </li>
                                         @else
                                             <li class="list-inline-item">
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
-                                                    click="$emit('openModal', 'terminales.save-system', {terminal: {{ $terminal['id'] }}})" />
+                                                    click="$dispatch('openModal', { component: 'terminales.save-system', arguments: {terminal: {{ $terminal['id'] }}} })" />
                                             </li>
                                         @endif
                                     @endcan
                                     @can('delete', App\Models\Terminal::find($terminal['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="{{ __('site.common.deactivate') }}"
-                                                click="$emit('openModal', 'terminales.delete', {terminal: {{ $terminal['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'terminales.delete', arguments: {terminal: {{ $terminal['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @else
                                     @can('restore', App\Models\Terminal::withTrashed()->find($terminal['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="check-circle" title="{{ __('site.common.restore') }}"
-                                                click="$emit('openModal', 'terminales.restore', {terminal: {{ $terminal['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'terminales.restore', arguments: {terminal: {{ $terminal['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @endif
@@ -118,7 +118,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>
@@ -129,5 +129,5 @@
         </table>
     </div>
 
-    <x-pagination :links="$terminales" :count="true" />
+    <x-pagination :links="$terminales" :count="true" :justify="'between'" class="mt-4" />
 </div>

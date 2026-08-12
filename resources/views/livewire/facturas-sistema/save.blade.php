@@ -74,7 +74,7 @@
                                                 class="fw-semibold small text-muted">{{ __('site.invoices.save_invoice.currency') }}
                                                 *</label>
                                             <select class="form-select @error('moneda') is-invalid @enderror"
-                                                wire:model="moneda" id="id_moneda">
+                                                wire:model.live="moneda" id="id_moneda">
                                                 @foreach ($monedas as $moneda)
                                                     <option value="{{ $moneda }}">{{ $moneda }}</option>
                                                 @endforeach
@@ -91,7 +91,7 @@
                                                         class="bi bi-currency-exchange"></i></span>
                                                 <input type="number" step="0.0001"
                                                     class="form-control @error('tipo_cambio') is-invalid @enderror" disabled
-                                                    wire:model="tipo_cambio">
+                                                    wire:model.live="tipo_cambio">
                                             </div>
                                             @error('tipo_cambio')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -253,7 +253,7 @@
                                 <div class="col-md-4">
                                     <label
                                         class="fw-semibold small text-muted">{{ __('site.invoices.save_invoice.issue_date') }}</label>
-                                    <input type="text" class="form-control" wire:model="fecha_emision_str" disabled>
+                                    <input type="text" class="form-control" wire:model.live="fecha_emision_str" disabled>
                                 </div>
                                 <div class="col-md-4">
                                     <x-select2 label="{{ __('site.invoices.save_invoice.cfdi') }}"
@@ -295,7 +295,7 @@
                                     <div class="col-md-4 mt-0">
                                         <label class=form-label fw-semibold small
                                             text-muted">{{ __('site.invoices.save_invoice.year') }}</label>
-                                        <select class="form-select @error('anio') is-invalid @enderror" wire:model="anio">
+                                        <select class="form-select @error('anio') is-invalid @enderror" wire:model.live="anio">
                                             @foreach ($anios as $a)
                                                 <option value="{{ $a }}">{{ $a }}</option>
                                             @endforeach
@@ -459,7 +459,7 @@
                                 <div class="mb-3">
                                     <label
                                         class="fw-semibold small text-muted">{{ __('site.invoices.save_invoice.quantity_in_words') }}</label>
-                                    <textarea class="form-control text-dark small bg-light" wire:model="cantidad_letras" rows="2" disabled></textarea>
+                                    <textarea class="form-control text-dark small bg-light" wire:model.live="cantidad_letras" rows="2" disabled></textarea>
                                 </div>
 
                                 <div class="mb-0">
@@ -480,7 +480,7 @@
                     <div class="mb-2">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" role="switch" id="chkAsociar"
-                                wire:model.lazy="con_facturas_relacionadas">
+                                wire:model.blur="con_facturas_relacionadas">
                             <label class="form-check-label fw-semibold text-dark small" style="cursor:pointer;"
                                 for="chkAsociar">
                                 {{ __('site.invoices.save_invoice.associate_invoices') }}
@@ -573,7 +573,7 @@
         @livewire('facturas-sistema.save-factura-concepto')
 
         <div class="modal fade {{ $iframeContainerClass ? 'show d-block bg-dark bg-opacity-50' : '' }}" tabindex="-1"
-            role="dialog" aria-hidden="true">
+            role="dialog" inert>
             <div class="modal-dialog modal-xl modal-dialog-centered">
                 <div class="modal-content shadow-lg border-0">
                     <div class="modal-header bg-light">

@@ -37,7 +37,11 @@ return [
         'production' => 'Production',
         'testing' => 'Testing',
         'mode' => 'mode',
-        'print' => ''
+        'print' => '',
+        'file_not_found' => 'File not found.',
+        'general_total' => 'General Total',
+        'generated_on' => 'Generated on :date',
+        'period' => 'Period',
     ],
     'statuses' => [
         'subscriptions' => [
@@ -848,7 +852,8 @@ return [
         'save_inovice_header_first' => 'You must first save the Invoice Header.',
         'stamping_method_saved' => 'Stamping Mode changed.',
         'log_updated' => 'Panel PAC updated.',
-        'log_updated_detail' => 'The PAC panel for Branch :nombre_comercial has been modified.'
+        'log_updated_detail' => 'The PAC panel for Branch :nombre_comercial has been modified.',
+        'stamping_mode_changed' => 'Stamping mode changed.'
     ],
     'invoice_header' => [
         'title' => 'Invoice Header',
@@ -896,7 +901,12 @@ return [
             'stamp_invoice_successfully' => 'Invoice stamped successfully.',
             'print_log_name' => 'Pre-Invoices',
             'print_log_detail' => 'Pre-Invoice list printed.',
-            'cancellation_motive' => 'Cancellation Reason'
+            'cancellation_motive' => 'Cancellation Reason',
+            'no_generic_client_exists' => 'First, you must register the customer: "VENTA A PUBLICO GENERAL" with RFC: "XAXX010101000".',
+            'log_invoice_stamped' => 'Invoice stamped.',
+            'log_invoice_stamped_detail' => 'Stamped invoice with internal folio :folio.',
+            'successful_stamping' =>  'Successful stamping.',
+            'error_stamping' =>  'Error stamping the invoice. Error: :error',
         ],
         'save_invoice' => [
             'pre_invoices' => 'Pre-Invoices',
@@ -957,7 +967,13 @@ return [
             'internal_folio' => 'Internal Reference',
             'type' => 'Type',
             'not_invoices_found' => 'No issued receipts found to associate.',
-            'errors_in_form' => 'There are errors in the form.'
+            'errors_in_form' => 'There are errors in the form.',
+            'log_created' => 'Invoice created.',
+            'log_created_detail' => 'Invoice generated with ID :id, belonging to Branch :nombre_comercial.',
+            'log_updated' => 'Invoice updated.',
+            'log_updated_detail' => 'Invoice with ID :id, belonging to Branch :nombre_comercial has been updated.',
+            'saved_invoice_successfully' => 'Invoice saved.',
+            'concept_deleted' => 'Concept deleted.',
         ],
         'invoice_concept' => [
             'new_concept' => 'New Item',
@@ -1098,14 +1114,18 @@ return [
             'f_int' => 'Int. D.',
             'type' => 'Type',
             'receiver' => 'Receiver',
+            'receiver_rfc' => 'Receiver\'s Tax ID',
+            'uuid' =>  'UUID',
+            'concepts' => 'Concepts',
             'subtotal' => 'Subtotal',
             'iva' => 'VAT',
             'total' => 'Total',
             'cancellation_motive' => 'Cancellation reason',
             'no_xml_file_found' => 'The XML file was not found.',
             'printing_log_name' => 'Invoice Storage',
-            'printing_log_detail' => 'Invoice storage list printed',
-            'download_xml_name' => 'Issued Invoices'
+            'download_excel_name' => 'Issued Invoices',
+            'issuer' => 'Issuer',
+            'issuer_rfc' => 'Issuer\'s Tax ID'
         ],
         'delete' => [
             'title' => 'Delete Invoice',
@@ -1157,7 +1177,12 @@ return [
         'cancel' => [
             'cancellation_motive' => 'Cancellation Reason',
             'invoice_to_cancel' => ':type with reference <b>:folio</b> will be cancelled.',
-            'substitute_folio' => 'Substitute reference'
+            'substitute_folio' => 'Substitute reference',
+            'cancellation_alert' => 'The invoice will be cancelledLa Factura será cancelada',
+            'cancel_success' => 'Cancellation successful.',
+            'cancel_error' => 'Error while cancelling. Error: :error',
+            'log_invoice_canceled' => 'Cancelled invoice.',
+            'log_invoice_canceled_detail' => 'Invoice with folio :folio cancelled',
         ]
     ],
     'accounts_receivable' => [

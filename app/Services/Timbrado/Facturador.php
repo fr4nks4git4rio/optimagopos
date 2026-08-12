@@ -140,7 +140,7 @@ class Facturador
         $xmlOrig = $Builder->generarXML();
 
         if ($xmlOrig === false) {
-            throw new \RuntimeException("Error al formar archivo XML ");
+            throw new \RuntimeException("Error al formar archivo XML");
             //            return false;
         }
 
@@ -217,18 +217,16 @@ class Facturador
             $factura->numero_serie_emisor = $vals[$index['CFDI:COMPROBANTE'][0]]['attributes']['NOCERTIFICADO'];
             $factura->version_cfdi_timbrado = '4.0';
 
-            $label = 'Factura';
-
-            activity($label . ' Timbrada')
+            activity(__('site.invoices.index.log_invoice_stamped'))
                 ->on($factura)
                 ->withProperties($factura->getDirty())
-                ->log("Timbrada " . $label . " con folio interno: $factura->folio_interno");
+                ->log(__('site.invoices.log_invoice_stamped_detail', ['folio' => $factura->folio_interno]));
 
             $factura->saveQuietly();
 
-            $response = ['success' => true, 'message' => "Timbrado exitoso."];
+            $response = ['success' => true, 'message' => __('site.invoices.index.successful_stamping')];
         } else {
-            $error = 'Error al timbrar: ' . $result['msg'];
+            $error = __('site.invoices.index.error_stamping',  ['error' => $result['msg']]);
             $response = ['success' => false, 'message' => $error];
         }
         return $response;
@@ -511,19 +509,19 @@ class Facturador
             $factura->motivo_cancelacion_id = $motivo_cancelacion;
             $factura->saveQuietly();
 
-            $label = 'Factura';
             $data = [
                 'motivo_cancelacion_id' => $motivo_cancelacion,
                 'motivo_cancelacion' => $motivo->nombre,
             ];
-            activity($label . ' Cancelada')
+            activity(__('site.invoices.cancel.log_invoice_canceled'))
                 ->on($factura)
+                ->event('cancelled')
                 ->withProperties($data)
-                ->log("Cancelada $label con folio interno: $factura->folio_interno");
+                ->log(__('site.invoices.cancel.log_invoice_canceled_detail', ['folio' => $factura->folio_interno]));
             $success = true;
-            $message = 'Cancelación exitosa.';
+            $message = __('site.invoices.cancel.cancel_success');
         } else {
-            $error = 'Error al cancelar: ' . $result['msg'];
+            $error = __('site.invoices.cancel.cancel_success', ['error' => $result['msg']]);
 
             $success = false;
             $message = $error;

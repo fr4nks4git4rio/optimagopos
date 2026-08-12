@@ -71,7 +71,7 @@
                             <div class="col-sm-4">
                                 <label
                                     class="text-muted fw-bold small">{{ __('site.invoices.save_credit_note.issue_date') }}</label>
-                                <input type="text" class="form-control bg-light" wire:model="fecha_emision_str" disabled>
+                                <input type="text" class="form-control bg-light" wire:model.live="fecha_emision_str" disabled>
                             </div>
                             <div class="col-sm-4">
                                 <label
@@ -124,7 +124,7 @@
                             <div class="col-sm-4">
                                 <label
                                     class="text-muted fw-bold small">{{ __('site.invoices.save_credit_note.currency') }}</label>
-                                <select class="form-select @error('moneda') is-invalid @enderror" wire:model.lazy="moneda"
+                                <select class="form-select @error('moneda') is-invalid @enderror" wire:model.blur="moneda"
                                     id="id_moneda">
                                     @foreach ($monedas as $moneda)
                                         <option value="{{ $moneda }}">{{ $moneda }}</option>
@@ -141,7 +141,7 @@
                                     <span class="input-group-text bg-light">$</span>
                                     <input type="number" step="0.0001"
                                         class="form-control @error('tipo_cambio') is-invalid @enderror" disabled
-                                        wire:model="tipo_cambio">
+                                        wire:model.live="tipo_cambio">
                                 </div>
                                 @error('tipo_cambio')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -336,12 +336,12 @@
                             <label
                                 class="text-muted fw-bold small">{{ __('site.invoices.save_credit_note.quantity_in_words') }}</label>
                             <input type="text" class="form-control bg-light fw-medium text-secondary"
-                                wire:model="cantidad_letras" disabled>
+                                wire:model.live="cantidad_letras" disabled>
                         </div>
 
                         <div class="form-check form-switch mb-3">
                             <input type="checkbox" id="asociar-facturas" class="form-check-input" role="switch"
-                                wire:model="asociar_facturas">
+                                wire:model.live="asociar_facturas">
                             <label for="asociar-facturas" class="form-check-label fw-bold text-dark small">
                                 {{ __('site.invoices.save_credit_note.associate_available_invoices') }}
                             </label>
@@ -369,7 +369,7 @@
                                         @foreach ($facturasFiscalesAll as $index => $factura)
                                             <tr>
                                                 <td><input type="checkbox" class="form-check-input"
-                                                        wire:model="facturasFiscalesAll.{{ $index }}.seleccionada">
+                                                        wire:model.live="facturasFiscalesAll.{{ $index }}.seleccionada">
                                                 </td>
                                                 <td class="small">{{ $factura['fecha_emision_str'] }}</td>
                                                 <td class="fw-bold">{{ $factura['folio_interno'] }}</td>

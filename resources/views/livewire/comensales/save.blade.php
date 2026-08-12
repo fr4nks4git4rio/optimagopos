@@ -9,7 +9,7 @@
             @if ($con_facturacion)
                 <div class="mb-3">
                     <input type="file" style="display: none" accept=".pdf" id="file_constacia_fiscal"
-                        wire:model="constancia_fiscal">
+                        wire:model.live="constancia_fiscal">
                     <button type="button" class="btn btn-warning" wire:loading.attr="disabled"
                         onclick="document.getElementById('file_constacia_fiscal').click()">
                         {{ __('site.diners.save.load_fiscal_data') }}
@@ -125,7 +125,7 @@
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
             {{ __('site.common.close') }}
         </button>
         <button type="submit" class="btn btn-primary">

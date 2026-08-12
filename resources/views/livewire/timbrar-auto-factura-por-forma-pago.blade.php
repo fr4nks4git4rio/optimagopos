@@ -132,7 +132,7 @@
                                                     </div>
                                                     <div class="col-12 col-md-4 mb-2">
                                                         <select class="form-control"
-                                                            wire:model="facturas.{{ $index }}.concepto_agrupado"
+                                                            wire:model.live="facturas.{{ $index }}.concepto_agrupado"
                                                             @if (!$factura['agrupar_conceptos']) disabled @endif>
                                                             @foreach ($posiblesConceptos as $concepto)
                                                                 <option value="{{ $concepto }}">
@@ -206,7 +206,7 @@
                                             placeholder="________-____-____-____-____________"
                                             aria-label="CFDI relacionado"
                                             aria-describedby="button-addon-cfdi{{ $i }}"
-                                            wire:model.lazy="facturas.{{ $index_factura_active }}.cfdis_relacionados.{{ $i }}">
+                                            wire:model.blur="facturas.{{ $index_factura_active }}.cfdis_relacionados.{{ $i }}">
                                         <button class="btn btn-danger" type="button"
                                             id="button-addon-cfdi{{ $i }}"
                                             wire:click="removeCfdiRelacionado('{{ $i }}')"><i

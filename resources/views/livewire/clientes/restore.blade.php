@@ -13,7 +13,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
+            wire:click="$dispatch('closeModal')">{{ __('site.common.close') }}</button>
         <button type="submit" class="btn btn-site-primary text-capitalize">{{ __('site.clients.restore.confirm_restore') }}</button>
     </x-slot:buttons>
 </x-modal>

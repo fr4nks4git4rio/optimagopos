@@ -53,7 +53,7 @@
             :class="submenu_absolute" id="submenu_facturacion" data-bs-parent="#submenu_facturacion">
             @can('setPanelPac', [App\Models\Factura::class])
                 <li class="w-100 li-item">
-                    <a href="javascript:void(0)" wire:click="$emit('openModal', 'facturas.panel-pac')" class="nav-link submenu">
+                    <a href="javascript:void(0)" wire:click="$dispatch('openModal', { component: 'facturas.panel-pac' })" class="nav-link submenu">
                         <i class="bi bi-cart fs-6"></i> <span
                             class="d-sm-inline px-2">{{ __('site.sidebar.panel-pac') }}</span></a>
                 </li>

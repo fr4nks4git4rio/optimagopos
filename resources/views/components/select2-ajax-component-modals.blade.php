@@ -14,8 +14,7 @@
     //    $options = Arr::isAssoc($options) ? $options : array_combine($options, $options);
 
         $label = $label ? "$label:" : null;
-        if ($lazy) $bind = '.lazy';
-        else $bind = '.defer';
+        $bind = $lazy ? '.live' : '';
 
         $id = \Illuminate\Support\Str::replace(".", "-", $model);
         $attributes = $attributes->class([
@@ -125,7 +124,7 @@
                 allowClear: true,
                 language: 'es'
             });
-            event.detail.data.forEach(function(element){
+            event.detail[0].data.forEach(function(element){
                 select2.$element.append(new Option(element.text, element.id, false, false));
             });
         }

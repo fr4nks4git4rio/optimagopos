@@ -17,7 +17,7 @@
     ])->merge([
         'type' => 'radio',
         'name' => $model,
-        'wire:model' . $bind => $model,
+        'wire:model.live' . $bind => $model,
     ]);
 @endphp
 

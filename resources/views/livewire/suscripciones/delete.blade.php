@@ -36,7 +36,7 @@
 
         <div class="alert alert-warning border-0 p-3 mb-0">
             <label for="" class="form-label">{{ __('site.subscriptions.delete.delete_motive') }}:</label>
-            <textarea class="form-control" wire:model="motivo_desactivacion" rows="4"></textarea>
+            <textarea class="form-control" wire:model.live="motivo_desactivacion" rows="4"></textarea>
             <small class="text-muted"><i class="bi bi-info-circle"></i> {{ __('site.subscriptions.delete.min_chars') }}</small>
             @error('motivo_desactivacion')
                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -46,13 +46,13 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">{{ __('site.common.close') }}</button>
+            wire:click="$dispatch('closeModal')">{{ __('site.common.close') }}</button>
         <button wire:loading.attr="disabled" type="submit" class="btn btn-danger">
             <span wire:loading.remove wire:target="confirmarDesactivacion">
                 <i class="bi bi-x-circle-fill me-1"></i> {{ __('site.subscriptions.delete.delete_subscription') }}
             </span>
             <span wire:loading wire:target="confirmarDesactivacion" class="spinner-border spinner-border-sm"
-                role="status" aria-hidden="true"></span>
+                role="status"></span>
         </button>
     </x-slot:buttons>
 </x-modal>

@@ -14,8 +14,7 @@
     //    $options = Arr::isAssoc($options) ? $options : array_combine($options, $options);
 
         $label = $label ? "$label:" : null;
-        if ($lazy) $bind = '.lazy';
-        else $bind = '.defer';
+        $bind = $lazy ? '.live' : '';
 
         $attributes = $attributes->class([
             'form-select',
@@ -37,7 +36,7 @@
 	    let elementName = $(this).attr('id').replaceAll('-', '.');
 	    @this.set(elementName, e.target.value);
 	    if('{{$onChange}}' !== 'false')
-	        @this.emit('{{$onChange}}', '{{$index}}');
+	        $dispatch('{{$onChange}}', ['{{$index}}']);
 	    reApplySelect2();
     });
     window.addEventListener('reApplySelect2', event => {
@@ -49,7 +48,7 @@
         select2.$element.find('option').remove();
         reApplySelect2();
 
-        event.detail.data.forEach(function(element){
+        event.detail[0].data.forEach(function(element){
             select2.$element.append(new Option(element.text, element.id, false, false));
             $(select2.$element).find('option').attr('data-photo', element.photo)
         });

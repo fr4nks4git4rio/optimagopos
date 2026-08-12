@@ -16,11 +16,7 @@
 @php
     //    $options = Arr::isAssoc($options) ? $options : array_combine($options, $options);
     $label = $label ? "$label:" : null;
-    if ($lazy) {
-        $bind = '.lazy';
-    } else {
-        $bind = '.defer';
-    }
+    $bind = $lazy ? '.live' : '';
 
     $id = \Illuminate\Support\Str::replace('.', '-', $model);
 
@@ -51,7 +47,7 @@
             let elementName = $(this).attr('id').replaceAll('-', '.');
             @this.set(elementName, e.target.value);
             if ('{{ $onChange }}' !== 'false')
-                @this.emit('{{ $onChange }}', '{{ $index }}');
+                $dispatch('{{ $onChange }}', ['{{ $index }}']);
             Livewire.hook('message.processed', (m, component) => {
                 $('#{{ $id }}.select2').select2({
                     dropdownParent: $('#{{ $parent }}'),

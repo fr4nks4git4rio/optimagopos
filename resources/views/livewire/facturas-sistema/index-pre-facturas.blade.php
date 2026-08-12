@@ -39,19 +39,22 @@
     </div>
     <div class="row mb-1">
         <div class="col-sm-2">
-            <x-input label="{{ __('site.invoices.index.start_date') }}" type="date" :lazy="true" model="fechaInicio" />
+            <x-input label="{{ __('site.invoices.index.start_date') }}" type="date" :lazy="true"
+                model="fechaInicio" />
         </div>
         <div class="col-sm-2">
-            <x-input label="{{ __('site.invoices.index.end_date') }}" type="date" :lazy="true" model="fechaFin" />
+            <x-input label="{{ __('site.invoices.index.end_date') }}" type="date" :lazy="true"
+                model="fechaFin" />
         </div>
         <div class="col-sm-4">
-            <x-select2-ajax label="{{ __('site.invoices.index.client') }}" placeholder="{{ __('site.common.select') }}..." class="form-control"
+            <x-select2-ajax label="{{ __('site.invoices.index.client') }}"
+                placeholder="{{ __('site.common.select') }}..." class="form-control"
                 url="{{ route('clientes.load-clientes') }}" model="cliente" />
         </div>
         <div class="col-sm-2">
             <div class="mb-1">
                 <label for="">{{ __('site.invoices.index.status') }}</label>
-                <select class="form-control" wire:model="estado">
+                <select class="form-control" wire:model.live="estado">
                     @foreach ($estados as $estado)
                         <option value="{{ $estado }}">{{ $estado }}</option>
                     @endforeach
@@ -61,7 +64,7 @@
         <div class="col-sm-2">
             <div class="mb-1">
                 <label for="">{{ __('site.invoices.index.currency') }}</label>
-                <select class="form-control" wire:model="moneda">
+                <select class="form-control" wire:model.live="moneda">
                     @foreach ($monedas as $moneda)
                         <option value="{{ $moneda }}">{{ $moneda }}</option>
                     @endforeach
@@ -112,7 +115,8 @@
                         <td>{{ $factura->fecha_emision_str }}</td>
                         <td>{{ $factura->receptor }}</td>
                         <td class="text-center">
-                            <span class="badge {{ $classEstado }}">{{ __('site.statuses.invoices.' . $factura->estado) }}</span>
+                            <span
+                                class="badge {{ $classEstado }}">{{ __('site.statuses.invoices.' . $factura->estado) }}</span>
                         </td>
                         <td class="text-center">{{ $factura->moneda }}</td>
                         <td class="text-center">{{ number_format($factura->subtotal, 2) }}</td>
@@ -135,13 +139,13 @@
                                 @if ($factura->estado == 'CAPTURADA')
                                     <li class="list-inline-item mb-1">
                                         <x-action icon="bell" title="{{ __('site.common.stamp') }}"
-                                            click="$emit('openModal', 'facturas-sistema.timbrar', {'factura': '{{ $factura->id }}'})" />
+                                            click="$dispatch('openModal', { component: 'facturas-sistema.timbrar', arguments: {'factura': '{{ $factura->id }}'} })" />
                                     </li>
                                 @endif
                                 @can('deleteFacturaSistema', App\Models\Factura::find($factura->id))
                                     <li class="list-inline-item mb-1">
                                         <x-action icon="trash" title="{{ __('site.common.delete') }}"
-                                            click="$emit('openModal', 'facturas-sistema.delete', {factura: '{{ $factura->id }}', scope: 'facturas-sistema.index-pre-facturas'})" />
+                                            click="$dispatch('openModal', { component: 'facturas-sistema.delete', arguments: {factura: '{{ $factura->id }}', scope: 'facturas-sistema.index-pre-facturas'} })" />
                                     </li>
                                 @endcan
                             </ul>
@@ -162,27 +166,25 @@
 
     <x-pagination :links="$facturas" :count="true" />
 
-    @if ($iframeContainerClass)
-        <div class="modal {{ $iframeContainerClass }}">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">PDF</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')"></button>
+    <div class="modal fade" id="pdf-index-prefacturas" tabindex="-1" wire:ignore.self>
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">PDF</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        wire:click="$set('iframeContainerClass', '')"></button>
+                </div>
+                <div class="modal-body pb-0 text-center">
+                    <div class="row">
+                        <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
+                            style="height: 80dvh"></iframe>
                     </div>
-                    <div class="modal-body pb-0 text-center">
-                        <div class="row">
-                            <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
-                                height="500px"></iframe>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')">{{ __('site.common.close') }}</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        wire:click="$set('iframeContainerClass', '')">{{ __('site.common.close') }}</button>
                 </div>
             </div>
         </div>
-    @endif
+    </div>
 </div>

@@ -8,13 +8,13 @@
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
                 <input type="search" placeholder="{{ __('site.modules.list.search_modules') }}"
-                    class="form-control text-capitalize" wire:model.debounce.500ms="search">
+                    class="form-control text-capitalize" wire:model.live.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
             @can('create', [App\Models\Modulo::class])
                 <button type="button" class="btn btn-site-primary btn-outline-warning text-capitalize"
-                    wire:click="$emit('openModal', 'modulos.save')">
+                    wire:click="$dispatch('openModal', { component: 'modulos.save' })">
                     <x-icon name="plus-lg" />
                     {{ __('site.modules.save.create_module') }}
                 </button>
@@ -74,20 +74,20 @@
                                     @can('update', App\Models\Modulo::find($modulo['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="pencil" title="{{__('site.common.edit')}}"
-                                                click="$emit('openModal', 'modulos.save', {modulo: {{ $modulo['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'modulos.save', arguments: {modulo: {{ $modulo['id'] }}} })" />
                                         </li>
                                     @endcan
                                     @can('delete', App\Models\Modulo::find($modulo['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="{{__('site.common.deactivate')}}"
-                                                click="$emit('openModal', 'modulos.delete', {modulo: {{ $modulo['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'modulos.delete', arguments: {modulo: {{ $modulo['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @else
                                     @can('restore', App\Models\Modulo::withTrashed()->find($modulo['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="check-circle" title="{{__('site.common.restore')}}"
-                                                click="$emit('openModal', 'modulos.restore', {modulo_id: {{ $modulo['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'modulos.restore', arguments: {modulo_id: {{ $modulo['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @endif

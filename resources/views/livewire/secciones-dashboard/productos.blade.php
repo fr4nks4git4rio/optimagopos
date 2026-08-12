@@ -56,7 +56,7 @@
 <div class="row">
     <div class="col-12 col-lg-6 mb-3">
         <div x-data="{
-            datosProductosCantidad: @entangle('productosData.top_productos_cantidad'),
+            datosProductosCantidad: @entangle('productosData.top_productos_cantidad').live,
             chart: null,
             sinDatos: false,
 
@@ -216,7 +216,7 @@
     </div>
     <div class="col-12 col-md-6 mb-3">
         <div x-data="{
-            datosProductosImporte: @entangle('productosData.top_productos_ingreso'),
+            datosProductosImporte: @entangle('productosData.top_productos_ingreso').live,
             chart: null,
             sinDatos: false,
 

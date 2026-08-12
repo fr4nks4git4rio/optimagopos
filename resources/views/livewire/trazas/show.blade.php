@@ -31,8 +31,8 @@
                             </thead>
                             <tbody>
                                 @php
-                                    $oldAttributes = (array)$this->getAttributes($properties->old);
-                                    $newAttributes = (array)$this->getAttributes($properties->attributes);
+                                    $oldAttributes = (array)$this->getDataAttributes($properties->old);
+                                    $newAttributes = (array)$this->getDataAttributes($properties->attributes);
                                 @endphp
 
                                 @foreach ($newAttributes as $index => $newItem)
@@ -60,7 +60,7 @@
                 @else
                     @php
                         $targetAttributes = $hasAttributes ? $properties->attributes : $properties;
-                        $attributesList = $this->getAttributes($targetAttributes);
+                        $attributesList = $this->getDataAttributes($targetAttributes);
                     @endphp
 
                     <div class="d-flex align-items-center mb-3 gap-2">
@@ -96,7 +96,7 @@
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
             {{__('site.common.close')}}
         </button>
     </x-slot:buttons>

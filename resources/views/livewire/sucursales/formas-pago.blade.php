@@ -72,49 +72,57 @@
                 </table>
             </div>
         </div>
-        @if ($modalFormaPagoSaveClass)
-            <div class="modal {{ $modalFormaPagoSaveClass }}" id="modal-forma-pago-save">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3 class="modal-title">
-                                {{ $index_forma_pago_activa !== null ? __('site.branches.branch_payment_forms.edit_payment_form') : __('site.branches.branch_payment_forms.new_payment_form') }}
-                            </h3>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                wire:click="$set('modalFormaPagoSaveClass', '')"></button>
+    </x-slot:content>
+
+    <x-slot:buttons>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            wire:click="$dispatch('closeModal')">Cerrar</button>
+    </x-slot:buttons>
+
+    <x-slot name="modals">
+        <div class="modal fade" id="modal-forma-pago-save" tabindex="-1" wire:ignore.self>
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">
+                            {{ $index_forma_pago_activa !== null ? __('site.branches.branch_payment_forms.edit_payment_form') : __('site.branches.branch_payment_forms.new_payment_form') }}
+                        </h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            wire:click="$set('modalFormaPagoSaveClass', '')"></button>
+                    </div>
+                    <div class="modal-body pb-0">
+                        <div class="row">
+                            @if ($index_forma_pago_activa !== null)
+                                <div class="col-12">
+                                    <x-alert icon="exclamation-triangle" alert="info">
+                                        {!! __('site.branches.branch_payment_forms.changes_alert') !!}
+                                    </x-alert>
+                                </div>
+                            @endif
+                            <x-input label="{{ __('site.branches.branch_payment_forms.name') }}"
+                                model="forma_pago_activa.nombre" />
+                            @if ($index_forma_pago_activa !== null)
+                                <x-select2-modals label="{{ __('site.branches.branch_payment_forms.currency') }}"
+                                    :options="$monedas" model="forma_pago_activa.moneda_id" class="form-control"
+                                    disabled />
+                            @else
+                                <x-select2-modals label="{{ __('site.branches.branch_payment_forms.currency') }}"
+                                    :options="$monedas" model="forma_pago_activa.moneda_id" class="form-control" />
+                            @endif
                         </div>
-                        <div class="modal-body pb-0">
-                            <div class="row">
-                                @if ($index_forma_pago_activa !== null)
-                                    <div class="col-12">
-                                        <x-alert icon="exclamation-triangle" alert="info">
-                                            {!! __('site.branches.branch_payment_forms.changes_alert') !!}
-                                        </x-alert>
-                                    </div>
-                                @endif
-                                <x-input label="{{ __('site.branches.branch_payment_forms.name') }}" model="forma_pago_activa.nombre" />
-                                @if ($index_forma_pago_activa !== null)
-                                    <x-select2-modals label="{{ __('site.branches.branch_payment_forms.currency') }}" :options="$monedas"
-                                        model="forma_pago_activa.moneda_id" class="form-control" disabled />
-                                @else
-                                    <x-select2-modals label="{{ __('site.branches.branch_payment_forms.currency') }}" :options="$monedas"
-                                        model="forma_pago_activa.moneda_id" class="form-control" />
-                                @endif
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                                wire:click="$set('modalFormaPagoSaveClass', '')">{{ __('site.common.close') }}</button>
-                            <button type="button" class="btn btn-primary" wire:click="guardarFormPago()">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">{{ __('site.common.close') }}</button>
+                        <button type="button" class="btn btn-primary" wire:click="guardarFormPago()">
                             {{ __('site.branches.branch_payment_forms.save_payment_form') }}
-                            </button>
-                        </div>
+                        </button>
                     </div>
                 </div>
             </div>
-        @endif
-        <div class="modal {{ $modalRestoreFormaPagoClass }}">
-            <div class="modal-dialog">
+        </div>
+        <div class="modal fade" id="modal-restore-forma-pago" tabindex="-1" wire:ignore.self>
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Confirmar</h5>
@@ -127,17 +135,17 @@
                         </x-alert>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('modalRestoreFormaPagoClass', '')">{{ __('Cerrar') }}</button>
-                        <button type="button" class="btn btn-primary" wire:click="restoreFormaPago()">Reactivar Forma
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cerrar') }}</button>
+                        <button type="button" class="btn btn-primary" wire:click="restoreFormaPago()">Reactivar
+                            Forma
                             de
                             Pago</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="modal {{ $modalDeleteFormaPagoClass }}">
-            <div class="modal-dialog">
+        <div class="modal fade" id="modal-delete-forma-pago" tabindex="-1" wire:ignore.self>
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Confirmar</h5>
@@ -159,10 +167,5 @@
                 </div>
             </div>
         </div>
-    </x-slot:content>
-
-    <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">Cerrar</button>
-    </x-slot:buttons>
+    </x-slot>
 </x-modal>

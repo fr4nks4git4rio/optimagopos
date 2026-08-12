@@ -10,17 +10,20 @@ use Maatwebsite\Excel\Concerns\FromView;
 class FacturaEmitidaExport implements FromView
 {
     use Exportable;
+    private $name;
     private $facturas;
 
-    public function __construct($facturas)
+    public function __construct($name, $facturas)
     {
+        $this->name = $name;
         $this->facturas = $facturas;
     }
 
     public function view(): View
     {
         return view('reports.excel.facturas_emitidas', [
-            'facturas' => $this->facturas
+            'name' => $this->name,
+            'facturas' => $this->facturas,
         ]);
     }
 }

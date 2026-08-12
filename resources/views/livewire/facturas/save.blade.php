@@ -201,7 +201,7 @@
             <div class="col-sm-4 col-xs-12">
                 <div class="mb-1">
                     <label for="">Año:</label>
-                    <select class="form-control" wire:model="anio">
+                    <select class="form-control" wire:model.live="anio">
                         <option value="">Seleccione...</option>
                         @foreach ($anios as $anio)
                             <option value="{{ $anio }}">{{ $anio }}</option>
@@ -231,7 +231,7 @@
                                 model="concepto.objeto_impuesto_id" />
                         </td>
                         <td>
-                            <textarea class="form-control" rows="1" wire:model="concepto.descripcion" placeholder="Concepto"></textarea>
+                            <textarea class="form-control" rows="1" wire:model.live="concepto.descripcion" placeholder="Concepto"></textarea>
                         </td>
                         <td>
                             <x-input model="concepto.precio_unitario" type="number" placeholder="Precio Unitario" />
@@ -338,7 +338,7 @@
     <div class="col-sm-12">
         <div class="mb-1">
             <label for="">Observaciones:</label>
-            <textarea class="form-control" rows="4" wire:model="comentarios"></textarea>
+            <textarea class="form-control" rows="4" wire:model.live="comentarios"></textarea>
         </div>
     </div>
     <div class="col-sm-12 pt-3 text-end">

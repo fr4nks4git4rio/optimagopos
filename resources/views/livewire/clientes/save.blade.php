@@ -5,28 +5,28 @@
 
     <x-slot:content>
         <div wire:init="init" class="row">
-            <div x-data="{ logo_uploaded: false }" class="col-12 col-md-3 text-center mb-2"
-                x-on:livewire-upload-finish="logo_uploaded=true;$wire.logo_src = URL.createObjectURL(document.getElementById('logo').files[0])">
+            <div class="col-12 col-md-3 text-center mb-2">
                 <label for="">{{ __('site.clients.save.logo') }}</label>
                 <hr>
-                @if (!$this->has_logo)
-                    <img src="{{ asset('img/no_image.png') }}" alt="" class="img-thumbnail rounded-4"
-                        id="logo_image">
+                @if ($logo)
+                    <img src="{{ $logo->temporaryUrl() }}" alt="Logo preview" class="img-thumbnail rounded-4">
+
+                    {{-- 2. Mostrar logo existente de la base de datos si existe --}}
+                @elseif ($logo_src)
+                    <img src="{{ asset($logo_src) }}" alt="Logo actual" class="img-thumbnail rounded-4">
+
+                    {{-- 3. Imagen por defecto si no hay nada --}}
                 @else
-                    <template x-if="logo_uploaded">
-                        <img src="{{ $logo_src }}" alt="" class="img-thumbnail rounded-4">
-                    </template>
-                    <template x-if="!logo_uploaded">
-                        <img src="{{ asset($logo_src) }}" alt="" class="img-thumbnail rounded-4">
-                    </template>
+                    <img src="{{ asset('img/no_image.png') }}" alt="Sin imagen" class="img-thumbnail rounded-4">
                 @endif
 
-                <input type="file" style="display: none" id="logo" wire:model="logo" accept=".jpg,.jpeg,.png">
+                <input type="file" style="display: none" id="logo" wire:model.live="logo"
+                    accept=".jpg,.jpeg,.png">
                 <button type="button" class="btn btn-site-primary mt-2"
                     onclick="document.getElementById('logo').click()">
                     {{ __('site.clients.save.upload_logo') }}
                 </button>
-                @if ($this->has_logo)
+                @if ($this->logo || $this->logo_src)
                     <button type="button" class="btn btn-secondary mt-2" wire:click="removeLogo()">
                         {{ __('site.clients.save.remove_logo') }}
                     </button>
@@ -39,7 +39,7 @@
                     @if ($con_facturacion)
                         <div class="mb-3">
                             <input type="file" style="display: none" accept=".pdf" id="file_constacia_fiscal"
-                                wire:model="constancia_fiscal">
+                                wire:model.live="constancia_fiscal">
                             <button type="button" class="btn btn-warning" wire:loading.attr="disabled"
                                 onclick="document.getElementById('file_constacia_fiscal').click()">
                                 {{ __('site.clients.save.load_fiscal_data') }}
@@ -203,7 +203,8 @@
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+            wire:click="$dispatch('closeModal')">
             {{ __('site.common.close') }}
         </button>
         <button type="submit" class="btn btn-primary">{{ __('site.clients.save.save_client') }}</button>

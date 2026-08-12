@@ -1,14 +1,11 @@
 @props(['label' => '', 'model', 'lazy' => false, 'inline' => false, 'onChange' => 'false', 'index' => ''])
 
 @php
-    if ($lazy) {
-        $bind = '.lazy';
-    } else {
-        $bind = '.defer';
-    }
+    $bind = $lazy ? '.live' : '';
 
-    if($label)
+    if ($label) {
         $label .= ':';
+    }
 
     $id = \Illuminate\Support\Str::replace('.', '-', $model);
 
@@ -145,16 +142,14 @@
 </style>
 
 <div class="mb-3 {{ $inline ? 'd-flex' : '' }}">
-    <label for="{{ $model }}" class="form-check-label {{ $inline ? 'mr-2' : ' mb-1' }} text-capitalize">{{ $label }}</label>
+    <label for="{{ $id }}"
+        class="form-check-label {{ $inline ? 'mr-2' : ' mb-1' }} text-capitalize">{{ $label }}</label>
     <div class="toggle-button-cover">
         <div class="button-cover">
             <div class="button r button-toggle">
-                <input x-data="{}" x-init="() => {
-                    $('#{{ $id }}').on('change', function(e) {
-                        if ('{{ $onChange }}' !== 'false')
-                            @this.emit('{{ $onChange }}', '{{ $index }}');
-                    });
-                }" {{ $attributes }}>
+                <input
+                    @if ($onChange !== 'false') @change="$dispatch('{{ $onChange }}', ['{{ $index }}'])" @endif
+                    {{ $attributes }}>
                 <div class="knobs"></div>
                 <div class="layer"></div>
             </div>

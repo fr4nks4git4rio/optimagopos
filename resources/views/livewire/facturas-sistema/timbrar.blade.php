@@ -19,7 +19,7 @@
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
             {{__('site.common.close')}}
         </button>
         <button type="submit" class="btn btn-danger">{{__('site.common.stamp')}} {{$this->type}}</button>

@@ -65,7 +65,7 @@
                                         <div class="mb-1">
                                             <label for="">Portal del PAC</label>
                                             <textarea rows="2" class="form-control @error("sucursales.$index.portal_pac") is-invalid @enderror"
-                                                wire:model="sucursales.{{ $index }}.portal_pac"></textarea>
+                                                wire:model.live="sucursales.{{ $index }}.portal_pac"></textarea>
                                             @error("sucursales.$index.portal_pac")
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror

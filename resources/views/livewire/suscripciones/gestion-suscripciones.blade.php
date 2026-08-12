@@ -116,7 +116,7 @@
                     <div class="d-flex gap-2 mt-1">
                         @if ($estado !== 'ACTIVA')
                             <button type="button" wire:loading.attr="disabled"
-                                wire:click="$emit('openModal', 'suscripciones.activar', {'scope': 'suscripciones.gestion-suscripciones', 'suscripcion': {{ $suscripcion->id }}})"
+                                wire:click="$dispatch('openModal', { component: 'suscripciones.activar', arguments: {'scope': 'suscripciones.gestion-suscripciones', 'suscripcion': {{ $suscripcion->id }}} })"
                                 class="btn btn-success btn-sm fw-bold shadow-sm">
                                 <i class="bi bi-check-circle-fill me-1" wire:target="activarSuscripcion"></i>
                                 Activar
@@ -125,7 +125,7 @@
 
                         @if ($estado === 'ACTIVA')
                             <button type="button" wire:loading.attr="disabled" wire:target="desactivarSuscripcion"
-                                wire:click="$emit('openModal', 'suscripciones.delete', {'scope': 'suscripciones.gestion-suscripciones', 'suscripcion': {{ $suscripcion->id }}})"
+                                wire:click="$dispatch('openModal', { component: 'suscripciones.delete', arguments: {'scope': 'suscripciones.gestion-suscripciones', 'suscripcion': {{ $suscripcion->id }}} })"
                                 class="btn btn-danger btn-sm fw-bold shadow-sm">
                                 <span wire:loading wire:target="desactivarSuscripcion"
                                     class="spinner-border spinner-border-sm me-1" role="status"></span>
@@ -149,7 +149,7 @@
         @endif
     </div>
 
-    <form wire:submit.prevent="submit">
+    <form wire:submit="submit">
         <div class="row g-4">
 
             <div class="col-lg-7">
@@ -312,7 +312,7 @@
                                         *</label>
                                     <input type="date" @if (!$this->can_edit_subscription) disabled @endif
                                         class="form-control border-secondary-subtle @error('fecha_inicio_operaciones') is-invalid @enderror"
-                                        wire:model="fecha_inicio_operaciones">
+                                        wire:model.live="fecha_inicio_operaciones">
                                     @error('fecha_inicio_operaciones')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -324,7 +324,7 @@
                                         *</label>
                                     <input type="date" @if (!$this->can_edit_subscription) disabled @endif
                                         class="form-control border-secondary-subtle @error('fecha_inicio_pagos') is-invalid @enderror"
-                                        wire:model="fecha_inicio_pagos">
+                                        wire:model.live="fecha_inicio_pagos">
                                     @error('fecha_inicio_pagos')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -336,7 +336,7 @@
                                         *</label>
                                     <select @if (!$this->can_edit_subscription) disabled @endif
                                         class="form-control form-select border-secondary-subtle @error('periodicidad_pagos') is-invalid @enderror"
-                                        wire:model="periodicidad_pagos">
+                                        wire:model.live="periodicidad_pagos">
                                         <option value="MENSUAL">
                                             {{ __('site.subscriptions.manage_subscription.monthly') }}</option>
                                         <option value="BIMESTRAL">
@@ -378,7 +378,7 @@
                                             <input type="number"
                                                 class="form-control text-center bg-white border-secondary-subtle fw-bold @error($infra['model']) is-invalid @enderror"
                                                 @if ($paquete_id) disabled @endif
-                                                wire:model="{{ $infra['model'] }}" min="1">
+                                                wire:model.live="{{ $infra['model'] }}" min="1">
                                             @if ($paquete_id && $this->can_edit_subscription)
                                                 <button type="button" wire:click="{{ $infra['inc'] }}"
                                                     class="btn btn-success border-success text-white px-2"><i
@@ -419,7 +419,7 @@
                                         </label>
                                         @if (count($sucursales) < $cant_sucursales && $cliente_id && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
-                                                wire:click="$emit('openModal', 'sucursales.save', { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $cliente_id }}, from_subscription: true })">
+                                                wire:click="$dispatch('openModal', { component: 'sucursales.save', arguments: { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $cliente_id }}, from_subscription: true } })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif
@@ -446,7 +446,7 @@
                                         </label>
                                         @if (count($terminales) < $cant_terminales && count($sucursales) == 1 && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
-                                                wire:click="$emit('openModal', 'terminales.save-system', { scope: 'suscripciones.gestion-suscripciones', sucursal_id: {{ $sucursales[0] }}, from_subscription: true })">
+                                                wire:click="$dispatch('openModal', { component: 'terminales.save-system', arguments: { scope: 'suscripciones.gestion-suscripciones', sucursal_id: {{ $sucursales[0] }}, from_subscription: true } })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif
@@ -473,7 +473,7 @@
                                         </label>
                                         @if (count($usuarios) < $cant_usuarios && $cliente_id && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
-                                                wire:click="$emit('openModal', 'usuarios.save-system', { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $cliente_id }}, from_subscription: true })">
+                                                wire:click="$dispatch('openModal', { component: 'usuarios.save-system', arguments: { scope: 'suscripciones.gestion-suscripciones', cliente_id: {{ $cliente_id }}, from_subscription: true } })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif
@@ -518,7 +518,7 @@
                                         <div class="d-flex align-items-start">
                                             <div class="form-check form-switch me-2 pt-1">
                                                 <input class="form-check-input check-modulo-custom" type="checkbox"
-                                                    role="switch" value="{{ $module->id }}" wire:model="modulos"
+                                                    role="switch" value="{{ $module->id }}" wire:model.live="modulos"
                                                     @if (($paquete_id && in_array($module->id, $this->modulos_paquete)) || !$this->can_edit_subscription) disabled @endif
                                                     id="mod-{{ $module->id }}">
                                             </div>
@@ -627,7 +627,7 @@
                                 <input type="number" step="0.01" min="0"
                                     @if (!$this->can_edit_subscription) disabled @endif
                                     class="form-control bg-white border-secondary-subtle fw-bold @error('descuento') is-invalid @enderror"
-                                    wire:model.lazy="descuento" placeholder="0.00">
+                                    wire:model.blur="descuento" placeholder="0.00">
                                 <span
                                     class="input-group-text bg-white border-secondary-subtle text-muted text-uppercase fs-8">{{ $globalSettings['moneda_sistema'] }}</span>
                             </div>

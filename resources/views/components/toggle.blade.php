@@ -10,11 +10,7 @@
 ])
 
 @php
-    if ($lazy) {
-        $bind = '.lazy';
-    } else {
-        $bind = '.defer';
-    }
+    $bind = $lazy ? '.live' : '';
 
     if (!in_array($size, ['sm', 'md'])) {
         $size = 'md';
@@ -44,7 +40,7 @@
             {{-- let elementName = $(this).attr('id').replaceAll('-', '.');
             @this.set(elementName, e.target.value); --}}
             if ('{{ $onChange }}' !== 'false')
-                $wire.emit('{{ $onChange }}', '{{ $index }}');
+                $dispatch('{{ $onChange }}', '{{ $index }}');
         });
     }">
     <label for="{{ $model }}"

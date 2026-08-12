@@ -19,14 +19,14 @@
                         <div class="form-check form-switch">
                             <label for="check-con_nota_credito" class="form-label">Con nota de crédito</label><br>
                             <input class="form-check-input m-auto" type="checkbox" role="switch"
-                                id="check-con_nota_credito" wire:model="con_nota_credito">
+                                id="check-con_nota_credito" wire:model.live="con_nota_credito">
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check form-switch">
                             <label for="check-con_diferente_moneda" class="form-label">Con diferente moneda</label><br>
                             <input class="form-check-input m-auto" type="checkbox" role="switch"
-                                id="check-con_diferente_moneda" wire:model="con_diferente_moneda">
+                                id="check-con_diferente_moneda" wire:model.live="con_diferente_moneda">
                         </div>
                     </div>
                 </div>
@@ -86,7 +86,7 @@
                                 @if ($this->con_diferente_moneda)
                                     <td class="text-center">
                                         <select class="form-select form-select-sm mx-auto" style="max-width: 90px;"
-                                            wire:model="facturas.{{ $index }}.moneda">
+                                            wire:model.live="facturas.{{ $index }}.moneda">
                                             @foreach ($monedas as $moneda)
                                                 <option value="{{ $moneda }}">{{ $moneda }}</option>
                                             @endforeach
@@ -157,7 +157,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('show-modal-confirm', '', '', 'facturacion.cuentas-cobrar.ingresar')">
+            wire:click="$dispatch('show-modal-confirm', '', '', 'facturacion.cuentas-cobrar.ingresar')">
             Cerrar
         </button>
         <button type="submit" class="btn btn-primary">Ingresar</button>

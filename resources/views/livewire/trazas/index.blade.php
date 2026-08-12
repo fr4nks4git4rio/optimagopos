@@ -7,7 +7,7 @@
         <div class="col-lg-auto mb-3">
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Trazas" class="form-control" wire:model.debounce.500ms="search">
+                <input type="search" placeholder="Buscar Trazas" class="form-control" wire:model.live.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
@@ -53,7 +53,7 @@
                             <ul class="list-unstyled mb-0">
                                 <li class="list-inline-item">
                                     <x-action icon="eye" title="{{ __('site.common.details') }}"
-                                        click="$emit('openModal', 'trazas.show', {log: {{ $log->id }}})" />
+                                        click="$dispatch('openModal', { component: 'trazas.show', arguments: {log: {{ $log->id }}} })" />
                                 </li>
                             </ul>
                         </td>

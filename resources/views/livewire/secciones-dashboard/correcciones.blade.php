@@ -35,7 +35,7 @@
 <div class="row">
     <div class="col-12 col-lg-6 mb-3">
         <div x-data="{
-            datosCorreccionesOperador: @entangle('correccionesData.grafica_correcciones_operador'),
+            datosCorreccionesOperador: @entangle('correccionesData.grafica_correcciones_operador').live,
             chart: null,
             sinDatos: false,
 
@@ -195,7 +195,7 @@
     </div>
     <div class="col-12 col-lg-6 mb-3">
         <div x-data="{
-            datosCorreccionesHora: @entangle('correccionesData.grafica_correcciones_hora'),
+            datosCorreccionesHora: @entangle('correccionesData.grafica_correcciones_hora').live,
             chart: null,
             sinDatos: false,
             horasDelDia: [],

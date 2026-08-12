@@ -10,3 +10,6 @@ select2();
 
 import "/node_modules/select2/dist/css/select2.css";
 import '../css/app.css';
+
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;

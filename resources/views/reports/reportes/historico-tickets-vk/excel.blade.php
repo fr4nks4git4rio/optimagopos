@@ -6,7 +6,7 @@
         <tr></tr>
         <tr>
             <td colspan="10">
-                Período:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+                {{ __('site.common.period') }}:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
                 @if (!empty($estadosSeleccionados))
                     &nbsp;|&nbsp;
                     Estado(s): &nbsp;

@@ -8,13 +8,13 @@
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
                 <input type="search" placeholder="{{ __('site.branches.index.search_branches') }}" class="form-control"
-                    wire:model.debounce.500ms="search">
+                    wire:model.live.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
             @can('create', [App\Models\Sucursal::class])
                 <button type="button" class="btn btn-site-primary btn-outline-warning"
-                    wire:click="$emit('openModal', 'sucursales.save')">
+                    wire:click="$dispatch('openModal', { component: 'sucursales.save' })">
                     <x-icon name="plus-lg" />
                     {{ __('site.common.create') }}
                 </button>
@@ -24,7 +24,7 @@
                 @foreach ($perPages as $perPage)
                     @if ($perPage == $this->perPage)
                         <x-dropdown-item label="{{ $perPage }}" class="active"
-                            click="$set('perPage', '{{ $perPage }}')" />
+                            click="$set('perPage', {{ $perPage }})" href="#" />
                     @else
                         <x-dropdown-item label="{{ $perPage }}" click="$set('perPage', '{{ $perPage }}')" />
                     @endif
@@ -82,32 +82,32 @@
                                     @can('update', App\Models\Sucursal::find($sucursal['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="pencil" title="{{ __('site.common.edit') }}"
-                                                click="$emit('openModal', 'sucursales.save', {sucursal : {{ $sucursal['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'sucursales.save', arguments: {sucursal : {{ $sucursal['id'] }}} })" />
                                         </li>
                                     @endcan
                                     @can('setPaymentForms', App\Models\Sucursal::find($sucursal['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="card-list" title="{{ __('site.common.payment_form') }}"
-                                                click="$emit('openModal', 'sucursales.formas-pago', {sucursal: {{ $sucursal['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'sucursales.formas-pago', arguments: {sucursal: {{ $sucursal['id'] }}} })" />
                                         </li>
                                     @endcan
                                     @can('setConfigs', App\Models\Sucursal::find($sucursal['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="gear" title="{{ __('site.common.configs') }}"
-                                                click="$emit('openModal', 'sucursales.configuraciones', {sucursal: {{ $sucursal['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'sucursales.configuraciones', arguments: {sucursal: {{ $sucursal['id'] }}} })" />
                                         </li>
                                     @endcan
                                     @can('delete', App\Models\Sucursal::find($sucursal['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="{{ __('site.common.deactivate') }}"
-                                                click="$emit('openModal', 'sucursales.delete', {sucursal: {{ $sucursal['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'sucursales.delete', arguments: {sucursal: {{ $sucursal['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @else
                                     @can('restore', App\Models\Sucursal::withTrashed()->find($sucursal['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="check-circle" title="{{ __('site.common.restore') }}"
-                                                click="$emit('openModal', 'sucursales.restore', {sucursal_id: {{ $sucursal['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'sucursales.restore', arguments: {sucursal_id: {{ $sucursal['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @endif
@@ -127,5 +127,5 @@
         </table>
     </div>
 
-    <x-pagination :links="$sucursales" :count="true" />
+    <x-pagination :links="$sucursales" :count="true" justify="between" class="mt-4" />
 </div>

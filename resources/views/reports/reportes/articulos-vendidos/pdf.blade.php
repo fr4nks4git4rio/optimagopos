@@ -207,7 +207,7 @@
                 <td>
                     <div class="report-title">{{ $name }}</div>
                     <div class="report-subtitle">
-                        Generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}
+                        {{ __('site.common.generated_on', ['date' => \Carbon\Carbon::now()->format('d/m/Y H:i')]) }}
                     </div>
                 </td>
             </tr>
@@ -216,7 +216,7 @@
 
     {{-- ================= FILTROS APLICADOS ================= --}}
     <div class="filters-box">
-        <strong>Periodo:</strong> {{ $fechaInicio ?? '-' }} al {{ $fechaFin ?? '-' }}
+        <strong>{{__('site.common.')}}:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
         @if (!empty($sucursalesSeleccionadas))
             &nbsp;&nbsp;|&nbsp;&nbsp;
             <strong>Sucursal(es):</strong>

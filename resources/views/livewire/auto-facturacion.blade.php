@@ -71,7 +71,7 @@
                             <div class="mb-1">
                                 <label for="">Código:</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" wire:model="codigo">
+                                    <input type="text" class="form-control" wire:model.live="codigo">
                                     <span class="input-group-text" style="cursor: pointer;"
                                         wire:click="mostrarTicketMuestra"><x-icon name="exclamation-circle" /></span>
                                     @error('codigo')
@@ -82,7 +82,7 @@
                             <div class="mb-1">
                                 <label for="">No. Ticket:</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" wire:model="ticket">
+                                    <input type="text" class="form-control" wire:model.live="ticket">
                                     <span class="input-group-text" style="cursor: pointer;"
                                         wire:click="mostrarTicketMuestra"><x-icon name="exclamation-circle" /></span>
                                     @error('ticket')

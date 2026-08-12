@@ -8,7 +8,7 @@
     @if ($this->hay_tipo_cambio)
         <span x-show="!editing"
             @click="editing = true; setTimeout(() => {$refs.input.focus()}, 100);">{{ $tipo_cambio }}</span>
-        <input x-show="editing" x-ref="input" wire:model.lazy="tipo_cambio" type="text" @blur="editing = false"
+        <input x-show="editing" x-ref="input" wire:model.blur="tipo_cambio" type="text" @blur="editing = false"
             @keydown.enter="editing = false; $wire.emit('saveTipoCambio')"
             style="max-width: 70px;border-radius: 5px;line-height: 10px;border: none;color: #000 !important">
     @else
@@ -23,8 +23,8 @@
             style="padding: 1px 4px; margin-top: -3px" wire:click="searchDof" title="{{ __('site.nav.obtain_from_dof') }}"><i
                 class="bi bi-cloud-download"></i></a>
 
-        <input wire:loading.remove type="text" wire:model.lazy="tipo_cambio" x-ref="input2" x-show="editing"
-            autofocus wire:change="$emit('saveTipoCambio')" @blur="editing = false"
+        <input wire:loading.remove type="text" wire:model.blur="tipo_cambio" x-ref="input2" x-show="editing"
+            autofocus wire:change="$dispatch('saveTipoCambio')" @blur="editing = false"
             style="max-width: 70px;border-radius: 5px;line-height: 10px;border: none;color: #000 !important">
     @endif
 </div>

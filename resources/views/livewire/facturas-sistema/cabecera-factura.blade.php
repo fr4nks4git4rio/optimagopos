@@ -37,7 +37,7 @@
                         <div class="col-sm-12">
                             <div class="mb-1">
                                 <label for="">{{ __('site.invoice_header.portal_pac') }}</label>
-                                <textarea rows="2" class="form-control @error('portal_pac') is-invalid @enderror" wire:model="portal_pac"></textarea>
+                                <textarea rows="2" class="form-control @error('portal_pac') is-invalid @enderror" wire:model.live="portal_pac"></textarea>
                                 @error('portal_pac')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror

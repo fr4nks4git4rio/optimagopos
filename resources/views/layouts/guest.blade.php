@@ -68,9 +68,9 @@
             padding-left: 0 !important;
         }
 
-        .modal.fade.show {
+        /* .modal.fade.show {
             z-index: 1051 !important;
-        }
+        } */
 
         .mr-1 {
             margin-right: 0.25rem !important;

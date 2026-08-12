@@ -14,7 +14,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Nombre del Paquete *</label>
                                 <input type="text" class="form-control @error('nombre') is-invalid @enderror"
-                                    wire:model.defer="nombre" placeholder="Ej. Paquete Básico">
+                                    wire:model="nombre" placeholder="Ej. Paquete Básico">
                                 @error('nombre')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
@@ -22,7 +22,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Descripción</label>
-                                <textarea class="form-control @error('descripcion') is-invalid @enderror" wire:model.defer="descripcion" rows="2"
+                                <textarea class="form-control @error('descripcion') is-invalid @enderror" wire:model="descripcion" rows="2"
                                     placeholder="Detalla qué incluye esta combinación de módulos..."></textarea>
                                 @error('descripcion')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -34,7 +34,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
                                     <input type="number" step="0.01"
-                                        class="form-control @error('precio') is-invalid @enderror" wire:model="precio"
+                                        class="form-control @error('precio') is-invalid @enderror" wire:model.live="precio"
                                         min="0">
                                 </div>
                                 @error('precio')
@@ -48,7 +48,7 @@
                                             class="bi bi-building me-1"></i>Sucursales Permitidas *</label>
                                     <input type="number"
                                         class="form-control @error('cant_sucursales') is-invalid @enderror"
-                                        wire:model="cant_sucursales" min="1">
+                                        wire:model.live="cant_sucursales" min="1">
                                     @error('cant_sucursales')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -59,7 +59,7 @@
                                             class="bi bi-display me-1"></i>Terminales / Cajas *</label>
                                     <input type="number"
                                         class="form-control @error('cant_terminales') is-invalid @enderror"
-                                        wire:model="cant_terminales" min="1">
+                                        wire:model.live="cant_terminales" min="1">
                                     @error('cant_terminales')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -70,7 +70,7 @@
                                             class="bi bi-person me-1"></i>Usuarios Permitidos *</label>
                                     <input type="number"
                                         class="form-control @error('cant_usuarios') is-invalid @enderror"
-                                        wire:model="cant_usuarios" min="1">
+                                        wire:model.live="cant_usuarios" min="1">
                                     @error('cant_usuarios')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -82,7 +82,7 @@
                                                 class="bi bi-file-pdf me-1"></i>Timbres Permitidos *</label>
                                         <input type="number"
                                             class="form-control @error('cant_timbres') is-invalid @enderror"
-                                            wire:model="cant_timbres" min="1" step="1">
+                                            wire:model.live="cant_timbres" min="1" step="1">
                                         @error('cant_timbres')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
@@ -95,7 +95,7 @@
                                                 class="bi bi-graph-up me-1"></i>Meses de Analítica Básica Permitidos *</label>
                                         <input type="number"
                                             class="form-control @error('cant_meses_analitica_basica') is-invalid @enderror"
-                                            wire:model="cant_meses_analitica_basica" min="1" step="1">
+                                            wire:model.live="cant_meses_analitica_basica" min="1" step="1">
                                         @error('cant_meses_analitica_basica')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
@@ -126,11 +126,11 @@
                                                     <div class="form-check me-3">
                                                         @if (in_array($module->id, [1, 2]))
                                                             <input class="form-check-input" type="checkbox"
-                                                                value="{{ $module->id }}" wire:model="modulos"
+                                                                value="{{ $module->id }}" wire:model.live="modulos"
                                                                 id="mod-{{ $module->id }}" disabled>
                                                         @else
                                                             <input class="form-check-input" type="checkbox"
-                                                                value="{{ $module->id }}" wire:model="modulos"
+                                                                value="{{ $module->id }}" wire:model.live="modulos"
                                                                 id="mod-{{ $module->id }}">
                                                         @endif
                                                     </div>
@@ -241,7 +241,7 @@
     </x-slot:content>
 
     <x-slot:buttons>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$emit('closeModal')">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
             Cerrar
         </button>
         <button type="submit" class="btn btn-primary">Guardar Paquete</button>

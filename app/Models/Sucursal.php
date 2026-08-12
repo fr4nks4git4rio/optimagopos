@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Storage;
  * @property integer $dias_vigencia
  * @property string $portal_pac
  * @property string $usuario_integrador_sat
+ * @property boolean $cfdi_timbrado_productivo
  * @property integer $cliente_id
  * @property integer $direccion_fiscal_id
  * @property integer $regimen_fiscal_id
@@ -53,6 +54,7 @@ class Sucursal extends Model
         'dias_vigencia',
         'portal_pac',
         'usuario_integrador_sat',
+        'cfdi_timbrado_productivo',
         'cliente_id',
         'direccion_fiscal_id',
         'regimen_fiscal_id',
@@ -81,7 +83,8 @@ class Sucursal extends Model
         'regimen_fiscal_id' => 'integer',
         'moneda_base_id' => 'integer',
         'moneda_facturacion_id' => 'integer',
-        'suscripcion_id' => 'integer'
+        'suscripcion_id' => 'integer',
+        'cfdi_timbrado_productivo' => 'boolean'
     ];
 
     /**

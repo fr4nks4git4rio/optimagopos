@@ -14,7 +14,7 @@
     ])->merge([
         'type' => 'checkbox',
         'id' => $model,
-        'wire:model' . $bind =>  $model,
+        'wire:model.live' . $bind =>  $model,
     ]);
 @endphp
 

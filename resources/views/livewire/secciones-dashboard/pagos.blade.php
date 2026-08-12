@@ -59,7 +59,7 @@
 <div class="row">
     <div class="col-12 col-lg-6">
         <div x-data="{
-            datosMetodosPagos: @entangle('pagosData.grafica_metodos_pago'), // Tu objeto de Livewire con los datos
+            datosMetodosPagos: @entangle('pagosData.grafica_metodos_pago').live, // Tu objeto de Livewire con los datos
             chart: null,
             sinDatos: false,
 
@@ -207,7 +207,7 @@
     </div>
     <div class="col-12 col-lg-6 mb-3">
         <div x-data="{
-            datosPagosHora: @entangle('pagosData.grafica_comportamiento_pagos_hora'), // Tu objeto de Livewire con los datos
+            datosPagosHora: @entangle('pagosData.grafica_comportamiento_pagos_hora').live, // Tu objeto de Livewire con los datos
             chart: null,
             sinDatos: false,
             horasDelDia: [],

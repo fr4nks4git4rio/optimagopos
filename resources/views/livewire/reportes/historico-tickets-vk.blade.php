@@ -161,27 +161,25 @@
         </table>
     </div>
 
-    @if ($iframeContainerClass)
-        <div class="modal {{ $iframeContainerClass }}">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">PDF</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')"></button>
+    <div class="modal fade" id="pdf-historico-vk">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">PDF</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        wire:click="$set('iframeContainerClass', '')"></button>
+                </div>
+                <div class="modal-body pb-0 text-center">
+                    <div class="row">
+                        <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
+                            style="height: 80dvh"></iframe>
                     </div>
-                    <div class="modal-body pb-0 text-center">
-                        <div class="row">
-                            <iframe src="{{ $iframeSrc }}" frameborder="0" id="frame-death-file"
-                                style="height: 80dvh"></iframe>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('iframeContainerClass', '')">{{ __('Cerrar') }}</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        wire:click="$set('iframeContainerClass', '')">{{ __('Cerrar') }}</button>
                 </div>
             </div>
         </div>
-    @endif
+    </div>
 </div>

@@ -29,6 +29,10 @@
     @livewireStyles
 
     <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
         body {
             /* font-size: 16px; */
         }
@@ -70,9 +74,9 @@
             padding-left: 0 !important;
         }
 
-        .modal.fade.show {
+        /* .modal.fade.show {
             z-index: 1051 !important;
-        }
+        } */
 
         .mr-1 {
             margin-right: 0.25rem !important;
@@ -314,7 +318,7 @@ window.addEventListener('resize', () => setModeScreen());" x-on:keydown.escape.w
         });
     </script>
     @stack('scripts')
-    @livewire('livewire-ui-modal')
+    @livewire('wire-elements-modal')
 </body>
 
 </html>

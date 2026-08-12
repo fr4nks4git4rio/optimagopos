@@ -7,7 +7,7 @@
         <tr></tr>
         <tr>
             <td colspan="{{ 1 + count($sucursales) * 2 }}">
-                Período:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+                {{ __('site.common.period') }}:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
                 @if (!empty($sucursalesSeleccionadas))
                     &nbsp;|&nbsp;
                     Sucursal(es): &nbsp;

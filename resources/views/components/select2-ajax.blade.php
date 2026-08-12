@@ -14,11 +14,7 @@
     //    $options = Arr::isAssoc($options) ? $options : array_combine($options, $options);
 
     $label = $label ? "$label:" : null;
-    if ($lazy) {
-        $bind = '.lazy';
-    } else {
-        $bind = '.defer';
-    }
+    $bind = $lazy ? '.live' : '';
 
     $id = \Illuminate\Support\Str::replace('.', '-', $model);
     $attributes = $attributes->class(['form-select', 'select2', 'is-invalid' => $errors->has($model)])->merge([
@@ -61,7 +57,7 @@
             $('#{{ $id }}.select2').on('change', function(e) {
                 let elementName = $(this).attr('id').replaceAll('-', '.');
                 @if($is_alpine)
-                $dispatch('cambio-{{ $model }}', e.target.value);
+                $dispatch('cambio-{{ $model }}', [e.target.value]);
                 @else
                 @this.set(elementName, e.target.value);
                 @endif
@@ -128,7 +124,7 @@
                     language: 'es'
                 });
 
-                event.detail.data.forEach(function(element) {
+                event.detail[0].data.forEach(function(element) {
                     select2.$element.append(new Option(element.text, element.id, false, false));
                 });
             });

@@ -11,7 +11,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-            wire:click="$emit('closeModal')">No</button>
+            wire:click="$dispatch('closeModal')">No</button>
         <button type="submit" class="btn btn-danger">Si</button>
     </x-slot:buttons>
 </x-modal>

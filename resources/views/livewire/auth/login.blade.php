@@ -15,7 +15,7 @@
         <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-4 p-sm-5">
 
-                <form wire:submit.prevent="login">
+                <form wire:submit="login">
 
                     <div class="mb-3">
                         <x-input-group :label="__('site.login.email')" icon="bi bi-envelope" type="text" model="email" />

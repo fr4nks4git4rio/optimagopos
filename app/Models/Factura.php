@@ -443,7 +443,7 @@ class Factura extends Model
 
     public function propietario()
     {
-        return $this->morphTo();
+        return $this->morphTo()->withTrashed();
     }
     public function periodicidad()
     {
@@ -733,7 +733,8 @@ class Factura extends Model
     public static function generateFacturaPdf($id, $mailing = false)
     {
         $factura = Factura::find($id);
-        $name = 'Factura_' . $factura->folio_interno . '.pdf';
+        $name = __('site.common.invoice');
+        $name .=  '_' . $factura->folio_interno . '.pdf';
         $view = 'reports.factura.pdf';
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, [

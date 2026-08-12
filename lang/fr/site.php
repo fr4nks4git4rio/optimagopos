@@ -37,7 +37,10 @@ return [
         'production' => 'Production',
         'testing' => 'Test',
         'mode' => 'mode',
-        'print' => ''
+        'print' => '',
+        'file_not_found' => 'Fichier introuvable.',
+        'generated_on' => 'Généré le :date',
+        'period' => 'Période'
     ],
     'statuses' => [
         'subscriptions' => [
@@ -848,7 +851,8 @@ return [
         'save_inovice_header_first' => 'Vous devez d\'abord enregistrer l\'En-tête de Facture.',
         'stamping_method_saved' => 'Mode de Certification modifié.',
         'log_updated' => 'Panneau de la pompe à chaleur mis à jour.',
-        'log_updated_detail' => 'Le panneau PAC pour la succursale :nombre_comercial a été modifié.'
+        'log_updated_detail' => 'Le panneau PAC pour la succursale :nombre_comercial a été modifié.',
+        'stamping_mode_changed' => 'Le mode d\'estampage a été modifié.'
     ],
     'invoice_header' => [
         'title' => 'En-tête de Facture',
@@ -896,7 +900,12 @@ return [
             'stamp_invoice_successfully' => 'Facture certifiée avec succès.',
             'print_log_name' => 'Pré-Factures',
             'print_log_detail' => 'Liste des Pré-Factures imprimée.',
-            'cancellation_motive' => 'Motif d\'Annulation'
+            'cancellation_motive' => 'Motif d\'Annulation',
+            'no_generic_client_exists' => 'First of all, this must be from the Client: "GENERAL PUBLISHED VENTILATION" with RFC: "XAXX010101000".',
+            'log_invoice_stamped' => 'Facture tamponnée.',
+            'log_invoice_stamped_detail' => 'Facture tamponnée avec numéro de folio interne :folio.',
+            'successful_stamping' =>  'Estampage réussi.',
+            'error_stamping' =>  'Erreur lors de l\'apposition du cachet sur la facture. Erreur: :error',
         ],
         'save_invoice' => [
             'pre_invoices' => 'Pré-Factures',
@@ -957,7 +966,13 @@ return [
             'internal_folio' => 'Référence Interne',
             'type' => 'Type',
             'not_invoices_found' => 'Aucun justificatif émis trouvé à associer.',
-            'errors_in_form' => 'Le formulaire contient des erreurs.'
+            'errors_in_form' => 'Le formulaire contient des erreurs.',
+            'log_created' => 'Facture créée.',
+            'log_created_detail' => 'Facture générée avec l\'identifiant :id, appartenant à la succursale :nombre_comercial.',
+            'log_updated' => 'Facture mise à jour.',
+            'log_updated_detail' => 'La facture portant l\'identifiant :id et appartenant à la succursale :nombre_comercial a été mise à jour.',
+            'saved_invoice_successfully' => 'Facture enregistrée.',
+            'concept_deleted' => 'coCcept éliminé.',
         ],
         'invoice_concept' => [
             'new_concept' => 'Nouvelle Ligne',
@@ -1098,14 +1113,18 @@ return [
             'f_int' => 'D. Int.',
             'type' => 'Type',
             'receiver' => 'Destinataire',
+            'receiver_rfc' => 'Récepteur RFC',
+            'uuid' =>  'UUID',
+            'concepts' => 'Conceps',
             'subtotal' => 'Sous-total',
             'iva' => 'TVA',
             'total' => 'Total',
             'cancellation_motive' => 'Motif d\'annulation',
             'no_xml_file_found' => 'Le fichier XML est introuvable.',
             'printing_log_name' => 'Archives des Factures',
-            'printing_log_detail' => 'Liste des archives des factures imprimée',
-            'download_xml_name' => 'Factures Émises'
+            'download_excel_name' => 'Factures Émises',
+            'issuer' => 'Émetteur',
+            'issuer_rfc' => 'RFC de l\'émetteur'
         ],
         'delete' => [
             'title' => 'Supprimer la Facture',
@@ -1157,7 +1176,11 @@ return [
         'cancel' => [
             'cancellation_motive' => 'Motif d\'Annulation',
             'invoice_to_cancel' => 'Le/la :type avec la référence <b>:folio</b> sera annulé(e).',
-            'substitute_folio' => 'Référence de substitution'
+            'substitute_folio' => 'Référence de substitution',
+            'cancel_success' => 'Annulation réussie.',
+            'cancel_error' => 'Erreur lors de l\'annulation. Erreur: :error',
+            'log_invoice_canceled' => 'Facture annulée.',
+            'log_invoice_canceled_detail' => 'Facture avec folio : folio annulé',
         ]
     ],
     'accounts_receivable' => [

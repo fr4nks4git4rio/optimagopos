@@ -10,11 +10,7 @@
 @php
     //    $options = Arr::isAssoc($options) ? $options : array_combine($options, $options);
     $label = $label ? "$label:" : null;
-    if ($lazy) {
-        $bind = '.lazy';
-    } else {
-        $bind = '.defer';
-    }
+    $bind = $lazy ? '.live' : '';
 
     $id = \Illuminate\Support\Str::replace('.', '-', $model);
 
@@ -79,7 +75,7 @@
             if (event.detail.term.length > 0)
                 select2.$element.append(new Option('Seleccione', '', false, false));
 
-            event.detail.data.forEach(function(element) {
+            event.detail[0].data.forEach(function(element) {
                 select2.$element.append(new Option(element.label, element.value, false, false));
             });
             if (event.detail.term.length > 0) {

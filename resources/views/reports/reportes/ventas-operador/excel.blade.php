@@ -6,7 +6,7 @@
         <tr></tr>
         <tr>
             <td colspan="6">
-                Período:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+                {{ __('site.common.period') }}:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
                 @if (!empty($sucursalesSeleccionadas))
                     &nbsp;|&nbsp;
                     Sucursal(es): &nbsp;

@@ -405,6 +405,18 @@ li.nav-item.text-danger.fw-bold>button {
     }
 }
 
+/* Forzar a wire-elements-modal a posicionarse por encima del sidebar de Bootstrap */
+div[wire\:id][x-data*="modal"],
+div[id*="wire-elements-modal"] {
+    z-index: 1060 !important;
+    /* Valor superior al sidebar (habitualmente 1030 o 1040) */
+}
+
+/* Forzar el contenedor del modal e influir en los menús fijos */
+div[wire\:id][x-data*="modal"]>div {
+    z-index: 1070 !important;
+}
+
 @media (max-width: 991px) {
     .hidden-xs {
         display: none !important;

@@ -37,7 +37,10 @@ return [
         'production' => 'Producción',
         'testing' => 'Prueba',
         'mode' => 'modo',
-        'print' => ''
+        'print' => '',
+        'file_not_found' => 'Fichero / Archivo no encontrado.',
+        'generated_on' => 'Generado el :date',
+        'period' => 'Período',
     ],
     'statuses' => [
         'subscriptions' => [
@@ -852,7 +855,8 @@ return [
         'save_inovice_header_first' => 'Primero debe guardar la Cabecera de Factura.',
         'stamping_method_saved' => 'Modo de Timbrado cambiado.',
         'log_updated' => 'Panel PAC modificado.',
-        'log_updated_detail' => 'Panel PAC de Sucursal :nombre_comercial ha sido modificado.'
+        'log_updated_detail' => 'Panel PAC de Sucursal :nombre_comercial ha sido modificado.',
+        'stamping_mode_changed' => 'Modo de timbrado cambiado.'
     ],
     'invoice_header' => [
         'title' => 'Cabecera Factura',
@@ -904,7 +908,12 @@ return [
             'stamp_invoice_successfully' => 'Factura timbrada satisfactoriamente.',
             'print_log_name' => 'Pre-Facturas',
             'print_log_detail' => 'Impreso Listado de Pre-Factura.',
-            'cancellation_motive' => 'Motivo de Cancelación'
+            'cancellation_motive' => 'Motivo de Cancelación',
+            'no_generic_client_exists' => 'Primero debe dar de alta al Cliente: "VENTA A PUBLICO GENERAL" con RFC: "XAXX010101000".',
+            'log_invoice_stamped' => 'Factura timbrada.',
+            'log_invoice_stamped_detail' => 'Factura timbrada con folio :folio.',
+            'successful_stamping' =>  'Timbrado exitoso.',
+            'error_stamping' =>  'Error al timbrar la factura. Error: :error',
         ],
         'save_invoice' => [
             'pre_invoices' => 'Pre-Facturas',
@@ -965,7 +974,13 @@ return [
             'internal_folio' => 'Folio Interno',
             'type' => 'Tipo',
             'not_invoices_found' => 'No se encontraron comprobantes emitidos para asociar.',
-            'errors_in_form' => 'Existen errores en el formulario.'
+            'errors_in_form' => 'Existen errores en el formulario.',
+            'log_created' => 'Factura creada',
+            'log_created_detail' => 'Generada factura con ID :id, perteneciente a la Sucursal :nombre_comercial.',
+            'log_updated' => 'Factura modificada',
+            'log_updated_detail' => 'Modificada factura con ID :id, perteneciente a la Sucursal :nombre_comercial.',
+            'saved_invoice_successfully' => 'Factura guardada.',
+            'concept_deleted' => 'Concepto eliminado',
         ],
         'invoice_concept' => [
             'new_concept' => 'Nuevo Concepto',
@@ -1106,14 +1121,18 @@ return [
             'f_int' => 'F. Int.',
             'type' => 'Tipo',
             'receiver' => 'Receptor',
+            'receiver_rfc' => 'RFC Receptor',
+            'uuid' =>  'UUID',
+            'concepts' => 'Conceptos',
             'subtotal' => 'Subtotal',
             'iva' => 'IVA',
             'total' => 'Total',
             'cancellation_motive' => 'Motivo cancelación',
             'no_xml_file_found' => 'No se encontró el archivo XML.',
-            'printing_log_name' => 'Almacén de Facturas',
-            'printing_log_detail' => 'Impreso listado de almacén de facturas',
-            'download_xml_name' => 'Facturas Emitidas'
+            'exporting_log_detail' => 'Exportado listado de almacén de facturas',
+            'download_excel_name' => 'Facturas Emitidas',
+            'issuer' => 'Emisor',
+            'issuer_rfc' => 'RFC Emisor'
         ],
         'delete' => [
             'title' => 'Eliminar Factura',
@@ -1122,8 +1141,11 @@ return [
             'complement_deleted' => 'Complemento eliminado',
             'credit_note_deleted' => 'Nota de Crédito eliminada',
             'invoice_deleted' => 'Factura eliminada',
+            'delete_error' => 'Ha ocurrido un error eliminando la factura.',
             'log_details' => 'Se ha eliminado definitivamente el/la :type con folio: :folio',
-            'deleted_successfully' => ':type eliminado/a correctamente.'
+            'deleted_successfully' => ':type eliminado/a correctamente.',
+            'log_invoice_deleted' => 'Factura eliminada.',
+            'log_invoice_deleted_detail' => 'Se ha eliminado definitivamente la factura con folio :folio.',
         ],
         'pdf_invoice' => [
             'rfc' => 'RFC',
@@ -1164,8 +1186,12 @@ return [
         ],
         'cancel' => [
             'cancellation_motive' => 'Motivo de Cancelación',
-            'invoice_to_cancel' => ':type con folio <b>:folio</b> será cancelado.',
-            'substitute_folio' => 'Folio sustituto'
+            'invoice_to_cancel' => ':type con folio <b>:folio</b> será cancelada/o.',
+            'substitute_folio' => 'Folio sustituto',
+            'cancel_success' => 'Cancelación exitosa.',
+            'cancel_error' => 'Error al cancelar. Error: :error',
+            'log_invoice_canceled' => 'Factura cancelada.',
+            'log_invoice_canceled_detail' => 'Cancelada factura con folio :folio',
         ]
     ],
     'accounts_receivable' => [

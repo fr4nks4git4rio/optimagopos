@@ -8,20 +8,20 @@
             <div class="input-group">
                 <span class="input-group-text"><x-icon name="search" /></span>
                 <input type="search" placeholder="{{ __('site.users.list.search_users') }}"
-                    class="form-control text-capitalize" wire:model.debounce.500ms="search">
+                    class="form-control text-capitalize" wire:model.live.debounce.500ms="search">
             </div>
         </div>
         <div class="col-lg-auto mb-3">
             @can('create', [App\Models\User::class])
                 @if (user()->cliente_id)
                     <button type="button" class="btn btn-site-primary btn-outline-warning"
-                        wire:click="$emit('openModal', 'usuarios.save')">
+                        wire:click="$dispatch('openModal', { component: 'usuarios.save' })">
                         <x-icon name="plus-lg" />
                         {{ __('site.common.create') }}
                     </button>
                 @else
                     <button type="button" class="btn btn-site-primary btn-outline-warning"
-                        wire:click="$emit('openModal', 'usuarios.save-system')">
+                        wire:click="$dispatch('openModal', { component: 'usuarios.save-system' })">
                         <x-icon name="plus-lg" />
                         {{ __('site.common.create') }}
                     </button>
@@ -30,7 +30,7 @@
 
             <x-dropdown icon="eye" :label="__($perPage)">
                 @foreach ($perPages as $perPage)
-                    <x-dropdown-item label="{{ $perPage }}" click="$set('perPage', '{{ $perPage }}')" />
+                    <x-dropdown-item label="{{ $perPage }}" click="$set('perPage', {{ $perPage }})" />
                 @endforeach
             </x-dropdown>
 
@@ -79,26 +79,26 @@
                                         @if (user()->cliente_id)
                                             <li class="list-inline-item">
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
-                                                    click="$emit('openModal', 'usuarios.save', {user: {{ $usuario['id'] }}})" />
+                                                    click="$dispatch('openModal', { component: 'usuarios.save', arguments: {user: {{ $usuario['id'] }}} })" />
                                             </li>
                                         @else
                                             <li class="list-inline-item">
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
-                                                    click="$emit('openModal', 'usuarios.save-system', {user: {{ $usuario['id'] }}})" />
+                                                    click="$dispatch('openModal', { component: 'usuarios.save-system', arguments: {user: {{ $usuario['id'] }}} })" />
                                             </li>
                                         @endif
                                     @endcan
                                     @can('delete', App\Models\User::find($usuario['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="trash" title="{{ __('site.common.deactivate') }}"
-                                                click="$emit('openModal', 'usuarios.delete', {usuario: {{ $usuario['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'usuarios.delete', arguments: {usuario: {{ $usuario['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @else
                                     @can('restore', App\Models\User::withTrashed()->find($usuario['id']))
                                         <li class="list-inline-item">
                                             <x-action icon="check-circle" title="{{ __('site.common.restore') }}"
-                                                click="$emit('openModal', 'usuarios.restore', {usuario: {{ $usuario['id'] }}})" />
+                                                click="$dispatch('openModal', { component: 'usuarios.restore', arguments: {usuario: {{ $usuario['id'] }}} })" />
                                         </li>
                                     @endcan
                                 @endif
@@ -118,5 +118,5 @@
         </table>
     </div>
 
-    <x-pagination :links="$usuarios" :count="true" />
+    <x-pagination :links="$usuarios" :count="true" justify="between" class="mt-4" />
 </div>

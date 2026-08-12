@@ -82,7 +82,7 @@
 <div class="row">
     <div class="col-12 col-lg-4 mb-3">
         <div x-data="{
-            datosServidor: @entangle('resumenData.ventas_netas_operacion'),
+            datosServidor: @entangle('resumenData.ventas_netas_operacion').live,
             chart: null,
             sinDatos: false,
 
@@ -194,7 +194,7 @@
     </div>
     <div class="col-12 col-lg-4 mb-3">
         <div x-data="{
-            datosActividad: @entangle('resumenData.grafica_actividad'),
+            datosActividad: @entangle('resumenData.grafica_actividad').live,
             chart: null,
             sinDatos: false,
             horasDelDia: [],
