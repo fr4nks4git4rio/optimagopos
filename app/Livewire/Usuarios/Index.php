@@ -113,7 +113,7 @@ class Index extends Component
             ->groupBy('u.id');
 
         if (user()->cliente_id)
-            $query->where('cliente_id', user()->cliente_id);
+            $query->where('u.cliente_id', user()->cliente_id);
 
         switch ($this->filter) {
             case __('site.common.actives'):
