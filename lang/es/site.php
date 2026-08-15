@@ -250,6 +250,7 @@ return [
             'full_nombre' => 'nombre completo',
             'email' => 'correo electrónico',
             'client' => 'cliente',
+            'subscription' => 'Suscripción',
         ],
         'save' => [
             'create_user' => 'crear usuario',
@@ -496,7 +497,8 @@ return [
             'rfc' => 'RFC',
             'social_reason' => 'Razón Social',
             'phone' => 'Teléfono',
-            'client' => 'Cliente'
+            'client' => 'Cliente',
+            'subscription' => 'Suscripción',
         ],
         'save' => [
             'create_branch' => 'Crear Sucursal',
@@ -606,6 +608,8 @@ return [
             'name' => 'Nombre',
             'is_vk' => 'Video Kitchen Habilitado',
             'branch' => 'Sucursal',
+            'client' => 'Cliente',
+            'subscription' => 'Suscripción',
             'comments' => 'Comentarios',
         ],
         'save' => [

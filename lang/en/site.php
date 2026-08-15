@@ -249,6 +249,7 @@ return [
             'full_nombre' => 'full name',
             'email' => 'email',
             'client' => 'client',
+            'subscription' => 'Subscription',
         ],
         'save' => [
             'create_user' => 'create user',
@@ -495,7 +496,8 @@ return [
             'rfc' => 'Tax ID',
             'social_reason' => 'Legal Name',
             'phone' => 'Phone',
-            'client' => 'Client'
+            'client' => 'Client',
+            'subscription' => 'Subscription',
         ],
         'save' => [
             'create_branch' => 'Create Branch',
@@ -604,6 +606,8 @@ return [
             'name' => 'Name',
             'is_vk' => 'Video Kitchen Enabled',
             'branch' => 'Branch',
+            'client' => 'Client',
+            'subscription' => 'Subscription',
             'comments' => 'Comments',
         ],
         'save' => [

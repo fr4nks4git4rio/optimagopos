@@ -17,11 +17,13 @@ class Logs extends Component
     public $page;
     public $perPage;
     public $perPages = [10, 25, 50, 100];
+    public $fechaInicio;
+    public $fechaFin;
     public $search;
     public $sort;
     public $sorts = ['Fecha', 'Log', 'Datos', 'Estado'];
 
-    protected $queryString = ['search', 'perPage', 'sort', 'page'];
+    protected $queryString = ['search', 'fechaInicio', 'fechaFin', 'perPage', 'sort', 'page'];
 
     protected $listeners = ['$refresh'];
 
@@ -31,11 +33,13 @@ class Logs extends Component
         $this->perPage ??= 10;
         $this->search ??= '';
         $this->sort ??= 'Fecha';
+        $this->fechaInicio ??= today()->format('Y-m-d');
+        $this->fechaFin ??= today()->format('Y-m-d');
     }
 
     public function updated($field)
     {
-        if (in_array($field, ['search', 'perPage', 'sort']))
+        if (in_array($field, ['search', 'fechaInicio', 'fechaFin', 'perPage', 'sort']))
             $this->resetPage();
     }
 
@@ -68,6 +72,14 @@ class Logs extends Component
             $query->join('tb_sucursales as sucursal', 'sucursal.id', 'log.sucursal_id')
                 ->where('sucursal.cliente_id', user()->cliente_id)
                 ->whereIn('sucursal.id', user()->sucursales->pluck('id')->toArray());
+        }
+
+        if($this->fechaInicio){
+            $query->whereDate('log.created_at', '>=', $this->fechaInicio);
+        }
+
+        if($this->fechaFin){
+            $query->whereDate('log.created_at', '<=', $this->fechaFin);
         }
 
         if ($this->search) {

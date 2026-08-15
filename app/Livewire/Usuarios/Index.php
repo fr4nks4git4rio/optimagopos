@@ -15,6 +15,7 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $clientes;
     public $page;
     public $perPage;
     public $perPages;
@@ -31,7 +32,7 @@ class Index extends Component
 
     public function updated($field)
     {
-        if (in_array($field, ['filter', 'search', 'perPage', 'order', 'sort'])){
+        if (in_array($field, ['filter', 'search', 'perPage', 'order', 'sort'])) {
             $this->resetPage();
         }
     }
@@ -39,9 +40,9 @@ class Index extends Component
     public function mount()
     {
         if (user()->is_super_admin)
-            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email'), __('site.users.list.client')];
+            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email'), __('site.users.list.client'), __('site.users.list.subscription')];
         else
-            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email')];
+            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email'), __('site.users.list.subscription')];
         $this->order = $this->order ?? 'asc';
         $this->sort = $this->sort ?? __('site.users.list.full_nombre');
         $this->filter = $this->filter ?? __('site.common.actives');
@@ -49,6 +50,7 @@ class Index extends Component
         $this->page = $this->perPage ?? 10;
         $this->perPage = $this->perPage ?? 10;
         $this->perPages = [10, 25, 50, 100];
+        $this->clientes = [];
     }
 
     public function getClassSortProperty()
@@ -58,6 +60,17 @@ class Index extends Component
 
     public function render()
     {
+        $clientes_q = DB::table('tb_clientes')->where('es_cliente', 1)->whereNull('deleted_at');
+        if (user()->cliente_id) {
+            $clientes_q->where('id', user()->cliente_id);
+        }
+        $clientes = $clientes_q->get()->map(function ($element) {
+            return [
+                'value' => $element->id,
+                'label' => Crypt::decrypt($element->nombre_comercial)
+            ];
+        })->toArray();
+
         $records = $this->query();
 
         $currentPage = $this->getPage(); // Obtiene la página real de Livewire
@@ -68,6 +81,7 @@ class Index extends Component
 
         return view('livewire.usuarios.index', [
             'usuarios' => $usuarios,
+            'clientesAll' => $clientes
         ]);
     }
 
@@ -89,9 +103,14 @@ class Index extends Component
                 'u.email',
                 'c.nombre_comercial as cliente',
                 'u.cliente_id',
+                DB::raw("GROUP_CONCAT(CONCAT(paquete.nombre, ' ( ', subs.estado, ' )') SEPARATOR ', ') as suscripciones"),
                 'u.deleted_at'
             )
-            ->leftJoin('tb_clientes as c', 'c.id', '=', 'u.cliente_id');
+            ->leftJoin('tb_clientes as c', 'c.id', '=', 'u.cliente_id')
+            ->leftJoin('tb_suscripciones_usuarios as subs_u', 'u.id', 'subs_u.usuario_id')
+            ->leftJoin('tb_suscripciones as subs', 'subs.id', 'subs_u.suscripcion_id')
+            ->leftJoin('tb_paquetes as paquete', 'paquete.id', 'subs.paquete_id')
+            ->groupBy('u.id');
 
         if (user()->cliente_id)
             $query->where('cliente_id', user()->cliente_id);
@@ -110,6 +129,10 @@ class Index extends Component
 
         if (!user()->is_super_admin) {
             $query->where('u.cliente_id', user()->cliente_id);
+        } else {
+            if (count($this->clientes) > 0) {
+                $query->whereIn('u.cliente_id', $this->clientes);
+            }
         }
 
         $usuarios = $query->get()->map(function ($element) {
@@ -119,12 +142,14 @@ class Index extends Component
 
         foreach ($usuarios as $usuario) {
             $usuario['cliente'] = $usuario['cliente'] ? Crypt::decrypt($usuario['cliente']) : '';
+            $usuario['suscripciones'] = Str::replaceLast(', ', ' y ', $usuario['suscripciones']);
 
             if (
                 !$this->search
                 || Str::contains(Str::upper($usuario['nombre']), Str::upper($this->search))
                 || Str::contains(Str::upper($usuario['email']), Str::upper($this->search))
                 || Str::contains(Str::upper($usuario['cliente']), Str::upper($this->search))
+                || Str::contains(Str::upper($usuario['suscripciones']), Str::upper($this->search))
             ) {
                 $records_final->push($usuario);
             }
@@ -148,6 +173,12 @@ class Index extends Component
                     $records_final = $records_final->sortBy('cliente', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('cliente', SORT_NATURAL)->values();
+                break;
+            case __('site.users.list.subscription'):
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('suscripciones', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('suscripciones', SORT_NATURAL)->values();
                 break;
         }
 

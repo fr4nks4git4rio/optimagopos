@@ -1,13 +1,27 @@
 @section('title', 'Logs')
 
-<div wire:poll>
+<div>
+    <div wire:loading.delay>
+        <div class="loading">
+            <img src="{{ asset('img/loading.gif') }}" />
+        </div>
+    </div>
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
-        <div class="col-lg-auto mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="Buscar Logs" class="form-control" wire:model.live.debounce.500ms="search">
+        <div class="col-lg-auto mb-3 row">
+            <div class="col-auto">
+                <x-input label="Fecha inicio" type="date" model="fechaInicio" :lazy="true"></x-input>
+            </div>
+            <div class="col-auto">
+                <x-input label="Fecha fin" type="date" model="fechaFin" :lazy="true"></x-input>
+            </div>
+            <div class="col-auto">
+                <div class="input-group pt-4">
+                    <span class="input-group-text"><x-icon name="search" /></span>
+                    <input type="search" placeholder="Buscar Logs" class="form-control"
+                        wire:model.live.debounce.500ms="search">
+                </div>
             </div>
         </div>
         <div class="col-lg-auto mb-3">

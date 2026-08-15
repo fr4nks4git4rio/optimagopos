@@ -4,14 +4,22 @@
     <h1 class="fs-1 mb-2 text-capitalize">@yield('title')</h1>
 
     <div class="row justify-content-between">
-        <div class="col-lg-auto mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="{{ __('site.users.list.search_users') }}"
-                    class="form-control text-capitalize" wire:model.live.debounce.500ms="search">
+        <div class="col-md-9 col-12 mb-3 row">
+            @if (!user()->cliente_id)
+                <div class="col-6">
+                    <x-select2-multiple label="{{ __('site.users.list.client') }}" model="clientes" class="form-control" :lazy="true"
+                        :options="$clientesAll"></x-select2-multiple>
+                </div>
+            @endif
+            <div class="col-6">
+                <div class="input-group pt-4">
+                    <span class="input-group-text"><x-icon name="search" /></span>
+                    <input type="search" placeholder="{{ __('site.users.list.search_users') }}" class="form-control"
+                        wire:model.live.debounce.500ms="search">
+                </div>
             </div>
         </div>
-        <div class="col-lg-auto mb-3">
+        <div class="col-md-3 col-12 mb-3 text-end">
             @can('create', [App\Models\User::class])
                 @if (user()->cliente_id)
                     <button type="button" class="btn btn-site-primary btn-outline-warning"
@@ -72,6 +80,7 @@
                         @if (user()->is_super_admin)
                             <td>{{ $usuario['cliente'] }}</td>
                         @endif
+                        <td>{{ $usuario['suscripciones'] }}</td>
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$usuario['deleted_at'])
@@ -107,7 +116,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ user()->cliente_id ? '4' : '5' }}">
+                        <td colspan="{{ user()->cliente_id ? '5' : '6' }}">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>

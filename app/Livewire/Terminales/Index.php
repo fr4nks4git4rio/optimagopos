@@ -16,6 +16,9 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $clientes;
+    public $sucursales;
+    public $suscripciones;
     public $page;
     public $perPage;
     public $perPages;
@@ -25,6 +28,8 @@ class Index extends Component
     public $sorts;
     public $filter;
     public $filters;
+    public $sucursalesAll = [];
+    public $suscripcionesAll = [];
 
     protected $queryString = ['search', 'order', 'sort', 'filter', 'perPage',  'page'];
 
@@ -32,7 +37,26 @@ class Index extends Component
 
     public function mount()
     {
-        $this->sorts = [__('site.terminals.index.identifier'), __('site.terminals.index.name'), __('site.terminals.index.is_vk'), __('site.terminals.index.branch'), __('site.terminals.index.comments')];
+        if (user()->cliente_id) {
+            $this->sorts = [
+                __('site.terminals.index.identifier'),
+                __('site.terminals.index.name'),
+                __('site.terminals.index.is_vk'),
+                __('site.terminals.index.branch'),
+                __('site.terminals.index.subscription'),
+                __('site.terminals.index.comments')
+            ];
+        } else {
+            $this->sorts = [
+                __('site.terminals.index.identifier'),
+                __('site.terminals.index.name'),
+                __('site.terminals.index.is_vk'),
+                __('site.terminals.index.branch'),
+                __('site.terminals.index.client'),
+                __('site.terminals.index.subscription'),
+                __('site.terminals.index.comments')
+            ];
+        }
         $this->filters = [__('site.common.actives'), __('site.common.inactives'), __('site.common.all')];
         $this->search = $this->search ?? '';
         $this->order = $this->order ?? 'asc';
@@ -41,6 +65,31 @@ class Index extends Component
         $this->page = $this->page ?? 1;
         $this->perPage = $this->perPage ?? 10;
         $this->perPages = [10, 25, 50, 100];
+        $this->clientes = [];
+        $this->sucursales = [];
+        $this->suscripciones = [];
+
+        if (user()->cliente_id) {
+            $this->sucursalesAll = DB::table('tb_sucursales')->where('id', user()->cliente_id)
+                ->get()->map(function ($element) {
+                    return [
+                        'value' => $element->id,
+                        'label' => Crypt::decrypt($element->nombre_comercial)
+                    ];
+                })->toArray();
+
+            $this->suscripcionesAll = DB::table('tb_suscripciones as s')
+                ->select('s.*', 'paquete.nombre')
+                ->leftJoin('tb_paquetes as paquete', 'paquete.id', 's.paquete_id')
+                ->where('s.cliente_id', user()->cliente_id)
+                ->groupBy('s.id')
+                ->get()->map(function ($element) {
+                    return [
+                        'value' => $element->id,
+                        'label' => "$element->nombre ( $element->estado )"
+                    ];
+                })->toArray();
+        }
     }
 
     public function getClassSortProperty()
@@ -50,13 +99,54 @@ class Index extends Component
 
     public function updated($field)
     {
-        if (in_array($field, ['filter', 'search', 'perPage', 'order', 'sort'])){
+        if (in_array($field, ['filter', 'search', 'perPage', 'order', 'sort', 'clientes', 'sucursales', 'suscripciones'])) {
             $this->resetPage();
         }
+
+        if (Str::startsWith($field, 'clientes')) {
+            $this->sucursalesAll = DB::table('tb_sucursales')
+                ->whereNull('deleted_at')
+                ->whereIn('cliente_id', $this->clientes)
+                ->get()->map(function ($element) {
+                    return [
+                        'value' => $element->id,
+                        'label' => Crypt::decrypt($element->nombre_comercial)
+                    ];
+                })->toArray();
+
+            $this->suscripcionesAll = DB::table('tb_suscripciones as s')
+                ->select('s.id', 's.estado', 'paquete.nombre')
+                ->leftJoin('tb_paquetes as paquete', 'paquete.id', 's.paquete_id')
+                ->whereIn('s.cliente_id', $this->clientes)
+                ->groupBy('s.id')
+                ->get()->map(function ($element) {
+                    return [
+                        'value' => $element->id,
+                        'label' => "$element->nombre ( $element->estado )"
+                    ];
+                })->toArray();
+        }
+        $this->dispatch('reApplySelect2');
+    }
+
+    public function hydrate()
+    {
+        $this->dispatch('reApplySelect2');
     }
 
     public function render()
     {
+        $clientes_q = DB::table('tb_clientes')->where('es_cliente', 1)->whereNull('deleted_at');
+        if (user()->cliente_id) {
+            $clientes_q->where('id', user()->cliente_id);
+        }
+        $clientes = $clientes_q->get()->map(function ($element) {
+            return [
+                'value' => $element->id,
+                'label' => Crypt::decrypt($element->nombre_comercial)
+            ];
+        })->toArray();
+
         $records = $this->query();
 
         $currentPage = $this->getPage();
@@ -66,6 +156,7 @@ class Index extends Component
         $terminales = new LengthAwarePaginator($currentItems, $total, $this->perPage, $currentPage, ['path' => LengthAwarePaginator::resolveCurrentPath()]);
         return view('livewire.terminales.index', [
             'terminales' => $terminales,
+            'clientesAll' => $clientes
         ]);
     }
 
@@ -86,13 +177,32 @@ class Index extends Component
                 't.nombre',
                 't.es_vk',
                 't.comentarios',
+                't.sucursal_id',
+                't.suscripcion_id',
                 't.deleted_at',
-                's.nombre_comercial as sucursal'
+                's.nombre_comercial as sucursal',
+                'c.nombre_comercial as cliente',
+                DB::raw("CONCAT(paquete.nombre, ' ( ', subs.estado, ' )') as suscripcion")
             )
-            ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id');
+            ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id')
+            ->leftJoin('tb_clientes as c', 'c.id', '=', 's.cliente_id')
+            ->leftJoin('tb_suscripciones as subs', 'subs.id', '=', 't.suscripcion_id')
+            ->leftJoin('tb_paquetes as paquete', 'paquete.id', '=', 'subs.paquete_id');
 
         if (user()->cliente_id) {
             $query->where('s.cliente_id', user()->cliente_id);
+        }
+
+        if (count($this->clientes) > 0) {
+            $query->whereIn('s.cliente_id', $this->clientes);
+        }
+
+        if (count($this->sucursales) > 0) {
+            $query->whereIn('t.sucursal_id', $this->sucursales);
+        }
+
+        if (count($this->suscripciones) > 0) {
+            $query->whereIn('t.suscripcion_id', $this->suscripciones);
         }
 
         switch ($this->filter) {
@@ -107,6 +217,8 @@ class Index extends Component
                 break;
         }
 
+        // dd($query->toRawSql());
+
         $terminales = $query->get()->map(function ($element) {
             return (array) $element;
         });
@@ -114,6 +226,7 @@ class Index extends Component
 
         foreach ($terminales as $terminal) {
             $terminal['sucursal'] = $terminal['sucursal'] ? Str::upper(Crypt::decrypt($terminal['sucursal'])) : '';
+            $terminal['cliente'] = $terminal['cliente'] ? Str::upper(Crypt::decrypt($terminal['cliente'])) : '';
 
             if (
                 !$this->search
@@ -121,6 +234,8 @@ class Index extends Component
                 || Str::contains(Str::upper($terminal['nombre']), Str::upper($this->search))
                 || Str::contains(Str::upper($terminal['comentarios']), Str::upper($this->search))
                 || Str::contains(Str::upper($terminal['sucursal']), Str::upper($this->search))
+                || Str::contains(Str::upper($terminal['cliente']), Str::upper($this->search))
+                || Str::contains(Str::upper($terminal['suscripcion']), Str::upper($this->search))
             ) {
                 $records_final->push($terminal);
             }
@@ -150,6 +265,18 @@ class Index extends Component
                     $records_final = $records_final->sortBy('sucursal', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('sucursal', SORT_NATURAL)->values();
+                break;
+            case __('site.terminals.index.client'):
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('cliente', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('cliente', SORT_NATURAL)->values();
+                break;
+            case __('site.terminals.index.subscription'):
+                if ($this->order == 'asc')
+                    $records_final = $records_final->sortBy('suscripcion', SORT_NATURAL)->values();
+                else
+                    $records_final = $records_final->sortByDesc('suscripcion', SORT_NATURAL)->values();
                 break;
             case __('site.terminals.index.comments'):
                 if ($this->order == 'asc')

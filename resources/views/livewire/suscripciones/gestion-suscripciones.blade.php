@@ -119,7 +119,7 @@
                                 wire:click="$dispatch('openModal', { component: 'suscripciones.activar', arguments: {'scope': 'suscripciones.gestion-suscripciones', 'suscripcion': {{ $suscripcion->id }}} })"
                                 class="btn btn-success btn-sm fw-bold shadow-sm">
                                 <i class="bi bi-check-circle-fill me-1" wire:target="activarSuscripcion"></i>
-                                Activar
+                                {{ __('site.common.activate') }}
                             </button>
                         @endif
 
@@ -131,7 +131,7 @@
                                     class="spinner-border spinner-border-sm me-1" role="status"></span>
                                 <i class="bi bi-x-circle-fill me-1" wire:loading.remove
                                     wire:target="desactivarSuscripcion"></i>
-                                Desactivar
+                                {{ __('site.common.deactivate') }}
                             </button>
                         @endif
                     </div>

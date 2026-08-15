@@ -87,11 +87,7 @@
             sinDatos: false,
 
             init() {
-                // Escuchamos los cambios en los datos que vienen de Livewire
                 this.$watch('datosServidor', value => {
-                    let el = document.getElementById('mi-canvas-grafica-venta-neta');
-                    if (!el) return;
-
                     const hayDatos = value && Object.keys(value).length > 0;
 
                     if (hayDatos) {
@@ -101,62 +97,75 @@
                             return { x: (index + 1).toString(), y: num };
                         });
 
-                        if (!this.chart) {
-                            // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
-                            let options = {
-                                chart: {
-                                    type: 'bar',
-                                    height: 280,
-                                    animations: {
-                                        enabled: true,
-                                        easing: 'smooth',
-                                        dynamicAnimation: { speed: 500 }
-                                    },
-                                    toolbar: {
-                                        show: true,
-                                        offsetY: -30,
-                                        tools: {
-                                            download: true,
-                                            selection: false,
-                                            zoom: false,
-                                            zoomin: false,
-                                            zoomout: false,
-                                            pan: false,
-                                            reset: false
+                        // Esperamos a que Alpine aplique x-show y el layout se estabilice
+                        // ANTES de medir el contenedor o crear/actualizar el chart.
+                        this.$nextTick(() => {
+                            let el = document.getElementById('mi-canvas-grafica-venta-neta');
+                            if (!el) return;
+
+                            if (!this.chart) {
+                                let options = {
+                                    chart: {
+                                        type: 'bar',
+                                        height: 280,
+                                        animations: {
+                                            enabled: true,
+                                            easing: 'smooth',
+                                            dynamicAnimation: { speed: 500 }
+                                        },
+                                        toolbar: {
+                                            show: true,
+                                            offsetY: -30,
+                                            tools: {
+                                                download: true,
+                                                selection: false,
+                                                zoom: false,
+                                                zoomin: false,
+                                                zoomout: false,
+                                                pan: false,
+                                                reset: false
+                                            }
+                                        },
+                                        // Fuerza un recálculo de tamaño justo después de montar el SVG,
+                                        // que es exactamente lo que hace tu interacción manual (resize/scroll).
+                                        events: {
+                                            mounted: function(chartContext) {
+                                                setTimeout(() => {
+                                                    chartContext.windowResizeHandler();
+                                                }, 50);
+                                            }
                                         }
                                     },
-                                },
-                                series: [{ name: '{{ __('site.dashboard.metrics') }}', data: datosFormateados }],
-                                xaxis: {
-                                    type: 'category',
-                                },
-                                colors: ['#065F46'],
-                                plotOptions: {
-                                    bar: {
-                                        columnWidth: '90%',
-                                        dataLabels: { position: 'top' }
+                                    series: [{ name: '{{ __('site.dashboard.metrics') }}', data: datosFormateados }],
+                                    xaxis: { type: 'category' },
+                                    colors: ['#065F46'],
+                                    plotOptions: {
+                                        bar: {
+                                            columnWidth: '90%',
+                                            dataLabels: { position: 'top' }
+                                        }
+                                    },
+                                    dataLabels: {
+                                        enabled: true,
+                                        offsetY: -20,
+                                        style: { fontSize: '9px', colors: ['#304758'] },
+                                        formatter: function(val) {
+                                            return val > 0 ? val : '';
+                                        }
                                     }
-                                },
-                                dataLabels: {
-                                    enabled: true,
-                                    offsetY: -20,
-                                    style: { fontSize: '9px', colors: ['#304758'] },
-                                    formatter: function(val) {
-                                        return val > 0 ? val : '';
-                                    }
-                                }
-                            };
+                                };
 
-                            this.chart = new ApexCharts(el, options);
-                            this.chart.render();
-                        } else {
-                            // 2. Si ya existe, solo actualizamos los datos
-                            this.chart.updateSeries([{ data: datosFormateados }]);
-                        }
+                                this.chart = new ApexCharts(el, options);
+                                this.chart.render();
+                            } else {
+                                this.chart.updateSeries([{ data: datosFormateados }]);
+                                // También forzamos recálculo en actualizaciones, por si el contenedor
+                                // cambió de tamaño mientras estaba oculto (sinDatos true → false).
+                                this.$nextTick(() => this.chart.windowResizeHandler());
+                            }
+                        });
                     } else {
-                        // 3. Resultado vacío/null: limpiamos la serie en vez de dejar la anterior
                         this.sinDatos = true;
-
                         if (this.chart) {
                             this.chart.updateSeries([{ data: [] }]);
                         }
@@ -201,14 +210,10 @@
 
             init() {
                 this.horasDelDia = Array.from({ length: 24 }, (_, i) => {
-                    return i.toString().padStart(2, '0') + ':00'; // Genera ['00:00', '01:00', ..., '23:00']
+                    return i.toString().padStart(2, '0') + ':00';
                 });
 
-                // Escuchamos los cambios en los datos que vienen de Livewire
                 this.$watch('datosActividad', value => {
-                    let el = document.getElementById('mi-canvas-grafica-actividad');
-                    if (!el) return;
-
                     const hayDatos = value && Object.keys(value).length > 0;
 
                     if (hayDatos) {
@@ -223,74 +228,82 @@
                             } else if (value[claveSimple] !== undefined) {
                                 return Number(value[claveSimple]);
                             }
-                            return 0; // Si la hora no viene en tu objeto, va un cero
+                            return 0;
                         });
+        
+                        this.$nextTick(() => {
+                            let el = document.getElementById('mi-canvas-grafica-actividad');
+                            if (!el) return;
 
-                        if (!this.chart) {
-                            // 1. Si el elemento existe y la gráfica NO se ha creado, la inicializamos
-                            let options = {
-                                chart: {
-                                    type: 'line',
-                                    height: 280,
-                                    animations: {
-                                        enabled: true,
-                                        easing: 'smooth',
-                                        dynamicAnimation: { speed: 500 }
-                                    },
-                                    toolbar: {
-                                        show: true,
-                                        offsetY: -30,
-                                        tools: {
-                                            download: true, // Deja el menú de las 3 líneas para descargar PNG/SVG/CSV
-                                            selection: false,
-                                            zoom: false, // Quita la lupa de zoom
-                                            zoomin: false, // Quita el botón +
-                                            zoomout: false, // Quita el botón -
-                                            pan: false, // Quita la mano de paneo
-                                            reset: false // Quita el botón de resetear vista
+                            if (!this.chart) {
+                                let options = {
+                                    chart: {
+                                        type: 'line',
+                                        height: 280,
+                                        animations: {
+                                            enabled: true,
+                                            easing: 'smooth',
+                                            dynamicAnimation: { speed: 500 }
+                                        },
+                                        toolbar: {
+                                            show: true,
+                                            offsetY: -30,
+                                            tools: {
+                                                download: true,
+                                                selection: false,
+                                                zoom: false,
+                                                zoomin: false,
+                                                zoomout: false,
+                                                pan: false,
+                                                reset: false
+                                            }
+                                        },
+                                        events: {
+                                            mounted: function(chartContext) {
+                                                setTimeout(() => {
+                                                    chartContext.windowResizeHandler();
+                                                }, 50);
+                                            }
                                         }
                                     },
-                                },
-                                series: [{ name: '{{ __('site.dashboard.operations') }}', data: serie24Horas }],
-                                colors: ['#065F46'],
-                                xaxis: {
-                                    type: 'category',
-                                    categories: this.horasDelDia, // Forzamos a que siempre muestre las 24 marcas
-                                    labels: {
-                                        rotate: -45, // Rota las horas un poco para que no se encimen en pantallas chicas
-                                        style: { fontSize: '10px' }
+                                    series: [{ name: '{{ __('site.dashboard.operations') }}', data: serie24Horas }],
+                                    colors: ['#065F46'],
+                                    xaxis: {
+                                        type: 'category',
+                                        categories: this.horasDelDia,
+                                        labels: {
+                                            rotate: -45,
+                                            style: { fontSize: '10px' }
+                                        }
+                                    },
+                                    yaxis: {
+                                        min: 0,
+                                        forceNiceScale: true
+                                    },
+                                    plotOptions: {
+                                        bar: {
+                                            columnWidth: '75%',
+                                            dataLabels: { position: 'top' }
+                                        }
+                                    },
+                                    dataLabels: {
+                                        enabled: true,
+                                        offsetY: -20,
+                                        style: { fontSize: '9px', colors: ['#304758'] },
+                                        formatter: function(val) {
+                                            return val > 0 ? val : '';
+                                        }
                                     }
-                                },
-                                yaxis: {
-                                    min: 0,
-                                    forceNiceScale: true
-                                },
-                                plotOptions: {
-                                    bar: {
-                                        columnWidth: '75%', // Un ancho cómodo para que quepan 24 barras
-                                        dataLabels: { position: 'top' }
-                                    }
-                                },
-                                dataLabels: {
-                                    enabled: true,
-                                    offsetY: -20,
-                                    style: { fontSize: '9px', colors: ['#304758'] },
-                                    // Opcional: Oculta el número cero para que la gráfica no se llene de '0' flotantes
-                                    formatter: function(val) {
-                                        return val > 0 ? val : '';
-                                    }
-                                }
-                            };
+                                };
 
-                            this.chart = new ApexCharts(el, options);
-                            this.chart.render();
-                        } else {
-                            // 2. Si ya existe, solo actualizamos los datos
-                            this.chart.updateSeries([{ data: serie24Horas }]);
-                        }
+                                this.chart = new ApexCharts(el, options);
+                                this.chart.render();
+                            } else {
+                                this.chart.updateSeries([{ data: serie24Horas }]);
+                                this.$nextTick(() => this.chart.windowResizeHandler());
+                            }
+                        });
                     } else {
-                        // 3. Resultado vacío/null: limpiamos la serie en vez de dejar la anterior.
-                        // Mantenemos las 24 categorías en cero para no perder el eje X si luego vuelve a haber datos.
                         this.sinDatos = true;
 
                         if (this.chart) {

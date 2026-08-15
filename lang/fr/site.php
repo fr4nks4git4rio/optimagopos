@@ -247,6 +247,7 @@ return [
             'full_nombre' => 'nom complet',
             'email' => 'e-mail',
             'client' => 'client',
+            'subscription' => 'Abonnement',
         ],
         'save' => [
             'create_user' => 'créer un utilisateur',
@@ -493,7 +494,8 @@ return [
             'rfc' => 'Identifiant Fiscal',
             'social_reason' => 'Raison Sociale',
             'phone' => 'Téléphone',
-            'client' => 'Client'
+            'client' => 'Client',
+            'subscription' => 'Abonnement',
         ],
         'save' => [
             'create_branch' => 'Créer une Succursale',
@@ -603,6 +605,8 @@ return [
             'name' => 'Nom',
             'is_vk' => 'Cuisine Vidéo Activée',
             'branch' => 'Succursale',
+            'client' => 'Client',
+            'subscription' => 'Abonnement',
             'comments' => 'Commentaires',
         ],
         'save' => [

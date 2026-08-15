@@ -4,14 +4,22 @@
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
-        <div class="col-lg-auto mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="{{ __('site.branches.index.search_branches') }}" class="form-control"
-                    wire:model.live.debounce.500ms="search">
+        <div class="col-md-9 col-12 mb-3 row">
+            @if (!user()->cliente_id)
+                <div class="col-6">
+                    <x-select2-multiple label="{{ __('site.branches.index.client') }}" model="clientes" class="form-control" :lazy="true"
+                        :options="$clientesAll"></x-select2-multiple>
+                </div>
+            @endif
+            <div class="col-6">
+                <div class="input-group pt-4">
+                    <span class="input-group-text"><x-icon name="search" /></span>
+                    <input type="search" placeholder="{{ __('site.branches.index.search_branches') }}"
+                        class="form-control" wire:model.live.debounce.500ms="search">
+                </div>
             </div>
         </div>
-        <div class="col-lg-auto mb-3">
+        <div class="col-md-3 col-12 mb-3 text-end">
             @can('create', [App\Models\Sucursal::class])
                 <button type="button" class="btn btn-site-primary btn-outline-warning"
                     wire:click="$dispatch('openModal', { component: 'sucursales.save' })">
@@ -76,6 +84,7 @@
                         @if (user()->is_super_admin)
                             <td>{{ $sucursal['cliente'] }}</td>
                         @endif
+                        <td>{{ $sucursal['suscripcion'] }}</td>
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$sucursal['deleted_at'])
@@ -116,7 +125,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ user()->cliente_id ? 6 : 7 }}">
+                        <td colspan="{{ user()->cliente_id ? 7 : 8 }}">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>

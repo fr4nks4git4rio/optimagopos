@@ -4,14 +4,30 @@
     <h1 class="fs-1 mb-2">@yield('title')</h1>
 
     <div class="row justify-content-between">
-        <div class="col-lg-auto mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><x-icon name="search" /></span>
-                <input type="search" placeholder="{{ __('site.terminals.index.search_terminals') }}" class="form-control"
-                    wire:model.live.debounce.500ms="search">
+        <div class="col-md-9 col-12 mb-3 row">
+            @if (!user()->cliente_id)
+                <div class="col-md-3 col-12">
+                    <x-select2-multiple class="form-control" label="{{ __('site.terminals.index.client') }}"
+                        :lazy="true" model="clientes" :options="$clientesAll" />
+                </div>
+            @endif
+            <div class="col-md-3 col-12">
+                <x-select2-multiple class="form-control" label="{{ __('site.terminals.index.branch') }}"
+                    :lazy="true" :dynamic="true" model="sucursales" :options="$sucursalesAll" />
+            </div>
+            <div class="col-md-3 col-12">
+                <x-select2-multiple class="form-control" label="{{ __('site.terminals.index.subscription') }}"
+                    :lazy="true" :dynamic="true" model="suscripciones" :options="$suscripcionesAll" />
+            </div>
+            <div class="col-md-3 col-12">
+                <div class="input-group pt-4">
+                    <span class="input-group-text"><x-icon name="search" /></span>
+                    <input type="search" placeholder="{{ __('site.terminals.index.search_terminals') }}"
+                        class="form-control" wire:model.live.debounce.500ms="search">
+                </div>
             </div>
         </div>
-        <div class="col-lg-auto mb-3">
+        <div class="col-md-3 col-12 mb-3">
             @can('create', [App\Models\Terminal::class])
                 @if (user()->cliente_id)
                     <button type="button" class="btn btn-site-primary btn-outline-warning"
@@ -76,12 +92,18 @@
                         <td>{{ $terminal['nombre'] }}</td>
                         <td>
                             @if ($terminal['es_vk'])
-                                <span class="badge bg-primary-subtle text-primary text-uppercase">{{ __('site.common.yes') }}</span>
+                                <span
+                                    class="badge bg-primary-subtle text-primary text-uppercase">{{ __('site.common.yes') }}</span>
                             @else
-                                <span class="badge bg-danger-subtle text-danger text-uppercase">{{ __('site.common.no') }}</span>
+                                <span
+                                    class="badge bg-danger-subtle text-danger text-uppercase">{{ __('site.common.no') }}</span>
                             @endif
                         </td>
                         <td>{{ $terminal['sucursal'] }}</td>
+                        @if (!user()->cliente_id)
+                            <td>{{ $terminal['cliente'] }}</td>
+                        @endif
+                        <td>{{ $terminal['suscripcion'] }}</td>
                         <td>{{ $terminal['comentarios'] }}</td>
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
@@ -118,7 +140,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6">
+                        <td colspan="{{ user()->cliente_id ? 7 : 8 }}">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>

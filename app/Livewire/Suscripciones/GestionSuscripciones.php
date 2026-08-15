@@ -15,6 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class GestionSuscripciones extends Component
@@ -163,7 +164,7 @@ class GestionSuscripciones extends Component
             $this->loadUsuarios();
         }
 
-        if ($propertyName == 'sucursales') {
+        if (Str::startsWith($propertyName, 'sucursales')) {
             $this->terminales = [];
             $this->terminalesDisponibles = [];
             $this->loadTerminales();
@@ -404,7 +405,12 @@ class GestionSuscripciones extends Component
 
     public function loadSucursales()
     {
-        $this->sucursalesDisponibles = Sucursal::where('cliente_id', $this->cliente_id)->whereDoesntHave('suscripcion')->orWhere('suscripcion_id', $this->suscripcion->id)->lazy()->map(function ($value) {
+        $query = Sucursal::where('cliente_id', $this->cliente_id)
+            ->whereDoesntHave('suscripcion');
+        if ($this->suscripcion->id)
+            $query->orWhere('suscripcion_id', $this->suscripcion->id);
+
+        $this->sucursalesDisponibles = $query->lazy()->map(function ($value) {
             return [
                 'value' => $value->id,
                 'label' => Crypt::decrypt($value->nombre_comercial)
@@ -414,10 +420,12 @@ class GestionSuscripciones extends Component
 
     public function loadTerminales()
     {
-        $this->terminalesDisponibles = Terminal::whereIn('sucursal_id', $this->sucursales)
-            ->whereDoesntHave('suscripcion')
-            ->orWhere('suscripcion_id', $this->suscripcion->id)
-            ->lazy()->map->only(['value', 'label'])->toArray();
+        $query = Terminal::whereIn('sucursal_id', $this->sucursales)
+            ->whereDoesntHave('suscripcion');
+        if ($this->suscripcion->id)
+            $query->orWhere('suscripcion_id', $this->suscripcion->id);
+        
+        $this->terminalesDisponibles = $query->lazy()->map->only(['value', 'label'])->toArray();
     }
 
     public function loadUsuarios()
