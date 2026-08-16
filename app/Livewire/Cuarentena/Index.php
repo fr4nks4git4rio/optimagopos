@@ -113,9 +113,9 @@ class Index extends Component
         switch ($this->sort) {
             case __('site.quarantine.index.date'):
                 if ($this->order == 'asc')
-                    $records = $records->sortBy('fecha', SORT_NATURAL)->values();
+                    $records = $records->sortBy('created_at', SORT_NATURAL)->values();
                 else
-                    $records = $records->sortByDesc('fecha', SORT_NATURAL)->values();
+                    $records = $records->sortByDesc('created_at', SORT_NATURAL)->values();
                 break;
             case __('site.quarantine.index.text'):
                 if ($this->order == 'asc')
