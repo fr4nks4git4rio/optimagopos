@@ -110,24 +110,6 @@ class HomeController
             return response()->json(['success' => false, 'error' => 'La Terminal está reconocida como dispositivo de Video Kitchen.'], 400);
         }
 
-        if (!$terminal->suscripcion || $terminal->suscripcion->estado != 'ACTIVA') {
-            ModelsLog::create([
-                'log' => 'La terminal no pertenece a una Suscripción ACTIVA.',
-                'data' => json_encode($decoded),
-                'status' => 400
-            ]);
-            Cuarentena::create([
-                'texto' => 'La terminal no pertenece a una Suscripción ACTIVA.',
-                'ip' => $request->ip(),
-                'cliente_id' => $terminal->sucursal->cliente_id,
-                'sucursal_id' => $terminal->sucursal_id,
-                'terminal_id' => $terminal->id,
-                'data' => $decoded ? json_encode($decoded) : '',
-                'es_vk' => 0
-            ]);
-            return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
-        }
-
         ModelsLog::create([
             'log' => 'Data recibida.',
             'data' => $decoded ? json_encode($decoded) : '',
@@ -555,24 +537,6 @@ class HomeController
                 'es_vk' => 1
             ]);
             return response()->json(['success' => false, 'error' => 'La Terminal no está reconocida como dispositivo de Video Kitchen.'], 400);
-        }
-
-        if (!$terminal->suscripcion || $terminal->suscripcion->estado != 'ACTIVA') {
-            ModelsLog::create([
-                'log' => 'La terminal no pertenece a una Suscripción ACTIVA.',
-                'data' => json_encode($decoded),
-                'status' => 400
-            ]);
-            Cuarentena::create([
-                'texto' => 'La terminal no pertenece a una Suscripción ACTIVA.',
-                'ip' => $request->ip(),
-                'cliente_id' => $terminal->sucursal->cliente_id,
-                'sucursal_id' => $terminal->sucursal_id,
-                'terminal_id' => $terminal->id,
-                'data' => $decoded ? json_encode($decoded) : '',
-                'es_vk' => 1
-            ]);
-            return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
         }
 
         ModelsLog::create([

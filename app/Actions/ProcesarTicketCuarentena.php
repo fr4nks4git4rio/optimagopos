@@ -68,13 +68,6 @@ class ProcesarTicketCuarentena
             return false;
         }
 
-        if (!$terminal->suscripcion || $terminal->suscripcion->estado != 'ACTIVA') {
-            $this->registro->update([
-                'texto' => 'La Terminal no pertenece a una Suscripción ACTIVA.'
-            ]);
-            return false;
-        }
-
         $terminal->id_pos = $decoded['PosId'];
         $terminal->save();
 

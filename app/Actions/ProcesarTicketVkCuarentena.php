@@ -65,13 +65,6 @@ class ProcesarTicketVkCuarentena
             return false;
         }
 
-        if (!$terminal->suscripcion || $terminal->suscripcion->estado != 'ACTIVA') {
-            $this->registro->update([
-                'texto' => 'La Terminal no pertenece a una Suscripción ACTIVA.'
-            ]);
-            return false;
-        }
-
         $ticket_vk = TicketVK::where('terminal_id', $terminal->id)->where('id_transaccion', $decoded['Data']['orderNumber'])->first();
         if ($ticket_vk) {
             $ticket_vk->update([
