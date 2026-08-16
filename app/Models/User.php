@@ -207,7 +207,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function sucursales()
     {
-        // return DB::table('tb_sucursales')
+        // return DB::table('tb_sucu    rsales')
         //     ->whereNull('deleted_at')
         //     ->whereIn('suscripcion_id', user()->suscripciones->pluck('id')->toArray())
         //     ->get()->each(function ($value) {

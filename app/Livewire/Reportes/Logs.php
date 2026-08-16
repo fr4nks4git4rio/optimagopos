@@ -66,7 +66,8 @@ class Logs extends Component
                 'log.log',
                 'log.data',
                 'log.status'
-            );
+            )
+            ->groupBy('log.id');
 
         if (user()->cliente_id) {
             $query->join('tb_sucursales as sucursal', 'sucursal.id', 'log.sucursal_id')

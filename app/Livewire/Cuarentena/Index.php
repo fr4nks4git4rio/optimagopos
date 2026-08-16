@@ -186,7 +186,8 @@ class Index extends Component
             )
             ->leftJoin('tb_clientes as cliente', 'ticket.cliente_id', '=', 'cliente.id')
             ->leftJoin('tb_sucursales as sucursal', 'ticket.sucursal_id', '=', 'sucursal.id')
-            ->leftJoin('tb_terminales as terminal', 'ticket.terminal_id', '=', 'terminal.id');
+            ->leftJoin('tb_terminales as terminal', 'ticket.terminal_id', '=', 'terminal.id')
+            ->groupBy('ticket.id');
 
         if ($this->search) {
             $query->where(function (Builder $query) {
