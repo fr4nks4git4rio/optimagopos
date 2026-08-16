@@ -110,7 +110,7 @@ class HomeController
             return response()->json(['success' => false, 'error' => 'La Terminal está reconocida como dispositivo de Video Kitchen.'], 400);
         }
 
-        if ($terminal->suscripcion->estado != 'ACTIVA') {
+        if (!$terminal->suscripcion || $terminal->suscripcion->estado != 'ACTIVA') {
             ModelsLog::create([
                 'log' => 'La terminal no pertenece a una Suscripción ACTIVA.',
                 'data' => json_encode($decoded),
@@ -557,7 +557,7 @@ class HomeController
             return response()->json(['success' => false, 'error' => 'La Terminal no está reconocida como dispositivo de Video Kitchen.'], 400);
         }
 
-        if ($terminal->suscripcion->estado != 'ACTIVA') {
+        if (!$terminal->suscripcion || $terminal->suscripcion->estado != 'ACTIVA') {
             ModelsLog::create([
                 'log' => 'La terminal no pertenece a una Suscripción ACTIVA.',
                 'data' => json_encode($decoded),
