@@ -32,7 +32,7 @@ class HomeController
 {
     public function parseTicketJson(Request $request)
     {
-        return false;
+        return response()->json(['success' => false, 'message' => 'API fuera de servicio.']);
         // Paso 1: Obtener contenido crudo
         $raw = $request->getContent();
 
@@ -472,7 +472,7 @@ class HomeController
 
     public function parseTicketVKJson(Request $request)
     {
-        return false;
+        return response()->json(['success' => false, 'message' => 'API fuera de servicio.']);
         $raw = $request->getContent();
 
         $decoded = json_decode($raw, true);
