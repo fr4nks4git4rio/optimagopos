@@ -32,7 +32,7 @@ class HomeController
 {
     public function parseTicketJson(Request $request)
     {
-        return response()->json(['success' => false, 'message' => 'API fuera de servicio.']);
+        // return response()->json(['success' => false, 'message' => 'API fuera de servicio.']);
         // Paso 1: Obtener contenido crudo
         $raw = $request->getContent();
 
@@ -467,12 +467,12 @@ class HomeController
             return response()->json(['success' => false, 'error' => 'Error recibiendo ticket json'], 400);
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => 'Data recibida']);
     }
 
     public function parseTicketVKJson(Request $request)
     {
-        return response()->json(['success' => false, 'message' => 'API fuera de servicio.']);
+        // return response()->json(['success' => false, 'message' => 'API fuera de servicio.']);
         $raw = $request->getContent();
 
         $decoded = json_decode($raw, true);
@@ -565,7 +565,7 @@ class HomeController
                     break;
             }
             $ticket_vk->update($update);
-            return response()->json(['success' => true]);
+            return response()->json(['success' => true, 'message' => 'Data recibida.']);
         }
 
         DB::beginTransaction();
@@ -701,6 +701,6 @@ class HomeController
             return response()->json(['success' => false, 'error' => 'Error recibiendo ticket json'], 400);
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => 'Data recibida.']);
     }
 }
