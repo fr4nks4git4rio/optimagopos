@@ -32,6 +32,7 @@ class HomeController
 {
     public function parseTicketJson(Request $request)
     {
+        return false;
         // Paso 1: Obtener contenido crudo
         $raw = $request->getContent();
 
@@ -471,6 +472,7 @@ class HomeController
 
     public function parseTicketVKJson(Request $request)
     {
+        return false;
         $raw = $request->getContent();
 
         $decoded = json_decode($raw, true);
