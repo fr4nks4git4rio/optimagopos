@@ -7,12 +7,12 @@
         <div wire:init="init">
 
             <x-select2-component-modals label="{{ __('site.terminals.save.client') }}"
-                placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$clientes" model="cliente_id"
-                :lazy="true" :disabled="$from_subscription" />
+                placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$clientes"
+                model="cliente_id" :lazy="true" :disabled="$from_subscription || $terminal->id" />
 
             <x-select2-component-modals label="{{ __('site.terminals.save.branch') }}"
-                placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$sucursales" model="sucursal_id"
-                :dynamic="true" :disabled="$from_subscription" />
+                placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$sucursales"
+                model="sucursal_id" :dynamic="true" />
 
             @if (!$from_subscription)
                 <x-select2-component-modals label="{{ __('site.terminals.save.subscription') }}"
@@ -22,7 +22,8 @@
 
             <x-input label="{{ __('site.terminals.save.name') }}" type="text" model="nombre" />
 
-            <x-input label="{{ __('site.terminals.save.identifier') }}" disabled type="text" model="identificador" />
+            <x-input label="{{ __('site.terminals.save.identifier') }}" disabled type="text"
+                model="identificador" />
 
             <div class="form-check form-switch mb-2 mt-2">
                 <input class="form-check-input" type="checkbox" role="switch" id="chkAsociar" wire:model.blur="es_vk">

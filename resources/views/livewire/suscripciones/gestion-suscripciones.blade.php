@@ -362,12 +362,12 @@
                             </h6>
                             <div class="row g-3 p-3 bg-light rounded-3 border mx-0">
                                 @foreach ([
-                                    ['label' => __('site.subscriptions.manage_subscription.branches'), 'model' => 'cant_sucursales', 'icon' => 'bi-building', 'inc' => 'incrementSucursales', 'dec' => 'decrementSucursales', 'res' => 'resetSucursales'],
-                                    ['label' => __('site.subscriptions.manage_subscription.terminals'), 'model' => 'cant_terminales', 'icon' => 'bi-display', 'inc' => 'incrementTerminales', 'dec' => 'decrementTerminales', 'res' => 'resetTerminales'],
-                                    ['label' => __('site.subscriptions.manage_subscription.users'), 'model' => 'cant_usuarios', 'icon' => 'bi-people', 'inc' => 'incrementUsuarios', 'dec' => 'decrementUsuarios', 'res' => 'resetUsuarios'],
-                                    ['label' => __('site.subscriptions.manage_subscription.stamps'), 'model' => 'cant_timbres', 'icon' => 'bi-file-pdf', 'inc' => 'incrementTimbres', 'dec' => 'decrementTimbres', 'res' => 'resetTimbres'],
-                                    ['label' => __('site.subscriptions.manage_subscription.analytic_basic_months'), 'model' => 'cant_meses_analitica_basica', 'icon' => 'bi-graph-up', 'inc' => 'incrementMesesAnaliticaBasica', 'dec' => 'decrementMesesAnaliticaBasica', 'res' => 'resetMesesAnaliticaBasica'],
-                                    ] as $infra)
+        ['label' => __('site.subscriptions.manage_subscription.branches'), 'model' => 'cant_sucursales', 'icon' => 'bi-building', 'inc' => 'incrementSucursales', 'dec' => 'decrementSucursales', 'res' => 'resetSucursales'],
+        ['label' => __('site.subscriptions.manage_subscription.terminals'), 'model' => 'cant_terminales', 'icon' => 'bi-display', 'inc' => 'incrementTerminales', 'dec' => 'decrementTerminales', 'res' => 'resetTerminales'],
+        ['label' => __('site.subscriptions.manage_subscription.users'), 'model' => 'cant_usuarios', 'icon' => 'bi-people', 'inc' => 'incrementUsuarios', 'dec' => 'decrementUsuarios', 'res' => 'resetUsuarios'],
+        ['label' => __('site.subscriptions.manage_subscription.stamps'), 'model' => 'cant_timbres', 'icon' => 'bi-file-pdf', 'inc' => 'incrementTimbres', 'dec' => 'decrementTimbres', 'res' => 'resetTimbres'],
+        ['label' => __('site.subscriptions.manage_subscription.analytic_basic_months'), 'model' => 'cant_meses_analitica_basica', 'icon' => 'bi-graph-up', 'inc' => 'incrementMesesAnaliticaBasica', 'dec' => 'decrementMesesAnaliticaBasica', 'res' => 'resetMesesAnaliticaBasica'],
+    ] as $infra)
                                     <div class="col-md-4">
                                         <label
                                             class="form-label fw-bold text-dark small">{{ $infra['label'] }}</label>
@@ -444,9 +444,9 @@
                                                 {{ count($terminales) }}/{{ $cant_terminales }}
                                             </span>
                                         </label>
-                                        @if (count($terminales) < $cant_terminales && count($sucursales) == 1 && $this->can_edit_subscription)
+                                        @if (count($terminales) < $cant_terminales && count($sucursales) > 0 && $this->can_edit_subscription)
                                             <button type="button" class="btn btn-sm btn-outline-success py-0 px-1"
-                                                wire:click="$dispatch('openModal', { component: 'terminales.save-system', arguments: { scope: 'suscripciones.gestion-suscripciones', sucursal_id: {{ $sucursales[0] }}, from_subscription: true } })">
+                                                wire:click="$dispatch('openModal', { component: 'terminales.save-system', arguments: { scope: 'suscripciones.gestion-suscripciones', 'cliente_id': {{ $cliente_id }}, sucursalesFromSubsOpts: '{{ implode(',', $sucursales) }}', from_subscription: true } })">
                                                 <i class="bi bi-plus-lg"></i>
                                             </button>
                                         @endif
@@ -518,7 +518,8 @@
                                         <div class="d-flex align-items-start">
                                             <div class="form-check form-switch me-2 pt-1">
                                                 <input class="form-check-input check-modulo-custom" type="checkbox"
-                                                    role="switch" value="{{ $module->id }}" wire:model.live="modulos"
+                                                    role="switch" value="{{ $module->id }}"
+                                                    wire:model.live="modulos"
                                                     @if (($paquete_id && in_array($module->id, $this->modulos_paquete)) || !$this->can_edit_subscription) disabled @endif
                                                     id="mod-{{ $module->id }}">
                                             </div>

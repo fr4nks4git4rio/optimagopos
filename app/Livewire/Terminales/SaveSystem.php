@@ -30,6 +30,7 @@ class SaveSystem extends Modal
     public $suscripciones = [];
     public $clientes = [];
     public $from_subscription = false;
+    public $sucursalesFromSubsOpts;
     protected $listeners = ['$refresh'];
 
     public function mount()
@@ -58,14 +59,18 @@ class SaveSystem extends Modal
             })->toArray();
 
         if ($this->cliente_id) {
-            $this->sucursales = DB::table('tb_sucursales')
+            $sucursales_q = DB::table('tb_sucursales')
                 ->select('id as value', 'nombre_comercial as label')
                 ->where('deleted_at', null)
-                ->where('cliente_id', $this->cliente_id)
-                ->get()->map(function ($element) {
-                    $element->label = Crypt::decrypt($element->label);
-                    return (array) $element;
-                })->toArray();
+                ->where('cliente_id', $this->cliente_id);
+
+            if ($this->from_subscription)
+                $sucursales_q->whereIn('id', explode(',', $this->sucursalesFromSubsOpts));
+            
+            $this->sucursales = $sucursales_q->get()->map(function ($element) {
+                $element->label = Crypt::decrypt($element->label);
+                return (array) $element;
+            })->toArray();
             $this->loadSuscripciones();
         }
     }
@@ -134,6 +139,23 @@ class SaveSystem extends Modal
             }
 
         $this->terminal->fill($data)->save();
+
+        if ($this->terminal->isDirty('sucursal_id') && $this->terminal->suscripcion_id) {
+            if (
+                !$this->terminal->sucursal->suscripcion ||
+                $this->terminal->suscripcion_id != $this->terminal->sucursal->suscripcion_id
+            ) {
+                if (!$this->terminal->sucursal->suscripcion) {
+                    $this->terminal->suscripcion_id = null;
+                    $this->terminal->save();
+                } else {
+                    if ($this->terminal->sucursal->suscripcion->terminales->count() < $this->terminal->sucursal->suscripcion->cant_terminales) {
+                        $this->terminal->suscripcion_id = $this->terminal->sucursal->suscripcion_id;
+                        $this->terminal->save();
+                    }
+                }
+            }
+        }
 
         $attributes = Arr::except($this->terminal->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
         if ($this->terminal->wasRecentlyCreated) {

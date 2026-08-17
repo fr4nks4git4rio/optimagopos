@@ -198,10 +198,11 @@ class Home extends Component
                         $operaciones_q = DB::table('tb_tickets as ticket')
                             ->select('ticket.*')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                            ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id');
+                            ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
+                            ->where('sucursal.cliente_id', user()->cliente_id);
 
                         $operaciones_q = $this->commonWhere($operaciones_q);
-                        $this->resumenData['operaciones'] = $operaciones_q->groupBy('ticket.id')->count();
+                        $this->resumenData['operaciones'] = $operaciones_q->count();
 
                         $ventas_departamento_q = DB::table('tb_ticket_productos as tp')
                             ->selectRaw("SUM(tp.precio) as total")

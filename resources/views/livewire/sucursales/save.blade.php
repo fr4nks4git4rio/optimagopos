@@ -41,7 +41,7 @@
                 @if (user()->is_super_admin)
                     <div class="row mb-3">
                         <div class="col-md-6 col-12">
-                            @if ($from_subscription)
+                            @if ($from_subscription || $this->sucursal->id)
                                 <x-select2-component-modals label="{{ __('site.branches.save.client') }}"
                                     placeholder="{{ __('site.common.select') }}..." class="form-control"
                                     :options="$clientes" model="cliente_id" :dynamic="true" disabled />
