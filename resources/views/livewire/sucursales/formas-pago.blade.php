@@ -79,7 +79,7 @@
             wire:click="$dispatch('closeModal')">Cerrar</button>
     </x-slot:buttons>
 
-    <x-slot name="modals">
+    <x-slot:modals>
         <div class="modal fade" id="modal-forma-pago-save" tabindex="-1" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -167,5 +167,5 @@
                 </div>
             </div>
         </div>
-    </x-slot>
+    </x-slot:modals>
 </x-modal>
