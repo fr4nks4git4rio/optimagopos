@@ -1359,6 +1359,16 @@ return [
             'total' => 'Total',
             'grand_total' => 'Total General'
         ],
+        'data_received' => [
+            'title' => 'Datos recibidos',
+            'start_date' => 'Fecha Inicio',
+            'end_date' => 'Fecha Fin',
+            'search' => 'Buscar',
+            'date' => 'fecha',
+            'message' => 'Mensaje',
+            'data' => 'Datos',
+            'status' => 'Estado'
+        ],
         'income' => [
             'title' => 'Income report',
             'start_date' => 'Fecha Inicio',
