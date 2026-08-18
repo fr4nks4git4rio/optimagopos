@@ -1364,7 +1364,7 @@ return [
             'start_date' => 'Fecha Inicio',
             'end_date' => 'Fecha Fin',
             'search' => 'Buscar',
-            'date' => 'fecha',
+            'date' => 'Fecha',
             'message' => 'Mensaje',
             'data' => 'Datos',
             'status' => 'Estado'
