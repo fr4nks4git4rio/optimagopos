@@ -106,7 +106,7 @@ class Configuraciones extends Modal
                 ->on($this->sucursal)
                 ->event('updated')
                 ->withProperty('attributes', [$key => $this->{$key}])
-                ->withProperty('old', [$key => $this->sucursal->moneda_base->codigo])
+                ->withProperty('old', [$key => $this->sucursal->moneda_base?->codigo])
                 ->log($log);
             DB::table('tb_sucursales')->where('id', $this->sucursal->id)->update(['moneda_base_id' => $this->{$key}]);
         }
