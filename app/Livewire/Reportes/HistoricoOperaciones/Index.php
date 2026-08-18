@@ -104,7 +104,7 @@ class Index extends Component
     {
         $records = $this->query();
 
-        $currentPage = $this->getPage;
+        $currentPage = $this->getPage();
         $total = $records->count();
         $currentItems = $records->forPage($currentPage, $this->perPage)->values();
 
