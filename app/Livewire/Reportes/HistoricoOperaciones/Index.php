@@ -102,10 +102,13 @@ class Index extends Component
 
     public function render()
     {
-        $tickets = $this->query();
-        $total = $tickets->count();
-        $records = $tickets->forPage($this->page, $this->perPage);
-        $tickets = new LengthAwarePaginator($records, $total, $this->perPage, $this->page);
+        $records = $this->query();
+
+        $currentPage = $this->getPage;
+        $total = $records->count();
+        $currentItems = $records->forPage($currentPage, $this->perPage)->values();
+
+        $tickets = new LengthAwarePaginator($currentItems, $total, $this->perPage, $currentPage);
         return view('livewire.reportes.historico-operaciones.index', [
             'tickets' => $tickets,
             'sucursalesDisponibles' => Sucursal::where('cliente_id', user()->cliente_id)

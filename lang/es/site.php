@@ -1406,5 +1406,18 @@ return [
         'ticket' => 'Ticket',
         'date' => 'Fecha',
         'stamp' => 'Timbrar',
+    ],
+    'data_parser' => [
+        'incomplete_jason' => 'JSON inválido o incompleto',
+        'terminal_not_found' => 'Terminal no encontrada.',
+        'terminal_is_vk' => 'La Terminal está reconocida como dispositivo de Video Kitchen.',
+        'terminal_not_vk' => 'La Terminal no está reconocida como dispositivo de Video Kitchen.',
+        'data_received' => 'Data recibida',
+        'employee_id_not_received' => 'Id de empleado no recibido.',
+        'properties_not_found' => 'Propiedad no recibida en ítem :item. Propiedades esperadas: :properties.',
+        'payment_form_not_found' => 'Forma de pago no encontrada: :payment_form',
+        'exception_error' => 'Error recibiendo ticket json. Error: :error',
+        'property_not_found_in_package' => 'Propiedad no recibida en el paquete. Propiedad esperada: :property.',
+        'property_invalid_format' => 'La propiedad: :property no cumple con el formato esperado.'
     ]
 ];

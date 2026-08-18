@@ -53,18 +53,18 @@ class HomeController
             || !isset($decoded['TransactionStartTime'])
         ) {
             ModelsLog::create([
-                'log' => 'Error. JSON inválido o incompleto',
+                'log' => __('site.data_parser.incomplete_jason'),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'status' => 400
             ]);
 
             Cuarentena::create([
-                'texto' => 'JSON inválido o incompleto',
+                'texto' => __('site.data_parser.incomplete_jason'),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 0
             ]);
-            return response()->json(['success' => false, 'error' => 'JSON inválido o incompleto'], 400);
+            return response()->json(['success' => false, 'error' => __('site.data_parser.incomplete_jason')], 400);
         }
 
         // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
@@ -80,27 +80,27 @@ class HomeController
 
         if (!$terminal) {
             ModelsLog::create([
-                'log' => 'Error. Terminal no encontrada.',
+                'log' => __('site.data_parser.terminal_not_found'),
                 'data' => json_encode($decoded),
                 'status' => 400
             ]);
             Cuarentena::create([
-                'texto' => 'Terminal no encontrada.',
+                'texto' => __('site.data_parser.terminal_not_found'),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 0
             ]);
-            return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
+            return response()->json(['success' => false, 'error' => __('site.data_parser.terminal_not_found')], 400);
         }
 
         if ($terminal->es_vk) {
             ModelsLog::create([
-                'log' => 'Error. La Terminal está reconocida como dispositivo de Video Kitchen.',
+                'log' => __('site.data_parser.terminal_is_vk'),
                 'data' => json_encode($decoded),
                 'status' => 400
             ]);
             Cuarentena::create([
-                'texto' => 'Error. La Terminal está reconocida como dispositivo de Video Kitchen.',
+                'texto' => __('site.data_parser.terminal_is_vk'),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'cliente_id' => $terminal->sucursal->cliente_id,
@@ -108,11 +108,11 @@ class HomeController
                 'terminal_id' => $terminal->id,
                 'es_vk' => 0
             ]);
-            return response()->json(['success' => false, 'error' => 'La Terminal está reconocida como dispositivo de Video Kitchen.'], 400);
+            return response()->json(['success' => false, 'error' => __('site.data_parser.terminal_is_vk')], 400);
         }
 
         ModelsLog::create([
-            'log' => 'Data recibida.',
+            'log' => __('site.data_parser.data_received'),
             'data' => $decoded ? json_encode($decoded) : '',
             'status' => 200,
             'sucursal_id' => $terminal->sucursal_id
@@ -127,13 +127,13 @@ class HomeController
             // Paso 4: Acceder a datos generales
             if (!$decoded['ClerkId']) {
                 ModelsLog::create([
-                    'log' => 'Id de empleado no recibido.',
+                    'log' => __('site.data_parser.employee_id_not_received'),
                     'data' => $decoded ? json_encode($decoded) : '',
                     'status' => 400,
                     'sucursal_id' => $terminal->sucursal_id
                 ]);
                 Cuarentena::create([
-                    'texto' => 'Id de empleado no recibido.',
+                    'texto' => __('site.data_parser.employee_id_not_received'),
                     'ip' => $request->ip(),
                     'data' => $decoded ? json_encode($decoded) : '',
                     'cliente_id' => $terminal->sucursal->cliente_id,
@@ -141,7 +141,7 @@ class HomeController
                     'terminal_id' => $terminal->id,
                     'es_vk' => 0
                 ]);
-                return response()->json(['success' => false, 'error' => 'Empelado no enviado'], 400);
+                return response()->json(['success' => false, 'error' => __('site.data_parser.employee_id_not_received')], 400);
             }
             $clerk = Empleado::where('sucursal_id', $terminal->sucursal_id)->where('id_empleado', $decoded['ClerkId'])->first();
             if (!$clerk) {
@@ -203,13 +203,13 @@ class HomeController
                     if (!isset($item['Name']) || !isset($item['Amount'])) {
                         DB::rollBack();
                         ModelsLog::create([
-                            'log' => 'Propiedad no recibida en ítem Tax. Propiedades esperadas: Name y Amount.',
+                            'log' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name ' . __('site.common.and') . ' Amount']),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'status' => 400,
                             'sucursal_id' => $terminal->sucursal_id
                         ]);
                         Cuarentena::create([
-                            'texto' => 'Propiedad no recibida en ítem Tax. Propiedades esperadas: Name y Amount.',
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name ' . __('site.common.and') . ' Amount']),
                             'ip' => $request->ip(),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'terminal_id' => $terminal->id,
@@ -217,7 +217,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Tax. Propiedades esperadas: Name y Amount.'], 400);
+                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name ' . __('site.common.and') . ' Amount'])], 400);
                     }
                     $ticket->impuestos()->create([
                         'nombre' => $item['Name'],
@@ -229,13 +229,13 @@ class HomeController
                     if (!isset($item['Name']) || !isset($item['Amount'])) {
                         DB::rollBack();
                         ModelsLog::create([
-                            'log' => 'Propiedad no recibida en ítem Tender. Propiedades esperadas: Name y Amount.',
+                            'log' => __('site.data_parser.properties_not_found', ['item' => 'Tender', 'properties' => 'Name ' . __('site.common.and') . ' Amount']),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'status' => 400,
                             'sucursal_id' => $terminal->sucursal_id
                         ]);
                         Cuarentena::create([
-                            'texto' => 'Propiedad no recibida en ítem Tender. Propiedades esperadas: Name y Amount.',
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Tender', 'properties' => 'Name ' . __('site.common.and') . ' Amount']),
                             'ip' => $request->ip(),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'terminal_id' => $terminal->id,
@@ -243,7 +243,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Tender'], 400);
+                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Tender', 'properties' => 'Name ' . __('site.common.and') . ' Amount'])], 400);
                     }
                     $forma_pago = DB::table('tb_sucursal_forma_pagos')
                         ->where('sucursal_id', $terminal->sucursal_id)
@@ -253,14 +253,14 @@ class HomeController
                     if (!$forma_pago) {
                         DB::rollBack();
                         ModelsLog::create([
-                            'log' => 'Error. Forma de pago no encontrada.',
+                            'log' => __('site.data_parser.payment_form_not_found', ['payment_form' => $item['Name']]),
                             'data' => json_encode($decoded),
                             'status' => 400,
                             'sucursal_id' => $terminal->sucursal_id
                         ]);
 
                         Cuarentena::create([
-                            'texto' => "Forma de pago no encontrada: {$item['Name']}.",
+                            'texto' => __('site.data_parser.payment_form_not_found', ['payment_form' => $item['Name']]),
                             'ip' => $request->ip(),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'terminal_id' => $terminal->id,
@@ -268,7 +268,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => 'Forma de pago no encontrada'], 400);
+                        return response()->json(['success' => false, 'error' => __('site.data_parser.payment_form_not_found', ['payment_form' => $item['Name']])], 400);
                     }
                     $tasa_cambio = 1;
                     if ($forma_pago && $forma_pago->moneda_id != $terminal->sucursal->moneda_base_id) {
@@ -293,13 +293,13 @@ class HomeController
                     if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
                         DB::rollBack();
                         ModelsLog::create([
-                            'log' => 'Propiedad no recibida en ítem Product. Propiedades esperadas: Id, Name, Amount, Qty, DepartmentId y DepartmentName.',
+                            'log' => __('site.data_parser.properties_not_found', ['item' => 'Product', 'properties' => 'Id, Name, Amount, Qty, DepartmentId ' . __('site.common.and') . ' DepartmentName']),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'status' => 400,
                             'sucursal_id' => $terminal->sucursal_id
                         ]);
                         Cuarentena::create([
-                            'texto' => 'Propiedad no recibida en ítem Product. Propiedades esperadas: Id, Name, Amount, Qty, DepartmentId y DepartmentName.',
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Product', 'properties' => 'Id, Name, Amount, Qty, DepartmentId ' . __('site.common.and') . ' DepartmentName']),
                             'ip' => $request->ip(),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'terminal_id' => $terminal->id,
@@ -307,7 +307,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Product'], 400);
+                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Product', 'properties' => 'Id, Name, Amount, Qty, DepartmentId ' . __('site.common.and') . ' DepartmentName'])], 400);
                     }
 
                     $producto = Producto::where('sucursal_id', $terminal->sucursal_id)
@@ -363,13 +363,13 @@ class HomeController
                     if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
                         DB::rollBack();
                         ModelsLog::create([
-                            'log' => 'Propiedad no recibida en ítem Department. Propiedades esperadas: Id, Name, Amount y Qty.',
+                            'log' => __('site.data_parser.properties_not_found', ['item' => 'Department', 'properties' => 'Id, Name, Amount ' . __('site.common.and') . ' Qty']),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'status' => 400,
                             'sucursal_id' => $terminal->sucursal_id
                         ]);
                         Cuarentena::create([
-                            'texto' => 'Propiedad no recibida en ítem Department. Propiedades esperadas: Id, Name, Amount y Qty.',
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Department', 'properties' => 'Id, Name, Amount ' . __('site.common.and') . ' Qty']),
                             'ip' => $request->ip(),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'terminal_id' => $terminal->id,
@@ -377,7 +377,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Department'], 400);
+                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Department', 'properties' => 'Id, Name, Amount ' . __('site.common.and') . ' Qty'])], 400);
                     }
 
                     $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
@@ -415,13 +415,13 @@ class HomeController
                     if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
                         DB::rollBack();
                         ModelsLog::create([
-                            'log' => 'Propiedad no recibida en ítem Correction. Propiedades esperadas: Name, Amount y Qty.',
+                            'log' => __('site.data_parser.properties_not_found', ['item' => 'Correction', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Qty']),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'status' => 400,
                             'sucursal_id' => $terminal->sucursal_id
                         ]);
                         Cuarentena::create([
-                            'texto' => 'Propiedad no recibida en ítem Correction. Propiedades esperadas: Name, Amount y Qty.',
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Correction', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Qty']),
                             'ip' => $request->ip(),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'terminal_id' => $terminal->id,
@@ -429,7 +429,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Correction'], 400);
+                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Correction', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Qty'])], 400);
                     }
 
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
@@ -453,21 +453,21 @@ class HomeController
         } catch (Exception $e) {
             DB::rollBack();
             ModelsLog::create([
-                'log' => "Error recibiendo ticket json. Error: {$e->getMessage()}",
+                'log' => __('site.data_parser.exception_error', ['error' => $e->getMessage()]),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'status' => 400
             ]);
             Cuarentena::create([
-                'texto' => "Error recibiendo ticket json. Error: {$e->getMessage()}",
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage()]),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 0
             ]);
-            Log::error("Error recibiendo ticket json. Error: {$e->getMessage()}");
-            return response()->json(['success' => false, 'error' => 'Error recibiendo ticket json'], 400);
+            Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage()]));
+            return response()->json(['success' => false, 'error' => __('site.data_parser.exception_error', ['error' => $e->getMessage()])], 400);
         }
 
-        return response()->json(['success' => true, 'message' => 'Data recibida']);
+        return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
     }
 
     public function parseTicketVKJson(Request $request)
@@ -490,18 +490,18 @@ class HomeController
             || !isset($decoded['Data']['timestamp'])
         ) {
             ModelsLog::create([
-                'log' => 'Error. JSON inválido o incompleto',
+                'log' => __('site.data_parser.incomplete_jason'),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'status' => 400
             ]);
 
             Cuarentena::create([
-                'texto' => 'JSON inválido o incompleto',
+                'texto' => __('site.data_parser.incomplete_jason'),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 1
             ]);
-            return response()->json(['success' => false, 'error' => 'JSON inválido o incompleto'], 400);
+            return response()->json(['success' => false, 'error' => __('site.data_parser.incomplete_jason')], 400);
         }
 
         $terminalId = $decoded['TerminalId'];
@@ -510,27 +510,27 @@ class HomeController
 
         if (!$terminal) {
             ModelsLog::create([
-                'log' => 'Error. Terminal no encontrada.',
+                'log' => __('site.data_parser.terminal_not_found'),
                 'data' => json_encode($decoded),
                 'status' => 400
             ]);
             Cuarentena::create([
-                'texto' => 'Terminal no encontrada.',
+                'texto' => __('site.data_parser.terminal_not_found'),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 1
             ]);
-            return response()->json(['success' => false, 'error' => 'Terminal no encontrada'], 400);
+            return response()->json(['success' => false, 'error' => __('site.data_parser.terminal_not_found')], 400);
         }
 
         if (!$terminal->es_vk) {
             ModelsLog::create([
-                'log' => 'Error. La Terminal no está reconocida como dispositivo de Video Kitchen.',
+                'log' => __('site.data_parser.terminal_not_vk'),
                 'data' => json_encode($decoded),
                 'status' => 400
             ]);
             Cuarentena::create([
-                'texto' => 'Error. La Terminal no está reconocida como dispositivo de Video Kitchen.',
+                'texto' => __('site.data_parser.terminal_not_vk'),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'cliente_id' => $terminal->sucursal->cliente_id,
@@ -538,11 +538,11 @@ class HomeController
                 'terminal_id' => $terminal->id,
                 'es_vk' => 1
             ]);
-            return response()->json(['success' => false, 'error' => 'La Terminal no está reconocida como dispositivo de Video Kitchen.'], 400);
+            return response()->json(['success' => false, 'error' => __('site.data_parser.terminal_not_vk')], 400);
         }
 
         ModelsLog::create([
-            'log' => 'Data recibida.',
+            'log' => __('site.data_parser.data_received'),
             'data' => $decoded ? json_encode($decoded) : '',
             'status' => 200,
             'sucursal_id' => $terminal->sucursal_id
@@ -565,7 +565,7 @@ class HomeController
                     break;
             }
             $ticket_vk->update($update);
-            return response()->json(['success' => true, 'message' => 'Data recibida.']);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         DB::beginTransaction();
@@ -620,14 +620,14 @@ class HomeController
                 $itemItecketVK->ticket_vk_id = $ticketVK->id;
                 if (!isset($item['name'])) {
                     ModelsLog::create([
-                        'log' => 'Propiedad no recibida en ítem. Propiedad esperada: name.',
+                        'log' => __('site.data_parser.property_not_found_in_package', ['property' => 'name']),
                         'data' => json_encode($decoded),
                         'status' => 400,
                         'sucursal_id' => $terminal->sucursal_id
                     ]);
 
                     Cuarentena::create([
-                        'texto' => 'Propiedad no recibida en ítem. Propiedad esperada: name.',
+                        'texto' => __('site.data_parser.property_not_found_in_package', ['property' => 'name']),
                         'ip' => $request->ip(),
                         'data' => $decoded ? json_encode($decoded) : '',
                         'terminal_id' => $terminal->id,
@@ -636,7 +636,7 @@ class HomeController
                         'es_vk' => 1
                     ]);
                     DB::rollBack();
-                    return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem. Propiedad esperada: name.'], 400);
+                    return response()->json(['success' => false, 'error' => __('site.data_parser.property_not_found_in_package', ['property' => 'name'])], 400);
                 }
 
                 $regex = '/^\s*(\d+(?:[.,]\d+)?)\s+(.+?)\s*$/';
@@ -645,14 +645,14 @@ class HomeController
                     $itemItecketVK->nombre = $coincidencias[2];
                 } else {
                     ModelsLog::create([
-                        'log' => "La propiedad 'name' no cumple con el formato esperado.",
+                        'log' => __('site.data_parser.property_invalid_format', ['property' => 'name']),
                         'data' => json_encode($decoded),
                         'status' => 400,
                         'sucursal_id' => $terminal->sucursal_id
                     ]);
 
                     Cuarentena::create([
-                        'texto' => "La propiedad 'name' no cumple con el formato esperado.",
+                        'texto' => __('site.data_parser.property_invalid_format', ['property' => 'name']),
                         'ip' => $request->ip(),
                         'data' => $decoded ? json_encode($decoded) : '',
                         'terminal_id' => $terminal->id,
@@ -661,7 +661,7 @@ class HomeController
                         'es_vk' => 1
                     ]);
                     DB::rollBack();
-                    return response()->json(['success' => false, 'error' => "La propiedad 'name' no cumple con el formato esperado."], 400);
+                    return response()->json(['success' => false, 'error' => __('site.data_parser.property_invalid_format', ['property' => 'name'])], 400);
                 }
 
                 if (isset($item['seat']))
@@ -686,21 +686,21 @@ class HomeController
             DB::commit();
         } catch (Exception $e) {
             ModelsLog::create([
-                'log' => "Error recibiendo ticket json. Error: {$e->getMessage()}",
+                'log' => __('site.data_parser.exception_error', ['error' => $e->getMessage()]),
                 'data' => json_encode($decoded),
                 'status' => 400
             ]);
             Cuarentena::create([
-                'texto' => "Error recibiendo ticket json. Error: {$e->getMessage()}",
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage()]),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 1
             ]);
-            Log::error("Error recibiendo ticket json. Error: {$e->getMessage()}");
+            Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage()]));
             DB::rollBack();
-            return response()->json(['success' => false, 'error' => 'Error recibiendo ticket json'], 400);
+            return response()->json(['success' => false, 'error' => __('site.data_parser.exception_error', ['error' => $e->getMessage()])], 400);
         }
 
-        return response()->json(['success' => true, 'message' => 'Data recibida.']);
+        return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
     }
 }
