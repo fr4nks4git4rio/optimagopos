@@ -2,18 +2,13 @@
 
 namespace App\Livewire\Facturas;
 
-use App\Exports\FacturaEmitidaExport;
-use App\Http\Libraries\Pdf;
 use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\Moneda;
 use App\Services\Timbrado\Facturador;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -61,17 +56,25 @@ class IndexPreFacturas extends Component
         $this->perPage = $this->perPage ?? 10;
         $this->search = $this->search ?? null;
         $this->order = $this->order ?? 'desc';
-        $this->sort = $this->sort ?? 'Fecha';
+        $this->sort = $this->sort ?? __('site.invoices.index.date');
         $this->fechaInicio = $this->fechaInicio ?? null;
         $this->fechaFin = $this->fechaFin ?? null;
         $this->cliente = $this->cliente ?? null;
-        $this->estado = $this->estado ?? 'Todos';
-        $this->moneda = $this->moneda ?? 'Todas';
+        $this->estado = $this->estado ?? __('site.common.all');
+        $this->moneda = $this->moneda ?? __('site.common.all');
         $this->importe = $this->importe ?? null;
-        $this->sorts = ['Fecha', 'Receptor', 'Estado', 'Moneda', 'Subtotal', 'IVA', 'Total'];
+        $this->sorts = [
+            __('site.invoices.index.date'),
+            __('site.invoices.index.receiver'),
+            __('site.invoices.index.status'),
+            __('site.invoices.index.currency'),
+            __('site.invoices.index.subtotal'),
+            __('site.invoices.index.iva'),
+            __('site.invoices.index.total')
+        ];
         $this->perPages = [10, 25, 50, 100];
-        $this->estados = ['Todos', 'PRECAPTURADA', 'CAPTURADA'];
-        $this->monedas = Moneda::all()->pluck('acronimo')->prepend('Todas');
+        $this->estados = ['PRECAPTURADA', 'CAPTURADA'];
+        $this->monedas = Moneda::all()->pluck('acronimo');
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
 
@@ -159,12 +162,12 @@ class IndexPreFacturas extends Component
         if ($this->cliente) {
             $query->where('factura.cliente_id', $this->cliente);
         }
-        if ($this->estado && $this->estado != 'Todos') {
+        if ($this->estado && $this->estado != __('site.common.all')) {
             $query->where('factura.estado', $this->estado);
         } else {
             $query->whereIn('factura.estado', ['PRECAPTURADA', 'CAPTURADA']);
         }
-        if ($this->moneda && $this->moneda != 'Todas') {
+        if ($this->moneda && $this->moneda != __('site.common.all')) {
             $query->where('factura.moneda', $this->moneda);
         }
         if ($this->importe) {
@@ -191,43 +194,43 @@ class IndexPreFacturas extends Component
         }
 
         switch ($this->sort) {
-            case 'Fecha':
+            case __('site.invoices.index.date'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('fecha_certificacion_sort', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('fecha_certificacion_sort', SORT_NATURAL)->values();
                 break;
-            case 'Receptor':
+            case __('site.invoices.index.receiver'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('receptor', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('receptor', SORT_NATURAL)->values();
                 break;
-            case 'Estado':
+            case __('site.invoices.index.status'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('estado', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('estado', SORT_NATURAL)->values();
                 break;
-            case 'Moneda':
+            case __('site.invoices.index.currency'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('moneda', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('moneda', SORT_NATURAL)->values();
                 break;
-            case 'Subtotal':
+            case __('site.invoices.index.subtotal'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('subtotal', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('subtotal', SORT_NATURAL)->values();
                 break;
-            case 'IVA':
+            case __('site.invoices.index.iva'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('iva', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('iva', SORT_NATURAL)->values();
                 break;
-            case 'Total':
+            case __('site.invoices.index.total'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('total', SORT_NATURAL)->values();
                 else

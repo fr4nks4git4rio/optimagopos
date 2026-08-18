@@ -1,23 +1,23 @@
 <table>
     <thead>
     <tr>
-        <td colspan="6" style="font-weight: bold; font-size: 16px">Reporte de Ingresos</td>
+        <td colspan="6" style="font-weight: bold; font-size: 16px">{{$name}}</td>
     </tr>
     <tr></tr>
     <tr>
-        <th style="text-align: center">Fecha</th>
-        <th style="text-align: center">Folio Interno</th>
-        <th>Cliente</th>
-        <th style="text-align: center">Folio UUID</th>
-        <th style="text-align: center">Moneda</th>
-        <th style="text-align: center">Importe</th>
+        <th style="text-align: center">{{__('site.reports.income.date')}}</th>
+        <th style="text-align: center">{{__('site.reports.income.internal_folio')}}</th>
+        <th>{{__('site.reports.income.client')}}</th>
+        <th style="text-align: center">{{__('site.reports.income.uuid')}}</th>
+        <th style="text-align: center">{{__('site.reports.income.currency')}}</th>
+        <th style="text-align: center">{{__('site.reports.income.import')}}</th>
     </tr>
     </thead>
     <tbody>
     @if($ingresos->isEmpty())
         <tr>
             <td colspan="6">
-                <div style="text-align: center">No se encontraron Ingresos.</div>
+                <div style="text-align: center">{{__('site.common.results_not_found')}}...</div>
             </td>
         </tr>
     @else
@@ -44,7 +44,7 @@
         @endforeach
         <tr>
             <td colspan="3" rowspan="2" style="vertical-align: middle; text-align: center; font-weight: bold">
-                Totales:
+                {{__('site.reports.income.total')}}:
             </td>
             <td style="text-align: right; font-weight: bold">
                 MXN:

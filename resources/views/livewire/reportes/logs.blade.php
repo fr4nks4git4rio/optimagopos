@@ -1,4 +1,4 @@
-@section('title', 'Logs')
+@section('title', __('site.reports.data_received.title'))
 
 <div>
     <div wire:loading.delay>
@@ -11,16 +11,18 @@
     <div class="row justify-content-between">
         <div class="col-lg-auto mb-3 row">
             <div class="col-auto">
-                <x-input label="Fecha inicio" type="date" model="fechaInicio" :lazy="true"></x-input>
+                <x-input label="{{ __('site.reports.data_received.start_date') }}" type="date" model="fechaInicio"
+                    :lazy="true"></x-input>
             </div>
             <div class="col-auto">
-                <x-input label="Fecha fin" type="date" model="fechaFin" :lazy="true"></x-input>
+                <x-input label="{{ __('site.reports.data_received.end_date') }}" type="date" model="fechaFin"
+                    :lazy="true"></x-input>
             </div>
             <div class="col-auto">
                 <div class="input-group pt-4">
                     <span class="input-group-text"><x-icon name="search" /></span>
-                    <input type="search" placeholder="Buscar Logs" class="form-control"
-                        wire:model.live.debounce.500ms="search">
+                    <input type="search" placeholder="{{ __('site.reports.data_received.search') }}"
+                        class="form-control" wire:model.live.debounce.500ms="search">
                 </div>
             </div>
         </div>
@@ -35,16 +37,6 @@
                     @endif
                 @endforeach
             </x-dropdown>
-
-            <x-dropdown icon="sort-down-alt" :label="__($sort)">
-                @foreach ($sorts as $sort)
-                    @if ($sort == $this->sort)
-                        <x-dropdown-item :label="__($sort)" class="active" click="$set('sort', '{{ $sort }}')" />
-                    @else
-                        <x-dropdown-item :label="__($sort)" click="$set('sort', '{{ $sort }}')" />
-                    @endif
-                @endforeach
-            </x-dropdown>
         </div>
     </div>
 
@@ -52,10 +44,16 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>Log</th>
-                    <th>Datos</th>
-                    <th>Estado</th>
+                    @foreach ($sorts as $sort)
+                        <th class="text-center align-middle cursor-pointer" rowspan="2"
+                            style="white-space: nowrap !important" wire:click="changeSort('{{ $sort }}')">
+                            <span>
+                                @if ($this->sort == $sort)
+                                    <i class="{{ $this->class_sort }}"></i>
+                                @endif {{ $sort }}
+                            </span>
+                        </th>
+                    @endforeach
                 </tr>
             </thead>
             <tbody>
@@ -70,7 +68,7 @@
                     <tr>
                         <td colspan="4">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{ __('site.common.results_not_found') }}...
                             </div>
                         </td>
                     </tr>

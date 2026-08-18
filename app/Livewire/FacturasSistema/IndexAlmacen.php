@@ -2,14 +2,10 @@
 
 namespace App\Livewire\FacturasSistema;
 
-use App\Exports\FacturaEmitidaExport;
-use App\Http\Libraries\Pdf;
-use App\Models\Facturador;
+use App\Exports\AlmacenFacturaExport;
 use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\Moneda;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
@@ -327,6 +323,6 @@ class IndexAlmacen extends Component
 
         $name = __('site.invoices.index_storage.download_excel_name');
 
-        return (new FacturaEmitidaExport($facturas, $name))->download("$name.xls");
+        return (new AlmacenFacturaExport($facturas, $name))->download("$name.xls");
     }
 }

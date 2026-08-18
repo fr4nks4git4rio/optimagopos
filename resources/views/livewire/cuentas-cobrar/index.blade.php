@@ -94,8 +94,8 @@
         let el = this;
         $.get('/admin/print-listado-cuentas-cobrar?' + params, function(data) {
             if (data.success) {
-                $wire.iframeContainerClass = 'show';
-                $wire.iframeSrc = data.report;
+                @this.set('iframeSrc', data.report);
+                $wire.dispatch('show-sub-modal', 'pdf-cuentas-cobrar');
             }
         }, 'json');
     },
@@ -132,16 +132,16 @@
     },
     ingresarFacturas() {
         if (!this.checkClienteFacturasSeleccionadas())
-            $wire.emit('show-modal-alert', 'Las facturas seleccionadas deben pertenecer a un único cliente.', 'warning');
+            $wire.dispatch('show-modal-alert', 'Las facturas seleccionadas deben pertenecer a un único cliente.', 'warning');
         else
-            $wire.emit('openModal', 'facturacion.cuentas-cobrar.ingresar', { facturas_ids: this.facturasSeleccionadas().reduce(function(acumulador, element) { return acumulador + element.id + ','; }, '') });
+            $wire.dispatch('openModal', { component: 'facturacion.cuentas-cobrar.ingresar', argument: { facturas_ids: this.facturasSeleccionadas().reduce(function(acumulador, element) { return acumulador + element.id + ','; }, '') } });
     },
     toggleSeleccion(id) {
         // Copia el array para forzar cambio de referencia
         let index = this.facturas.findIndex(function(element) { return element.id == id });
         if (this.facturasSeleccionadas().length > 0 && this.facturasSeleccionadas()[0]['cliente_id'] != this.facturas[index]['cliente_id']) {
             document.getElementById('factura_' + id + '_seleccionado').checked = false;
-            $wire.emit('show-toast', 'Las facturas seleccionadas deben pertenecer al mismo Cliente.', 'danger');
+            $wire.dispatch('show-toast', 'Las facturas seleccionadas deben pertenecer al mismo Cliente.', 'danger');
             return;
         }
         let updatedFacturas = [...this.facturas];
@@ -186,8 +186,9 @@
                     </select>
                 </div>
                 <div class="col-sm-4">
-                    <x-select2-ajax label="{{ __('site.accounts_receivable.index.client') }}" placeholder="Seleccione..." class="form-control" :is_alpine="true"
-                        model="cliente" url="{{ route('clientes.load-clientes') }}" />
+                    <x-select2-ajax label="{{ __('site.accounts_receivable.index.client') }}"
+                        placeholder="Seleccione..." class="form-control" :is_alpine="true" model="cliente"
+                        url="{{ route('clientes.load-clientes') }}" />
                 </div>
                 <div class="col-sm-2">
                     <div class="mb-1">
@@ -217,14 +218,14 @@
         <div class="col-sm-12 mb-3 d-flex justify-content-between">
             <button type="button" class="btn btn-site-primary mr-1" @click="ingresarFacturas()"
                 x-bind:disabled="facturasSeleccionadas().length < 2">
-                {{__('site.accounts_receivable.index.enter_invoices')}}
+                {{ __('site.accounts_receivable.index.enter_invoices') }}
             </button>
             <div>
                 <button type="button" class="btn btn-site-primary mr-1" @click="printListado()">
                     {{ __('site.common.print') }}
                 </button>
                 <x-dropdown icon="eye">
-                    <x-slot name="slot_label">
+                    <x-slot name="label">
                         <span x-text="perPage"></span>
                     </x-slot>
 
@@ -243,15 +244,15 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th class="text-center">Sel.</th>
-                    <th class="text-center">F. Int.</th>
-                    <th class="text-center">Fecha Factura</th>
-                    <th class="text-center">Receptor</th>
-                    <th class="text-center">Tipo</th>
-                    <th class="text-center">Moneda</th>
-                    <th class="text-center">Total</th>
-                    <th class="text-center">Pendiente</th>
-                    <th class="text-center" style="min-width: 150px">Acciones</th>
+                    <th class="text-center">{{__('site.accounts_receivable.index.sel')}}</th>
+                    <th class="text-center">{{__('site.accounts_receivable.index.f_int')}}</th>
+                    <th class="text-center">{{__('site.accounts_receivable.index.date')}}</th>
+                    <th class="text-center">{{__('site.accounts_receivable.index.receiver')}}</th>
+                    <th class="text-center">{{__('site.accounts_receivable.index.type')}}</th>
+                    <th class="text-center">{{__('site.accounts_receivable.index.currency')}}</th>
+                    <th class="text-center">{{__('site.accounts_receivable.index.total')}}</th>
+                    <th class="text-center">{{__('site.accounts_receivable.index.pending')}}</th>
+                    <th class="text-center" style="min-width: 150px">{{__('site.common.actions')}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -280,17 +281,17 @@
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 <li class="list-inline-item mb-1">
-                                    <x-action icon="eye" title="Detalles"
-                                        @click="$wire.emit('openModal', 'cuentas-cobrar.detalles-pago-factura', {factura: factura.id})" />
+                                    <x-action icon="eye" title="{{__('site.common.details')}}"
+                                        @click="$wire.dispatch('openModal', {component: 'cuentas-cobrar.detalles-pago-factura', arguments: {factura: factura.id} })" />
                                 </li>
                                 <li class="list-inline-item mb-1">
-                                    <x-action icon="file-pdf" title="Mostrar PDF"
+                                    <x-action icon="file-pdf" title="{{__('site.common.pdf')}}"
                                         @click="$wire.showPdf(factura.id)" />
                                 </li>
                                 <template x-if="factura.estado != 'COBRADA'">
                                     <li class="list-inline-item mb-1">
-                                        <x-action icon="download" title="Ingresar"
-                                            @click="$wire.emit('openModal', 'cuentas-cobrar.ingresar', {facturas_ids: factura.id})" />
+                                        <x-action icon="download" title="{{__('site.common.enter')}}"
+                                            @click="$wire.dispatch('openModal', 'cuentas-cobrar.ingresar', {facturas_ids: factura.id})" />
                                     </li>
                                 </template>
                             </ul>
@@ -301,7 +302,7 @@
                     <tr>
                         <td colspan="10">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{ __('site.common.results_not_found') }}...
                             </div>
                         </td>
                     </tr>
@@ -390,11 +391,11 @@
 
     </div>
 
-    <div class="modal {{ $iframeContainerClass }}">
+    <div class="modal fade" id="pdf-cuentas-cobrar" tabindex="-1" wire:ignore.self>
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Cuentas por Cobrar</h5>
+                    <h5 class="modal-title">PDF</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                         wire:click="$set('iframeContainerClass', '')"></button>
                 </div>

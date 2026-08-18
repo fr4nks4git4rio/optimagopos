@@ -2,33 +2,22 @@
 
 namespace App\Livewire\Reportes;
 
-use App\Exports\FacturaEmitidaExport;
 use App\Exports\HistoricoTicketsVkExport;
-use App\Exports\VentasDiariasExport;
-use App\Http\Libraries\Pdf;
-use App\Models\Facturador;
-use App\Models\Cliente;
-use App\Models\Factura;
 use App\Models\Sucursal;
 use App\Models\Terminal;
 use Carbon\CarbonInterval;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class HistoricoTicketsVk extends Component
 {
     public $perPages;
     public $order;
-    public $sort = 'Sucursal';
+    public $sort;
     public $sorts;
     public $fechaInicio;
     public $fechaFin;
@@ -53,12 +42,12 @@ class HistoricoTicketsVk extends Component
     public function mount()
     {
         $this->order = $this->order ?? 'desc';
-        $this->sort = $this->sort ?? 'Sucursal';
+        $this->sort = $this->sort ?? __('site.reports.vk_ticket_history.branch');
         $this->fechaInicio = $this->fechaInicio ?? today()->format('Y-m-d');
         $this->fechaFin = $this->fechaFin ?? today()->format('Y-m-d');
         $this->sucursal = $this->sucursal ?? null;
 
-        $this->sorts = ['Sucursal', 'Ticket', 'Terminal'];
+        $this->sorts = [__('site.reports.vk_ticket_history.branch'), __('site.reports.vk_ticket_history.ticket'), __('site.reports.vk_ticket_history.terminal')];
         $this->perPages = [10, 25, 50, 100];
 
         $this->loadTerminales();
@@ -170,13 +159,13 @@ class HistoricoTicketsVk extends Component
         }
 
         switch ($this->sort) {
-            case 'Ticket':
+            case __('site.reports.vk_ticket_history.ticket'):
                 if ($this->order == 'asc')
                     $query->orderBy('ticket.id_transaccion');
                 else
                     $query->orderByDesc('ticket.id_transaccion');
                 break;
-            case 'Terminal':
+            case __('site.reports.vk_ticket_history.terminal'):
                 if ($this->order == 'asc')
                     $query->orderByRaw('terminal.nombre asc');
                 else
@@ -189,7 +178,7 @@ class HistoricoTicketsVk extends Component
         });
 
         switch ($this->sort) {
-            case 'Sucursal':
+            case __('site.reports.vk_ticket_history.branch'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('sucursal', SORT_NATURAL)->values();
                 else
@@ -282,17 +271,17 @@ class HistoricoTicketsVk extends Component
 
     public function imprimirPdf()
     {
-        if (File::exists(public_path('Histórico de Tickets Video Kitchen.pdf'))) {
-            File::delete(public_path('Histórico de Tickets Video Kitchen.pdf'));
+        $name = __('site.reports.vk_ticket_history.title');
+        if (File::exists(public_path("$name.pdf"))) {
+            File::delete(public_path("$name.pdf"));
         }
-        $name = 'Histórico de Tickets Video Kitchen';
         $view = 'reports.reportes.historico-tickets-vk.pdf';
 
         $estados = Arr::pluck([
-            ['value' => 'open', 'label' => 'ABIERTO'],
-            ['value' => 'in_process', 'label' => 'EN PROCESO'],
-            ['value' => 'delayed', 'label' => 'DEMORADO'],
-            ['value' => 'done', 'label' => 'TERMINADO'],
+            ['value' => 'open', 'label' => __('site.statuses.tickets_vk.Open')],
+            ['value' => 'in_process', 'label' => __('site.statuses.tickets_vk.InProcess')],
+            ['value' => 'delayed', 'label' => __('site.statuses.tickets_vk.Delayed')],
+            ['value' => 'done', 'label' => __('site.statuses.tickets_vk.Done')],
         ], 'label', 'value');
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, [
@@ -318,13 +307,13 @@ class HistoricoTicketsVk extends Component
 
     public function exportarExcel()
     {
-        $name = 'Histórico de Tickets Video Kitchen';
+        $name =  __('site.reports.vk_ticket_history.title');
         $fileName = "$name.xlsx";
         $estados = Arr::pluck([
-            ['value' => 'open', 'label' => 'ABIERTO'],
-            ['value' => 'in_process', 'label' => 'EN PROCESO'],
-            ['value' => 'delayed', 'label' => 'DEMORADO'],
-            ['value' => 'done', 'label' => 'TERMINADO'],
+            ['value' => 'open', 'label' => __('site.statuses.tickets_vk.Open')],
+            ['value' => 'in_process', 'label' => __('site.statuses.tickets_vk.InProcess')],
+            ['value' => 'delayed', 'label' => __('site.statuses.tickets_vk.Delayed')],
+            ['value' => 'done', 'label' => __('site.statuses.tickets_vk.Done')],
         ], 'label', 'value');
 
         $estadosSeleccionados = Arr::where($estados, function ($element, $key) {

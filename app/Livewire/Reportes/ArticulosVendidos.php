@@ -3,26 +3,16 @@
 namespace App\Livewire\Reportes;
 
 use App\Exports\ArticulosVendidosExport;
-use App\Exports\FacturaEmitidaExport;
-use App\Http\Libraries\Pdf;
-use App\Models\Facturador;
-use App\Models\Cliente;
-use App\Models\Factura;
 use App\Models\Sucursal;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class ArticulosVendidos extends Component
 {
     public $order;
-    public $sort = 'Artículo';
+    public $sort;
     public $sorts;
     public $fechaInicio;
     public $fechaFin;
@@ -45,12 +35,12 @@ class ArticulosVendidos extends Component
     public function mount()
     {
         $this->order ??= 'desc';
-        $this->sort ??= 'Fecha';
+        $this->sort ??= __('site.reports.articles_sold.article');
         $this->fechaInicio ??= today()->format('Y-m-d');
         $this->fechaFin ??= today()->format('Y-m-d');
         $this->sucursal ??= null;
 
-        $this->sorts = ['Artículo'];
+        $this->sorts = [__('site.reports.articles_sold.article')];
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
 
@@ -108,7 +98,7 @@ class ArticulosVendidos extends Component
         }
 
         switch ($this->sort) {
-            case 'Artículo':
+            case __('site.reports.articles_sold.article'):
                 if ($this->order == 'asc')
                     $query->orderByRaw('producto.nombre asc');
                 else
@@ -127,15 +117,6 @@ class ArticulosVendidos extends Component
                 ];
             }
         });
-
-        switch ($this->sort) {
-            case 'Artículo':
-                if ($this->order == 'asc')
-                    $records = $records->sortBy('producto', SORT_NATURAL)->values();
-                else
-                    $records = $records->sortByDesc('producto', SORT_NATURAL)->values();
-                break;
-        }
 
         $grandTotal = [];
 
@@ -173,10 +154,10 @@ class ArticulosVendidos extends Component
 
     public function imprimirPdf()
     {
-        if (File::exists(public_path('Artículos Vendidos.pdf'))) {
-            File::delete(public_path('Artículos Vendidos.pdf'));
+        $name = __('site.reports.articles_sold.title');
+        if (File::exists(public_path("$name.pdf"))) {
+            File::delete(public_path("$name.pdf"));
         }
-        $name = 'Artículos Vendidos';
         $view = 'reports.reportes.articulos-vendidos.pdf';
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, [
@@ -199,7 +180,7 @@ class ArticulosVendidos extends Component
 
     public function exportarExcel()
     {
-        $name = 'Artículos Vendidos';
+        $name = __('site.reports.articles_sold.title');
         $fileName = "$name.xlsx";
 
         $res = $this->query();

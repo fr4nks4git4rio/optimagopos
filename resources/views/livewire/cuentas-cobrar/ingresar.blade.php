@@ -5,7 +5,7 @@
         </div>
     </div>
     <x-slot:title>
-        Ingresar
+        {{ __('site.accounts_receivable.deposit.title') }}
     </x-slot:title>
 
     <x-slot:content>
@@ -13,18 +13,21 @@
             <div class="card-body py-3">
                 <div class="row g-3 align-items-center">
                     <div class="col-md-4 col-12">
-                        <x-input type="date" label="Fecha de Ingreso" model="fecha" class="form-control-sm" />
+                        <x-input type="date" label="{{ __('site.accounts_receivable.deposit.deposit_date') }}"
+                            model="fecha" class="form-control-sm" />
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check form-switch">
-                            <label for="check-con_nota_credito" class="form-label">Con nota de crédito</label><br>
+                            <label for="check-con_nota_credito"
+                                class="form-label">{{ __('site.accounts_receivable.deposit.with_credit_note') }}</label><br>
                             <input class="form-check-input m-auto" type="checkbox" role="switch"
                                 id="check-con_nota_credito" wire:model.live="con_nota_credito">
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
                         <div class="form-check form-switch">
-                            <label for="check-con_diferente_moneda" class="form-label">Con diferente moneda</label><br>
+                            <label for="check-con_diferente_moneda"
+                                class="form-label">{{ __('site.accounts_receivable.deposit.with_different_currency') }}</label><br>
                             <input class="form-check-input m-auto" type="checkbox" role="switch"
                                 id="check-con_diferente_moneda" wire:model.live="con_diferente_moneda">
                         </div>
@@ -39,18 +42,24 @@
                     <thead class="table-light text-secondary small text-uppercase">
                         <tr>
                             @if ($this->con_nota_credito)
-                                <th class="py-3 ps-3" style="min-width: 200px;">Nota de Crédito</th>
-                                <th class="py-3 text-center" style="width: 160px;">Monto Ingresado NC</th>
+                                <th class="py-3 ps-3" style="min-width: 200px;">
+                                    {{ __('site.accounts_receivable.deposit.credit_note') }}</th>
+                                <th class="py-3 text-center" style="width: 160px;">
+                                    {{ __('site.accounts_receivable.deposit.amount_deposited_cn') }}</th>
                             @endif
 
-                            <th class="py-3 text-center" style="width: 150px;">Pendiente</th>
+                            <th class="py-3 text-center" style="width: 150px;">
+                                {{ __('site.accounts_receivable.deposit.pendign') }}</th>
 
                             @if ($this->con_diferente_moneda)
-                                <th class="py-3 text-center" style="width: 120px;">Moneda</th>
-                                <th class="py-3 text-end" style="width: 160px;">Monto Moneda Orig.</th>
+                                <th class="py-3 text-center" style="width: 120px;">
+                                    {{ __('site.accounts_receivable.deposit.currency') }}</th>
+                                <th class="py-3 text-end" style="width: 160px;">
+                                    {{ __('site.accounts_receivable.deposit.amount_original_currency') }}</th>
                             @endif
 
-                            <th class="py-3 text-end pe-3" style="width: 180px;">Monto a Ingresar</th>
+                            <th class="py-3 text-end pe-3" style="width: 180px;">
+                                {{ __('site.accounts_receivable.deposit.amount_to_deposit') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,7 +136,7 @@
                             @if ($this->totales['total_usd'] > 0)
                                 <tr class="table-light border-top">
                                     <td colspan="{{ $total_columns }}" class="text-end text-muted fw-bold small py-3">
-                                        TOTAL USD:</td>
+                                        {{ __('site.accounts_receivable.deposit.total') }} USD:</td>
                                     <td class="text-end pe-3 fw-bold text-primary py-3 fs-6">
                                         ${{ number_format($this->totales['total_usd'], 2) }}</td>
                                 </tr>
@@ -136,7 +145,7 @@
                             @if ($this->totales['total_mxn'] > 0)
                                 <tr class="table-light border-top">
                                     <td colspan="{{ $total_columns }}" class="text-end text-muted fw-bold small py-3">
-                                        TOTAL MXN:</td>
+                                        {{ __('site.accounts_receivable.deposit.total') }} MXN:</td>
                                     <td class="text-end pe-3 fw-bold text-success py-3 fs-6">
                                         ${{ number_format($this->totales['total_mxn'], 2) }}</td>
                                 </tr>
@@ -149,8 +158,9 @@
 
         <div class="card shadow-sm border-0">
             <div class="card-body">
-                <x-textarea label="Comentarios u Observaciones" rows="3" model="comentarios"
-                    placeholder="Escriba aquí los detalles o notas adicionales referentes a este ingreso..." />
+                <x-textarea label="{{ __('site.accounts_receivable.deposit.comments') }}" rows="3"
+                    model="comentarios"
+                    placeholder="{{ __('site.accounts_receivable.deposit.comments_placeholder') }}..." />
             </div>
         </div>
     </x-slot:content>
@@ -158,8 +168,8 @@
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
             wire:click="$dispatch('show-modal-confirm', '', '', 'facturacion.cuentas-cobrar.ingresar')">
-            Cerrar
+            {{ __('site.common.close') }}
         </button>
-        <button type="submit" class="btn btn-primary">Ingresar</button>
+        <button type="submit" class="btn btn-primary">{{ __('site.accounts_receivable.deposit.deposit') }}</button>
     </x-slot:buttons>
 </x-modal>

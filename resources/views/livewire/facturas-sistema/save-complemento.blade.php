@@ -198,7 +198,7 @@
                                     class="  text-muted small fw-bold">{{ __('site.invoices.save_complement.currency') }}</label>
                                 <select class="form-select form-select-sm @error('moneda') is-invalid @enderror"
                                     wire:model.live="moneda" id="id_moneda">
-                                    @foreach ($moendas as $moneda)
+                                    @foreach ($monedas as $moneda)
                                         <option value="{{ $moneda }}">{{ $moneda }}</option>
                                     @endforeach
                                 </select>

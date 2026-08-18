@@ -30,7 +30,7 @@
                 model="fechaInicio" />
         </div>
         <div class="col-sm-2">
-            <x-input label="{{ __('site.invoices.index_storage.enda_date') }}" type="date" :lazy="true"
+            <x-input label="{{ __('site.invoices.index_storage.end_date') }}" type="date" :lazy="true"
                 model="fechaFin" />
         </div>
         <div class="col-sm-4">

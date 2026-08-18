@@ -48,6 +48,8 @@ class AutoFacturacion extends Component
     public $alertaRegistrarComensal = '';
     public $rfc_exists = false;
     public $facturar_por_forma_pago = false;
+    public $lang;
+    public $langs = ['es' => 'ES', 'en' => 'EN', 'fr' => 'FR'];
 
     public $comensal = [
         'id' => null,
@@ -113,6 +115,7 @@ class AutoFacturacion extends Component
                 $this->suc = $this->terminal->sucursal_id;
             }
         }
+        $this->lang = app()->getLocale();
     }
 
     public function hydrate()
@@ -121,8 +124,10 @@ class AutoFacturacion extends Component
         $this->init();
     }
 
-    public function updated()
+    public function updated($field, $value)
     {
+        if ($field == 'lang')
+            app()->setLocale($value);
         $this->dispatch('reApplySelect2');
         $this->init();
     }

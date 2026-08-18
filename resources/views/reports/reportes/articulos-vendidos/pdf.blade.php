@@ -199,7 +199,7 @@
                         <div class="company-meta">
                             RFC: {{ $empresa->rfc ?? '' }}
                             @if (!empty($empresa->direccion_fiscal))
-                                &nbsp;|&nbsp; Dirección: {{ $empresa->direccion_plain }}
+                                &nbsp;|&nbsp; {{ __('site.address.address') }}: {{ $empresa->direccion_plain }}
                             @endif
                         </div>
                     @endif
@@ -216,11 +216,11 @@
 
     {{-- ================= FILTROS APLICADOS ================= --}}
     <div class="filters-box">
-        <strong>{{__('site.common.')}}:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+        <strong>{{__('site.common.period')}}:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
         @if (!empty($sucursalesSeleccionadas))
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            <strong>Sucursal(es):</strong>
-            {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+            <strong>{{ __('site.reports.articles_sold.branch') }}:</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $sucursalesSeleccionadas)) }}
         @endif
     </div>
 
@@ -229,15 +229,15 @@
         @if (count($records) > 0)
             <thead>
                 <tr>
-                    <th rowspan="2" style="text-align: center">Artículo</th>
+                    <th rowspan="2" style="text-align: center">{{ __('site.reports.articles_sold.article') }}</th>
                     @foreach ($sucursales as $sucursal)
                         <th colspan="2" style="text-align: center">{{ $sucursal }}</th>
                     @endforeach
                 </tr>
                 <tr class="sub-header">
                     @foreach ($sucursales as $sucursal)
-                        <th style="text-align: right">Monto</th>
-                        <th style="text-align: center">Cant.</th>
+                        <th style="text-align: right">{{ __('site.reports.articles_sold.amount') }}</th>
+                        <th style="text-align: center">{{ __('site.reports.articles_sold.quantity') }}</th>
                     @endforeach
                 </tr>
             </thead>
@@ -256,7 +256,7 @@
             @empty
                 <tr>
                     <td colspan="{{ 1 + count($sucursales) * 2 }}" class="no-results">
-                        No se encontraron resultados para los filtros seleccionados.
+                        {{ __('site.common.results_not_found') }}
                     </td>
                 </tr>
             @endforelse
@@ -265,7 +265,7 @@
         @if (count($records) > 0)
             <tfoot>
                 <tr class="grand-total-row">
-                    <td style="text-align: right">TOTAL GENERAL</td>
+                    <td style="text-align: right">{{ __('site.reports.articles_sold.general_total') }}</td>
                     @foreach ($sucursales as $i => $sucursal)
                         @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'vendidos' => 0]; @endphp
                         <td style="text-align: right">{{ number_format($totalGeneral['monto'], 2) }}</td>

@@ -142,7 +142,7 @@ class Index extends Component
 
         foreach ($usuarios as $usuario) {
             $usuario['cliente'] = $usuario['cliente'] ? Crypt::decrypt($usuario['cliente']) : '';
-            $usuario['suscripciones'] = Str::replaceLast(', ', ' y ', $usuario['suscripciones']);
+            $usuario['suscripciones'] = Str::replaceLast(', ', ' '.__('site.common.and').' ', $usuario['suscripciones']);
 
             if (
                 !$this->search

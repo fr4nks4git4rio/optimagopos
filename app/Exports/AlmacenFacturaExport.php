@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 
-class FacturaEmitidaExport implements FromView
+class AlmacenFacturaExport implements FromView
 {
     use Exportable;
     private $name;
@@ -21,7 +21,7 @@ class FacturaEmitidaExport implements FromView
 
     public function view(): View
     {
-        return view('reports.excel.facturas_emitidas', [
+        return view('reports.excel.almacen_facturas', [
             'name' => $this->name,
             'facturas' => $this->facturas,
         ]);

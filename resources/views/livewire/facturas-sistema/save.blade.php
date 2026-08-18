@@ -339,7 +339,7 @@
                                             <th class="text-center px-4">{{ __('site.invoices.save_invoice.quantity') }}
                                             </th>
                                             <th>{{ __('site.invoices.save_invoice.prod_serv_code') }}</th>
-                                            <th class="text-center">{{ __('site.invoices.save_invoice.unitity_code') }}
+                                            <th class="text-center">{{ __('site.invoices.save_invoice.unit_code') }}
                                             </th>
                                             <th>{{ __('site.invoices.save_invoice.description') }}</th>
                                             <th class="text-end">{{ __('site.invoices.save_invoice.unit_value') }}</th>

@@ -20,27 +20,40 @@ class Logs extends Component
     public $fechaInicio;
     public $fechaFin;
     public $search;
+    public $order;
     public $sort;
-    public $sorts = ['Fecha', 'Log', 'Datos', 'Estado'];
+    public $sorts;
 
-    protected $queryString = ['search', 'fechaInicio', 'fechaFin', 'perPage', 'sort', 'page'];
+    protected $queryString = ['search', 'fechaInicio', 'fechaFin', 'perPage', 'sort', 'order'];
 
     protected $listeners = ['$refresh'];
 
     public function mount()
     {
+        $this->sorts = [
+            __('site.reports.data_received.date'),
+            __('site.reports.data_received.message'),
+            __('site.reports.data_received.data'),
+            __('site.reports.data_received.status'),
+        ];
         $this->page ??= 1;
         $this->perPage ??= 10;
         $this->search ??= '';
-        $this->sort ??= 'Fecha';
+        $this->order ??= 'desc';
+        $this->sort ??= __('site.reports.data_received.date');
         $this->fechaInicio ??= today()->format('Y-m-d');
         $this->fechaFin ??= today()->format('Y-m-d');
     }
 
     public function updated($field)
     {
-        if (in_array($field, ['search', 'fechaInicio', 'fechaFin', 'perPage', 'sort']))
+        if (in_array($field, ['search', 'fechaInicio', 'fechaFin', 'perPage', 'sort', 'order']))
             $this->resetPage();
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
     public function render()
@@ -75,11 +88,11 @@ class Logs extends Component
                 ->whereIn('sucursal.id', user()->sucursales->pluck('id')->toArray());
         }
 
-        if($this->fechaInicio){
+        if ($this->fechaInicio) {
             $query->whereDate('log.created_at', '>=', $this->fechaInicio);
         }
 
-        if($this->fechaFin){
+        if ($this->fechaFin) {
             $query->whereDate('log.created_at', '<=', $this->fechaFin);
         }
 
@@ -90,20 +103,38 @@ class Logs extends Component
         }
 
         switch ($this->sort) {
-            case 'Fecha':
-                $query->orderBy('log.created_at', 'desc');
+            case __('site.reports.data_received.date'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('log.created_at');
+                else
+                    $query->orderBy('log.created_at');
                 break;
-            case 'Log':
-                $query->orderBy('log.log');
+            case __('site.reports.data_received.message'):
+                if ($this->order == 'desc')
+                    $query->orderBy('log.log');
+                else
+                    $query->orderByDesc('log.log');
                 break;
-            case 'Datos':
-                $query->orderBy('log.data');
+            case __('site.reports.data_received.data'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('log.data');
+                else
+                    $query->orderBy('log.data');
                 break;
-            case 'Estado':
-                $query->orderBy('log.status');
+            case __('site.reports.data_received.status'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('log.status');
+                else
+                    $query->orderBy('log.status');
                 break;
         }
 
         return $query;
+    }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
     }
 }

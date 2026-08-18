@@ -4,9 +4,12 @@
             <td colspan="16" style="font-weight: 700; font-size: 16px">{{ $name }}</td>
         </tr>
         <tr></tr>
+        @if()
+        <tr></tr>
         <tr>
             <th>{{ __('site.invoices.index_storage.date') }}</th>
             <th>{{ __('site.invoices.index_storage.f_int') }}</th>
+            <th>{{ __('site.invoices.index_storage.type') }}</th>
             <th>{{ __('site.invoices.index_storage.issuer') }}</th>
             <th>{{ __('site.invoices.index_storage.issuer_rfc') }}</th>
             <th>{{ __('site.invoices.index_storage.receiver') }}</th>
@@ -30,13 +33,13 @@
                 <td style="text-align: center">
                     <span>{{ $factura->tipo }}</span>
                 </td>
-                <td>{{ \Illuminate\Support\Facades\Crypt::decrypt($factura->emisor) }}</td>
-                <td>{{ \Illuminate\Support\Facades\Crypt::decrypt($factura->rfc_emisor) }}</td>
-                <td>{{ \Illuminate\Support\Facades\Crypt::decrypt($factura->receptor) }}</td>
-                <td>{{ \Illuminate\Support\Facades\Crypt::decrypt($factura->rfc_receptor) }}</td>
+                <td>{{ $factura->emisor }}</td>
+                <td>{{ $factura->rfc_emisor }}</td>
+                <td>{{ $factura->receptor }}</td>
+                <td>{{ $factura->rfc_receptor }}</td>
                 <td>{{ $factura->uuid }}</td>
                 <td style="text-align: center">
-                    <span>{{ $factura->estado }}</span>
+                    <span>{{ __('site.statuses.invoices.' . $factura->estado) }}</span>
                 </td>
                 <td>{{ $factura->conceptos }}</td>
                 <td style="text-align: center">{{ $factura->moneda }}</td>

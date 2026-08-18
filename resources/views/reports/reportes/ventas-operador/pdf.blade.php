@@ -207,7 +207,7 @@
                         <div class="company-meta">
                             RFC: {{ $empresa->rfc ?? '' }}
                             @if (!empty($empresa->direccion_fiscal))
-                                &nbsp;|&nbsp; Dirección: {{ $empresa->direccion_plain }}
+                                &nbsp;|&nbsp; {{ __('site.address.address') }}: {{ $empresa->direccion_plain }}
                             @endif
                         </div>
                     @endif
@@ -224,11 +224,11 @@
 
     {{-- ================= FILTROS APLICADOS ================= --}}
     <div class="filters-box">
-        <strong>Periodo:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+        <strong>{{ __('site.common.period') }}:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
         @if (!empty($sucursalesSeleccionadas))
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            <strong>Sucursal(es):</strong>
-            {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+            <strong>{{ __('site.reports.sales_by_operator.branches') }}:</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', implode(', ', $sucursalesSeleccionadas)) }}
         @endif
     </div>
 
@@ -240,14 +240,15 @@
                     @foreach ($sorts as $sort)
                         <th rowspan="2" style="text-align: center">{{ $sort }}</th>
                     @endforeach
-                    <th colspan="2" style="text-align: center">Ventas</th>
-                    <th colspan="2" style="text-align: center">Correcciones</th>
+                    <th colspan="2" style="text-align: center">{{ __('site.reports.sales_by_operator.sales') }}</th>
+                    <th colspan="2" style="text-align: center">
+                        {{ __('site.reports.sales_by_operator.corrections') }}</th>
                 </tr>
                 <tr class="sub-header">
-                    <th style="text-align: right">Monto</th>
-                    <th style="text-align: center">Op.</th>
-                    <th style="text-align: right">Monto</th>
-                    <th style="text-align: center">Op.</th>
+                    <th style="text-align: right">{{ __('site.reports.sales_by_operator.amount') }}</th>
+                    <th style="text-align: center">{{ __('site.reports.sales_by_operator.quantity') }}</th>
+                    <th style="text-align: right">{{ __('site.reports.sales_by_operator.amount') }}</th>
+                    <th style="text-align: center">{{ __('site.reports.sales_by_operator.quantity') }}</th>
                 </tr>
             </thead>
         @endif
@@ -277,7 +278,8 @@
 
                 {{-- Totalizador por sucursal --}}
                 <tr class="subtotal-row">
-                    <td colspan="2" style="text-align: right">Total {{ $sucursalData['sucursal'] }}</td>
+                    <td colspan="2" style="text-align: right">{{ __('site.reports.sales_by_operator.total') }}
+                        {{ $sucursalData['sucursal'] }}</td>
                     <td style="text-align: right">{{ number_format($sucursalData['totales']['ventas_importe'], 2) }}
                     </td>
                     <td style="text-align: center">{{ $sucursalData['totales']['ventas_cant'] }}</td>
@@ -290,7 +292,7 @@
             @empty
                 <tr>
                     <td colspan="6" class="no-results">
-                        No se encontraron resultados para los filtros seleccionados.
+                        {{ __('site.common.results_not_found') }}...
                     </td>
                 </tr>
             @endforelse
@@ -299,7 +301,7 @@
         @if (count($records) > 0)
             <tfoot>
                 <tr class="grand-total-row">
-                    <td colspan="2" style="text-align: right">TOTAL GENERAL</td>
+                    <td colspan="2" style="text-align: right">{{ __('site.reports.sales_by_operator.grand_total') }}</td>
                     <td style="text-align: right">{{ number_format($grandTotal['ventas_importe'], 2) }}</td>
                     <td style="text-align: center">{{ $grandTotal['ventas_cant'] }}</td>
                     <td style="text-align: right">{{ number_format($grandTotal['correcciones_importe'], 2) }}</td>

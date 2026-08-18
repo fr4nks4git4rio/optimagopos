@@ -2,23 +2,15 @@
 
 namespace App\Livewire\Facturas;
 
-use App\Exports\FacturaEmitidaExport;
-use App\Http\Libraries\Pdf;
-use App\Models\Cliente;
 use App\Models\Factura;
-use App\Models\Moneda;
 use App\Models\Sucursal;
 use App\Models\SucursalFormaPago;
 use App\Models\TicketOperacion;
 use App\Services\Timbrado\Facturador;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Save extends Component
@@ -633,14 +625,14 @@ class Save extends Component
     public function mostrarModalEliminarConcepto($index)
     {
         $this->index_concepto_activo = $index;
-        $this->modalDeleteConceptoClass = 'show';
+        $this->dispatch('show-sub-modal', 'modal-confirm-delete-concept');
     }
 
     public function eliminarConcepto()
     {
         array_splice($this->factura_conceptos, $this->index_concepto_activo, 1);
         $this->factura_conceptos = array_values($this->factura_conceptos);
-        $this->modalDeleteConceptoClass = '';
+        $this->dispatch('hide-sub-modal', 'modal-confirm-delete-concept');
         $this->dispatch('show-toast', __('site.invoices.save_invoice.concept_deleted'), 'success');
     }
 

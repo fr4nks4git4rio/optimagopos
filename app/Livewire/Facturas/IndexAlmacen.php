@@ -2,13 +2,9 @@
 
 namespace App\Livewire\Facturas;
 
-use App\Exports\FacturaEmitidaExport;
-use App\Http\Libraries\Pdf;
-use App\Models\Facturador;
+use App\Exports\AlmacenFacturaExport;
 use App\Models\Cliente;
 use App\Models\Factura;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -30,11 +26,11 @@ class IndexAlmacen extends Component
     public $fechaInicio;
     public $fechaFin;
     public $cliente;
-    public $estado = 'Todos';
-    public $estados = ['Todos', 'TIMBRADA', 'CANCELADA'];
+    public $estado;
+    public $estados = ['TIMBRADA', 'CANCELADA'];
     public $folioInterno;
     public $moneda;
-    public $monedas = ['Todas', 'MXN', 'USD'];
+    public $monedas = ['MXN', 'USD'];
     public $importe;
     public $iframeContainerClass = '';
     public $iframeSrc = '';
@@ -61,16 +57,25 @@ class IndexAlmacen extends Component
         $this->perPage = $this->perPage ?? 10;
         $this->order = $this->order ?? 'desc';
         $this->search = $this->search ?? null;
-        $this->sort = $this->sort ?? 'Fecha';
+        $this->sort = $this->sort ?? __('site.invoices.index_storage.date');
         $this->fechaInicio = $this->fechaInicio ?? null;
         $this->fechaFin = $this->fechaFin ?? null;
         $this->cliente = $this->cliente ?? null;
-        $this->estado = $this->estado ?? 'Todos';
+        $this->estado = $this->estado ?? __('site.common.all');
         $this->folioInterno = $this->folioInterno ?? null;
-        $this->moneda = $this->moneda ?? 'Todas';
+        $this->moneda = $this->moneda ?? __('site.common.all');
         $this->importe = $this->importe ?? null;
 
-        $this->sorts = ['Fecha', 'F. Int.', 'Receptor', 'Estado', 'Moneda', 'Subtotal', 'IVA', 'Total'];
+        $this->sorts = [
+            __('site.invoices.index_storage.date'),
+            __('site.invoices.index_storage.f_int'),
+            __('site.invoices.index_storage.receiver'),
+            __('site.invoices.index_storage.status'),
+            __('site.invoices.index_storage.currency'),
+            __('site.invoices.index_storage.subtotal'),
+            __('site.invoices.index_storage.iva'),
+            __('site.invoices.index_storage.total')
+        ];
         $this->perPages = [10, 25, 50, 100];
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
@@ -149,7 +154,8 @@ class IndexAlmacen extends Component
                 'factura.total',
                 DB::raw("(SELECT GROUP_CONCAT(fc.descripcion SEPARATOR '
                 ') FROM tb_factura_conceptos as fc WHERE fc.factura_id = factura.id) as conceptos"),
-                'mc.descripcion as motivo_cancelacion'
+                'mc.descripcion as motivo_cancelacion',
+                DB::raw("'' as tipo")
             )
             ->leftJoin('tb_clientes as cliente', 'factura.cliente_id', '=', 'cliente.id')
             ->leftJoin('tb_sucursales as propietario', 'factura.propietario_id', '=', 'propietario.id')
@@ -167,13 +173,13 @@ class IndexAlmacen extends Component
         if ($this->cliente) {
             $query->where('factura.cliente_id', $this->cliente);
         }
-        if ($this->estado && $this->estado != 'Todos') {
+        if ($this->estado && $this->estado != __('site.common.all')) {
             $query->where('factura.estado', $this->estado);
         }
         if ($this->folioInterno) {
             $query->where('factura.folio_interno', 'like', "%$this->folioInterno%");
         }
-        if ($this->moneda && $this->moneda != 'Todas') {
+        if ($this->moneda && $this->moneda != __('site.common.all')) {
             $query->where('factura.moneda', $this->moneda);
         }
         if ($this->importe) {
@@ -184,7 +190,14 @@ class IndexAlmacen extends Component
 
         $final_records = collect();
         foreach ($records as $record) {
+            if ($record->es_complemento)
+                $record->tipo = __('site.common.complement');
+            elseif ($record->es_nota_credito)
+                $record->tipo = __('site.common.credit_note');
+            else
+                $record->tipo = __('site.common.invoice');
             $folio_interno = strtoupper($record->folio_interno);
+            $record->emisor = strtoupper(Crypt::decrypt($record->emisor));
             $record->receptor = strtoupper(Crypt::decrypt($record->receptor));
             if (
                 !$this->search
@@ -202,43 +215,49 @@ class IndexAlmacen extends Component
         }
 
         switch ($this->sort) {
-            case 'Fecha':
+            case __('site.invoices.index_storage.date'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('fecha_certificacion_sort', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('fecha_certificacion_sort', SORT_NATURAL)->values();
                 break;
-            case 'Receptor':
+            case __('site.invoices.index_storage.f_int'):
+                if ($this->order == 'asc')
+                    $final_records = $final_records->sortBy('folio_interno', SORT_NATURAL)->values();
+                else
+                    $final_records = $final_records->sortByDesc('folio_interno', SORT_NATURAL)->values();
+                break;
+            case __('site.invoices.index_storage.receiver'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('receptor', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('receptor', SORT_NATURAL)->values();
                 break;
-            case 'Estado':
+            case __('site.invoices.index_storage.status'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('estado', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('estado', SORT_NATURAL)->values();
                 break;
-            case 'Moneda':
+            case __('site.invoices.index_storage.currency'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('moneda', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('moneda', SORT_NATURAL)->values();
                 break;
-            case 'Subtotal':
+            case __('site.invoices.index_storage.subtotal'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('subtotal', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('subtotal', SORT_NATURAL)->values();
                 break;
-            case 'IVA':
+            case __('site.invoices.index_storage.iva'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('iva', SORT_NATURAL)->values();
                 else
                     $final_records = $final_records->sortByDesc('iva', SORT_NATURAL)->values();
                 break;
-            case 'Total':
+            case __('site.invoices.index_storage.total'):
                 if ($this->order == 'asc')
                     $final_records = $final_records->sortBy('total', SORT_NATURAL)->values();
                 else
@@ -275,17 +294,17 @@ class IndexAlmacen extends Component
     {
         $facturas = $this->query();
 
-        activity(__('site.invoices.index_storage.print_log_name'))
+        $name = __('site.invoices.index_storage.print_log_name');
+        activity($name)
             ->causedBy(auth()->user())
             ->log(__('site.invoices.index_storage.print_log_detail'));
 
-        $name = "AlmFAct_" . date('YmdHis') . ".pdf";
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.factura.index_almacen_pdf', [
             'facturas' => $facturas,
             'name' => $name
         ]);
-        $pdf->save($name);
-        $this->iframeSrc = \Illuminate\Support\Facades\Request::root() . "/$name";
+        $pdf->save("$name.pdf");
+        $this->iframeSrc = \Illuminate\Support\Facades\Request::root() . "/$name.pdf?" . now()->timestamp;
         $this->dispatch('show-sub-modal', 'pdf-almacen-facturas');
     }
 
@@ -297,6 +316,8 @@ class IndexAlmacen extends Component
             ->causedBy(auth()->user())
             ->log(__('site.invoices.index_storage.exporting_log_detail'));
 
-        return (new FacturaEmitidaExport($facturas))->download("Facturas Emitidas.xls");
+        $name = __('site.invoices.index_storage.print_log_name');
+
+        return (new AlmacenFacturaExport($name, $facturas))->download("$name.xls");
     }
 }

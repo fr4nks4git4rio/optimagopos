@@ -10,8 +10,8 @@
                 {{ __('site.common.period') }}:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
                 @if (!empty($sucursalesSeleccionadas))
                     &nbsp;|&nbsp;
-                    Sucursal(es): &nbsp;
-                    {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+                    {{ __('site.address.address') }}: &nbsp;
+                    {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $sucursalesSeleccionadas)) }}
                 @endif
             </td>
         </tr>
@@ -30,8 +30,8 @@
         </tr>
         <tr>
             @foreach ($sucursales as $sucursal)
-                <th style="text-align: center;">Monto</th>
-                <th style="text-align: center;">Cant.</th>
+                <th style="text-align: center;">{{ __('site.reports.articles_sold.amount') }}</th>
+                <th style="text-align: center;">{{ __('site.reports.articles_sold.quantity') }}</th>
             @endforeach
         </tr>
     </thead>
@@ -50,7 +50,7 @@
         @empty
             <tr>
                 <td colspan="{{ 1 + count($sucursales) * 2 }}" style="text-align: center;">
-                    No se encontraron resultados...
+                    {{ __('site.common.results_not_found') }}...
                 </td>
             </tr>
         @endforelse
@@ -58,7 +58,7 @@
     @if (count($records) > 0)
         <tfoot>
             <tr>
-                <td style="text-align: end; font-weight: bold;">Total General</td>
+                <td style="text-align: end; font-weight: bold;">{{ __('site.reports.articles_sold.general_total') }}</td>
                 @foreach ($sucursales as $i => $sucursal)
                     @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'vendidos' => 0]; @endphp
                     <td style="text-align: end; font-weight: bold;">{{ number_format($totalGeneral['monto'], 2) }}</td>

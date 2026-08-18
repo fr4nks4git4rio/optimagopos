@@ -29,13 +29,21 @@
                     <button wire:ignore.self class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"
                         data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
                         aria-selected="true">
-                        Facturar
+                        {{ __('site.common.invoice') }}
                     </button>
                     <button wire:ignore.self class="nav-link" id="nav-profile-tab" data-bs-toggle="tab"
                         data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile"
                         aria-selected="false">
-                        Tickets Pendientes
+                        {{ __('site.self_billing.pending_tickets') }}
                     </button>
+                    <vid wire:ignore.self class="nav-link border-0" id="nav-lang-tab" role="tab"
+                        style="margin-left: auto">
+                        <select class="form-control form-control-sm" wire:model.live="lang">
+                            @foreach ($langs as $key => $value)
+                                <option value="{{ $key }}">{{ $value }}</option>
+                            @endforeach
+                        </select>
+                    </vid>
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
@@ -49,27 +57,26 @@
                             </div>
                         @endif
                         <div class="alert alert-success mb-3">
-                            Bienvenido(a) a nuestro portal de facturación.
-                            Recuerde que la información para generar su factura se encuentra en su ticket de compra.
-                            Contáctenos si presenta algún inconveniente.
+                            {{ __('site.self_billing.welcome') }}
                         </div>
                         <div class="mb-3 pb-2 border-bottom">
-                            <x-select2 label="Sucursal" placeholder="Seleccione..." :options="$sucursales" :lazy="true"
+                            <x-select2 label="{{ __('site.self_billing.branch') }}"
+                                placeholder="{{ __('site.common.select') }}..." :options="$sucursales" :lazy="true"
                                 class="form-control" model="suc" />
                             @if ($this->sucursal)
                                 <div class="mb-1">
-                                    <label for="">Teléfono:</label>
+                                    <label for="">{{ __('site.self_billing.phone') }}:</label>
                                     <input type="text" class="form-control" value="{{ $this->telefono }}" disabled>
                                 </div>
                                 <div class="mb-1">
-                                    <label for="">Correo:</label>
+                                    <label for="">{{ __('site.self_billing.email') }}:</label>
                                     <input type="text" class="form-control" value="{{ $this->correo }}" disabled>
                                 </div>
                             @endif
                         </div>
                         <div class="mb-3 pb-2 border-bottom">
                             <div class="mb-1">
-                                <label for="">Código:</label>
+                                <label for="">{{ __('site.self_billing.code') }}:</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" wire:model.live="codigo">
                                     <span class="input-group-text" style="cursor: pointer;"
@@ -80,7 +87,7 @@
                                 </div>
                             </div>
                             <div class="mb-1">
-                                <label for="">No. Ticket:</label>
+                                <label for="">{{ __('site.self_billing.no_ticket') }}:</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" wire:model.live="ticket">
                                     <span class="input-group-text" style="cursor: pointer;"
@@ -91,16 +98,16 @@
                                 </div>
                             </div>
                             <div class="mb-1">
-                                <x-input :label="'RFC'" :lazy="true" model="rfc" />
+                                <x-input label="'{{ __('site.self_billing.rfc') }}" :lazy="true" model="rfc" />
                             </div>
                             @if ($rfc_exists)
                                 <div class="mb-1">
-                                    <label for="">Razón Social:</label>
+                                    <label for="">{{ __('site.self_billing.social_reason') }}:</label>
                                     <input type="text" class="form-control"
                                         value="{{ $this->razon_social_comensal }}" disabled>
                                 </div>
                                 <div class="mb-1">
-                                    <label for="">Código Postal:</label>
+                                    <label for="">{{ __('site.self_billing.postal_code') }}:</label>
                                     <input type="text" class="form-control"
                                         value="{{ $this->codigo_postal_comensal }}" disabled>
                                 </div>
@@ -109,7 +116,7 @@
                         <div class="mb-3 border-bottom text-center">
                             <button type="button"
                                 class="btn btn-primary mb-3 @if (!$rfc_exists) disabled @endif"
-                                wire:click="facturar">Facturar</button>
+                                wire:click="facturar">{{ __('site.self_billing.bill') }}</button>
                         </div>
                     </div>
                 </div>
@@ -118,10 +125,12 @@
                     <div class="w-100 py-2">
                         <div class="row mb-3 pt-2">
                             <div class="col-sm-4">
-                                <x-input label="RFC" :lazy="true" model="rfc_filtro" />
+                                <x-input label="{{ __('site.self_billing.rfc') }}" :lazy="true"
+                                    model="rfc_filtro" />
                             </div>
                             <div class="col-sm-8">
-                                <x-select2 label="Sucursal" placeholder="Seleccione..." :options="$sucursalesFiltro"
+                                <x-select2 label="{{ __('site.self_billing.branch') }}"
+                                    placeholder="{{ __('site.common.select') }}..." :options="$sucursalesFiltro"
                                     :lazy="true" class="form-control" model="sucursal_filtro" />
                             </div>
                         </div>
@@ -130,10 +139,10 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Sucursal</th>
-                                            <th>Ticket</th>
-                                            <th>Fecha</th>
-                                            <th class="text-center">Acciones</th>
+                                            <th>{{ __('site.self_billing.branch') }}</th>
+                                            <th>{{ __('site.self_billing.ticket') }}</th>
+                                            <th>{{ __('site.self_billing.date') }}</th>
+                                            <th class="text-center">{{ __('site.common.actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -145,7 +154,8 @@
                                                 <td class="text-center">
                                                     <ul class="list-unstyled mb-0">
                                                         <li class="list-inline-item">
-                                                            <x-action icon="bell" title="Timbrar"
+                                                            <x-action icon="bell"
+                                                                title="{{ __('site.self_billing.stamp') }}"
                                                                 click="facturarDesdeTabla('{{ $ticket['terminal'] }}', '{{ $ticket['numero'] }}', '{{ $ticket['sucursal_id'] }}')" />
                                                         </li>
                                                     </ul>
@@ -156,7 +166,7 @@
                                             <tr>
                                                 <td colspan="4">
                                                     <div class="list-group-item text-center">
-                                                        No se encontraron resultados...
+                                                        {{ __('site.common.results_not_found') }}...
                                                     </div>
                                                 </td>
                                             </tr>
@@ -170,7 +180,7 @@
             </div>
         </div>
 
-        <div class="modal {{ $registrarComensalClass }}" id="modal-comensal">
+        <div class="modal fade{{ $registrarComensalClass }}" id="modal-comensal" tabindex="-1" wire:ignore.self>
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -214,34 +224,35 @@
                             <div wire:init="init" class="row">
                                 <div class="col-12">
                                     <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                        <li class="nav-item @error('comensal.direccion_fiscal.codigo_postal') text-danger fw-bold @endif"
+                                        <li class="nav-item @error('comensal.direccion_fiscal.codigo_postal') text-danger fw-bold @enderror"
                                             role="presentation">
-                                            <button wire:ignore.self
-                                                class="nav-link active"
-                                                id="direccion-fiscal-tab" data-bs-toggle="tab"
-                                                data-bs-target="#direccion-fiscal-tab-pane"
-                                                type="button" role="tab" aria-controls="direccion-fiscal-tab-pane"
-                                                aria-selected="false">
-                                                @error('comensal.direccion_fiscal.codigo_postal') <i
-                                                    class="bi bi-exclamation-triangle"></i> @endif
+                                            <button wire:ignore.self class="nav-link active" id="direccion-fiscal-tab"
+                                                data-bs-toggle="tab" data-bs-target="#direccion-fiscal-tab-pane"
+                                                type="button" role="tab"
+                                                aria-controls="direccion-fiscal-tab-pane" aria-selected="false">
+                                                @error('comensal.direccion_fiscal.codigo_postal')
+                                                    <i class="bi bi-exclamation-triangle"></i>
+                                                @enderror
                                                 Dirección Fiscal
                                             </button>
                                         </li>
                                     </ul>
                                     <div class="tab-content" id="myTabContent">
-                                        <div wire:ignore.self class="tab-pane fade pt-2 show active" id="direccion-fiscal-tab-pane"
-                                            role="tabpanel"
-                                            aria-labelledby="direccion-fiscal-tab"
-                                            tabindex="2">
+                                        <div wire:ignore.self class="tab-pane fade pt-2 show active"
+                                            id="direccion-fiscal-tab-pane" role="tabpanel"
+                                            aria-labelledby="direccion-fiscal-tab" tabindex="2">
                                             <div class="row">
                                                 <div class="col-3">
-                                                    <x-input label="Calle" type="text" model="comensal.direccion_fiscal.calle" />
+                                                    <x-input label="Calle" type="text"
+                                                        model="comensal.direccion_fiscal.calle" />
                                                 </div>
                                                 <div class="col-3">
-                                                    <x-input label="No. Exterior" type="text" model="comensal.direccion_fiscal.no_exterior" />
+                                                    <x-input label="No. Exterior" type="text"
+                                                        model="comensal.direccion_fiscal.no_exterior" />
                                                 </div>
                                                 <div class="col-3">
-                                                    <x-input label="No. Interior" type="text" model="comensal.direccion_fiscal.no_interior" />
+                                                    <x-input label="No. Interior" type="text"
+                                                        model="comensal.direccion_fiscal.no_interior" />
                                                 </div>
                                                 <div class="col-3">
                                                     <x-input label="Código Postal" type="text"
@@ -250,7 +261,8 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-3">
-                                                    <x-input label="Colonia" type="text" model="comensal.direccion_fiscal.colonia" />
+                                                    <x-input label="Colonia" type="text"
+                                                        model="comensal.direccion_fiscal.colonia" />
                                                 </div>
                                                 <div class="col-3">
                                                     <x-select2-ajax-modals label="Estado" placeholder="Seleccione..."
@@ -260,15 +272,15 @@
                                                         :dynamic="true" />
                                                 </div>
                                                 <div class="col-3">
-                                                    <x-select2-ajax-modals label="Localidad" placeholder="Seleccione..."
-                                                        class="form-control"
+                                                    <x-select2-ajax-modals label="Localidad"
+                                                        placeholder="Seleccione..." class="form-control"
                                                         url="{{ route('localidades.load-localidades', ['estado_id' => $comensal['direccion_fiscal']['estado_id']]) }}"
                                                         model="comensal.direccion_fiscal.localidad_id"
                                                         :dynamic="true" />
                                                 </div>
                                                 <div class="col-3">
-                                                    <x-select2-ajax-modals label="Municipio" placeholder="Seleccione..."
-                                                        class="form-control"
+                                                    <x-select2-ajax-modals label="Municipio"
+                                                        placeholder="Seleccione..." class="form-control"
                                                         url="{{ route('municipios.load-municipios', ['estado_id' => $comensal['direccion_fiscal']['estado_id']]) }}"
                                                         model="comensal.direccion_fiscal.municipio_id"
                                                         :dynamic="true" />
@@ -276,7 +288,8 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <x-input label="Referencia" type="text" model="comensal.direccion_fiscal.referencia" />
+                                                    <x-input label="Referencia" type="text"
+                                                        model="comensal.direccion_fiscal.referencia" />
                                                 </div>
                                             </div>
                                         </div>
@@ -289,38 +302,34 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             wire:click="$set('registrarComensalClass', '')">{{ __('Cerrar') }}</button>
                         @if (!$comensal['id'])
-                        <button type="button" class="btn btn-primary"
-                            wire:click="guardarComensal">Guardar</button>
+                            <button type="button" class="btn btn-primary"
+                                wire:click="guardarComensal">Guardar</button>
                         @endif
                     </div>
                 </div>
             </div>
         </div>
-        <div class="modal
-                                            {{ $ticketImageClass }}" id="modal-comensal">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Ticket de Muestra</h5>
-                                                        <button type="button" class="btn-close"
-                                                            data-bs-dismiss="modal"
-                                                            wire:click="$set('ticketImageClass', '')"></button>
-                                                    </div>
-                                                    <div class="modal-body pb-0 text-center">
-                                                        <img src="{{ asset('/img/Ticket.png') }}"
-                                                            class="m-auto w-100" alt="Ticket Muestra">
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal"
-                                                            wire:click="$set('ticketImageClass', '')">{{ __('Cerrar') }}</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="modal {{ $ticketImageClass }}" id="modal-comensal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Ticket de Muestra</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            wire:click="$set('ticketImageClass', '')"></button>
+                    </div>
+                    <div class="modal-body pb-0 text-center">
+                        <img src="{{ asset('/img/Ticket.png') }}" class="m-auto w-100" alt="Ticket Muestra">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            wire:click="$set('ticketImageClass', '')">{{ __('Cerrar') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                        @push('scripts')
-                            <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-                        @endpush
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+@endpush

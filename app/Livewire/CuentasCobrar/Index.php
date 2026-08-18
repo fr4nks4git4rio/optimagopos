@@ -37,6 +37,7 @@ class Index extends Component
 
     public function mount()
     {
+        $this->perPage ??= 10;
         $this->sorts = ['F. Int.', 'Fecha Factura', 'Receptor', 'Tipo', 'Moneda', 'Total', 'Pendiente'];
         $this->perPages = [10, 25, 50, 100];
 
@@ -64,6 +65,6 @@ class Index extends Component
     {
         $name = Factura::generatePdf($id, true);
         $this->iframeSrc = Request::root() . "/$name?" . time();
-        $this->iframeContainerClass = 'show';
+        $this->dispatch('show-sub-modal', 'pdf-cuentas-cobrar');
     }
 }

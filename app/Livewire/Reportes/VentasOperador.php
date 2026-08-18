@@ -2,28 +2,18 @@
 
 namespace App\Livewire\Reportes;
 
-use App\Exports\FacturaEmitidaExport;
 use App\Exports\VentasOperadorExport;
-use App\Http\Libraries\Pdf;
-use App\Models\Facturador;
-use App\Models\Cliente;
-use App\Models\Factura;
 use App\Models\Sucursal;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class VentasOperador extends Component
 {
     public $perPages;
     public $order;
-    public $sort = 'Operador';
+    public $sort;
     public $sorts;
     public $fechaInicio;
     public $fechaFin;
@@ -45,12 +35,12 @@ class VentasOperador extends Component
     public function mount()
     {
         $this->order = $this->order ?? 'desc';
-        $this->sort = $this->sort ?? 'Operador';
+        $this->sort = $this->sort ?? __('site.reports.sales_by_operator.operator');
         $this->fechaInicio = $this->fechaInicio ?? today()->format('Y-m-d');
         $this->fechaFin = $this->fechaFin ?? today()->format('Y-m-d');
         $this->sucursal = $this->sucursal ?? null;
 
-        $this->sorts = ['Sucursal', 'Operador'];
+        $this->sorts = [__('site.reports.sales_by_operator.branch'), __('site.reports.sales_by_operator.operator')];
         $this->perPages = [10, 25, 50, 100];
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
@@ -151,13 +141,13 @@ class VentasOperador extends Component
         });
 
         switch ($this->sort) {
-            case 'Sucursal':
+            case __('site.reports.sales_by_operator.branch'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('sucursal', SORT_NATURAL)->values();
                 else
                     $records = $records->sortByDesc('sucursal', SORT_NATURAL)->values();
                 break;
-            case 'Operador':
+            case __('site.reports.sales_by_operator.operator'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('empleado', SORT_NATURAL)->values();
                 else
@@ -225,10 +215,10 @@ class VentasOperador extends Component
 
     public function imprimirPdf()
     {
-        if (File::exists(public_path('Ventas por Operador.pdf'))) {
-            File::delete(public_path('Ventas por Operador.pdf'));
+        $name = __('site.reports.sales_by_operator.title');
+        if (File::exists(public_path("$name.pdf"))) {
+            File::delete(public_path("$name.pdf"));
         }
-        $name = 'Ventas por Operador';
         $view = 'reports.reportes.ventas-operador.pdf';
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, [
@@ -250,7 +240,7 @@ class VentasOperador extends Component
 
     public function exportarExcel()
     {
-        $name = 'Ventas por Operador';
+        $name = __('site.reports.sales_by_operator.title');
         $fileName = "$name.xlsx";
 
         $res = $this->query();

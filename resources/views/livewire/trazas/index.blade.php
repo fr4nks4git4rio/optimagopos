@@ -1,4 +1,4 @@
-@section('title', 'Trazas')
+@section('title', __('site.logs.index.title'))
 
 <div>
     <h1 class="fs-1 mb-2">@yield('title')</h1>

@@ -147,22 +147,23 @@ class Ingreso extends Model
         $col_width_2 = ($pdf->GetPageWidth() - 10) * 0.5;
 
         $y_inicial = $pdf->GetY();
-        $pdf->Image(public_path() . '/img/BLANCO.png', 15, 10, 25, 17);
+        $pdf->Image(public_path() . '/images/logo_' . (user()->lang ?? 'en') . '.png', 15, 10, 25, 17);
 
+        $name = __('site.reports.income.income_by_invoice');
         $pdf->SetX(($pdf->GetPageWidth() - 10) - $col_width_1);
         //todo Escribiendo la cabcera DERECHA
         $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell(0, 10, "Ingreso por Factura", 0, 1, 'R');
+        $pdf->Cell(0, 10, $name, 0, 1, 'R');
         $pdf->SetX(($pdf->GetPageWidth() - 10) - $col_width_1);
         $pdf->SetFont('Arial', 'B', 8);
         $width = $ingreso->factura->folio_interno ? ($col_width_1 - 10) : 0;
-        $pdf->Cell($width, 5, 'Folio Factura: ', 0, 0, 'R');
+        $pdf->Cell($width, 5, __('site.reports.income.invoice_folio') . ': ', 0, 0, 'R');
         $pdf->SetFont('Arial', '', 8);
         $pdf->Cell(0, 5, $ingreso->factura->folio_interno, 0, 1, 'R');
         $pdf->SetX(($pdf->GetPageWidth() - 10) - $col_width_1);
         $width = $owner->codigo_postal ? $col_width_1 - 3 : 0;
         $pdf->SetFont('Arial', 'B', 8);
-        $pdf->Cell($width, 5, utf8_decode('Lugar de expedición: '), 0, 0, 'R');
+        $pdf->Cell($width, 5, utf8_decode(__('site.reports.income.expedition_location')) . ': ', 0, 0, 'R');
         $pdf->SetFont('Arial', '', 7);
         $pdf->Cell(0, 5, $owner->codigo_postal, 0, 1, 'R');
 
@@ -173,29 +174,29 @@ class Ingreso extends Model
         $pdf->SetX(15);
         $pdf->SetFont('arial', '', 17);
         $pdf->Cell($col_width_2, 7, '+52 998 8479278', 0, 1);
-        $pdf->Cell($col_width_2, 7, 'www.wifiempresarial.com', 0, 1);
+        $pdf->Cell($col_width_2, 7, config('app.url'), 0, 1);
         $pdf->Ln(5);
 
         $pdf->SetFont('arial', '', 9);
-        $pdf->Cell($col_width_2, 5, 'COMERCIO ELECTRONICO DOMINGUEZ & BALLESTER S. DE R.L DE C.V', 0, 1);
+        $pdf->Cell($col_width_2, 5, config('app.name'), 0, 1);
         $pdf->SetFont('arial', 'B', 9);
-        $pdf->Cell(10, 5, 'RFC: ', 0, 0);
+        $pdf->Cell(10, 5, __('site.reports.income.rfc') . ': ', 0, 0);
         $pdf->SetFont('arial', '', 9);
         $pdf->Cell($col_width_2, 5, $owner->rfc, 0, 1);
         $pdf->SetFont('arial', 'B', 9);
-        $pdf->Cell(25, 5, utf8_decode('Régimen fiscal: '), 0, 0);
+        $pdf->Cell(25, 5, utf8_decode(__('site.reports.income.fiscal_regime')) . ': ', 0, 0);
         $pdf->SetFont('arial', '', 9);
         $pdf->Cell($col_width_2, 5, $owner->regimen_fiscal->nombre, 0, 1);
-        $pdf->WriteHTML('<b>Domicilio Fiscal: </b>' . utf8_decode($owner->direccion_fiscal->direccion_formateada), 5, $col_width_2, 1);
+        $pdf->WriteHTML('<b>' . __('site.reports.income.fiscal_address') . ': </b>' . utf8_decode($owner->direccion_fiscal->direccion_formateada), 5, $col_width_2, 1);
         $pdf->Ln(7);
         $pdf->Line(5, 8, $pdf->GetPageWidth() - 5, 8);
         $pdf->Line(5, 8, $pdf->GetX(), $pdf->GetY());
         $pdf->Line(5, $pdf->GetY(), $pdf->GetPageWidth() - 5, $pdf->GetY());
         $pdf->Line($pdf->GetPageWidth() - 5, $pdf->GetY(), $pdf->GetPageWidth() - 5, 8);
         $pdf->Ln(2);
-        $pdf->WriteHTML('<b>Cliente: </b> ' . utf8_decode($ingreso->factura->cliente->razon_social) . ' <b>RFC: </b>' . $ingreso->factura->cliente->rfc, 5, '', 1);
+        $pdf->WriteHTML('<b>' . __('site.reports.income.client') . ': </b> ' . utf8_decode($ingreso->factura->cliente->razon_social) . ' <b>' . __('site.reports.income.rfc') . ': </b>' . $ingreso->factura->cliente->rfc, 5, '', 1);
         $pdf->Ln(5);
-        $pdf->WriteHTML('<b>Domicilio Fiscal: </b>' . utf8_decode($ingreso->factura->cliente->direccion_fiscal->direccion_formateada), 5, '', 1);
+        $pdf->WriteHTML('<b>' . __('site.reports.income.fiscal_address') . ': </b>' . utf8_decode($ingreso->factura->cliente->direccion_fiscal->direccion_formateada), 5, '', 1);
         $pdf->Ln(5);
         $cots = '';
         $cots_arr = [];
@@ -205,20 +206,18 @@ class Ingreso extends Model
                 $cots_arr[] = $f_c->cotizacion->consecutivo;
             }
         });
-        $cotizaciones = Str::replaceLast(', ', ' y ', Str::replaceLast(', ', '', $cots));
-        $pdf->WriteHTML('<b>Cotizaciones: </b>' . $cotizaciones, 5, '', 1);
         $pdf->Ln(5);
-        $pdf->WriteHTML('<b>Monto Cobrado: $</b>' . number_format($ingreso->monto, 2), 5, '', 1);
+        $pdf->WriteHTML('<b>' . __('site.reports.income.amount_collected') . ': $</b>' . number_format($ingreso->monto, 2), 5, '', 1);
         $pdf->Ln(5);
-        $pdf->WriteHTML('<b>Fecha de Cobro: </b>' . $ingreso->fecha->format('d/m/Y'), 5, '', 1);
+        $pdf->WriteHTML('<b>' . __('site.reports.income.payment_date') . ': </b>' . $ingreso->fecha->format('d/m/Y'), 5, '', 1);
         $pdf->Ln(5);
-        $pdf->WriteHTML('<b>Comentarios: </b>' . utf8_decode($ingreso->comentarios), 5, '', 1);
+        $pdf->WriteHTML('<b>' . __('site.reports.income.comments') . ': </b>' . utf8_decode($ingreso->comentarios), 5, '', 1);
 
         if ($mailing) {
-            $pdf->Output('F', 'Ingreso.pdf');
-            return "Ingreso.pdf";
+            $pdf->Output('F', $name . '.pdf');
+            return "$name.pdf";
         }
 
-        $pdf->Output('I', 'Ingreso.pdf');
+        $pdf->Output('I', $name . '.pdf');
     }
 }

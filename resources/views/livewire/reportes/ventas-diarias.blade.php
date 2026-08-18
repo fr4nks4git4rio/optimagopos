@@ -1,4 +1,4 @@
-@section('title', 'Ventas Diarias')
+@section('title', __('site.reports.daily_dales.title'))
 
 <div>
     <div wire:loading.delay.longer>
@@ -12,24 +12,27 @@
     <div class="row justify-content-between">
         <div class="row mb-1 col-md-10">
             <div class="col-sm-2">
-                <x-input label="Fecha Inicio" type="date" :lazy="true" model="fechaInicio" />
+                <x-input label="{{ __('site.reports.daily_dales.start_date') }}" type="date" :lazy="true"
+                    model="fechaInicio" />
             </div>
             <div class="col-sm-2">
-                <x-input label="Fecha Fin" type="date" :lazy="true" model="fechaFin" />
+                <x-input label="{{ __('site.reports.daily_dales.end_date') }}" type="date" :lazy="true"
+                    model="fechaFin" />
             </div>
             <div class="col-sm-8">
-                <x-select2-multiple label="Sucursal" placeholder="Seleccione..." class="form-control" :options="$sucursalesAll"
+                <x-select2-multiple label="{{ __('site.reports.daily_dales.branches') }}"
+                    placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$sucursalesAll"
                     model="sucursal" :lazy="true" :dynamic="true" />
             </div>
         </div>
         <div class="mb-1 col-md-2 text-end">
             <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
                 <span class="bi bi-file-pdf"></span>
-                Imprimir
+                {{ __('site.common.print') }}
             </button>
             <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
                 <span class="bi bi-file-excel"></span>
-                Exportar
+                {{ __('site.common.export') }}
             </button>
         </div>
     </div>
@@ -58,8 +61,10 @@
                     </tr>
                     <tr>
                         @foreach ($formasPago as $formaPago)
-                            <th class="text-end" style="white-space: nowrap !important">Monto</th>
-                            <th class="text-center" style="white-space: nowrap !important">Op.</th>
+                            <th class="text-end" style="white-space: nowrap !important">
+                                {{ __('site.reports.daily_dales.amount') }}</th>
+                            <th class="text-center" style="white-space: nowrap !important">
+                                {{ __('site.reports.daily_dales.quantity') }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -84,7 +89,7 @@
 
                     {{-- Totalizador por sucursal --}}
                     <tr class="table-success fw-bold">
-                        <td class="text-end" colspan="2">Total {{ $sucursalData['sucursal'] }}</td>
+                        <td class="text-end" colspan="2">{{__('site.reports.daily_dales.total')}} {{ $sucursalData['sucursal'] }}</td>
                         @foreach ($formasPago as $i => $formaPago)
                             @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                             <td class="text-end">{{ number_format($totalCelda['monto'], 2) }}</td>
@@ -95,7 +100,7 @@
                     <tr>
                         <td colspan="{{ 2 + count($formasPago) * 2 }}" class="text-center">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{__('site.common.results_not_found')}}...
                             </div>
                         </td>
                     </tr>
@@ -104,7 +109,7 @@
             @if (count($records) > 0)
                 <tfoot>
                     <tr class="table-dark fw-bold">
-                        <td colspan="2" class="text-end">Total General</td>
+                        <td colspan="2" class="text-end">{{__('site.reports.daily_dales.grand_total')}}</td>
                         @foreach ($formasPago as $i => $formaPago)
                             @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                             <td class="text-end">{{ number_format($totalGeneral['monto'], 2) }}</td>

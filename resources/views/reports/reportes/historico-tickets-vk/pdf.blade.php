@@ -240,7 +240,7 @@
                         <div class="company-meta">
                             RFC: {{ $empresa->rfc ?? '' }}
                             @if (!empty($empresa->direccion_fiscal))
-                                &nbsp;|&nbsp; Dirección: {{ $empresa->direccion_plain }}
+                                &nbsp;|&nbsp; {{ __('site.address.address') }}: {{ $empresa->direccion_plain }}
                             @endif
                         </div>
                     @endif
@@ -257,21 +257,21 @@
 
     {{-- ================= FILTROS APLICADOS ================= --}}
     <div class="filters-box">
-        <strong>Periodo:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+        <strong>{{ __('site.common.period') }}:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
         @if (!empty($estadosSeleccionados))
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            <strong>Estado(s):</strong>
-            {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $estadosSeleccionados)) }}
+            <strong>{{ __('site.reports.vk_ticket_history.statuses') }}:</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $estadosSeleccionados)) }}
         @endif
         @if (!empty($sucursalesSeleccionadas))
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            <strong>Sucursal(es):</strong>
-            {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+            <strong>{{ __('site.reports.vk_ticket_history.branches') }}:</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $sucursalesSeleccionadas)) }}
         @endif
         @if (!empty($terminalesSeleccionadas))
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            <strong>Terminal(es):</strong>
-            {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $terminalesSeleccionadas)) }}
+            <strong>{{ __('site.reports.vk_ticket_history.terminals') }}:</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $terminalesSeleccionadas)) }}
         @endif
     </div>
 
@@ -283,19 +283,22 @@
                     @foreach ($sorts as $sort)
                         <th rowspan="2" class="text-center align-middle">{{ $sort }}</th>
                     @endforeach
-                    <th colspan="2" class="th-abierto text-center">ABIERTO</th>
-                    <th colspan="2" class="th-proceso text-center">EN PROCESO</th>
-                    <th colspan="2" class="th-demorado text-center">DEMORADO</th>
-                    <th rowspan="2" class="th-terminado text-center align-middle">TERMINADO
+                    <th colspan="2" class="th-abierto text-center">{{ __('site.statuses.tickets_vk.Open') }}</th>
+                    <th colspan="2" class="th-proceso text-center">{{ __('site.statuses.tickets_vk.InProcess') }}
+                    </th>
+                    <th colspan="2" class="th-demorado text-center">{{ __('site.statuses.tickets_vk.Delayed') }}
+                    </th>
+                    <th rowspan="2" class="th-terminado text-center align-middle">
+                        {{ __('site.statuses.tickets_vk.Done') }}
                     </th>
                 </tr>
                 <tr class="sub-header">
-                    <th class="text-center">Fecha/Hora</th>
-                    <th class="text-center">Duración</th>
-                    <th class="text-center">Fecha/Hora</th>
-                    <th class="text-center">Duración</th>
-                    <th class="text-center">Fecha/Hora</th>
-                    <th class="text-center">Duración</th>
+                    <th class="text-center">{{ __('site.reports.vk_ticket_history.date') }}</th>
+                    <th class="text-center">{{ __('site.reports.vk_ticket_history.duration') }}</th>
+                    <th class="text-center">{{ __('site.reports.vk_ticket_history.date') }}</th>
+                    <th class="text-center">{{ __('site.reports.vk_ticket_history.duration') }}</th>
+                    <th class="text-center">{{ __('site.reports.vk_ticket_history.date') }}</th>
+                    <th class="text-center">{{ __('site.reports.vk_ticket_history.duration') }}</th>
                 </tr>
             </thead>
         @endif
@@ -318,7 +321,7 @@
                         <td class="text-center">
                             {{ $record->tiempo_abierto ?? '-' }}
                             @if (!$record->fecha_terminado && $record->fecha_transaccion)
-                                <span class="en-curso">(en curso)</span>
+                                <span class="en-curso">({{ __('site.reports.vk_ticket_history.ongoing') }})</span>
                             @endif
                         </td>
 
@@ -326,7 +329,7 @@
                         <td class="text-center">
                             {{ $record->tiempo_en_proceso ?? '-' }}
                             @if (!$record->fecha_terminado && $record->fecha_en_proceso)
-                                <span class="en-curso">(en curso)</span>
+                                <span class="en-curso">({{ __('site.reports.vk_ticket_history.ongoing') }})</span>
                             @endif
                         </td>
 
@@ -334,7 +337,7 @@
                         <td class="text-center">
                             {{ $record->tiempo_demorado ?? '-' }}
                             @if (!$record->fecha_terminado && $record->fecha_demorado)
-                                <span class="en-curso">(en curso)</span>
+                                <span class="en-curso">({{ __('site.reports.vk_ticket_history.ongoing') }})</span>
                             @endif
                         </td>
 
@@ -344,16 +347,17 @@
 
                 {{-- Totalizador por sucursal --}}
                 <tr class="subtotal-row">
-                    <td colspan="3" class="text-end">Totales {{ $sucursalData['sucursal'] }}</td>
+                    <td colspan="3" class="text-end">{{ __('site.reports.vk_ticket_history.totals') }}
+                        {{ $sucursalData['sucursal'] }}</td>
                     <td colspan="2" class="text-center">
                         {{ $sucursalData['totales']['tickets_abiertos'] }}
-                        <span class="en-curso">(Prom:
+                        <span class="en-curso">({{ __('site.reports.vk_ticket_history.average_time') }}:
                             {{ $sucursalData['totales']['promedio_tickets_abiertos'] }})</span>
                     </td>
                     <td colspan="2"></td>
                     <td colspan="2" class="text-center">
                         {{ $sucursalData['totales']['tickets_demorados'] }}
-                        <span class="en-curso">(Prom:
+                        <span class="en-curso">({{ __('site.reports.vk_ticket_history.average_time') }}:
                             {{ $sucursalData['totales']['promedio_tickets_demorados'] }})</span>
                     </td>
                     <td></td>
@@ -361,7 +365,7 @@
             @empty
                 <tr>
                     <td colspan="{{ count($sorts) + 7 }}" class="no-results">
-                        No se encontraron resultados para los filtros seleccionados.
+                        {{ __('site.common.results_not_found') }}
                     </td>
                 </tr>
             @endforelse
@@ -370,15 +374,15 @@
         @if (count($records) > 0)
             <tfoot>
                 <tr class="grand-total-row">
-                    <td colspan="3" class="text-end">TOTAL GENERAL</td>
+                    <td colspan="3" class="text-end">{{ __('site.reports.vk_ticket_history.grand_total') }}</td>
                     <td colspan="2" class="text-center">
                         {{ $totalGeneral['tickets_abiertos'] }}
-                        (Prom: {{ $totalGeneral['promedio_tickets_abiertos'] }})
+                        ({{ __('site.reports.vk_ticket_history.average_time') }}: {{ $totalGeneral['promedio_tickets_abiertos'] }})
                     </td>
                     <td colspan="2"></td>
                     <td colspan="2" class="text-center">
                         {{ $totalGeneral['tickets_demorados'] }}
-                        (Prom: {{ $totalGeneral['promedio_tickets_demorados'] }})
+                        ({{ __('site.reports.vk_ticket_history.average_time') }}: {{ $totalGeneral['promedio_tickets_demorados'] }})
                     </td>
                     <td></td>
                 </tr>

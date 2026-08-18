@@ -1,4 +1,4 @@
-@section('title', 'Productos más vendidos')
+@section('title', __('site.reports.best_selling_products.title'))
 
 <div wire:init="init">
     <div wire:loading.delay.longer>
@@ -11,13 +11,13 @@
 
     <div class="row mb-1">
         <div class="col-sm-2">
-            <x-input label="Fecha Inicio" type="date" :lazy="true" model="fechaInicio" />
+            <x-input label="{{__('site.reports.best_selling_products.start_date')}}" type="date" :lazy="true" model="fechaInicio" />
         </div>
         <div class="col-sm-2">
-            <x-input label="Fecha Fin" type="date" :lazy="true" model="fechaFin" />
+            <x-input label="{{__('site.reports.best_selling_products.end_date')}}" type="date" :lazy="true" model="fechaFin" />
         </div>
         <div class="col-sm-4">
-            <x-select2 label="Sucursal" placeholder="Seleccione..." class="form-control" :options="$sucursales"
+            <x-select2 label="{{__('site.reports.best_selling_products.branch')}}" placeholder="{{__('site.common.select')}}..." class="form-control" :options="$sucursales"
                 model="sucursal" :dynamic="true" />
         </div>
     </div>
@@ -26,8 +26,8 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th class="text-center">Producto</th>
-                    <th class="text-center">Cantidad Vendida</th>
+                    <th class="text-center">{{__('site.reports.best_selling_products.producto')}}</th>
+                    <th class="text-center">{{__('site.reports.best_selling_products.quantity_sold')}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,7 +40,7 @@
                     <tr>
                         <td colspan="2">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{__('site.common.results_not_found')}}...
                             </div>
                         </td>
                     </tr>

@@ -5,7 +5,7 @@ namespace App\Livewire\CuentasCobrar;
 use App\Livewire\Layouts\Modal;
 use App\Models\Factura;
 
-class DetallesPagoFactura extends Modal
+class Show extends Modal
 {
     public $scope;
     public Factura $factura;
@@ -30,13 +30,10 @@ class DetallesPagoFactura extends Modal
     }
 
     public function getTipoProperty(){
-        if($this->factura->es_nota_venta){
-            return 'Nota de Venta';
-        }
-        return 'Factura';
+        return __('site.common.invoice');
     }
     public function render()
     {
-        return view('livewire.cuentas-cobrar.detalles-pago-factura');
+        return view('livewire.cuentas-cobrar.show');
     }
 }

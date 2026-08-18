@@ -1,4 +1,4 @@
-@section('title', 'Cabecera Facturas')
+@section('title', __('site.invoice_header.title'))
 
 <div wire:init="init">
     <h1 class="fs-1 mb-2">@yield('title')</h1>
@@ -23,39 +23,39 @@
                     <div class="col-12 col-md-8">
                         <div class="card mb-3">
                             <div class="card-header">
-                                <h3 class="fs-5 fw-bold">Datos Generales</h3>
+                                <h3 class="fs-5 fw-bold">{{ __('site.invoice_header.general_data') }}</h3>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-sm-5">
-                                        <x-input label="Nombre Comercial" type="text"
+                                        <x-input label="{{ __('site.invoice_header.commercial_name') }}" type="text"
                                             model="sucursales.{{ $index }}.nombre_comercial" />
                                     </div>
                                     <div class="col-sm-5">
-                                        <x-input label="Razón Social" type="text"
+                                        <x-input label="{{ __('site.invoice_header.social_reason') }}" type="text"
                                             model="sucursales.{{ $index }}.razon_social" />
                                     </div>
                                     <div class="col-sm-2">
-                                        <x-input label="RFC" type="text"
+                                        <x-input label="{{ __('site.invoice_header.rfc') }}" type="text"
                                             model="sucursales.{{ $index }}.rfc" class="text-uppercase" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        <x-select2 :label="'Régimen Fiscal'" :placeholder="'Seleccione...'" :options="$regimenesFiscales"
+                                        <x-select2 label="{{ __('site.invoice_header.fiscal_regime') }}" :placeholder="__('site.common.select').'...'" :options="$regimenesFiscales"
                                             model="sucursales.{{ $index }}.regimen_fiscal_id"
                                             class="form-control" />
                                     </div>
                                     <div class="col-sm-4">
-                                        <x-input label="Correo" type="email"
+                                        <x-input label="{{ __('site.invoice_header.email') }}" type="email"
                                             model="sucursales.{{ $index }}.correo" />
                                     </div>
                                     <div class="col-sm-2">
-                                        <x-input label="Teléfono" type="text"
+                                        <x-input label="{{ __('site.invoice_header.phone') }}" type="text"
                                             model="sucursales.{{ $index }}.telefono" />
                                     </div>
                                     <div class="col-sm-2">
-                                        <x-select2 :label="'Moneda facturación'" :placeholder="'Seleccione...'" :options="$monedas"
+                                        <x-select2 label="{{ __('site.invoice_header.billing_currency') }}" :placeholder="__('site.common.select').'...'" :options="$monedas"
                                             model="sucursales.{{ $index }}.moneda_facturacion_id"
                                             class="form-control" :dynamic="true" />
                                     </div>
@@ -63,7 +63,7 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="mb-1">
-                                            <label for="">Portal del PAC</label>
+                                            <label for="">{{ __('site.invoice_header.portal_pac') }}</label>
                                             <textarea rows="2" class="form-control @error("sucursales.$index.portal_pac") is-invalid @enderror"
                                                 wire:model.live="sucursales.{{ $index }}.portal_pac"></textarea>
                                             @error("sucursales.$index.portal_pac")
@@ -74,7 +74,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <x-input label="Usuario Integrador SAT" type="text"
+                                        <x-input label="{{ __('site.invoice_header.integrator_user_sat') }}" type="text"
                                             model="sucursales.{{ $index }}.usuario_integrador_sat" />
                                     </div>
                                 </div>
@@ -82,55 +82,55 @@
                             <div class="card-footer">
                                 <div class="text-center">
                                     <button class="btn btn-primary w-auto float-end"
-                                        wire:click="saveDatosGenerales('{{ $index }}')">Guardar
-                                        Datos
+                                        wire:click="saveDatosGenerales('{{ $index }}')">
+                                        {{ __('site.common.save') }}
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="fs-5 fw-bold">Dirección Fiscal</h3>
+                                <h3 class="fs-5 fw-bold">{{ __('site.invoice_header.fiscal_address') }}</h3>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <x-input label="Calle"
+                                        <x-input label="{{ __('site.address.street') }}"
                                             model="sucursales.{{ $index }}.direccion.calle" />
                                     </div>
                                     <div class="col-sm-3">
-                                        <x-input label="No. Exterior"
+                                        <x-input label="{{ __('site.address.exterior_number') }}"
                                             model="sucursales.{{ $index }}.direccion.no_exterior" />
                                     </div>
                                     <div class="col-sm-3">
-                                        <x-input label="No. Interior"
+                                        <x-input label="{{ __('site.address.interior_number') }}"
                                             model="sucursales.{{ $index }}.direccion.no_interior" />
                                     </div>
                                     <div class="col-sm-3">
-                                        <x-input label="Código Postal"
+                                        <x-input label="{{ __('site.address.postal_code') }}"
                                             model="sucursales.{{ $index }}.direccion.codigo_postal" />
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <x-input label="Colonia"
+                                        <x-input label="{{ __('site.address.colony') }}"
                                             model="sucursales.{{ $index }}.direccion.colonia" />
                                     </div>
                                     <div class="col-sm-3">
-                                        <x-select2-ajax label="Estado" placeholder="Seleccione..." class="form-control"
+                                        <x-select2-ajax label="{{ __('site.address.state') }}" placeholder="{{ __('site.common.select') }}..." class="form-control"
                                             url="{{ route('estados.load-estados') }}"
                                             model="sucursales.{{ $index }}.direccion.estado_id"
                                             :dynamic="true" />
                                     </div>
                                     <div class="col-sm-3">
-                                        <x-select2-ajax label="Localidad" placeholder="Seleccione..."
+                                        <x-select2-ajax label="{{ __('site.address.locality') }}" placeholder="{{ __('site.common.select') }}..."
                                             class="form-control"
                                             url="{{ route('localidades.load-localidades', ['estado_id' => $sucursales[$index]['direccion']['estado_id']]) }}"
                                             model="sucursales.{{ $index }}.direccion.localidad_id"
                                             :dynamic="true" />
                                     </div>
                                     <div class="col-sm-3">
-                                        <x-select2-ajax label="Municipio" placeholder="Seleccione..."
+                                        <x-select2-ajax label="{{ __('site.address.municipality') }}" placeholder="{{ __('site.common.select') }}..."
                                             class="form-control"
                                             url="{{ route('municipios.load-municipios', ['estado_id' => $sucursales[$index]['direccion']['estado_id']]) }}"
                                             model="sucursales.{{ $index }}.direccion.municipio_id"
@@ -139,7 +139,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <x-input label="Referencia"
+                                        <x-input label="{{ __('site.address.reference') }}"
                                             model="sucursales.{{ $index }}.direccion.referencia" />
                                     </div>
                                 </div>
@@ -147,8 +147,8 @@
                             <div class="card-footer">
                                 <div class="text-center">
                                     <button class="btn btn-primary w-auto float-end"
-                                        wire:click="saveDireccion('{{ $index }}')">Guardar
-                                        Datos
+                                        wire:click="saveDireccion('{{ $index }}')">
+                                        {{ __('site.common.save') }}
                                     </button>
                                 </div>
                             </div>
@@ -157,16 +157,16 @@
                     <div class="col-12 col-md-4">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="fs-5 fw-bold">Formas de Pago Facturación</h3>
+                                <h3 class="fs-5 fw-bold">{{ __('site.invoice_header.billing_payment_forms') }}</h3>
                             </div>
                             <div class="card-body table-responsive">
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Nombre</th>
-                                            <th>Forma de Pago SAT</th>
-                                            <th class="text-center">Moneda</th>
-                                            <th class="text-center">Activa</th>
+                                            <th>{{ __('site.invoice_header.name') }}</th>
+                                            <th>{{ __('site.invoice_header.sat_payment_form') }}</th>
+                                            <th class="text-center">{{ __('site.invoice_header.currency') }}</th>
+                                            <th class="text-center">{{ __('site.common.active') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -184,16 +184,16 @@
                                                 </td>
                                                 <td class="text-center">
                                                     @if ($forma_pago['deleted_at'])
-                                                        <span class="text-danger">NO</span>
+                                                        <span class="text-danger">{{ __('site.common.no') }}</span>
                                                     @else
-                                                        <span class="text-success">SI</span>
+                                                        <span class="text-success">{{ __('site.common.yes') }}</span>
                                                     @endif
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
                                                 <td class="text-center" colspan="5">
-                                                    Sin datos que mostrar
+                                                    {{ __('site.common.results_not_found') }}
                                                 </td>
                                             </tr>
                                         @endforelse

@@ -9,6 +9,7 @@ use App\Models\Ingreso;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use Livewire\Component;
@@ -21,6 +22,7 @@ class Ingresos extends Component
     public $page;
     public $perPage;
     public $perPages = [];
+    public $order;
     public $sort;
     public $sorts = [];
     public $fechaInicio;
@@ -33,7 +35,7 @@ class Ingresos extends Component
     public $iframeContainerClass = '';
     public $iframeSrc = '';
 
-    protected $queryString = ['perPage', 'sort', 'fechaInicio', 'fechaFin', 'cliente', 'moneda', 'importe'];
+    protected $queryString = ['perPage', 'sort', 'order', 'fechaInicio', 'fechaFin', 'cliente', 'moneda', 'importe'];
 
     protected $listeners = ['$refresh'];
 
@@ -42,14 +44,26 @@ class Ingresos extends Component
         $this->page ??= 1;
         $this->perPage ??= 10;
         $this->perPages = [10, 25, 50, 100];
-        $this->sort ??= 'Fecha';
-        $this->sorts = ['Fecha', 'Folio Interno', 'Cliente', 'Folio UUID', 'Moneda', 'Importe'];
+        $this->sort ??= __('site.reports.income.date');
+        $this->sorts = [
+            __('site.reports.income.date'),
+            __('site.reports.income.internal_folio'),
+            __('site.reports.income.client'),
+            __('site.reports.income.uuid'),
+            __('site.reports.income.currency'),
+            __('site.reports.income.import')
+        ];
     }
 
     public function updated($field)
     {
-        if (in_array($field, ['perPage', 'sort', 'fechaInicio', 'fechaFin', 'cliente', 'moneda', 'importe']))
+        if (in_array($field, ['perPage', 'sort', 'order', 'fechaInicio', 'fechaFin', 'cliente', 'moneda', 'importe']))
             $this->resetPage();
+    }
+
+    public function getClassSortProperty()
+    {
+        return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
     public function render()
@@ -104,29 +118,55 @@ class Ingresos extends Component
         }
 
         switch ($this->sort) {
-            case 'Fecha':
-                $query->orderBy('fecha', 'desc');
+            case __('site.reports.income.date'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('fecha');
+                else
+                    $query->orderBy('fecha');
                 break;
-            case 'Folio Interno':
-                $query->orderBy('folio_interno', 'desc')
-                    ->orderByRaw("LENGTH(folio_interno) DESC");
+            case __('site.reports.income.internal_folio'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('folio_interno')
+                        ->orderByRaw("LENGTH(folio_interno) DESC");
+                else
+                    $query->orderBy('folio_interno', 'desc')
+                        ->orderByRaw("LENGTH(folio_interno) DESC");
                 break;
-            case 'Cliente':
-                $query->orderBy('razon_social');
+            case __('site.reports.income.client'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('razon_social');
+                else
+                    $query->orderBy('razon_social');
                 break;
-            case 'Folio UUID':
-                $query->orderBy('uuid');
+            case __('site.reports.income.uuid'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('uuid');
+                else
+                    $query->orderBy('uuid');
                 break;
-            case 'Moneda':
-                $query->orderBy('moneda');
+            case __('site.reports.income.currency'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('moneda');
+                else
+                    $query->orderBy('moneda');
                 break;
-            case 'Importe':
-                $query->orderBy('monto');
+            case __('site.reports.income.import'):
+                if ($this->order == 'desc')
+                    $query->orderByDesc('monto');
+                else
+                    $query->orderBy('monto');
                 break;
         }
 
         return $query;
     }
+
+    public function changeSort($sort)
+    {
+        $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
+        $this->sort = !$this->order ? '' : $sort;
+    }
+
 
     public function imprimirFactura($id)
     {
@@ -149,6 +189,7 @@ class Ingresos extends Component
 
     public function imprimirListadoIngresos()
     {
+        $name = __('site.reports.income.title');
         $ingresos = $this->query()->get();
         $pdf = new Pdf();
         $pdf->AddPage('L');
@@ -156,19 +197,19 @@ class Ingresos extends Component
         $pdf->SetFont('arial', 'B', 12);
 
         //    $pdf->Image('img/transparent.png', 1, 1, 1, 1);
-        $pdf->Cell(0, 10, utf8_decode('Reporte de Ingresos'), 0, 1, 'C');
+        $pdf->Cell(0, 10, utf8_decode($name), 0, 1, 'C');
         $pdf->Ln(10);
 
         $col1 = $pdf->pageWidth() * 0.10;
         $col2 = $pdf->pageWidth() * 0.40;
         $col3 = $pdf->pageWidth() * 0.20;
         $pdf->SetFontSize(10);
-        $pdf->Cell($col1, 8, 'Fecha', 1, 0, 'C');
-        $pdf->Cell($col1, 8, 'Folio Int.', 1, 0, 'C');
-        $pdf->Cell($col2, 8, 'Cliente', 1, 0, 'C');
-        $pdf->Cell($col3, 8, 'Folio UUID', 1, 0, 'C');
-        $pdf->Cell($col1, 8, 'Moneda', 1, 0, 'C');
-        $pdf->Cell($col1, 8, 'Importe', 1, 1, 'C');
+        $pdf->Cell($col1, 8, __('site.reports.income.date'), 1, 0, 'C');
+        $pdf->Cell($col1, 8, __('site.reports.income.internal_folio'), 1, 0, 'C');
+        $pdf->Cell($col2, 8, __('site.reports.income.client'), 1, 0, 'C');
+        $pdf->Cell($col3, 8, __('site.reports.income.uuid'), 1, 0, 'C');
+        $pdf->Cell($col1, 8, __('site.reports.income.currency'), 1, 0, 'C');
+        $pdf->Cell($col1, 8, __('site.reports.income.import'), 1, 1, 'C');
 
         $pdf->SetFont('arial', '', 8);
         $total_importe_mxn = 0;
@@ -181,7 +222,8 @@ class Ingresos extends Component
 
             $pdf->SetX(5 + $col1 * 2);
             $y_ini = $pdf->GetY();
-            $pdf->MultiCell($col2, 6, utf8_decode($ingreso->razon_social), 1, 'C');
+            $razon_social = $ingreso->razon_social ? Crypt::decrypt($ingreso->razon_social) : '';
+            $pdf->MultiCell($col2, 6, utf8_decode($razon_social), 1, 'C');
             $height = $pdf->GetY() - $y_ini;
             $pdf->SetY($y_ini);
             $pdf->Cell($col1, $height, $ingreso->fecha_str, 1, 0, 'C');
@@ -204,16 +246,17 @@ class Ingresos extends Component
         $pdf->Cell($col1, 6, 'USD:', 1, 0, 'C');
         $pdf->Cell($col1, 6, number_format($total_importe_usd, 2), 1, 1, 'C');
 
-        $pdf->Output('F', 'Reporte de Ingresos.pdf');
+        $pdf->Output('F', "$name.pdf");
 
-        $this->iframeSrc = Request::root() . '/Reporte de Ingresos.pdf';
+        $this->iframeSrc = Request::root() . "/$name.pdf?" . now()->timestamp;
         $this->dispatch('show-sub-modal', 'pdf-ingresos');
     }
 
     public function exportarExcelListadoIngresos()
     {
+        $name = __('site.reports.income.title');
         $ingresos = $this->query()->get();
 
-        return (new ReporteIngresosExport($ingresos))->download("Reporte de Ingresos.xls");
+        return (new ReporteIngresosExport($name, $ingresos))->download("$name.xls");
     }
 }

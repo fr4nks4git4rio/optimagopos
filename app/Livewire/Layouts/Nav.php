@@ -57,14 +57,14 @@ class Nav extends Component
     public function logout()
     {
         $user = User::find(user()->id);
-        activity('Logout Usuario')
+        activity(__('site.auth.log_user_logout'))
             ->on($user)
             ->event('login')
             ->withProperties(User::parseData(Arr::except(
                 $user->toArray(),
                 ['password', 'created_at', 'updated_at', 'deleted_at']
             )))
-            ->log("El usuario con email $user->email se ha desconectado.");
+            ->log(__('site.auth.log_user_logout_detail', ['email' => $user->email]));
 
         Auth::logout();
 

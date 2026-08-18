@@ -122,7 +122,7 @@
             <li class="w-100 li-item {{ active_route('admin/cuentas-cobrar*') }}">
                 <a href="{{ route('admin.cuentas-cobrar.index') }}" class="nav-link submenu">
                     <i class="bi bi-currency-exchange fs-6"></i> <span class="d-sm-inline px-2">
-                        {{ __('site.sidebar.accounts-receivable') }}</span></a>
+                        {{ __('site.sidebar.accounts_receivable') }}</span></a>
             </li>
         @endcan
     </ul>

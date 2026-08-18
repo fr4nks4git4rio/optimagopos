@@ -29,7 +29,7 @@ class Index extends Component
     public $search;
     public $order;
     public $sort;
-    public $sorts = ['No. Ticket', 'Fecha', 'Cliente', 'Sucursal', 'Terminal', 'Empleado', 'Ubicación', 'Productos', 'Pagos', 'Departamentos', 'Importe'];
+    public $sorts = [];
 
     protected $queryString = [
         'search' => ['except' => null],
@@ -54,7 +54,19 @@ class Index extends Component
         $this->sort ??= 'Fecha';
         $this->fecha_inicio ??= today()->format('Y-m-d');
         $this->fecha_fin ??= today()->format('Y-m-d');
-
+        $this->sorts = [
+            __('site.reports.operations_history.no_ticket'),
+            __('site.reports.operations_history.date'),
+            __('site.reports.operations_history.client'),
+            __('site.reports.operations_history.branch'),
+            __('site.reports.operations_history.terminal'),
+            __('site.reports.operations_history.employee'),
+            __('site.reports.operations_history.location'),
+            __('site.reports.operations_history.products'),
+            __('site.reports.operations_history.payments'),
+            __('site.reports.operations_history.departments'),
+            __('site.reports.operations_history.import')
+        ];
 
         if ($this->sucursales_query) {
             $this->sucursales = explode(',', $this->sucursales_query);
@@ -179,67 +191,67 @@ class Index extends Component
         }
 
         switch ($this->sort) {
-            case 'No. Ticket':
+            case __('site.reports.operations_history.no_ticket'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('id_transaccion', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('id_transaccion', SORT_NATURAL)->values();
                 break;
-            case 'Fecha':
+            case __('site.reports.operations_history.date'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('fecha_transaccion', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('fecha_transaccion', SORT_NATURAL)->values();
                 break;
-            case 'Cliente':
+            case __('site.reports.operations_history.client'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('cliente', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('cliente', SORT_NATURAL)->values();
                 break;
-            case 'Sucursal':
+            case __('site.reports.operations_history.branch'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('sucursal', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('sucursal', SORT_NATURAL)->values();
                 break;
-            case 'Terminal':
+            case __('site.reports.operations_history.terminal'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('terminal', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('terminal', SORT_NATURAL)->values();
                 break;
-            case 'Empleado':
+            case __('site.reports.operations_history.employee'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('empleado', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('empleado', SORT_NATURAL)->values();
                 break;
-            case 'Ubicación':
+            case __('site.reports.operations_history.location'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('ubicacion', SORT_NATURAL)->values();
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortByDesc('ubicacion', SORT_NATURAL)->values();
                 break;
-            case 'Productos':
+            case __('site.reports.operations_history.products'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('productos', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('productos', SORT_NATURAL)->values();
                 break;
-            case 'Pagos':
+            case __('site.reports.operations_history.payments'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('pagos', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('pagos', SORT_NATURAL)->values();
                 break;
-            case 'Departamentos':
+            case __('site.reports.operations_history.departments'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('departamentos', SORT_NATURAL)->values();
                 else
                     $records_final = $records_final->sortByDesc('departamentos', SORT_NATURAL)->values();
                 break;
-            case 'Importe':
+            case __('site.reports.operations_history.import'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('importe', SORT_NATURAL)->values();
                 else

@@ -1,40 +1,39 @@
-@section('title', 'Reporte de Ingresos')
+@section('title', __('site.reports.income.title'))
 
 <div>
     <h1 class="h2 fw-bold">@yield('title')</h1>
 
     <div class="row mb-3">
         <div class="col-2">
-            <label for="">Fecha Inicio</label>
+            <label for="">{{__('site.reports.income.start_date')}}:</label>
             <input type="date" class="form-control" wire:model.live="fechaInicio">
         </div>
         <div class="col-2">
-            <label for="">Fecha Fin</label>
+            <label for="">{{__('site.reports.income.end_date')}}:</label>
             <input type="date" class="form-control" wire:model.live="fechaFin">
         </div>
         <div class="col-4">
-            <x-select2-ajax class="form-control" :label="'Cliente'" :placeholder="'Seleccione...'"
+            <x-select2-ajax class="form-control" label="{{ __('site.reports.income.client') }}:" placeholder="{{__('site.common.select')}}..."
                 url="{{ route('clientes.load-clientes', ['is_filter' => 1]) }}" model="cliente" />
         </div>
         <div class="col-2">
-            <label for="">Moneda:</label>
+            <label for="">{{__('site.reports.income.currency')}}:</label>
             <select class="form-control " wire:model.live="moneda">
-                <option value="">Todas</option>
+                <option value="">{{__('site.common.all')}}</option>
                 @foreach ($monedas as $moneda)
                     <option value="{{ $moneda }}">{{ $moneda }}</option>
                 @endforeach
             </select>
         </div>
         <div class="col-2">
-            <label for="">Importe</label>
+            <label for="">{{__('site.reports.income.import')}}</label>
             <input type="text" class="form-control" wire:model.live="importe">
         </div>
     </div>
     <div class="row justify-content-end">
         <div class="col-lg-auto mb-3">
-            <button type="button" class="btn btn-primary" wire:click="imprimirListadoIngresos">Imprimir</button>
-            <button type="button" class="btn btn-primary" wire:click="exportarExcelListadoIngresos">Exportar
-                EXCEL</button>
+            <button type="button" class="btn btn-primary" wire:click="imprimirListadoIngresos">{{__('site.common.print')}}</button>
+            <button type="button" class="btn btn-primary" wire:click="exportarExcelListadoIngresos">{{__('site.common.export')}}</button>
             <x-dropdown icon="eye" :label="__($perPage)">
                 @foreach ($perPages as $perPage)
                     @if ($this->perPage === $perPage)
@@ -45,16 +44,6 @@
                     @endif
                 @endforeach
             </x-dropdown>
-            <x-dropdown icon="sort-down-alt" :label="__($sort)">
-                @foreach ($sorts as $sort)
-                    @if ($this->sort === $sort)
-                        <x-dropdown-item class="active opacity-50" :label="__($sort)"
-                            click="$set('sort', '{{ $sort }}')" />
-                    @else
-                        <x-dropdown-item :label="__($sort)" click="$set('sort', '{{ $sort }}')" />
-                    @endif
-                @endforeach
-            </x-dropdown>
         </div>
     </div>
 
@@ -62,13 +51,17 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>Folio Interno</th>
-                    <th>Cliente</th>
-                    <th>Folio UUID</th>
-                    <th>Moneda</th>
-                    <th>Importe</th>
-                    <th class="text-center" style="width: 150px">Acciones</th>
+                    @foreach ($sorts as $sort)
+                        <th class="text-center align-middle cursor-pointer" rowspan="2"
+                            style="white-space: nowrap !important" wire:click="changeSort('{{ $sort }}')">
+                            <span>
+                                @if ($this->sort == $sort)
+                                    <i class="{{ $this->class_sort }}"></i>
+                                @endif {{ $sort }}
+                            </span>
+                        </th>
+                    @endforeach
+                    <th class="text-center" style="width: 150px">{{__('site.common.actions')}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,15 +87,15 @@
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 <li class="list-inline-item">
-                                    <x-action icon="file-pdf" title="Imprimir Factura"
+                                    <x-action icon="file-pdf" title="{{__('site.common.print')}}"
                                         click="imprimirFactura({{ $ingreso->factura_id }})" />
                                 </li>
                                 <li class="list-inline-item">
-                                    <x-action icon="eye" title="Detalles Ingreso"
-                                        click="$dispatch('openModal', { component: 'facturacion.ingresos.show', arguments: {ingreso_id: '{{ $ingreso->id }}', factura_id: '{{ $ingreso->factura_id }}'} })" />
+                                    <x-action icon="eye" title="{{__('site.common.details')}}"
+                                        click="$dispatch('openModal', { component: 'cuentas-cobrar.show', arguments: {factura: '{{ $ingreso->factura_id }}'} })" />
                                 </li>
                                 <li class="list-inline-item">
-                                    <x-action icon="file-earmark-post" title="Imprimir Ingreso"
+                                    <x-action icon="file-earmark-post" title="{{__('site.common.print')}}"
                                         click="imprimirIngresoPdf({{ $ingreso->id }})" />
                                 </li>
                             </ul>
@@ -112,7 +105,7 @@
                     <tr>
                         <td colspan="7">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{__('site.common.results_not_found')}}...
                             </div>
                         </td>
                     </tr>
@@ -120,14 +113,14 @@
                 @if (count($ingresos) > 0)
                     <tr>
                         <td colspan="5" class="text-end fw-bold">
-                            Total MXN:
+                            {{__('site.reports.income.total')}} MXN:
                         </td>
                         <td class="fw-bold">${{ number_format($total_mxn, 2) }}</td>
                         <td></td>
                     </tr>
                     <tr>
                         <td colspan="5" class="text-end fw-bold">
-                            Total USD:
+                            {{__('site.reports.income.total')}} USD:
                         </td>
                         <td class="fw-bold">${{ number_format($total_usd, 2) }}</td>
                         <td></td>
@@ -154,7 +147,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cerrar') }}</button>
+                    <button type="button" class="btn btn-secondary"
+                        data-bs-dismiss="modal">{{ __('Cerrar') }}</button>
                 </div>
             </div>
         </div>

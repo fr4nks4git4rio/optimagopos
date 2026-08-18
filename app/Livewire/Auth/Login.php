@@ -24,6 +24,13 @@ class Login extends Component
     public $email;
     public $password;
     public $remember;
+    public $lang;
+    public $langs = ['es' => 'ES', 'en' => 'EN', 'fr' => 'FR'];
+
+    public function mount()
+    {
+        $this->lang = app()->getLocale();
+    }
 
     public function render()
     {
@@ -45,6 +52,12 @@ class Login extends Component
             'email.required' => 'Debe entrar el correo.',
             'password.required' => 'Debe entrar la contraseña.'
         ];
+    }
+
+    public function updated($field, $value)
+    {
+        if ($field == 'lang')
+            app()->setLocale($value);
     }
 
     public function login()
@@ -86,14 +99,14 @@ class Login extends Component
             auth()->login($user, $data['remember']);
             RateLimiter::clear($throttleKey);
 
-            activity('Login Usuario')
+            activity(__('site.auth.log_user_logged'))
                 ->on($user)
                 ->event('login')
                 ->withProperties(Arr::except(
                     $user->toArray(),
                     ['password', 'created_at', 'updated_at', 'deleted_at']
                 ))
-                ->log("El usuario $user->email se ha autenticado.");
+                ->log(__('site.auth.log_user_logged_detail', ['email' => $user->email]));
 
             return redirect()->intended(RouteServiceProvider::HOME);
         }
@@ -110,7 +123,7 @@ class Login extends Component
             recipients: $user->email,
             from_email: '',
             from_name: '',
-            subject: 'Código de Verificación - ' . config('app.name'),
+            subject: __('site.auth.email_2fa_subject', ['app_name' => config('app.name')]),
             view: 'emails.notifications.verification-code',
             data: [
                 'userName' => $user->nombre_completo,

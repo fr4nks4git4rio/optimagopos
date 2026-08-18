@@ -13,6 +13,13 @@
         </div>
 
         <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header text-end">
+                <select class="form-control form-control-sm w-auto float-end" wire:model.live="lang">
+                    @foreach ($langs as $key => $value)
+                        <option value="{{ $key }}">{{ $value }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="card-body p-4 p-sm-5">
 
                 <form wire:submit="login">

@@ -7,6 +7,7 @@ use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\Ingreso;
 use App\Rules\IngresoNotaCreditoRule;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -196,7 +197,7 @@ class Ingresar extends Modal
             if ($cliente->requiere_complemento) {
 
                 if (!get_tipo_cambio_sistema()->id) {
-                    $this->dispatch('show-toast', 'Debe definir el Tipo de Cambio para hoy!', 'danger');
+                    $this->dispatch('show-toast', __('site.validation.exchange_type_missing'), 'danger');
                     DB::rollBack();
                     return;
                 }
@@ -251,7 +252,30 @@ class Ingresar extends Modal
         }
 
         DB::commit();
-        $this->dispatch('show-toast', "Ingreso registrado satisfactoriamente.");
+
+        $attributes = Arr::only($ingreso->getAttributes(), ['fecha', 'comentarios']);
+        $attributes['facturas'] = [];
+        $folios = [];
+        foreach ($ingreso->facturas as $factura) {
+            $folios[] = $factura->folio_interno;
+            $f = [
+                'id' => $factura->id,
+                'folio_interno' => $factura->folio_interno,
+                'uuid' => $factura->uuid,
+                'monto' => $factura->pivot->monto,
+                'nota_credito' => $factura->pivot->nota_credito_id ? Factura::find($factura->pivot->nota_credito_id)->folio_interno : '',
+                'moneda' => $factura->pivot->moneda
+            ];
+            $attributes['facturas'][] = $f;
+        }
+
+        activity(__('site.accounts_receivable.deposit.log_saved'))
+            ->on($ingreso)
+            ->event('created')
+            ->withProperties($attributes)
+            ->log(__('site.accounts_receivable.deposit.log_saved_details', ['invoices' => Str::replaceLast(",", ' ' . __('site.common.and') . ' ', implode(',', $folios))]));
+
+        $this->dispatch('show-toast', __('site.accounts_receivable.deposit.log_saved'));
         $this->dispatch('closeModal');
         return redirect()->route('admin.cuentas-cobrar.index');
     }

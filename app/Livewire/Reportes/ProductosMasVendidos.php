@@ -2,18 +2,8 @@
 
 namespace App\Livewire\Reportes;
 
-use App\Exports\FacturaEmitidaExport;
-use App\Http\Libraries\Pdf;
-use App\Models\Facturador;
-use App\Models\Cliente;
-use App\Models\Factura;
-use App\Models\Sucursal;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
 

@@ -67,7 +67,7 @@
                         <td>{{ $paquete->nombre }}</td>
                         <td>{{ $paquete->descripcion }}</td>
                         <td>{{ $paquete->precio }}</td>
-                        <td>{{ Illuminate\Support\Str::replaceLast(', ', ' y ', $paquete->modulos) }}</td>
+                        <td>{{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', $paquete->modulos) }}</td>
                         <td class="text-center">
                             <ul class="list-unstyled mb-0">
                                 @if (!$paquete->deleted_at)

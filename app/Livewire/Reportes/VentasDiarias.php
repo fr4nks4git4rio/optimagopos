@@ -2,28 +2,18 @@
 
 namespace App\Livewire\Reportes;
 
-use App\Exports\FacturaEmitidaExport;
 use App\Exports\VentasDiariasExport;
-use App\Http\Libraries\Pdf;
-use App\Models\Facturador;
-use App\Models\Cliente;
-use App\Models\Factura;
 use App\Models\Sucursal;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class VentasDiarias extends Component
 {
     public $perPages;
     public $order;
-    public $sort = 'Fecha';
+    public $sort;
     public $sorts;
     public $fechaInicio;
     public $fechaFin;
@@ -45,12 +35,12 @@ class VentasDiarias extends Component
     public function mount()
     {
         $this->order = $this->order ?? 'desc';
-        $this->sort = $this->sort ?? 'Fecha';
+        $this->sort = $this->sort ?? __('site.reports.daily_dales.date');
         $this->fechaInicio = $this->fechaInicio ?? today()->format('Y-m-d');
         $this->fechaFin = $this->fechaFin ?? today()->format('Y-m-d');
         $this->sucursal = $this->sucursal ?? null;
 
-        $this->sorts = ['Sucursal', 'Fecha'];
+        $this->sorts = [__('site.reports.daily_dales.branch'), __('site.reports.daily_dales.date')];
         $this->perPages = [10, 25, 50, 100];
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
@@ -128,7 +118,7 @@ class VentasDiarias extends Component
         }
 
         switch ($this->sort) {
-            case 'Fecha':
+            case __('site.reports.daily_dales.date'):
                 if ($this->order == 'asc')
                     $query->orderByRaw('DATE(ticket.fecha_transaccion) asc');
                 else
@@ -144,7 +134,7 @@ class VentasDiarias extends Component
         });
 
         switch ($this->sort) {
-            case 'Sucursal':
+            case __('site.reports.daily_dales.branch'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('sucursal', SORT_NATURAL)->values();
                 else
@@ -212,10 +202,10 @@ class VentasDiarias extends Component
 
     public function imprimirPdf()
     {
-        if (File::exists(public_path('Ventas Diarias.pdf'))) {
-            File::delete(public_path('Ventas Diarias.pdf'));
+        $name = __('site.reports.daily_dales.title');
+        if (File::exists(public_path("$name.pdf"))) {
+            File::delete(public_path("$name.pdf"));
         }
-        $name = 'Ventas Diarias';
         $view = 'reports.reportes.ventas-diarias.pdf';
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, [
@@ -238,7 +228,7 @@ class VentasDiarias extends Component
 
     public function exportarExcel()
     {
-        $name = 'Ventas Diarias';
+        $name = __('site.reports.daily_dales.title');
         $fileName = "$name.xlsx";
 
         $res = $this->query();

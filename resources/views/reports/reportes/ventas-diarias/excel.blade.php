@@ -10,8 +10,8 @@
                 {{ __('site.common.period') }}:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
                 @if (!empty($sucursalesSeleccionadas))
                     &nbsp;|&nbsp;
-                    Sucursal(es): &nbsp;
-                    {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+                    {{__('site.reports.daily_dales.branches')}}: &nbsp;
+                    {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $sucursalesSeleccionadas)) }}
                 @endif
             </td>
         </tr>
@@ -30,8 +30,8 @@
         </tr>
         <tr>
             @foreach ($formasPago as $formaPago)
-                <th style="text-align: center;">Monto</th>
-                <th style="text-align: center;">Op.</th>
+                <th style="text-align: center;">{{__('site.reports.daily_dales.amount')}}</th>
+                <th style="text-align: center;">{{__('site.reports.daily_dales.quantity')}}</th>
             @endforeach
         </tr>
     </thead>
@@ -57,7 +57,7 @@
             {{-- Totalizador por sucursal --}}
             <tr>
                 <td>
-                    Total {{ $sucursalData['sucursal'] }}</td>
+                    {{__('site.reports.daily_dales.total')}} {{ $sucursalData['sucursal'] }}</td>
                 @foreach ($formasPago as $i => $formaPago)
                     @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                     <td style="text-align: right; font-weight: bold;">
@@ -70,7 +70,7 @@
             <tr>
                 <td colspan="{{ 2 + count($formasPago) * 2 }}">
                     <div>
-                        No se encontraron resultados...
+                        {{__('site.common.results_not_found')}}...
                     </div>
                 </td>
             </tr>
@@ -79,7 +79,7 @@
     @if (count($records) > 0)
         <tfoot>
             <tr>
-                <td colspan="2" style="text-align: right; font-weight: bold;">Total General</td>
+                <td colspan="2" style="text-align: right; font-weight: bold;">{{__('site.reports.daily_dales.grand_total')}}</td>
                 @foreach ($formasPago as $i => $formaPago)
                     @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                     <td style="text-align: right; font-weight: bold;">{{ number_format($totalGeneral['monto'], 2) }}

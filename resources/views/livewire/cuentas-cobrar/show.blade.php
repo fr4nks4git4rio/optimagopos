@@ -1,15 +1,15 @@
 <x-modal form-action="cancel">
     <x-slot:title>
-        Detalles {{$this->tipo}}: <strong>{{$factura->folio_interno}}</strong>
+        {{ __('site.common.details') }} {{$this->tipo}}: <strong>{{$factura->folio_interno}}</strong>
     </x-slot:title>
 
     <x-slot:content>
         <table class="table table-striped table-responsive">
             <thead>
             <tr>
-                <th class="text-center">Fecha de Pago</th>
-                <th class="text-center">Moneda</th>
-                <th class="text-center">Importe</th>
+                <th class="text-center">{{ __('site.accounts_receivable.show.payment_date') }}</th>
+                <th class="text-center">{{ __('site.accounts_receivable.show.currency') }}</th>
+                <th class="text-center">{{ __('site.accounts_receivable.show.import') }}</th>
             </tr>
             </thead>
             <tbody>
@@ -28,7 +28,7 @@
             @endforeach
             @if(count($pagos) > 0)
                 <tr>
-                    <td colspan="2" class="fw-bold text-end">Total:</td>
+                    <td colspan="2" class="fw-bold text-end">{{ __('site.accounts_receivable.show.total') }}:</td>
                     <td class="fw-bold text-center">{{number_format($total, 2)}}</td>
                 </tr>
             @endif
@@ -38,7 +38,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
-            Cerrar
+            {{__('site.common.close')}}
         </button>
     </x-slot:buttons>
 </x-modal>

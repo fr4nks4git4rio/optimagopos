@@ -9,8 +9,8 @@
                 {{ __('site.common.period') }}:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
                 @if (!empty($sucursalesSeleccionadas))
                     &nbsp;|&nbsp;
-                    Sucursal(es): &nbsp;
-                    {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+                    {{ __('site.reports.sales_by_operator.branches') }}: &nbsp;
+                    {{ Illuminate\Support\Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', implode(', ', $sucursalesSeleccionadas)) }}
                 @endif
             </td>
         </tr>
@@ -21,14 +21,20 @@
                     {{ $sort }}
                 </th>
             @endforeach
-            <th colspan="2" style="text-align:center; white-space: nowrap !important">Ventas</th>
-            <th colspan="2" style="text-align:center; white-space: nowrap !important">Correcciones</th>
+            <th colspan="2" style="text-align:center; white-space: nowrap !important">
+                {{ __('site.reports.sales_by_operator.sales') }}</th>
+            <th colspan="2" style="text-align:center; white-space: nowrap !important">
+                {{ __('site.reports.sales_by_operator.corrections') }}</th>
         </tr>
         <tr>
-            <th style="white-space: nowrap !important; text-align: right;">Monto</th>
-            <th style="white-space: nowrap !important; text-align: center;">Op.</th>
-            <th style="white-space: nowrap !important; text-align: right;">Monto</th>
-            <th style="white-space: nowrap !important; text-align: center;">Op.</th>
+            <th style="white-space: nowrap !important; text-align: right;">
+                {{ __('site.reports.sales_by_operator.amount') }}</th>
+            <th style="white-space: nowrap !important; text-align: center;">
+                {{ __('site.reports.sales_by_operator.quantity') }}</th>
+            <th style="white-space: nowrap !important; text-align: right;">
+                {{ __('site.reports.sales_by_operator.amount') }}</th>
+            <th style="white-space: nowrap !important; text-align: center;">
+                {{ __('site.reports.sales_by_operator.quantity') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -52,7 +58,7 @@
             {{-- Totalizador por sucursal --}}
             <tr>
                 <td style="font-weight: bold !important; text-align: right;">
-                    Total {{ $sucursalData['sucursal'] }}</td>
+                    {{ __('site.reports.sales_by_operator.total') }} {{ $sucursalData['sucursal'] }}</td>
                 <td style="font-weight: bold !important; text-align: right;">
                     {{ number_format($sucursalData['totales']['ventas_importe'], 2) }}</td>
                 <td style="font-weight: bold !important; text-align: center;">
@@ -66,7 +72,7 @@
         @empty
             <tr>
                 <td colspan="6">
-                    No se encontraron resultados...
+                    {{ __('site.common.results_not_found') }}...
                 </td>
             </tr>
         @endforelse
@@ -74,10 +80,12 @@
     @if (count($records) > 0)
         <tfoot>
             <tr>
-                <td colspan="2" style="text-align: right; font-weight: bold;">Total General</td>
-                <td style="text-align: right; font-weight: bold;">{{ number_format($grandTotal['ventas_importe'], 2) }}</td>
+                <td colspan="2" style="text-align: right; font-weight: bold;">{{ __('site.reports.sales_by_operator.grand_total') }}</td>
+                <td style="text-align: right; font-weight: bold;">{{ number_format($grandTotal['ventas_importe'], 2) }}
+                </td>
                 <td style="text-align: center; font-weight: bold;">{{ $grandTotal['ventas_cant'] }}</td>
-                <td style="text-align: right; font-weight: bold;">{{ number_format($grandTotal['correcciones_importe'], 2) }}
+                <td style="text-align: right; font-weight: bold;">
+                    {{ number_format($grandTotal['correcciones_importe'], 2) }}
                 </td>
                 <td style="text-align: center; font-weight: bold;">{{ $grandTotal['correcciones_cant'] }}</td>
             </tr>

@@ -1,4 +1,4 @@
-@section('title', 'Histórico de Tickets Video Kitchen')
+@section('title', __('site.reports.vk_ticket_history.title'))
 
 <div>
     <div wire:loading.delay.longer>
@@ -12,32 +12,37 @@
     <div class="row justify-content-between">
         <div class="row mb-1 col-md-10">
             <div class="col-sm-2">
-                <x-input label="Fecha Inicio" type="date" :lazy="true" model="fechaInicio" />
+                <x-input label="{{ __('site.reports.vk_ticket_history.start_date') }}" type="date" :lazy="true"
+                    model="fechaInicio" />
             </div>
             <div class="col-sm-2">
-                <x-input label="Fecha Fin" type="date" :lazy="true" model="fechaFin" />
+                <x-input label="{{ __('site.reports.vk_ticket_history.end_date') }}" type="date" :lazy="true"
+                    model="fechaFin" />
             </div>
             <div class="col-sm-2">
-                <x-select2-multiple label="Estado" placeholder="Seleccione..." class="form-control" :options="$estadosAll"
+                <x-select2-multiple label="{{ __('site.reports.vk_ticket_history.statuses') }}"
+                    placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$estadosAll"
                     model="estado" :lazy="true" :dynamic="true" />
             </div>
             <div class="col-sm-3">
-                <x-select2-multiple label="Sucursal" placeholder="Seleccione..." class="form-control" :options="$sucursalesAll"
+                <x-select2-multiple label="{{ __('site.reports.vk_ticket_history.branches') }}"
+                    placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$sucursalesAll"
                     model="sucursal" :lazy="true" :dynamic="true" />
             </div>
             <div class="col-sm-3">
-                <x-select2-multiple label="Terminal" placeholder="Seleccione..." class="form-control" :options="$terminalesAll"
+                <x-select2-multiple label="{{ __('site.reports.vk_ticket_history.terminals') }}"
+                    placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$terminalesAll"
                     model="terminal" :lazy="true" :dynamic="true" />
             </div>
         </div>
         <div class="mb-1 col-md-2 text-end">
             <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
                 <span class="bi bi-file-pdf"></span>
-                Imprimir
+                {{ __('site.common.print') }}
             </button>
             <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
                 <span class="bi bi-file-excel"></span>
-                Exportar
+                {{ __('site.common.export') }}
             </button>
         </div>
     </div>
@@ -59,25 +64,31 @@
                             </th>
                         @endforeach
                         <th class="text-center" colspan="2" style="white-space: nowrap !important">
-                            ABIERTO
+                            {{ __('site.statuses.tickets_vk.Open') }}
                         </th>
                         <th class="text-center" colspan="2" style="white-space: nowrap !important">
-                            EN PROCESO
+                            {{ __('site.statuses.tickets_vk.InProcess') }}
                         </th>
                         <th class="text-center" colspan="2" style="white-space: nowrap !important">
-                            DEMORADO
+                            {{ __('site.statuses.tickets_vk.Delayed') }}
                         </th>
                         <th class="text-center align-middle" rowspan="2" style="white-space: nowrap !important">
-                            TERMINADO
+                            {{ __('site.statuses.tickets_vk.Done') }}
                         </th>
                     </tr>
                     <tr>
-                        <th class="text-center" style="white-space: nowrap !important">Fecha/Hora</th>
-                        <th class="text-center" style="white-space: nowrap !important">Duración</th>
-                        <th class="text-center" style="white-space: nowrap !important">Fecha/Hora</th>
-                        <th class="text-center" style="white-space: nowrap !important">Duración</th>
-                        <th class="text-center" style="white-space: nowrap !important">Fecha/Hora</th>
-                        <th class="text-center" style="white-space: nowrap !important">Duración</th>
+                        <th class="text-center" style="white-space: nowrap !important">
+                            {{ __('site.reports.vk_ticket_history.date') }}</th>
+                        <th class="text-center" style="white-space: nowrap !important">
+                            {{ __('site.reports.vk_ticket_history.duration') }}</th>
+                        <th class="text-center" style="white-space: nowrap !important">
+                            {{ __('site.reports.vk_ticket_history.date') }}</th>
+                        <th class="text-center" style="white-space: nowrap !important">
+                            {{ __('site.reports.vk_ticket_history.duration') }}</th>
+                        <th class="text-center" style="white-space: nowrap !important">
+                            {{ __('site.reports.vk_ticket_history.date') }}</th>
+                        <th class="text-center" style="white-space: nowrap !important">
+                            {{ __('site.reports.vk_ticket_history.duration') }}</th>
                     </tr>
                 </thead>
             @endif
@@ -96,39 +107,47 @@
                             <td class="text-center">
                                 {{ $record->tiempo_abierto ?? '-' }}
                                 @if (!$record->fecha_terminado && $record->fecha_transaccion)
-                                    <i class="text-muted" title="Ticket aún en curso, tiempo calculado hasta ahora"> (en
-                                        curso)</i>
+                                    <i class="text-muted"
+                                        title="{{ __('site.reports.vk_ticket_history.ongoing_detail') }}">
+                                        ({{ __('site.reports.vk_ticket_history.ongoing') }})
+                                    </i>
                                 @endif
                             </td>
                             <td class="text-center">{{ $record->fecha_en_proceso_str ?? '-' }}</td>
                             <td class="text-center">
                                 {{ $record->tiempo_en_proceso ?? '-' }}
                                 @if (!$record->fecha_terminado && $record->fecha_en_proceso)
-                                    <i class="text-muted" title="Ticket aún en curso, tiempo calculado hasta ahora"> (en
-                                        curso)</i>
+                                    <i class="text-muted"
+                                        title="{{ __('site.reports.vk_ticket_history.ongoing_detail') }}">
+                                        ({{ __('site.reports.vk_ticket_history.ongoing') }})</i>
                                 @endif
                             </td>
                             <td class="text-center">{{ $record->fecha_demorado_str ?? '-' }}</td>
                             <td class="text-center">
                                 {{ $record->tiempo_demorado ?? '-' }}
                                 @if (!$record->fecha_terminado && $record->fecha_demorado)
-                                    <i class="text-muted" title="Ticket aún en curso, tiempo calculado hasta ahora"> (en
-                                        curso)</i>
+                                    <i class="text-muted"
+                                        title="{{ __('site.reports.vk_ticket_history.ongoing_detail') }}">
+                                        ({{ __('site.reports.vk_ticket_history.ongoing') }})
+                                    </i>
                                 @endif
                             </td>
                             <td class="text-center">{{ $record->fecha_terminado_str ?? '-' }}</td>
                         </tr>
                     @endforeach
                     <tr class="table-success fw-bold">
-                        <td colspan="3" class="text-end">Totales</td>
+                        <td colspan="3" class="text-end">{{ __('site.reports.vk_ticket_history.totals') }}
+                            {{ $sucursalData['sucursal'] }}</td>
                         <td class="text-center" colspan="2">
                             {{ $sucursalData['totales']['tickets_abiertos'] }}
-                            (Tiempo promedio: {{ $sucursalData['totales']['promedio_tickets_abiertos'] }})
+                            ({{ __('site.reports.vk_ticket_history.average_time') }}:
+                            {{ $sucursalData['totales']['promedio_tickets_abiertos'] }})
                         </td>
                         <td colspan="2"></td>
                         <td class="text-center" colspan="2">
                             {{ $sucursalData['totales']['tickets_demorados'] }}
-                            (Tiempo promedio: {{ $sucursalData['totales']['promedio_tickets_demorados'] }})
+                            ({{ __('site.reports.vk_ticket_history.average_time') }}:
+                            {{ $sucursalData['totales']['promedio_tickets_demorados'] }})
                         </td>
                         <td></td>
                     </tr>
@@ -136,7 +155,7 @@
                     <tr>
                         <td colspan="{{ count($this->sorts) + 7 }}" class="text-center">
                             <div class="list-group-item">
-                                No se encontraron resultados...
+                                {{ __('site.common.results_not_found') }}...
                             </div>
                         </td>
                     </tr>
@@ -145,15 +164,15 @@
             @if (count($records) > 0)
                 <tfoot>
                     <tr class="table-dark fw-bold">
-                        <td colspan="3" class="text-end">Totales</td>
+                        <td colspan="3" class="text-end">{{ __('site.reports.vk_ticket_history.grand_total') }}</td>
                         <td class="text-center" colspan="2">
                             {{ $totalGeneral['tickets_abiertos'] }}
-                            (Tiempo promedio: {{ $totalGeneral['promedio_tickets_abiertos'] }})
+                            ({{ __('site.reports.vk_ticket_history.average_time') }}: {{ $totalGeneral['promedio_tickets_abiertos'] }})
                         </td>
                         <td colspan="2"></td>
                         <td class="text-center" colspan="2">
                             {{ $totalGeneral['tickets_demorados'] }}
-                            (Tiempo promedio: {{ $totalGeneral['promedio_tickets_demorados'] }})</td>
+                            ({{ __('site.reports.vk_ticket_history.average_time') }}: {{ $totalGeneral['promedio_tickets_demorados'] }})</td>
                         <td></td>
                     </tr>
                 </tfoot>

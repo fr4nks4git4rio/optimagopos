@@ -9,17 +9,20 @@ use Maatwebsite\Excel\Concerns\FromView;
 class ReporteIngresosExport implements FromView
 {
     use Exportable;
+    private $name;
     private $ingresos;
 
-    public function __construct($ingresos)
+    public function __construct($name, $ingresos)
     {
+        $this->name = $name;
         $this->ingresos = $ingresos;
     }
 
     public function view(): View
     {
         return view('reports.excel.ingresos', [
-            'ingresos' => $this->ingresos
+            'name' => $this->name,
+            'ingresos' => $this->ingresos,
         ]);
     }
 }

@@ -164,8 +164,12 @@ class MyCompany extends Modal
                 ]);
                 if (count($this->company->direccion_fiscal->getDirty()) > 0) {
                     $attributes = Arr::except($this->company->direccion_fiscal->getDirty(), ['created_at', 'updated_at']);
-                    $log = $this->company->rfc ? "La Dirección Fiscal de la Empresa con RFC: {$this->company->rfc}, ha sido actualizada." : "La Dirección Fiscal de la Empresa con nombre comercial: {$this->company->nombre_comercial}, ha sido actualizada.";
-                    activity('Dirección Fiscal de Cliente Actualizada')
+                    if ($this->company->rfc) {
+                        $log = __('site.clients.save.address_updated_rfc', ['rfc' => $this->company->rfc]);
+                    } else {
+                        $log = __('site.clients.save.address_updated_commercial_name', ['nombre_comercial' => Crypt::decrypt($this->company->nombre_comercial)]);
+                    }
+                    activity(__('site.clients.save.fiscal_address_updated'))
                         ->on($this->company->direccion_fiscal)
                         ->event('updated')
                         ->withProperty('attributes', Direccion::parseData($attributes))
@@ -188,9 +192,13 @@ class MyCompany extends Modal
                 $this->company->direccion_fiscal_id = $dir->id;
                 $this->company->save();
 
-                $log = $this->company->rfc ? "La Dirección Fiscal de la Empresa con RFC: {$this->company->rfc}, ha sido creada." : "La Dirección Fiscal de la Empresa con nombre comercial: {$this->company->nombre_comercial}, ha sido creada.";
+                if ($this->company->rfc) {
+                    $log = __('site.clients.save.address_created_rfc', ['rfc' => $this->company->rfc]);
+                } else {
+                    $log = __('site.clients.save.address_created_commercial_name', ['nombre_comercial' => Crypt::decrypt($this->company->nombre_comercial)]);
+                }
 
-                activity("Dirección Fiscal de Cliente Creada")
+                activity(__('site.clients.save.fiscal_address_created'))
                     ->on($dir)
                     ->event('created')
                     ->withProperties(Direccion::parseData(Arr::except($dir->toArray(), ['updated_at'])))
@@ -210,14 +218,14 @@ class MyCompany extends Modal
             }
             $this->company->save();
 
-            $this->dispatch('show-toast', 'Datos guardados.');
+            $this->dispatch('show-toast', __('site.clients.save.client_saved_successfully'));
             $this->dispatch('$refresh');
             DB::commit();
             $this->dispatch('closeModal');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
-            $this->dispatch('show-toast', 'Ocurrio un error. ' . $e->getMessage(), 'danger');
+            $this->dispatch('show-toast', __('site.clients.save.client_save_failed'), 'danger');
         }
     }
 

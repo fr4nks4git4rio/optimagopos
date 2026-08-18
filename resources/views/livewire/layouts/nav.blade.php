@@ -111,7 +111,7 @@
                     </div>
 
                     <div class="nav-item flex-shrink-0 dropdown">
-                        <a class="nav-link dropdown-toggle px-2" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle px-2 cursor-pointer" data-bs-toggle="dropdown">
                             {{ strtoupper(user()->lang ?? config('app.locale')) }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end">

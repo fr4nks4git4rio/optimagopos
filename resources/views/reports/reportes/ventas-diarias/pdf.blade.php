@@ -205,7 +205,7 @@
                         <div class="company-meta">
                             RFC: {{ $empresa->rfc ?? '' }}
                             @if (!empty($empresa->direccion_fiscal))
-                                &nbsp;|&nbsp; Dirección: {{ $empresa->direccion_plain }}
+                                &nbsp;|&nbsp; {{__('site.address.address')}}: {{ $empresa->direccion_plain }}
                             @endif
                         </div>
                     @endif
@@ -222,11 +222,11 @@
 
     {{-- ================= FILTROS APLICADOS ================= --}}
     <div class="filters-box">
-        <strong>Periodo:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+        <strong>{{__('site.common.period')}}:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
         @if (!empty($sucursalesSeleccionadas))
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            <strong>Sucursal(es):</strong>
-            {{ Illuminate\Support\Str::replaceLast(', ', ' y ', implode(', ', $sucursalesSeleccionadas)) }}
+            <strong>{{__('site.reports.daily_dales.branches')}}:</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $sucursalesSeleccionadas)) }}
         @endif
     </div>
 
@@ -244,8 +244,8 @@
                 </tr>
                 <tr class="sub-header">
                     @foreach ($formasPago as $formaPago)
-                        <th style="text-align: right">Monto</th>
-                        <th>Op.</th>
+                        <th style="text-align: right">{{__('site.reports.daily_dales.amount')}}</th>
+                        <th>{{__('site.reports.daily_dales.quantity')}}</th>
                     @endforeach
                 </tr>
             </thead>
@@ -277,7 +277,7 @@
 
                 {{-- Totalizador por sucursal --}}
                 <tr class="subtotal-row">
-                    <td colspan="2" style="text-align: right">Total {{ $sucursalData['sucursal'] }}</td>
+                    <td colspan="2" style="text-align: right">{{__('site.reports.daily_dales.total')}} {{ $sucursalData['sucursal'] }}</td>
                     @foreach ($formasPago as $i => $formaPago)
                         @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                         <td style="text-align: right">{{ number_format($totalCelda['monto'], 2) }}</td>
@@ -287,7 +287,7 @@
             @empty
                 <tr>
                     <td colspan="{{ 2 + count($formasPago) * 2 }}" class="no-results">
-                        No se encontraron resultados para los filtros seleccionados.
+                        {{__('site.common.results_not_found')}}...
                     </td>
                 </tr>
             @endforelse
@@ -296,7 +296,7 @@
         @if (count($records) > 0)
             <tfoot>
                 <tr class="grand-total-row">
-                    <td colspan="2" style="text-align: right">TOTAL GENERAL</td>
+                    <td colspan="2" style="text-align: right">{{__('site.reports.daily_dales.grand_total')}}</td>
                     @foreach ($formasPago as $i => $formaPago)
                         @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                         <td style="text-align: right">{{ number_format($totalGeneral['monto'], 2) }}</td>
