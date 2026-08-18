@@ -2,7 +2,7 @@
 <div wire:init="init" class="row" x-data="{
     mostrarFiltros: true,
     init() {
-        {{-- this.loadData(); --}}
+        this.loadData();
         // En móvil arrancamos con filtros ocultos para priorizar contenido
         if (window.innerWidth < 768) {
             this.mostrarFiltros = false;
