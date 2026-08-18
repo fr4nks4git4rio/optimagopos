@@ -201,6 +201,7 @@ class HomeController
 
                 if ($type === 'Tax') {
                     if (!isset($item['Name']) || !isset($item['Amount'])) {
+                        DB::rollBack();
                         ModelsLog::create([
                             'log' => 'Propiedad no recibida en ítem Tax. Propiedades esperadas: Name y Amount.',
                             'data' => $decoded ? json_encode($decoded) : '',
@@ -216,7 +217,6 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        DB::rollBack();
                         return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Tax. Propiedades esperadas: Name y Amount.'], 400);
                     }
                     $ticket->impuestos()->create([
@@ -227,6 +227,7 @@ class HomeController
 
                 if ($type === 'Tender') {
                     if (!isset($item['Name']) || !isset($item['Amount'])) {
+                        DB::rollBack();
                         ModelsLog::create([
                             'log' => 'Propiedad no recibida en ítem Tender. Propiedades esperadas: Name y Amount.',
                             'data' => $decoded ? json_encode($decoded) : '',
@@ -242,7 +243,6 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        DB::rollBack();
                         return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Tender'], 400);
                     }
                     $forma_pago = DB::table('tb_sucursal_forma_pagos')
@@ -251,6 +251,7 @@ class HomeController
                         ->whereNull('deleted_at')
                         ->get()->first();
                     if (!$forma_pago) {
+                        DB::rollBack();
                         ModelsLog::create([
                             'log' => 'Error. Forma de pago no encontrada.',
                             'data' => json_encode($decoded),
@@ -267,7 +268,6 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        DB::rollBack();
                         return response()->json(['success' => false, 'error' => 'Forma de pago no encontrada'], 400);
                     }
                     $tasa_cambio = 1;
@@ -291,6 +291,7 @@ class HomeController
 
                 if ($type === 'Product') {
                     if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        DB::rollBack();
                         ModelsLog::create([
                             'log' => 'Propiedad no recibida en ítem Product. Propiedades esperadas: Id, Name, Amount, Qty, DepartmentId y DepartmentName.',
                             'data' => $decoded ? json_encode($decoded) : '',
@@ -306,7 +307,6 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        DB::rollBack();
                         return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Product'], 400);
                     }
 
@@ -361,6 +361,7 @@ class HomeController
 
                 if ($type === 'Department') {
                     if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        DB::rollBack();
                         ModelsLog::create([
                             'log' => 'Propiedad no recibida en ítem Department. Propiedades esperadas: Id, Name, Amount y Qty.',
                             'data' => $decoded ? json_encode($decoded) : '',
@@ -376,7 +377,6 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        DB::rollBack();
                         return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Department'], 400);
                     }
 
@@ -413,6 +413,7 @@ class HomeController
 
                 if ($type === 'Correction') {
                     if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        DB::rollBack();
                         ModelsLog::create([
                             'log' => 'Propiedad no recibida en ítem Correction. Propiedades esperadas: Name, Amount y Qty.',
                             'data' => $decoded ? json_encode($decoded) : '',
@@ -428,7 +429,6 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        DB::rollBack();
                         return response()->json(['success' => false, 'error' => 'Propiedad no recibida en ítem Correction'], 400);
                     }
 
@@ -451,6 +451,7 @@ class HomeController
 
             DB::commit();
         } catch (Exception $e) {
+            DB::rollBack();
             ModelsLog::create([
                 'log' => "Error recibiendo ticket json. Error: {$e->getMessage()}",
                 'data' => $decoded ? json_encode($decoded) : '',
@@ -463,7 +464,6 @@ class HomeController
                 'es_vk' => 0
             ]);
             Log::error("Error recibiendo ticket json. Error: {$e->getMessage()}");
-            DB::rollBack();
             return response()->json(['success' => false, 'error' => 'Error recibiendo ticket json'], 400);
         }
 
