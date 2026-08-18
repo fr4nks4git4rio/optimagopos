@@ -116,7 +116,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4">
+                        <td colspan="7">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>

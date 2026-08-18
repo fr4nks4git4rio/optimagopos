@@ -359,7 +359,7 @@ class AutoFacturacion extends Component
             $this->dispatch('show-toast', 'Datos guardados satisfactoriamente', 'success');
             $this->rfc = $newComensal->rfc;
             $this->rfc_exists = true;
-            $this->registrarComensalClass = '';
+            $this->dispatch('hide-sub-modal', 'modal-comensal');
         }
     }
 
@@ -390,7 +390,7 @@ class AutoFacturacion extends Component
             $this->alertaRegistrarComensal = "Lo sentimos su RFC no se encuentra registrado en nuestra plataforma. Verifique que su RFC esta correctamente escrito, y de ser asi puede llenar sus datos en el formulario que se muestra.";
             $this->comensal['id'] = null;
             $this->comensal['rfc'] = Str::upper($rfc);
-            $this->registrarComensalClass = 'show';
+            $this->dispatch('show-sub-modal', 'modal-comensal');
             $this->rfc = '';
         } else {
             $this->rfc_exists = true;
@@ -608,6 +608,6 @@ class AutoFacturacion extends Component
 
     public function mostrarTicketMuestra()
     {
-        $this->ticketImageClass = 'show';
+        $this->dispatch('show-sub-modal', 'modal-ticket');
     }
 }

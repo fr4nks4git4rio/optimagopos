@@ -180,13 +180,12 @@
             </div>
         </div>
 
-        <div class="modal fade{{ $registrarComensalClass }}" id="modal-comensal" tabindex="-1" wire:ignore.self>
+        <div class="modal fade" id="modal-comensal" tabindex="-1" wire:ignore.self>
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $comensal['id'] ? 'Detalles Cliente' : 'Nuevo Cliente' }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            wire:click="$set('registrarComensalClass', '')"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body pb-0">
                         <div class="row">
@@ -299,8 +298,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('registrarComensalClass', '')">{{ __('Cerrar') }}</button>
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">{{ __('Cerrar') }}</button>
                         @if (!$comensal['id'])
                             <button type="button" class="btn btn-primary"
                                 wire:click="guardarComensal">Guardar</button>
@@ -309,20 +308,19 @@
                 </div>
             </div>
         </div>
-        <div class="modal {{ $ticketImageClass }}" id="modal-comensal">
+        <div class="modal fade" id="modal-ticket" tabindex="-1" wire:ignore.self>
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Ticket de Muestra</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            wire:click="$set('ticketImageClass', '')"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body pb-0 text-center">
                         <img src="{{ asset('/img/Ticket.png') }}" class="m-auto w-100" alt="Ticket Muestra">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            wire:click="$set('ticketImageClass', '')">{{ __('Cerrar') }}</button>
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">{{ __('Cerrar') }}</button>
                     </div>
                 </div>
             </div>
