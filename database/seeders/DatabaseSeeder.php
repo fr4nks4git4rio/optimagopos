@@ -2,21 +2,41 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
+     *
+     * Order matters: catalog tables with no dependencies go first,
+     * then tables whose foreign keys point at tables seeded above.
+     * TbEstadosSeeder must run before TbLocalidadesSeeder and
+     * TbMunicipiosSeeder, since both reference tb_estados.id via
+     * their estado_id foreign key.
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $this->call([
+            TbEstadosSeeder::class,
+            TbClaveUnidadesSeeder::class,
+            TbClaveProdServsSeeder::class,
+            TbCfdisSeeder::class,
+            TbFormaPagosSeeder::class,
+            TbMetodoPagosSeeder::class,
+            TbMesesSeeder::class,
+            TbModulosSeeder::class,
+            TbMonedasSeeder::class,
+            TbMotivosCancelacionFacturaSeeder::class,
+            TbObjetosImpuestoSeeder::class,
+            TbPeriodicidadesFacturaSeeder::class,
+            TbRegimenFiscalesSeeder::class,
+            TbRolesSeeder::class,
+            TbSeriesSeeder::class,
+            TbTipoComprobantesSeeder::class,
+            TbTipoRelacionFacturasSeeder::class,
+            TbLocalidadesSeeder::class,
+            TbMunicipiosSeeder::class,
+        ]);
     }
 }
