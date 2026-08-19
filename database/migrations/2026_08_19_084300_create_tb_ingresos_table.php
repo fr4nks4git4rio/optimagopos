@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tb_modulos', function (Blueprint $table) {
+        Schema::create('tb_ingresos', function (Blueprint $table) {
+
             $table->id();
-            $table->string('icono');
-            $table->string('icono_color');
-            $table->string('nombre');
-            $table->text('descripcion')->nullable();
-            $table->integer('cant_funciones');
-            $table->float('costo_base');
+            $table->timestamp('fecha')->useCurrent();
+            $table->text('comentarios')->nullable();
+            $table->boolean('conciliado')->default(false);
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tb_modulos');
+        Schema::dropIfExists('tb_ingresos');
     }
 };
