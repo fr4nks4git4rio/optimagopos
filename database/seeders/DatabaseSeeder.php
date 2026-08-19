@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             TbLocalidadesSeeder::class,
             TbMunicipiosSeeder::class,
             TbOwnerSeeder::class,
+            TbConfigsSeeder::class,
         ]);
     }
 }
