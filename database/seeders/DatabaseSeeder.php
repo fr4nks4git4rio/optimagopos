@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
         $this->call([
             TbEstadosSeeder::class,
             TbClaveUnidadesSeeder::class,
@@ -37,6 +38,7 @@ class DatabaseSeeder extends Seeder
             TbTipoRelacionFacturasSeeder::class,
             TbLocalidadesSeeder::class,
             TbMunicipiosSeeder::class,
+            TbOwnerSeeder::class,
         ]);
     }
 }
