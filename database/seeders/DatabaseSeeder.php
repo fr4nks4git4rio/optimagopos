@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
             TbMunicipiosSeeder::class,
             TbOwnerSeeder::class,
             TbConfigsSeeder::class,
+            TbUserSeeder::class,
         ]);
     }
 }

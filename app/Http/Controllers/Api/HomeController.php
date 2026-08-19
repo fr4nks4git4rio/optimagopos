@@ -64,7 +64,7 @@ class HomeController
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 0
             ]);
-            return response()->json(['success' => false, 'error' => __('site.data_parser.incomplete_jason')], 400);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         // dd(Carbon::parse($decoded['TransactionStartTime'])->format('Y-m-d H:i:s'));
@@ -90,7 +90,7 @@ class HomeController
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 0
             ]);
-            return response()->json(['success' => false, 'error' => __('site.data_parser.terminal_not_found')], 400);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         if ($terminal->es_vk) {
@@ -108,7 +108,7 @@ class HomeController
                 'terminal_id' => $terminal->id,
                 'es_vk' => 0
             ]);
-            return response()->json(['success' => false, 'error' => __('site.data_parser.terminal_is_vk')], 400);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         ModelsLog::create([
@@ -141,7 +141,7 @@ class HomeController
                     'terminal_id' => $terminal->id,
                     'es_vk' => 0
                 ]);
-                return response()->json(['success' => false, 'error' => __('site.data_parser.employee_id_not_received')], 400);
+                return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
             }
             $clerk = Empleado::where('sucursal_id', $terminal->sucursal_id)->where('id_empleado', $decoded['ClerkId'])->first();
             if (!$clerk) {
@@ -217,7 +217,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name ' . __('site.common.and') . ' Amount'])], 400);
+                        return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                     }
                     $ticket->impuestos()->create([
                         'nombre' => $item['Name'],
@@ -243,7 +243,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Tender', 'properties' => 'Name ' . __('site.common.and') . ' Amount'])], 400);
+                        return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                     }
                     $forma_pago = DB::table('tb_sucursal_forma_pagos')
                         ->where('sucursal_id', $terminal->sucursal_id)
@@ -268,7 +268,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => __('site.data_parser.payment_form_not_found', ['payment_form' => $item['Name']])], 400);
+                        return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                     }
                     $tasa_cambio = 1;
                     if ($forma_pago && $forma_pago->moneda_id != $terminal->sucursal->moneda_base_id) {
@@ -307,7 +307,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Product', 'properties' => 'Id, Name, Amount, Qty, DepartmentId ' . __('site.common.and') . ' DepartmentName'])], 400);
+                        return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                     }
 
                     $producto = Producto::where('sucursal_id', $terminal->sucursal_id)
@@ -377,7 +377,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Department', 'properties' => 'Id, Name, Amount ' . __('site.common.and') . ' Qty'])], 400);
+                        return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                     }
 
                     $departamento = Departamento::where('sucursal_id', $terminal->sucursal_id)
@@ -429,7 +429,7 @@ class HomeController
                             'cliente_id' => $terminal->sucursal->cliente_id,
                             'es_vk' => 0
                         ]);
-                        return response()->json(['success' => false, 'error' => __('site.data_parser.properties_not_found', ['item' => 'Correction', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Qty'])], 400);
+                        return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                     }
 
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
@@ -464,7 +464,7 @@ class HomeController
                 'es_vk' => 0
             ]);
             Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage()]));
-            return response()->json(['success' => false, 'error' => __('site.data_parser.exception_error', ['error' => $e->getMessage()])], 400);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
@@ -501,7 +501,7 @@ class HomeController
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 1
             ]);
-            return response()->json(['success' => false, 'error' => __('site.data_parser.incomplete_jason')], 400);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         $terminalId = $decoded['TerminalId'];
@@ -520,7 +520,7 @@ class HomeController
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 1
             ]);
-            return response()->json(['success' => false, 'error' => __('site.data_parser.terminal_not_found')], 400);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         if (!$terminal->es_vk) {
@@ -538,7 +538,7 @@ class HomeController
                 'terminal_id' => $terminal->id,
                 'es_vk' => 1
             ]);
-            return response()->json(['success' => false, 'error' => __('site.data_parser.terminal_not_vk')], 400);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         ModelsLog::create([
@@ -636,7 +636,7 @@ class HomeController
                         'es_vk' => 1
                     ]);
                     DB::rollBack();
-                    return response()->json(['success' => false, 'error' => __('site.data_parser.property_not_found_in_package', ['property' => 'name'])], 400);
+                    return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                 }
 
                 $regex = '/^\s*(\d+(?:[.,]\d+)?)\s+(.+?)\s*$/';
@@ -661,7 +661,7 @@ class HomeController
                         'es_vk' => 1
                     ]);
                     DB::rollBack();
-                    return response()->json(['success' => false, 'error' => __('site.data_parser.property_invalid_format', ['property' => 'name'])], 400);
+                    return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                 }
 
                 if (isset($item['seat']))
@@ -698,7 +698,7 @@ class HomeController
             ]);
             Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage()]));
             DB::rollBack();
-            return response()->json(['success' => false, 'error' => __('site.data_parser.exception_error', ['error' => $e->getMessage()])], 400);
+            return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
         return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
