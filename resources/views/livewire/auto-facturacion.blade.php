@@ -98,7 +98,7 @@
                                 </div>
                             </div>
                             <div class="mb-1">
-                                <x-input label="'{{ __('site.self_billing.rfc') }}" :lazy="true" model="rfc" />
+                                <x-input label="{{ __('site.self_billing.rfc') }}" :lazy="true" model="rfc" />
                             </div>
                             @if ($rfc_exists)
                                 <div class="mb-1">

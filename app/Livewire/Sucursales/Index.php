@@ -72,8 +72,7 @@ class Index extends Component
 
         $records = $this->query();
 
-        // Paginación manual compatible con Livewire 3
-        $currentPage = $this->getPage(); // Obtiene la página real de Livewire
+        $currentPage = $this->getPage();
         $total = $records->count();
         $currentItems = $records->forPage($currentPage, $this->perPage)->values();
 

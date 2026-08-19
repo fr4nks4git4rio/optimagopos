@@ -350,13 +350,19 @@ class AutoFacturacion extends Component
 
             Sucursal::find($this->suc)->cliente->comensales()->attach($newComensal->id);
 
-            activity("Dirección Fiscal de Cliente Creada")
+            if ($newComensal->rfc) {
+                $log = __('site.clients.save.address_created_rfc', ['rfc' => $newComensal->rfc]);
+            } else {
+                $log = __('site.clients.save.address_created_commercial_name', ['nombre_comercial' => Crypt::decrypt($newComensal->nombre_comercial)]);
+            }
+
+            activity(__('site.clients.save.fiscal_address_created'))
                 ->on($dir)
                 ->event('created')
                 ->withProperties(Direccion::parseData(Arr::except($dir->toArray(), ['updated_at'])))
-                ->log('La Dirección Fiscal del Cliente con RFC: ' . $newComensal->rfc . ' ha sido creada.');
+                ->log($log);
 
-            $this->dispatch('show-toast', 'Datos guardados satisfactoriamente', 'success');
+            $this->dispatch('show-toast', __('site.clients.save.client_saved_successfully'), 'success');
             $this->rfc = $newComensal->rfc;
             $this->rfc_exists = true;
             $this->dispatch('hide-sub-modal', 'modal-comensal');
@@ -368,31 +374,30 @@ class AutoFacturacion extends Component
         $rfc = $rfc ?: $this->rfc;
 
         if (!$rfc) {
-            $this->addError('rfc', 'Campo requerido!');
+            $this->addError('rfc', __('validation.required', ['attribute' => __('site.clients.save.rfc')]));
             return;
         }
         if (!$this->suc) {
-            $this->addError('suc', 'Campo requerido!');
+            $this->addError('suc', __('validation.required', ['attribute' => __('site.terminals.save.branch')]));
             return;
         }
         $isFisica = preg_match('/^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/i', $rfc);
         $isMoral  = preg_match('/^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/i', $rfc);
 
         if (!$isFisica && !$isMoral) {
-            $this->addError('rfc', 'Formato incorrecto.');
+            $this->addError('rfc', __('site.validation.rfc_format'));
             return;
         }
-        $comensal = DB::table('tb_clientes as c')
-            ->select('c.*')
-            ->where('rfc', $rfc)
-            ->first();
+        $comensal = Cliente::withTrashed()->where('es_comensal', 1)->where('rfc', $rfc)->first();
         if (!$comensal) {
-            $this->alertaRegistrarComensal = "Lo sentimos su RFC no se encuentra registrado en nuestra plataforma. Verifique que su RFC esta correctamente escrito, y de ser asi puede llenar sus datos en el formulario que se muestra.";
+            $this->alertaRegistrarComensal = __('site.self_billing.diner_not_found');
             $this->comensal['id'] = null;
             $this->comensal['rfc'] = Str::upper($rfc);
             $this->dispatch('show-sub-modal', 'modal-comensal');
             $this->rfc = '';
         } else {
+            if ($comensal->trashed())
+                $comensal->restore();
             $this->rfc_exists = true;
         }
     }
@@ -434,7 +439,7 @@ class AutoFacturacion extends Component
             ->where('id_transaccion', $data['ticket'])
             ->where('sucursal_id', $this->suc)->count() == 0
         ) {
-            $this->addError('ticket', 'El Ticket no fue emitido por la Sucursal seleccionada!');
+            $this->addError('ticket', __('site.self_billing.ticket_validation_1'));
             return;
         }
 
@@ -443,20 +448,20 @@ class AutoFacturacion extends Component
             ->where('id_transaccion', $data['ticket'])
             ->where('terminal_id', $this->terminal->id)->count() == 0
         ) {
-            $this->addError('ticket', 'El Ticket no se corresponde con el Código entrado!');
+            $this->addError('ticket', __('site.self_billing.ticket_validation_2'));
             return;
         }
 
         $ticket = Ticket::where('id_transaccion', $this->ticket)->where('terminal_id', $this->terminal->id)->first();
 
         if (!$ticket) {
-            $this->dispatch('show-toast', 'Ticket no encontrado.', 'danger');
+            $this->dispatch('show-toast', __('site.self_billing.ticket_not_found'), 'danger');
             return;
         }
-        if ($ticket->vigencia_facturacion && $ticket->vigencia_facturacion->format('Y-m-d') < today()->format('Y-m-d')) {
-            $this->dispatch('openModal', component: 'modal-toast', arguments: ['messages' => [['type' => 'danger', 'text' => 'Lo sentimos. La vigencia del Ticket para su facturación ya ha expirado.']]]);
-            return;
-        }
+        // if ($ticket->vigencia_facturacion && $ticket->vigencia_facturacion->format('Y-m-d') < today()->format('Y-m-d')) {
+        //     $this->dispatch('openModal', component: 'modal-toast', arguments: ['messages' => [['type' => 'danger', 'text' => __('site.self_billing.ticket_validation_3')]]]);
+        //     return;
+        // }
 
         if ($this->facturar_por_forma_pago) {
             $ticket_facturado = true;
@@ -470,7 +475,7 @@ class AutoFacturacion extends Component
             $ticket_facturado = $ticket->factura()->exists() && ($ticket->factura->estado == 'TIMBRADA' || $ticket->factura->estado == 'COBRADA');
         }
         if ($ticket_facturado) {
-            $this->dispatch('openModal', component: 'modal-toast', arguments: ['messages' => [['type' => 'success', 'text' => 'El Ticket ya ha sido facturado previamente.']]]);
+            $this->dispatch('openModal', component: 'modal-toast', arguments: ['messages' => [['type' => 'success', 'text' => __('site.self_billing.ticket_validation_4')]]]);
             return;
         }
 
@@ -603,7 +608,7 @@ class AutoFacturacion extends Component
 
         DB::table('tb_clientes')->where('id', $comensal->id)->update(['es_comensal' => 1]);
 
-        // return redirect()->to($url)->with('status', 'Operación exitosa');
+        return redirect()->to($url)->with('status', 'Operación exitosa');
     }
 
     public function mostrarTicketMuestra()

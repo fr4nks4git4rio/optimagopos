@@ -44,12 +44,12 @@ class TimbrarAutoFactura extends Component
     public $cfdis = [];
     public $tiposRelacionFactura = [];
 
-    public $posiblesConceptos = ['CONSUMO DE ALIMENTO Y BEBIDAS', 'CONSUMO DE BEBIDAS', 'CONSUMO DE ALIMENTOS', 'DIVERSOS'];
+    public $posiblesConceptos = [];
 
     public $cfdis_relacionados = [];
     public $incluir_propina = false;
     public $agrupar_conceptos = true;
-    public $concepto_agrupado = 'CONSUMO DE ALIMENTO Y BEBIDAS';
+    public $concepto_agrupado = '';
     public $cfdisModalClass = '';
     public $factura_timbrada = false;
     protected $listeners = ['$refresh', 'cambioIncluirPropina'];
@@ -76,6 +76,8 @@ class TimbrarAutoFactura extends Component
             ];
         })->toArray();
         $this->tiposRelacionFactura = array_merge([['value' => '', 'label' => '']], $this->tiposRelacionFactura);
+        $this->concepto_agrupado = __('site.self_billing_stamp.concept_1');
+        $this->posiblesConceptos = [__('site.self_billing_stamp.concept_1'), __('site.self_billing_stamp.concept_2'), __('site.self_billing_stamp.concept_3'), __('site.self_billing_stamp.concept_4')];
     }
 
     public function hydrate()
@@ -143,7 +145,7 @@ class TimbrarAutoFactura extends Component
 
     public function showModalCfdisRelacionados()
     {
-        $this->cfdisModalClass = 'show';
+        $this->dispatch('show-sub-modal', 'modal-cfdis');
     }
 
     public function addCfdiRelacionado()
@@ -168,23 +170,24 @@ class TimbrarAutoFactura extends Component
 
     public function timbrar()
     {
-        $data = $this->validate([
-            'rfc' => ['required', new RfcRule('ambas')],
-            'nombre_comercial' => ['required'],
-            'razon_social' => ['required'],
-            'lugar_expedicion' => ['required'],
-            'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id', new RfcYRegimenCoherentesRule($this->rfc)],
-            'cfdi_id' => ['required', 'exists:tb_cfdis,id']
-        ],
-        // [
-        //     'nombre_comercial.required' => 'Campo requerido',
-        //     'razon_social.required' => 'Campo requerido',
-        //     'lugar_expedicion.required' => 'Campo requerido',
-        //     'regimen_fiscal_id.required' => 'Campo requerido',
-        //     'regimen_fiscal_id.exists' => 'Régimen Fiscal no encontrado',
-        //     'cfdi_id.required' => 'Campo requerido.',
-        //     'cfdi_id.exists' => 'Cfdi no encontrado.'
-        // ]
+        $data = $this->validate(
+            [
+                'rfc' => ['required', new RfcRule('ambas')],
+                'nombre_comercial' => ['required'],
+                'razon_social' => ['required'],
+                'lugar_expedicion' => ['required'],
+                'regimen_fiscal_id' => ['required', 'exists:tb_regimen_fiscales,id', new RfcYRegimenCoherentesRule($this->rfc)],
+                'cfdi_id' => ['required', 'exists:tb_cfdis,id']
+            ],
+            // [
+            //     'nombre_comercial.required' => 'Campo requerido',
+            //     'razon_social.required' => 'Campo requerido',
+            //     'lugar_expedicion.required' => 'Campo requerido',
+            //     'regimen_fiscal_id.required' => 'Campo requerido',
+            //     'regimen_fiscal_id.exists' => 'Régimen Fiscal no encontrado',
+            //     'cfdi_id.required' => 'Campo requerido.',
+            //     'cfdi_id.exists' => 'Cfdi no encontrado.'
+            // ]
         );
         try {
             DB::beginTransaction();
@@ -307,13 +310,19 @@ class TimbrarAutoFactura extends Component
             if ($res['success']) {
                 $this->factura->propietario->comensales()->syncWithoutDetaching($this->factura->cliente_id);
                 $this->factura_timbrada = true;
-                $this->dispatch('show-toast', "Factura timbrada satisfactoriamente.");
+                $this->dispatch('show-toast', __('site.self_billing_stamp.invoice_stamped'));
             } else {
                 $this->dispatch('show-toast', pretty_message($res['message'], 'danger'), 'danger');
             }
+
+            activity(__('site.invoices.index.log_invoice_stamped'))
+                ->on($this->factura)
+                ->withProperties($this->factura->getDirty())
+                ->log(__('site.invoices.log_invoice_stamped_detail', ['folio' => $this->factura->folio_interno]));
+
             DB::commit();
         } catch (Exception $e) {
-            $this->dispatch('show-toast', 'Ha ocurrido un error intentando timbrar la Factura.', 'danger');
+            $this->dispatch('show-toast', __('site.self_billing_stamp.invoice_stamp_error'), 'danger');
             Log::error("Ha ocurrido un error intentando timbrar una Factura. Error: {$e->getMessage()}");
             DB::rollBack();
         }
