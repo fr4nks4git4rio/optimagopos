@@ -136,11 +136,18 @@
                                     <label class="form-label fw-bold text-dark small">ClerkId</label>
                                     <input type="text" class="form-control" wire:model.live="formData.ClerkId">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label fw-bold text-dark small">ClerkName</label>
                                     <input type="text" class="form-control" wire:model.live="formData.ClerkName">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-dark small">TrainingMode</label>
+                                    <select class="form-select" wire:model.live="formData.TrainingMode">
+                                        <option value="true">{{ __('site.common.yes') }}</option>
+                                        <option value="false">{{ __('site.common.no') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
                                     <label class="form-label fw-bold text-dark small">FiscalInvoice</label>
                                     <select class="form-select" wire:model.live="formData.FiscalInvoice">
                                         <option value="Si">{{ __('site.common.yes') }}</option>

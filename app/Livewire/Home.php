@@ -171,6 +171,7 @@ class Home extends Component
 
     private function commonWhere($query)
     {
+        $query->where('ticket.modo_entrenamiento', 0);
         if ($this->fecha_inicio)
             $query->whereDate('ticket.fecha_transaccion', '>=', "$this->fecha_inicio 00:00:00");
         if ($this->fecha_fin)

@@ -121,6 +121,7 @@ class VentasOperador extends Component
             ->leftJoinSub($correccionesSub, 'cor', 'cor.ticket_id', 'ticket.id')
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
             ->leftJoin('tb_empleados as empleado', 'empleado.id', 'ticket.empleado_id')
+            ->where('ticket.modo_entrenamiento', 0)
             ->groupBy('sucursal.id', 'sucursal.nombre_comercial', 'empleado.id', 'empleado.nombre');
 
         if ($this->fechaInicio) {

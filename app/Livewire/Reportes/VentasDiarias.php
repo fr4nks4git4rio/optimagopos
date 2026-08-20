@@ -103,6 +103,7 @@ class VentasDiarias extends Component
             ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'operacion.sucursal_forma_pago_id')
             ->where('operacion.monto', '>', 0)
             ->where('sucursal.cliente_id', user()->cliente_id)
+            ->where('ticket.modo_entrenamiento', 0)
             ->groupByRaw('DATE(ticket.fecha_transaccion), operacion.sucursal_forma_pago_id');
 
         if ($this->fechaInicio) {

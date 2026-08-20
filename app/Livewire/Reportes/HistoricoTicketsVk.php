@@ -124,7 +124,8 @@ class HistoricoTicketsVk extends Component
             )
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-            ->where('sucursal.cliente_id', user()->cliente_id);
+            ->where('sucursal.cliente_id', user()->cliente_id)
+            ->where('ticket.modo_entrenamiento', 0);
 
         if ($this->fechaInicio) {
             $query->whereDate('ticket.fecha_transaccion', '>=', $this->fechaInicio);

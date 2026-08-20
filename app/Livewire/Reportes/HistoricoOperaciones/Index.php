@@ -150,6 +150,7 @@ class Index extends Component
             ->leftJoin('tb_empleados as e', 'e.id', '=', 't.empleado_id')
             ->leftJoin('tb_clientes as c', 'c.id', '=', 't.comensal_id')
             ->where('s.cliente_id', user()->cliente_id)
+            ->where('t.modo_entrenamiento', 0)
             ->groupBy('t.id');
 
         if ($this->fecha_inicio)

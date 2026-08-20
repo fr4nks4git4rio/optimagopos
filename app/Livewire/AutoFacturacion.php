@@ -264,7 +264,7 @@ class AutoFacturacion extends Component
             $query->leftJoin('tb_facturas as factura', 'factura.id', '=', 'ticket.factura_id');
         }
 
-        $query->where('sub.estado', 'ACTIVA');
+        $query->where('ticket.modo_entrenamiento', 0)->where('sub.estado', 'ACTIVA');
 
         $query->where(function ($query) {
             $query->where('factura.id', '=', '')
@@ -458,6 +458,12 @@ class AutoFacturacion extends Component
             $this->dispatch('show-toast', __('site.self_billing.ticket_not_found'), 'danger');
             return;
         }
+
+        if ($ticket->modo_entrenamiento) {
+            $this->dispatch('show-toast', __('site.self_billing.ticket_validation_5'), 'danger');
+            return;
+        }
+
         // if ($ticket->vigencia_facturacion && $ticket->vigencia_facturacion->format('Y-m-d') < today()->format('Y-m-d')) {
         //     $this->dispatch('openModal', component: 'modal-toast', arguments: ['messages' => [['type' => 'danger', 'text' => __('site.self_billing.ticket_validation_3')]]]);
         //     return;

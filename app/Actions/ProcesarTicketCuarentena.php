@@ -133,6 +133,7 @@ class ProcesarTicketCuarentena
                 'id_transaccion' => $decoded['TransactionId'],
                 'fecha_transaccion' => Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'),
                 'vigencia_facturacion' => $vigencia_facturacion ? $vigencia_facturacion->format('Y-m-d') : null,
+                'modo_entrenamiento' => isset($decoded['TrainingMode']) && $decoded['TrainingMode'],
                 'empleado_id' => optional($clerk)->id,
                 'sucursal_id' => $terminal->sucursal_id,
                 'terminal_id' => $terminal->id,

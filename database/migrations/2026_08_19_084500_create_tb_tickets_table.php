@@ -19,6 +19,7 @@ return new class extends Migration
             $table->dateTime('fecha_transaccion')->nullable();
             $table->decimal('importe', 10, 2)->nullable();
             $table->date('vigencia_facturacion')->nullable();
+            $table->boolean('modo_entrenamiento')->default(0)->nullable();
             $table->unsignedBigInteger('empleado_id')->nullable();
             $table->unsignedBigInteger('sucursal_id')->nullable();
             $table->unsignedBigInteger('terminal_id')->nullable();

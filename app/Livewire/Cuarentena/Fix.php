@@ -92,6 +92,7 @@ class Fix extends Modal
             'ClerkName' => '',
             'APIPassword' => '',
             'APIUserName' => '',
+            'TrainingMode' => false,
             'FiscalInvoice' => 'No',
             'PrinterHeader' => null,
             'TransactionId' => '',

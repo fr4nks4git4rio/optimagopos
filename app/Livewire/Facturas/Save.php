@@ -125,6 +125,7 @@ class Save extends Component
                 ->leftJoin('tb_sucursal_forma_pagos as sfp', 'to.sucursal_forma_pago_id', '=', 'sfp.id')
                 ->where('to.factura_id', $id)
                 ->where('to.es_cambio', 0)
+                ->where('ticket.modo_entrenamiento', 0)
                 ->groupBy('to.sucursal_forma_pago_id', 'ticket.created_at')
                 ->orderBy('ticket.created_at', 'asc')
                 ->get()
@@ -542,6 +543,7 @@ class Save extends Component
             ->join('tb_ticket_operaciones as to', 'ticket.id', '=', 'to.ticket_id')
             ->where('to.factura_id', null)
             ->where('to.monto', '>', 0)
+            ->where('ticket.modo_entrenamiento', 0)
             ->whereRaw($whereFP)
             ->whereDate('ticket.created_at', '<', $this->fecha_inicio)
             ->get();
@@ -566,6 +568,7 @@ class Save extends Component
             ->leftJoin('tb_sucursal_forma_pagos as sfp', 'to.sucursal_forma_pago_id', '=', 'sfp.id')
             ->where('to.factura_id', null)
             ->where('to.monto', '>', 0)
+            ->where('ticket.modo_entrenamiento', 0)
             ->whereRaw($whereFP)
             ->whereBetween('ticket.created_at', [$this->fecha_inicio . ' 00:00:00', $this->fecha_fin . ' 23:59:59'])
             ->groupBy('to.sucursal_forma_pago_id', 'ticket.created_at')

@@ -1411,6 +1411,7 @@ return [
         'ticket_validation_2' => 'El Ticket no se corresponde con el Código entrado!',
         'ticket_validation_3' => 'Lo sentimos. La vigencia del Ticket para su facturación ya ha expirado.',
         'ticket_validation_4' => 'El Ticket ya ha sido facturado previamente.',
+        'ticket_validation_5' => 'Este ticket no es facturable. Es un ticket de prueba.',
         'ticket_not_found' => 'Ticket no encontrado',
     ],
     'self_billing_stamp' => [

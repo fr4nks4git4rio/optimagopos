@@ -1397,7 +1397,8 @@ return [
         'ticket_validation_2' => 'The Ticket does not match the entered Code!',
         'ticket_validation_3' => 'Sorry. The validity period for invoicing this Ticket has expired.',
         'ticket_validation_4' => 'This Ticket has already been invoiced.',
-        'ticket_not_found' => 'Ticket not found',
+        'ticket_validation_5' => 'This Ticket has already been invoiced.',
+        'ticket_not_found' => 'This ticket is not billable. It is a test ticket.',
     ],
     'self_billing_stamp' => [
         'emitter_details' => 'Issuer Details',

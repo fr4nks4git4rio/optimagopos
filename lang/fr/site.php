@@ -1395,6 +1395,7 @@ return [
         'ticket_validation_2' => 'Le Ticket ne correspond pas au Code saisi !',
         'ticket_validation_3' => 'Nous sommes désolés. La période de validité du Ticket pour sa facturation a expiré.',
         'ticket_validation_4' => 'Ce Ticket a déjà été facturé.',
+        'ticket_validation_5' => 'Ce ticket n\'est pas facturable. Il s\'agit d\'un ticket de test.',
         'ticket_not_found' => 'Ticket introuvable',
     ],
     'self_billing_stamp' => [

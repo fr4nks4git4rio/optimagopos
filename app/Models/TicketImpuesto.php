@@ -13,9 +13,9 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @package App\Models
  * @version January 12, 2021, 7:55 pm CST
  *
- * @property string nombre
- * @property float monto
- * @property integer ticket_id
+ * @property string $nombre
+ * @property float $monto
+ * @property integer $ticket_id
  */
 class TicketImpuesto extends Model
 {
