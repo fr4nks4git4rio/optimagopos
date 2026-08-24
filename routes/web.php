@@ -25,6 +25,8 @@ use App\Livewire\AutoFacturacion;
 use App\Livewire\Facturas\CabeceraFactura;
 use App\Livewire\Reportes\HistoricoTicketsVk;
 use App\Livewire\Trazas\Index as IndexTrazas;
+use App\Livewire\Roles\IndexSystem as IndexSystemRoles;
+use App\Livewire\Roles\Index as IndexRoles;
 use App\Livewire\Usuarios\Index as IndexUsuarios;
 use App\Livewire\GestionConfiguracionesComponent as IndexConfiguraciones;
 use App\Livewire\Modulos\Index as IndexModulos;
@@ -47,6 +49,7 @@ use App\Livewire\FacturasSistema\SaveComplemento as SaveComplementoSistema;
 use App\Livewire\FacturasSistema\SaveNotaCredito as SaveNotaCreditoSistema;
 use App\Livewire\FacturasSistema\CabeceraFactura as CabeceraFacturaSistema;
 use App\Livewire\Reportes\HistoricoOperaciones\Index as IndexHistoricoOperaciones;
+use App\Livewire\Reportes\HistoricoOperaciones\IndexTesting as IndexHistoricoOperacionesTesting;
 use App\Livewire\Reportes\ProductosMasVendidos;
 use App\Livewire\Reportes\Logs;
 use App\Livewire\Reportes\Ingresos as ReporteIngresos;
@@ -114,20 +117,21 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
     Route::get('/load-tipos-comprobantes', [TipoComprobanteController::class, 'loadTiposComprobantes'])->name('tipos-comprobantes.load-tipos-comprobantes');
     Route::get('/load-series', [SerieController::class, 'loadSeries'])->name('series.load-series');
 
-    Route::middleware(['hasRole:1|3'])->prefix('admin')->group(function () {
+    Route::middleware(['role:SuperAdmin|Accountant'])->prefix('admin')->group(function () {
 
-        Route::get('/modulos', IndexModulos::class)->name('admin.modulos.index')->middleware('hasRole:1');
-        Route::get('/paquetes', IndexPaquetes::class)->name('admin.paquetes.index')->middleware('hasRole:1');
-        Route::get('/usuarios', IndexUsuarios::class)->name('admin.usuarios.index')->middleware('hasRole:1');
-        Route::get('/configuraciones', IndexConfiguraciones::class)->name('admin.configuraciones.index')->middleware('hasRole:1');
-        Route::get('/cuarentena', IndexCuarentena::class)->name('admin.cuarentena.index')->middleware('hasRole:1');
-        Route::get('/trazas', IndexTrazas::class)->name('admin.trazas.index')->middleware('hasRole:1');
+        Route::get('/modulos', IndexModulos::class)->name('admin.modulos.index')->middleware('role:SuperAdmin');
+        Route::get('/paquetes', IndexPaquetes::class)->name('admin.paquetes.index')->middleware('role:SuperAdmin');
+        Route::get('/roles', IndexSystemRoles::class)->name('admin.roles.index')->middleware('role:SuperAdmin');
+        Route::get('/usuarios', IndexUsuarios::class)->name('admin.usuarios.index')->middleware('role:SuperAdmin');
+        Route::get('/configuraciones', IndexConfiguraciones::class)->name('admin.configuraciones.index')->middleware('role:SuperAdmin');
+        Route::get('/cuarentena', IndexCuarentena::class)->name('admin.cuarentena.index')->middleware('role:SuperAdmin');
+        Route::get('/trazas', IndexTrazas::class)->name('admin.trazas.index')->middleware('role:SuperAdmin');
 
         Route::get('/clientes', IndexClients::class)->name('admin.clientes.index');
         Route::get('/sucursales', IndexSucursales::class)->name('admin.sucursales.index');
-        Route::get('/terminales', IndexTerminales::class)->name('admin.terminales.index')->middleware('hasRole:1');
+        Route::get('/terminales', IndexTerminales::class)->name('admin.terminales.index')->middleware('role:SuperAdmin');
         Route::get('/suscripciones', IndexSuscripciones::class)->name('admin.suscripciones.index');
-        Route::get('/suscripciones/gestion-suscripcion/{suscripcionId?}', GestionSuscripciones::class)->name('admin.suscripciones.save')->middleware('hasRole:1');
+        Route::get('/suscripciones/gestion-suscripcion/{suscripcionId?}', GestionSuscripciones::class)->name('admin.suscripciones.save')->middleware('role:SuperAdmin');
 
         Route::get('/pre-facturas/save/{id?}', SavePreFacturasSistema::class)->name('admin.pre-facturas.save');
         Route::get('/complementos/save/{id?}', SaveComplementoSistema::class)->name('admin.complementos.save');
@@ -142,37 +146,45 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
         Route::get('/print-listado-cuentas-cobrar', [FacturaController::class, 'imprimirListadoCuentasCobrar'])->name('admin.cuentas-cobrar.print-listado');
 
         Route::prefix('reportes')->group(function () {
+            Route::get('/historico-tickets-vk', HistoricoTicketsVk::class)->name('admin.reportes.historico-tickets-vk')->middleware('permission:reportsVKTicketHistory-viewAny');
+            Route::get('/ventas-diarias', VentasDiarias::class)->name('admin.reportes.ventas-diarias')->middleware('permission:reportsDailySales-viewAny');
+            Route::get('/articulos-vendidos', ArticulosVendidos::class)->name('admin.reportes.articulos-vendidos')->middleware('permission:reportsArticlesSold-viewAny');
+            Route::get('/ventas-operador', VentasOperador::class)->name('admin.reportes.ventas-operador')->middleware('permission:reportsSalesByOperator-viewAny');
+            Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('admin.reportes.productos-mas-vendidos')->middleware('permission:reportsBestSellingProducts-viewAny');
+            Route::get('/historico-operaciones', IndexHistoricoOperaciones::class)->name('admin.reportes.historico-operaciones')->middleware('permission:reportsOperationsHistory-viewAny');
+            Route::get('/testing-historico-operaciones', IndexHistoricoOperacionesTesting::class)->name('admin.reportes.testing-historico-operaciones')->middleware('permission:reportsTestingOperationsHistory-viewAny');
             Route::get('/ingresos', ReporteIngresos::class)->name('admin.reportes.ingresos');
             Route::get('/logs', Logs::class)->name('admin.reportes.logs');
         });
     });
 
-    Route::middleware(['hasRole:2'])->prefix('cliente')->group(function () {
-        Route::get('/usuarios', IndexUsuarios::class)->name('cliente.usuarios.index');
-        Route::get('/trazas', IndexTrazas::class)->name('cliente.trazas.index');
+    Route::middleware(['role:Admin|Manager'])->prefix('cliente')->group(function () {
+        Route::get('/roles', IndexRoles::class)->name('cliente.roles.index')->middleware('permission:roles-viewAny');
+        Route::get('/usuarios', IndexUsuarios::class)->name('cliente.usuarios.index')->middleware('permission:users-viewAny');
+        Route::get('/trazas', IndexTrazas::class)->name('cliente.trazas.index')->middleware('permission:logs-viewAny');
         // Route::get('/comensales', IndexComensales::class)->name('cliente.comensales.index');
-        Route::get('/sucursales', IndexSucursales::class)->name('cliente.sucursales.index');
-        Route::get('/terminales', IndexTerminales::class)->name('cliente.terminales.index');
+        Route::get('/sucursales', IndexSucursales::class)->name('cliente.sucursales.index')->middleware('permission:branches-viewAny');
+        Route::get('/terminales', IndexTerminales::class)->name('cliente.terminales.index')->middleware('permission:terminals-viewAny');
 
         Route::middleware('conFacturacion')->group(function () {
-            Route::get('/pre-facturas/save/{id?}', SavePreFacturas::class)->name('cliente.pre-facturas.save');
-            Route::get('/pre-facturas', IndexPreFacturas::class)->name('cliente.pre-facturas.index');
+            Route::get('/pre-facturas/save/{id?}', SavePreFacturas::class)->name('cliente.pre-facturas.save')->middleware('permission:invoices-create|invoices-update');
+            Route::get('/pre-facturas', IndexPreFacturas::class)->name('cliente.pre-facturas.index')->middleware('permission:invoices-viewAny');
 
-            Route::get('/almacen-facturas', IndexAlmacenFacturas::class)->name('cliente.almacen-facturas.index');
+            Route::get('/almacen-facturas', IndexAlmacenFacturas::class)->name('cliente.almacen-facturas.index')->middleware('permission:invoices-viewAny');
 
-            Route::get('/cabecera-factura', CabeceraFactura::class)->name('cliente.cabecera-factura');
+            Route::get('/cabecera-factura', CabeceraFactura::class)->name('cliente.cabecera-factura')->middleware('permission:invoiceHeader-view');
             Route::get('/obtener-timbres-disponibles/{rfc}', [SoapController::class, 'obtenerTimbresDisponibles']);
         });
 
         Route::prefix('reportes')->group(function () {
-
-            Route::get('/historico-tickets-vk', HistoricoTicketsVk::class)->name('cliente.reportes.historico-tickets-vk');
-            Route::get('/ventas-diarias', VentasDiarias::class)->name('cliente.reportes.ventas-diarias');
-            Route::get('/articulos-vendidos', ArticulosVendidos::class)->name('cliente.reportes.articulos-vendidos');
-            Route::get('/ventas-operador', VentasOperador::class)->name('cliente.reportes.ventas-operador');
-            Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('cliente.reportes.productos-mas-vendidos');
-            Route::get('/historico-operaciones', IndexHistoricoOperaciones::class)->name('cliente.reportes.historico-operaciones');
-            Route::get('/logs', Logs::class)->name('cliente.reportes.logs');
+            Route::get('/historico-tickets-vk', HistoricoTicketsVk::class)->name('cliente.reportes.historico-tickets-vk')->middleware('permission:reportsVKTicketHistory-viewAny');
+            Route::get('/ventas-diarias', VentasDiarias::class)->name('cliente.reportes.ventas-diarias')->middleware('permission:reportsDailySales-viewAny');
+            Route::get('/articulos-vendidos', ArticulosVendidos::class)->name('cliente.reportes.articulos-vendidos')->middleware('permission:reportsArticlesSold-viewAny');
+            Route::get('/ventas-operador', VentasOperador::class)->name('cliente.reportes.ventas-operador')->middleware('permission:reportsSalesByOperator-viewAny');
+            Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('cliente.reportes.productos-mas-vendidos')->middleware('permission:reportsBestSellingProducts-viewAny');
+            Route::get('/historico-operaciones', IndexHistoricoOperaciones::class)->name('cliente.reportes.historico-operaciones')->middleware('permission:reportsOperationsHistory-viewAny');
+            Route::get('/testing-historico-operaciones', IndexHistoricoOperacionesTesting::class)->name('cliente.reportes.testing-historico-operaciones')->middleware('permission:reportsTestingOperationsHistory-viewAny');
+            Route::get('/logs', Logs::class)->name('cliente.reportes.logs')->middleware('permission:reportsDataReceived-viewAny');
         });
     });
 });

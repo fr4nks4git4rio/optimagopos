@@ -29,12 +29,12 @@ class SoapController extends BaseSoapController
 
     public function obtenerTimbresDisponibles($rfc)
     {
-        if (user()->cliente_id) {
-            $owner = Sucursal::where('rfc', $rfc)->first();
-            $modo_productivo = $owner->cfdi_timbrado_productivo;
-        } else {
+        if (user()->hasAnyRole(['SuperAdmin', 'Accountant'])) {
             $owner = Cliente::where('rfc', $rfc)->first();
             $modo_productivo = system_config('cfdi_timbrado_productivo');
+        } else {
+            $owner = Sucursal::where('rfc', $rfc)->first();
+            $modo_productivo = $owner->cfdi_timbrado_productivo;
         }
 
         if ($modo_productivo == 1) {

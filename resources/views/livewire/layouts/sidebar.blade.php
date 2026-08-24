@@ -10,7 +10,7 @@
         {{-- </a> --}}
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100"
             id="menu_principal">
-            @if (user()->cliente_id)
+            @if (user()->hasAnyRole(['Admin', 'Manager']))
                 @include('livewire.layouts.sidebars.client')
             @else
                 @include('livewire.layouts.sidebars.owner')

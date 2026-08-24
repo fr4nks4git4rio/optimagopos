@@ -14,7 +14,7 @@ class ClienteController extends Controller
     {
         $label = $request->label ?: 'nombre_comercial';
 
-        if (user()->cliente_id)
+        if (!user()->hasAnyRole(['SuperAdmin', 'Accountant']))
             return response()->json(['success' => true, 'items' => []]);
 
         $query = DB::table('tb_clientes')

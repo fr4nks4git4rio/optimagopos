@@ -16,6 +16,13 @@
                         class="d-sm-inline px-2">{{ __('site.sidebar.branches') }}</span></a>
             </li>
         @endcan
+        @can('roles-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/roles*') }}">
+                <a href="{{ route('cliente.roles.index') }}" class="nav-link submenu">
+                    <i class="bi bi-person-badge fs-6"></i> <span
+                        class="d-sm-inline px-2">{{ __('site.sidebar.roles') }}</span></a>
+            </li>
+        @endcan
         @can('viewAny', [App\Models\User::class])
             <li class="w-100 li-item {{ active_route('cliente/usuarios*') }}">
                 <a href="{{ route('cliente.usuarios.index') }}" class="nav-link submenu">
@@ -30,13 +37,13 @@
                         class="d-sm-inline px-2">{{ __('site.sidebar.terminals') }}</span></a>
             </li>
         @endcan
-        @if (user()->is_admin)
+        @can('logs-viewAny')
             <li class="w-100 li-item {{ active_route('cliente/trazas*') }}">
                 <a href="{{ route('cliente.trazas.index') }}" class="nav-link submenu">
                     <i class="bi bi-fingerprint fs-6"></i> <span
                         class="d-sm-inline px-2">{{ __('site.sidebar.traces') }}</span></a>
             </li>
-        @endif
+        @endcan
     </ul>
 </li>
 @if (user()->cliente->con_facturacion)
@@ -51,14 +58,15 @@
         </a>
         <ul class="collapse nav flex-column ms-1 @if ($this->facturacion_routes_active) show @endif"
             :class="submenu_absolute" id="submenu_facturacion" data-bs-parent="#submenu_facturacion">
-            @can('setPanelPac', [App\Models\Factura::class])
+            @can('panelPac-view')
                 <li class="w-100 li-item">
-                    <a href="javascript:void(0)" wire:click="$dispatch('openModal', { component: 'facturas.panel-pac' })" class="nav-link submenu">
+                    <a href="javascript:void(0)" wire:click="$dispatch('openModal', { component: 'facturas.panel-pac' })"
+                        class="nav-link submenu">
                         <i class="bi bi-cart fs-6"></i> <span
                             class="d-sm-inline px-2">{{ __('site.sidebar.panel-pac') }}</span></a>
                 </li>
             @endcan
-            @can('setCabeceraFactura', [App\Models\Factura::class])
+            @can('invoiceHeader-view')
                 <li class="w-100 li-item {{ active_route('cliente/cabecera-factura*') }}">
                     <a href="{{ route('cliente.cabecera-factura') }}" class="nav-link submenu">
                         <i class="bi bi-gear fs-6"></i> <span class="d-sm-inline px-2">
@@ -91,47 +99,69 @@
     </a>
     <ul class="collapse nav flex-column ms-1 @if ($this->reportes_routes_active) show @endif" :class="submenu_absolute"
         id="submenu_reportes" data-bs-parent="#submenu_reportes">
-        <li class="w-100 li-item {{ active_route('cliente/reportes/articulos-vendidos*') }}">
-            <a href="{{ route('cliente.reportes.articulos-vendidos') }}" class="nav-link submenu">
-                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
-                    {{ __('site.sidebar.articles_sold') }}
-                </span></a>
-        </li>
-        <li class="w-100 li-item {{ active_route('cliente/reportes/productos-mas-vendidos*') }}">
-            <a href="{{ route('cliente.reportes.productos-mas-vendidos') }}" class="nav-link submenu">
-                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
-                    {{ __('site.sidebar.best_selling_products') }}
-                </span></a>
-        </li>
-        <li class="w-100 li-item {{ active_route('cliente/reportes/historico-operaciones*') }}">
-            <a href="{{ route('cliente.reportes.historico-operaciones') }}" class="nav-link submenu">
-                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
-                    {{ __('site.sidebar.operations_history') }}
-                </span></a>
-        </li>
-        <li class="w-100 li-item {{ active_route('cliente/reportes/historico-tickets-vk*') }}">
-            <a href="{{ route('cliente.reportes.historico-tickets-vk') }}" class="nav-link submenu">
-                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
-                    {{ __('site.sidebar.vk_ticket_history') }}
-                </span></a>
-        </li>
-        <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-diarias*') }}">
-            <a href="{{ route('cliente.reportes.ventas-diarias') }}" class="nav-link submenu">
-                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
-                    {{ __('site.sidebar.daily_sales') }}
-                </span></a>
-        </li>
-        <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-operador*') }}">
-            <a href="{{ route('cliente.reportes.ventas-operador') }}" class="nav-link submenu">
-                <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
-                    {{ __('site.sidebar.sales_by_operator') }}
-                </span></a>
-        </li>
-        <li class="w-100 li-item {{ active_route('cliente/reportes/logs*') }}">
-            <a href="{{ route('cliente.reportes.logs') }}" class="nav-link submenu">
-                <i class="bi bi-fingerprint fs-6"></i> <span class="d-sm-inline px-2">
-                    {{ __('site.sidebar.data_received') }}
-                </span></a>
-        </li>
+        @can('reportsArticlesSold-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/reportes/articulos-vendidos*') }}">
+                <a href="{{ route('cliente.reportes.articulos-vendidos') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.articles_sold') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsBestSellingProducts-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/reportes/productos-mas-vendidos*') }}">
+                <a href="{{ route('cliente.reportes.productos-mas-vendidos') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.best_selling_products') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsOperationsHistory-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/reportes/historico-operaciones*') }}">
+                <a href="{{ route('cliente.reportes.historico-operaciones') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.operations_history') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsVKTicketHistory-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/reportes/historico-tickets-vk*') }}">
+                <a href="{{ route('cliente.reportes.historico-tickets-vk') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.vk_ticket_history') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsDailySales-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-diarias*') }}">
+                <a href="{{ route('cliente.reportes.ventas-diarias') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.daily_sales') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsSalesByOperator-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/reportes/ventas-operador*') }}">
+                <a href="{{ route('cliente.reportes.ventas-operador') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.sales_by_operator') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsTestingOperationsHistory-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/reportes/testing-historico-operaciones*') }}">
+                <a href="{{ route('cliente.reportes.testing-historico-operaciones') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.operations_history_testing') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsDataReceived-viewAny')
+            <li class="w-100 li-item {{ active_route('cliente/reportes/logs*') }}">
+                <a href="{{ route('cliente.reportes.logs') }}" class="nav-link submenu">
+                    <i class="bi bi-fingerprint fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.data_received') }}
+                    </span></a>
+            </li>
+        @endcan
     </ul>
 </li>

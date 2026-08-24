@@ -20,6 +20,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
@@ -42,7 +43,7 @@ use Staudenmeir\EloquentHasManyDeep\HasRelationships;
  */
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable, CausesActivity, SoftDeletes, HasRelationships;
+    use HasApiTokens, HasFactory, Notifiable, CausesActivity, SoftDeletes, HasRelationships, HasRoles;
 
     protected $table = 'tb_usuarios';
 
@@ -77,7 +78,7 @@ class User extends Authenticatable implements JWTSubject
         // 'two_factor_authentication_enabled'
     ];
 
-    protected $appends = ['value', 'label', 'nombre_completo', 'is_super_admin', 'is_contabilidad', 'is_admin'];
+    protected $appends = ['value', 'label', 'nombre_completo'];
 
     public function rules()
     {
@@ -85,8 +86,8 @@ class User extends Authenticatable implements JWTSubject
             'email' => ['required', 'email', Rule::unique('tb_usuarios')->ignore($this->id)],
             'nombre' => ['required'],
             'apellidos' => ['nullable'],
-            'rol_id' => ['required'],
-            'cliente_id' => ['nullable', 'required_if:rol_id,2', 'exists:tb_clientes,id'],
+            'roles' => ['required', 'in:SuperAdmin,Accountant,Admin,Manager'],
+            'cliente_id' => ['nullable', 'required_if:roles,Admin,Manager', 'exists:tb_clientes,id'],
             'suscripciones' => 'nullable|array',
             'password' => ['confirmed', Password::default()]
         ];
@@ -170,10 +171,6 @@ class User extends Authenticatable implements JWTSubject
                         $data['cliente'] = DB::table('tb_clientes')
                             ->selectRaw('id, nombre_comercial as nombre')->where('id', $value)->first()->nombre;
                         break;
-                    case 'rol_id':
-                        $data['rol'] = DB::table('tb_roles')
-                            ->selectRaw('id, nombre')->where('id', $value)->first()->nombre;
-                        break;
                 }
             }
         }
@@ -184,11 +181,6 @@ class User extends Authenticatable implements JWTSubject
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'cliente_id');
-    }
-
-    public function rol()
-    {
-        return $this->belongsTo(Role::class, 'rol_id');
     }
 
     public function owner()
@@ -207,12 +199,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function sucursales()
     {
-        // return DB::table('tb_sucu    rsales')
-        //     ->whereNull('deleted_at')
-        //     ->whereIn('suscripcion_id', user()->suscripciones->pluck('id')->toArray())
-        //     ->get()->each(function ($value) {
-        //         $value = Sucursal::decryptInfo($value);
-        //     });
+        return $this->belongsToMany(Sucursal::class, 'tb_usuarios_sucursales', 'usuario_id', 'sucursal_id');
         return $this->hasManyDeep(
             Sucursal::class,
             ['tb_suscripciones_usuarios', Suscripcion::class],  // Tablas intermedias en orden

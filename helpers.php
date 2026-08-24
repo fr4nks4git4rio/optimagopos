@@ -36,7 +36,7 @@ if (!function_exists('get_owner')) {
     {
         if (!user())
             return null;
-        return user()->cliente_id ? user()->owner : Cliente::where('es_propietario', 1)->first();
+        return user()->hasAnyRole(['SuperAdmin', 'Accountant']) ? Cliente::where('es_propietario', 1)->first() : user()->owner;
     }
 }
 

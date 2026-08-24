@@ -134,7 +134,7 @@
                                     <x-action icon="file-pdf" title="{{ __('site.common.pdf') }}"
                                         click="showPdf({{ $factura->id }})" />
                                 </li>
-                                @if ($factura->estado == 'CAPTURADA')
+                                @if ($factura->estado == 'CAPTURADA' && user()->can('stamp', App\Models\Factura::find($factura->id)))
                                     <li class="list-inline-item mb-1">
                                         <x-action icon="bell" title="{{ __('site.common.stamp') }}"
                                             click="timbrar('{{ $factura->id }}')" />

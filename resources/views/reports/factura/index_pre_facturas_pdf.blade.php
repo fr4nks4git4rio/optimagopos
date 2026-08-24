@@ -207,13 +207,19 @@
 <body>
 
     @php
-        $empresa = auth()->user()->cliente_id
+        $empresa = auth()
+            ->user()
+            ->hasAnyRole(['Admin', 'Manager'])
             ? App\Models\Cliente::decryptInfo(auth()->user()->cliente)
             : App\Models\Cliente::decryptInfo(get_system_owner());
 
         $ownerLogoPath = public_path('images/logo_' . (user()->lang ?: config('app.locale')) . '.png');
 
-        if (auth()->user()->cliente_id) {
+        if (
+            auth()
+                ->user()
+                ->hasAnyRole(['Admin', 'Manager'])
+        ) {
             $logoPath = $empresa->logo
                 ? Illuminate\Support\Facades\Storage::disk('logos')->path($empresa->logo)
                 : public_path('img/no_image.png');

@@ -32,7 +32,6 @@ class DatabaseSeeder extends Seeder
             TbObjetosImpuestoSeeder::class,
             TbPeriodicidadesFacturaSeeder::class,
             TbRegimenFiscalesSeeder::class,
-            TbRolesSeeder::class,
             TbSeriesSeeder::class,
             TbTipoComprobantesSeeder::class,
             TbTipoRelacionFacturasSeeder::class,
@@ -40,6 +39,7 @@ class DatabaseSeeder extends Seeder
             TbMunicipiosSeeder::class,
             TbOwnerSeeder::class,
             TbConfigsSeeder::class,
+            TbPermissionsSeeder::class,
             TbUserSeeder::class,
         ]);
     }

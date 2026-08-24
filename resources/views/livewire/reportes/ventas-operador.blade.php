@@ -1,6 +1,6 @@
 @section('title', __('site.reports.sales_by_operator.title'))
 
-<div>
+<div wire:ignore="init">
     <div wire:loading.delay.longer>
         <div class="loading">
             <img src="{{ asset('img/loading.gif') }}" />
@@ -26,14 +26,18 @@
             </div>
         </div>
         <div class="mb-1 col-md-2 text-end">
-            <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
-                <span class="bi bi-file-pdf"></span>
-                {{ __('site.common.print') }}
-            </button>
-            <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
-                <span class="bi bi-file-excel"></span>
-                {{ __('site.common.export') }}
-            </button>
+            @can('reportsSalesByOperator-print')
+                <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
+                    <span class="bi bi-file-pdf"></span>
+                    {{ __('site.common.print') }}
+                </button>
+            @endcan
+            @can('reportsSalesByOperator-export')
+                <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
+                    <span class="bi bi-file-excel"></span>
+                    {{ __('site.common.export') }}
+                </button>
+            @endcan
         </div>
     </div>
 
@@ -52,14 +56,20 @@
                                 </span>
                             </th>
                         @endforeach
-                        <th class="text-center" colspan="2" style="white-space: nowrap !important">{{__('site.reports.sales_by_operator.sales')}}</th>
-                        <th class="text-center" colspan="2" style="white-space: nowrap !important">{{__('site.reports.sales_by_operator.corrections')}}</th>
+                        <th class="text-center" colspan="2" style="white-space: nowrap !important">
+                            {{ __('site.reports.sales_by_operator.sales') }}</th>
+                        <th class="text-center" colspan="2" style="white-space: nowrap !important">
+                            {{ __('site.reports.sales_by_operator.corrections') }}</th>
                     </tr>
                     <tr>
-                        <th class="text-end" style="white-space: nowrap !important">{{__('site.reports.sales_by_operator.amount')}}</th>
-                        <th class="text-center" style="white-space: nowrap !important">{{__('site.reports.sales_by_operator.quantity')}}</th>
-                        <th class="text-end" style="white-space: nowrap !important">{{__('site.reports.sales_by_operator.amount')}}</th>
-                        <th class="text-center" style="white-space: nowrap !important">{{__('site.reports.sales_by_operator.quantity')}}</th>
+                        <th class="text-end" style="white-space: nowrap !important">
+                            {{ __('site.reports.sales_by_operator.amount') }}</th>
+                        <th class="text-center" style="white-space: nowrap !important">
+                            {{ __('site.reports.sales_by_operator.quantity') }}</th>
+                        <th class="text-end" style="white-space: nowrap !important">
+                            {{ __('site.reports.sales_by_operator.amount') }}</th>
+                        <th class="text-center" style="white-space: nowrap !important">
+                            {{ __('site.reports.sales_by_operator.quantity') }}</th>
                     </tr>
                 </thead>
             @endif
@@ -83,7 +93,8 @@
 
                     {{-- Totalizador por sucursal --}}
                     <tr class="table-success fw-bold">
-                        <td class="text-end" colspan="2">{{__('site.reports.sales_by_operator.total')}} {{ $sucursalData['sucursal'] }}</td>
+                        <td class="text-end" colspan="2">{{ __('site.reports.sales_by_operator.total') }}
+                            {{ $sucursalData['sucursal'] }}</td>
                         <td class="text-end">{{ number_format($sucursalData['totales']['ventas_importe'], 2) }}</td>
                         <td class="text-center">{{ $sucursalData['totales']['ventas_cant'] }}</td>
                         <td class="text-end">{{ number_format($sucursalData['totales']['correcciones_importe'], 2) }}
@@ -95,7 +106,7 @@
                     <tr>
                         <td colspan="6" class="text-center">
                             <div class="list-group-item">
-                                {{__('site.common.results_not_found')}}...
+                                {{ __('site.common.results_not_found') }}...
                             </div>
                         </td>
                     </tr>
@@ -104,7 +115,7 @@
             @if (count($records) > 0)
                 <tfoot>
                     <tr class="table-dark fw-bold">
-                        <td colspan="2" class="text-end">{{__('site.reports.sales_by_operator.grand_total')}}</td>
+                        <td colspan="2" class="text-end">{{ __('site.reports.sales_by_operator.grand_total') }}</td>
                         <td class="text-end">{{ number_format($grandTotal['ventas_importe'], 2) }}</td>
                         <td class="text-center">{{ $grandTotal['ventas_cant'] }}</td>
                         <td class="text-end">{{ number_format($grandTotal['correcciones_importe'], 2) }}</td>

@@ -424,13 +424,19 @@ class GestionSuscripciones extends Component
             ->whereDoesntHave('suscripcion');
         if ($this->suscripcion->id)
             $query->orWhere('suscripcion_id', $this->suscripcion->id);
-        
-        $this->terminalesDisponibles = $query->lazy()->map->only(['value', 'label'])->toArray();
+
+        $this->terminalesDisponibles = $query->get()->map->only(['value', 'label'])->toArray();
     }
 
     public function loadUsuarios()
     {
-        $this->usuariosDisponibles = User::where('cliente_id', $this->cliente_id)->lazy()->map->only(['value', 'label'])->toArray();
+        User::where('cliente_id', $this->cliente_id)->get()->map(function (User $element) {
+            if ($element->hasRole('Admin'))
+                $this->usuariosDisponibles[] = [
+                    'value' => $element->value,
+                    'label' => $element->label
+                ];
+        });
     }
 
     public function AddSucursal($id)
@@ -482,6 +488,8 @@ class GestionSuscripciones extends Component
         if ($withErrors)
             return;
 
+        $data['paquete_id'] = $data['paquete_id'] ?: null;
+
         $this->suscripcion->fill(Arr::except($data, [
             'modulos',
             'sucursales',
@@ -494,11 +502,19 @@ class GestionSuscripciones extends Component
 
         $this->suscripcion->usuarios()->sync($this->usuarios);
 
+        foreach ($this->usuarios as $u) {
+            User::find($u)->sucursales()->detach($this->suscripcion->sucursales()->pluck('id')->toArray());
+        }
+
         $this->suscripcion->sucursales()->update(['suscripcion_id' => null]);
         Sucursal::whereIn('id', $this->sucursales)->update(['suscripcion_id' => $this->suscripcion->id]);
 
         $this->suscripcion->terminales()->update(['suscripcion_id' => null]);
         Terminal::whereIn('id', $this->terminales)->update(['suscripcion_id' => $this->suscripcion->id]);
+
+        foreach ($this->usuarios as $u) {
+            User::find($u)->sucursales()->attach($this->sucursales);
+        }
 
         $this->dispatch('show-toast', __('site.subscriptions.manage_subscription.subscription_save_successfully'), 'success');
     }

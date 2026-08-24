@@ -5,7 +5,7 @@
 
     <div class="row justify-content-between">
         <div class="col-md-9 col-12 mb-3 row">
-            @if (!user()->cliente_id)
+            @if (user()->hasAnyRole(['SuperAdmin', 'Accountant']))
                 <div class="col-md-3 col-12">
                     <x-select2-multiple class="form-control" label="{{ __('site.terminals.index.client') }}"
                         :lazy="true" model="clientes" :options="$clientesAll" />
@@ -29,13 +29,7 @@
         </div>
         <div class="col-md-3 col-12 mb-3">
             @can('create', [App\Models\Terminal::class])
-                @if (user()->cliente_id)
-                    <button type="button" class="btn btn-site-primary btn-outline-warning"
-                        wire:click="$dispatch('openModal', { component: 'terminales.save' })">
-                        <x-icon name="plus-lg" />
-                        {{ __('site.common.create') }}
-                    </button>
-                @else
+                @if (user()->hasAnyRole(['SuperAdmin', 'Accountant']))
                     <button type="button" class="btn btn-site-primary btn-outline-warning"
                         wire:click="$dispatch('openModal', { component: 'terminales.save-system' })">
                         <x-icon name="plus-lg" />
@@ -100,7 +94,7 @@
                             @endif
                         </td>
                         <td>{{ $terminal['sucursal'] }}</td>
-                        @if (!user()->cliente_id)
+                        @if (user()->hasAnyRole(['SuperAdmin', 'Accountant']))
                             <td>{{ $terminal['cliente'] }}</td>
                         @endif
                         <td>{{ $terminal['suscripcion'] }}</td>
@@ -109,7 +103,7 @@
                             <ul class="list-unstyled mb-0">
                                 @if (!$terminal['deleted_at'])
                                     @can('update', App\Models\Terminal::find($terminal['id']))
-                                        @if (user()->cliente_id)
+                                        @if (user()->hasAnyRole(['Admin', 'Manager']))
                                             <li class="list-inline-item">
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
                                                     click="$dispatch('openModal', { component: 'terminales.save', arguments: {terminal: {{ $terminal['id'] }}} })" />
@@ -140,7 +134,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ user()->cliente_id ? 7 : 8 }}">
+                        <td colspan="{{ user()->hasAnyRole(['Admin', 'Manager']) ? 7 : 8 }}">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>

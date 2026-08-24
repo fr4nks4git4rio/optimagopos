@@ -127,6 +127,14 @@ class Index extends Component
         return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
+    public function init()
+    {
+        if (user()->cannot('reportsOperationsHistory-viewAny')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function query()
     {
         $query = DB::table('tb_tickets as t')
@@ -136,8 +144,8 @@ class Index extends Component
                 't.ubicacion',
                 't.fecha_transaccion',
                 DB::raw("DATE_FORMAT(t.fecha_transaccion, '%d/%m/%Y %H:%i') as fecha_transaccion_str"),
-                'c.razon_social as cliente',
-                's.razon_social as sucursal',
+                'c.nombre_comercial as cliente',
+                's.nombre_comercial as sucursal',
                 'ter.nombre as terminal',
                 'e.nombre as empleado',
                 't.importe',

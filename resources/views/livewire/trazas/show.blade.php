@@ -10,7 +10,7 @@
             $hasAttributes = isset($properties->attributes);
         @endphp
 
-        <div class="card border-0 shadow-sm rounded-4">
+        <div wire:init="init" class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
 
                 @if ($hasOld && $hasAttributes)
@@ -23,16 +23,19 @@
                         <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
                             <thead class="table-light text-uppercase tracking-wider" style="font-size: 0.75rem;">
                                 <tr>
-                                    <th class="ps-4 text-muted fw-semibold" style="width: 30%;">{{ __('site.logs.show.property') }}
+                                    <th class="ps-4 text-muted fw-semibold" style="width: 30%;">
+                                        {{ __('site.logs.show.property') }}
                                     </th>
-                                    <th class="text-danger fw-semibold" style="width: 35%;">{{ __('site.logs.show.before') }}</th>
-                                    <th class="text-success fw-semibold" style="width: 35%;">{{ __('site.logs.show.after') }}</th>
+                                    <th class="text-danger fw-semibold" style="width: 35%;">
+                                        {{ __('site.logs.show.before') }}</th>
+                                    <th class="text-success fw-semibold" style="width: 35%;">
+                                        {{ __('site.logs.show.after') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php
-                                    $oldAttributes = (array)$this->getDataAttributes($properties->old);
-                                    $newAttributes = (array)$this->getDataAttributes($properties->attributes);
+                                    $oldAttributes = (array) $this->getDataAttributes($properties->old);
+                                    $newAttributes = (array) $this->getDataAttributes($properties->attributes);
                                 @endphp
 
                                 @foreach ($newAttributes as $index => $newItem)
@@ -49,7 +52,7 @@
                                         $isChanged = $oldText !== $newText;
                                     @endphp
                                     <tr class="{{ $isChanged ? 'table-warning-subtle' : '' }}">
-                                        <td class="ps-4 fw-medium text-secondary">{{ __($index) }}</td>
+                                        <td class="ps-4 fw-medium text-secondary text-capitalize">{{ __($index) }}</td>
                                         <td class="text-muted text-decoration-line-through">{{ $oldText }}</td>
                                         <td class="fw-semibold text-dark">{{ $newText }}</td>
                                     </tr>
@@ -72,15 +75,17 @@
                         <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
                             <thead class="table-light text-uppercase tracking-wider" style="font-size: 0.75rem;">
                                 <tr>
-                                    <th class="ps-4 text-muted fw-semibold" style="width: 40%;">{{ __('site.logs.show.property') }}
+                                    <th class="ps-4 text-muted fw-semibold" style="width: 40%;">
+                                        {{ __('site.logs.show.property') }}
                                     </th>
-                                    <th class="text-muted fw-semibold" style="width: 60%;">{{ __('site.logs.show.value') }}</th>
+                                    <th class="text-muted fw-semibold" style="width: 60%;">
+                                        {{ __('site.logs.show.value') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($attributesList as $index => $item)
                                     <tr>
-                                        <td class="ps-4 fw-medium text-secondary">{{ __($index) }}</td>
+                                        <td class="ps-4 fw-medium text-secondary text-capitalize">{{ __($index) }}</td>
                                         <td class="text-dark fw-semibold">
                                             {{ json_encode($item) == 'null' ? '-' : $this->plainText($index, json_encode($item)) }}
                                         </td>
@@ -97,7 +102,7 @@
 
     <x-slot:buttons>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$dispatch('closeModal')">
-            {{__('site.common.close')}}
+            {{ __('site.common.close') }}
         </button>
     </x-slot:buttons>
 </x-modal>

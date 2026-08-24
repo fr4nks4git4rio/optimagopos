@@ -15,7 +15,7 @@ class ConFacturacion
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (user()->is_admin && user()->cliente?->con_facturacion){
+        if (user()->cliente?->con_facturacion){
             return $next($request);
         }
         return redirect('/home');

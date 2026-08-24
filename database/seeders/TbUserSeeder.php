@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class TbUserSeeder extends Seeder
 {
@@ -19,10 +21,13 @@ class TbUserSeeder extends Seeder
             'nombre' => 'Super Admin',
             'apellidos' => 'Administrador',
             'email' => 'erp@wifiempresarial.com',
-            'password' => 'Cancun2026*',
+            'password' => Hash::make('Cancun2026*'),
             'lang' => 'es',
-            'rol_id' => 1,
+            'cliente_id' => 1,
             'created_at' => now()->format('Y-m-d H:i:s')
         ]);
+
+        $user = User::find(1);
+        $user->assignRole('SuperAdmin');
     }
 }

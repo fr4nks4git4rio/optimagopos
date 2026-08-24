@@ -39,10 +39,10 @@ class Index extends Component
 
     public function mount()
     {
-        if (user()->is_super_admin)
-            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email'), __('site.users.list.client'), __('site.users.list.subscription')];
+        if (user()->hasRole('SuperAdmin'))
+            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email'), __('site.users.list.roles'), __('site.users.list.client'), __('site.users.list.subscription')];
         else
-            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email'), __('site.users.list.subscription')];
+            $this->sorts = [__('site.users.list.full_nombre'), __('site.users.list.email'), __('site.users.list.roles'), __('site.users.list.subscription')];
         $this->order = $this->order ?? 'asc';
         $this->sort = $this->sort ?? __('site.users.list.full_nombre');
         $this->filter = $this->filter ?? __('site.common.actives');
@@ -61,7 +61,7 @@ class Index extends Component
     public function render()
     {
         $clientes_q = DB::table('tb_clientes')->where('es_cliente', 1)->whereNull('deleted_at');
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $clientes_q->where('id', user()->cliente_id);
         }
         $clientes = $clientes_q->get()->map(function ($element) {
@@ -104,15 +104,19 @@ class Index extends Component
                 'c.nombre_comercial as cliente',
                 'u.cliente_id',
                 DB::raw("GROUP_CONCAT(CONCAT(paquete.nombre, ' ( ', subs.estado, ' )') SEPARATOR ', ') as suscripciones"),
+                DB::raw("GROUP_CONCAT(role.name SEPARATOR ', ') as roles"),
                 'u.deleted_at'
             )
             ->leftJoin('tb_clientes as c', 'c.id', '=', 'u.cliente_id')
             ->leftJoin('tb_suscripciones_usuarios as subs_u', 'u.id', 'subs_u.usuario_id')
             ->leftJoin('tb_suscripciones as subs', 'subs.id', 'subs_u.suscripcion_id')
             ->leftJoin('tb_paquetes as paquete', 'paquete.id', 'subs.paquete_id')
+            ->leftJoin('model_has_roles as mr', 'u.id', 'mr.model_id')
+            ->leftJoin('roles as role', 'role.id', 'mr.role_id')
+            ->where('mr.model_type', User::class)
             ->groupBy('u.id');
 
-        if (user()->cliente_id)
+        if (user()->hasAnyRole(['Admin', 'Manager']))
             $query->where('u.cliente_id', user()->cliente_id);
 
         switch ($this->filter) {
@@ -127,7 +131,7 @@ class Index extends Component
                 break;
         }
 
-        if (!user()->is_super_admin) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $query->where('u.cliente_id', user()->cliente_id);
         } else {
             if (count($this->clientes) > 0) {
@@ -142,7 +146,7 @@ class Index extends Component
 
         foreach ($usuarios as $usuario) {
             $usuario['cliente'] = $usuario['cliente'] ? Crypt::decrypt($usuario['cliente']) : '';
-            $usuario['suscripciones'] = Str::replaceLast(', ', ' '.__('site.common.and').' ', $usuario['suscripciones']);
+            $usuario['suscripciones'] = Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', $usuario['suscripciones']);
 
             if (
                 !$this->search

@@ -28,13 +28,13 @@ class SaveSystem extends Modal
     public $email;
     public $nombre;
     public $apellidos;
-    public $rol_id;
     public $cliente_id;
     public $password;
     public $password_confirmation;
     public $avatar_src;
     public $suscripciones = [];
-    public $roles = [];
+    public $roles;
+    public $rolesAll = [];
     public $suscripcionesAll = [];
     public $from_subscription = false;
 
@@ -46,21 +46,24 @@ class SaveSystem extends Modal
         $this->email = isset($this->user) ? $this->user->email : '';
         $this->nombre = isset($this->user) ? $this->user->nombre : '';
         $this->apellidos = isset($this->user) ? $this->user->apellidos : '';
-        $this->rol_id = isset($this->user) ? $this->user->rol_id : '';
         $this->cliente_id = isset($this->user) ? $this->user->cliente_id : ($this->cliente_id ?? '');
+        $this->roles = isset($this->user) ? $this->user->roles()->first()->name : null;
+
         if (isset($this->user))
             $this->suscripciones = $this->user->suscripciones()->pluck('id')->toArray();
         if (!isset($this->user)) {
-        $this->user = new User();
+            $this->user = new User();
         }
 
-        $roles_query = DB::table('tb_roles')->select('id as value', 'nombre as label');
+        $roles_query = DB::table('roles')->select('name as value', 'name as label');
         if ($this->from_subscription) {
-            $roles_query->where('id', 2);
+            $roles_query->whereIn('name', ['Admin']);
         }
-        $this->roles = $roles_query->get()->map(function ($element) {
-            return (array) $element;
+        $this->rolesAll = $roles_query->get()->map(function ($element) {
+            $element->label = __('site.roles.values.' . $element->label);
+            return (array)$element;
         })->toArray();
+
         if ($this->cliente_id)
             $this->loadSuscripciones();
     }
@@ -81,9 +84,9 @@ class SaveSystem extends Modal
         $this->dispatch('reApplySelect2');
         // $this->init();
     }
-    public function updatedRolId($value)
+    public function updatedRoles($value)
     {
-        if (in_array($value, [1, 3])) {
+        if (in_array($value, ['SuperAdmin', 'Accountant'])) {
             $this->dispatch("set-data-cliente_id", ['data' => [['id' => null, 'text' => '']], 'term' => '', 'value' => null]);
             $this->cliente_id = null;
             $this->suscripciones = [];
@@ -134,10 +137,13 @@ class SaveSystem extends Modal
             Arr::forget($data, ['password']);
         }
 
-        $this->user->fill(Arr::except($data, ['suscripciones']))->save();
+        $this->user->fill(Arr::except($data, ['suscripciones', 'roles']))->save();
         $this->user->suscripciones()->sync($data['suscripciones']);
+        $oldRoles = $this->user->roles()->pluck('name')->toArray();
+        $this->user->syncRoles([$data['roles']]);
 
         $attributes = Arr::except($this->user->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+        $attributes['roles'] = $data['roles'];
         if ($this->user->wasRecentlyCreated) {
             $log = __('site.users.save.log_created_detail', ['email' => $this->user->email]);
             activity(__('site.users.save.log_created'))
@@ -147,11 +153,13 @@ class SaveSystem extends Modal
                 ->log($log);
         } else {
             $log = __('site.users.save.log_updated_detail', ['email' => $this->user->email]);
+            $oldData = User::parseData(Arr::only($this->user->getOriginal(), array_keys($attributes)));
+            $oldData['roles'] = $oldRoles[0];
             activity(__('site.users.save.log_updated'))
                 ->on($this->user)
                 ->event('updated')
                 ->withProperty('attributes', User::parseData($attributes))
-                ->withProperty('old', User::parseData(Arr::only($this->user->getOriginal(), array_keys($attributes))))
+                ->withProperty('old', $oldData)
                 ->log($log);
         }
 

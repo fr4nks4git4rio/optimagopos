@@ -56,6 +56,14 @@ class Logs extends Component
         return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
+    public function init()
+    {
+        if (user()->cannot('reportsDataReceived-viewAny')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function render()
     {
         $records = $this->query()->get();
@@ -82,7 +90,7 @@ class Logs extends Component
             )
             ->groupBy('log.id');
 
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $query->join('tb_sucursales as sucursal', 'sucursal.id', 'log.sucursal_id')
                 ->where('sucursal.cliente_id', user()->cliente_id)
                 ->whereIn('sucursal.id', user()->sucursales->pluck('id')->toArray());

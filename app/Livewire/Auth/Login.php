@@ -87,7 +87,7 @@ class Login extends Component
 
         $user = User::where('email', $this->email)->first();
 
-        if ($user->cliente_id && $user->suscripciones_activas()->count() == 0) {
+        if ($user->hasAnyRole(['Admin', 'Manager']) && $user->suscripciones_activas()->count() == 0) {
             $this->addError('email', __('auth.subscription_failed'));
             return;
         }

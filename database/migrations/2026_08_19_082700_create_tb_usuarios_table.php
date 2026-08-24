@@ -23,12 +23,10 @@ return new class extends Migration
             $table->string('two_factor_code')->nullable();
             $table->dateTime('two_factor_expires_at')->nullable();
             $table->rememberToken();
-            $table->unsignedBigInteger('rol_id');
             $table->unsignedBigInteger('cliente_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('rol_id')->references('id')->on('tb_roles');
             $table->foreign('cliente_id')->references('id')->on('tb_clientes');
         });
     }

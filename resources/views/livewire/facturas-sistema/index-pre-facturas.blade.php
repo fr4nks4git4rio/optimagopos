@@ -15,9 +15,13 @@
                 <a href="{{ route('admin.pre-facturas.save') }}" class="btn btn-site-primary mr-1">
                     {{ __('site.invoices.index.new_invoice') }}
                 </a>
+            @endcan
+            @can('createComplementoSistema', [App\Models\Factura::class])
                 <a href="{{ route('admin.complementos.save') }}" class="btn btn-site-primary mr-1">
                     {{ __('site.invoices.index.new_complement') }}
                 </a>
+            @endcan
+            @can('createNotaCreditoSistema', [App\Models\Factura::class])
                 <a href="{{ route('admin.notas-credito.save') }}" class="btn btn-site-primary mr-1">
                     {{ __('site.invoices.index.new_credit_note') }}
                 </a>
@@ -136,7 +140,7 @@
                                     <x-action icon="file-pdf" title="{{ __('site.common.download_pdf') }}"
                                         click="showPdf({{ $factura->id }})" />
                                 </li>
-                                @if ($factura->estado == 'CAPTURADA')
+                                @if ($factura->estado == 'CAPTURADA' && user()->can('stampFacturaSistema', App\Models\Factura::find($factura->id)))
                                     <li class="list-inline-item mb-1">
                                         <x-action icon="bell" title="{{ __('site.common.stamp') }}"
                                             click="$dispatch('openModal', { component: 'facturas-sistema.timbrar', arguments: {'factura': '{{ $factura->id }}'} })" />

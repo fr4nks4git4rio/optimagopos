@@ -14,13 +14,10 @@ class ClientePolicy
      */
     public function viewAnyCliente(User $user): bool
     {
-        if ($user->cliente_id)
+        if ($user->hasAnyRole(['Admin', 'Manager']))
             return false;
 
-        if ($user->is_super_admin ||  $user->is_contabilidad)
-            return true;
-
-        return false;
+        return $user->can('clients-viewAny');
     }
 
     /**
@@ -28,14 +25,10 @@ class ClientePolicy
      */
     public function viewCliente(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin &&  $cliente->id == $user->cliente_id)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-
-        return false;
+        return $user->can('clients-view');
     }
 
     /**
@@ -43,13 +36,10 @@ class ClientePolicy
      */
     public function createCliente(User $user): bool
     {
-        if ($user->cliente_id)
+        if ($user->hasAnyRole(['Admin', 'Manager']))
             return false;
 
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
+        return $user->can('clients-create');
     }
 
     /**
@@ -57,24 +47,11 @@ class ClientePolicy
      */
     public function updateCliente(User $user, Cliente $cliente): bool
     {
-        if ($user->cliente_id)
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
             return false;
+        }
 
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
-    }
-
-    public function manageClientSuscripcion(User $user, Cliente $cliente): bool
-    {
-        if ($user->cliente_id)
-            return false;
-
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
+        return $user->can('clients-update');
     }
 
     /**
@@ -82,13 +59,10 @@ class ClientePolicy
      */
     public function deleteCliente(User $user, Cliente $cliente): bool
     {
-        if ($user->cliente_id)
+        if ($user->hasAnyRole(['Admin', 'Manager']))
             return false;
 
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
+        return $user->can('clients-delete');
     }
 
     /**
@@ -96,13 +70,10 @@ class ClientePolicy
      */
     public function restoreCliente(User $user, Cliente $cliente): bool
     {
-        if ($user->cliente_id)
+        if ($user->hasAnyRole(['Admin', 'Manager']))
             return false;
 
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
+        return $user->can('clients-restore');
     }
 
     /**
@@ -122,7 +93,7 @@ class ClientePolicy
      */
     public function viewAnyComensal(User $user): bool
     {
-        if ($user->is_admin)
+        if ($user->hasAnyRole('SuperAdmin', 'Admin'))
             return true;
 
         return false;
@@ -133,7 +104,10 @@ class ClientePolicy
      */
     public function viewComensal(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales->pluck('id')->toArray()))
+        if ($user->hasRole('SuperAdmin'))
+            return true;
+
+        if ($user->hasRole('Admin') && in_array($cliente->id, $user->cliente->comensales->pluck('id')->toArray()))
             return true;
 
         return false;
@@ -144,9 +118,6 @@ class ClientePolicy
      */
     public function createComensal(User $user): bool
     {
-        if ($user->is_admin)
-            return true;
-
         return false;
     }
 
@@ -155,12 +126,6 @@ class ClientePolicy
      */
     public function updateComensal(User $user, Cliente $cliente): bool
     {
-        if ($cliente->rfc === 'XAXX010101000')
-            return false;
-
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales_activos->pluck('id')->toArray()))
-            return true;
-
         return false;
     }
 
@@ -169,9 +134,6 @@ class ClientePolicy
      */
     public function deleteComensal(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales_activos->pluck('id')->toArray()))
-            return true;
-
         return false;
     }
 
@@ -180,9 +142,6 @@ class ClientePolicy
      */
     public function restoreComensal(User $user, Cliente $cliente): bool
     {
-        if ($user->is_admin && in_array($cliente->id, $user->cliente->comensales_inactivos->pluck('id')->toArray()))
-            return true;
-
         return false;
     }
 

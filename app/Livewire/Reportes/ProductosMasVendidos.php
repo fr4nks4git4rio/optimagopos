@@ -53,6 +53,11 @@ class ProductosMasVendidos extends Component
 
     public function init()
     {
+        if (user()->cannot('reportsBestSellingProducts-viewAny')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return redirect()->to('/');
+        }
+
         $this->sucursales = DB::table('tb_sucursales')
             ->select('id', 'nombre_comercial', 'razon_social')
             ->whereIn('id', user()->sucursales->pluck('id')->toArray())

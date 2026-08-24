@@ -15,8 +15,7 @@ class UserActiveSubscription
     public function handle(Request $request, Closure $next): Response
     {
         // 1. Si el usuario tiene una sesión temporal de 2FA activa...
-        Log::info(user()->cliente_id);
-        if (user()->cliente_id && user()->suscripciones_activas()->count() == 0) {
+        if (user()->hasAnyRole(['Admin', 'Manager']) && user()->suscripciones_activas()->count() == 0) {
             return redirect()->to('/')->withErrors(['email' => __('auth.subscription_failed')]);
         }
 

@@ -49,7 +49,7 @@ class PanelPac extends Modal
 
     public function init()
     {
-        if (user()->cannot('setPanelPacFacturaSistema', [Factura::class])) {
+        if (user()->cannot('panelPac-update')) {
             $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
             $this->dispatch('closeModal');
             return;

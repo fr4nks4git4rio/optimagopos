@@ -40,7 +40,11 @@ class UpdateProfile extends Modal
 
     public function getRolProperty()
     {
-        return user()->rol->nombre;
+        $roles = [];
+        foreach (user()->getRoleNames()->toArray() as $r)
+            $roles[] = __('site.roles.values.' . $r);
+
+        return Str::replaceLast(', ', ' ' . __('site.common.and') . ' ',  implode(', ', $roles));
     }
 
     public function render()

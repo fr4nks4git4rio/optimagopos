@@ -5,10 +5,10 @@
 
     <div class="row justify-content-between">
         <div class="col-md-9 col-12 mb-3 row">
-            @if (!user()->cliente_id)
+            @if (user()->hasAnyRole(['SuperAdmin', 'Accountant']))
                 <div class="col-6">
-                    <x-select2-multiple label="{{ __('site.users.list.client') }}" model="clientes" class="form-control" :lazy="true"
-                        :options="$clientesAll"></x-select2-multiple>
+                    <x-select2-multiple label="{{ __('site.users.list.client') }}" model="clientes" class="form-control"
+                        :lazy="true" :options="$clientesAll"></x-select2-multiple>
                 </div>
             @endif
             <div class="col-6">
@@ -21,7 +21,7 @@
         </div>
         <div class="col-md-3 col-12 mb-3 text-end">
             @can('create', [App\Models\User::class])
-                @if (user()->cliente_id)
+                @if (user()->hasAnyRole(['Admin', 'Manager']))
                     <button type="button" class="btn btn-site-primary btn-outline-warning"
                         wire:click="$dispatch('openModal', { component: 'usuarios.save' })">
                         <x-icon name="plus-lg" />
@@ -77,7 +77,10 @@
                         </td>
                         <td>{{ $usuario['nombre'] }}</td>
                         <td>{{ $usuario['email'] }}</td>
-                        @if (user()->is_super_admin)
+                        <td class="text-uppercase">
+                            {{ Illuminate\Support\Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', __('site.roles.values.' . $usuario['roles'])) }}
+                        </td>
+                        @if (user()->hasRole('SuperAdmin'))
                             <td>{{ $usuario['cliente'] }}</td>
                         @endif
                         <td>{{ $usuario['suscripciones'] }}</td>
@@ -85,7 +88,7 @@
                             <ul class="list-unstyled mb-0">
                                 @if (!$usuario['deleted_at'])
                                     @can('update', App\Models\User::find($usuario['id']))
-                                        @if (user()->cliente_id)
+                                        @if (user()->hasAnyRole(['Admin', 'Manager']))
                                             <li class="list-inline-item">
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
                                                     click="$dispatch('openModal', { component: 'usuarios.save', arguments: {user: {{ $usuario['id'] }}} })" />
@@ -94,6 +97,27 @@
                                             <li class="list-inline-item">
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
                                                     click="$dispatch('openModal', { component: 'usuarios.save-system', arguments: {user: {{ $usuario['id'] }}} })" />
+                                            </li>
+                                        @endif
+                                    @endcan
+                                    @can('setBranches', App\Models\User::find($usuario['id']))
+                                        <li class="list-inline-item">
+                                            <x-action icon="building" title="{{ __('site.users.list.set_branches') }}"
+                                                click="$dispatch('openModal', { component: 'usuarios.set-branches', arguments: {usuario: {{ $usuario['id'] }}} })" />
+                                        </li>
+                                    @endif
+                                    @can('users-assignPermissions')
+                                        @if (user()->hasRole('SuperAdmin'))
+                                            <li class="list-inline-item">
+                                                <x-action icon="gear"
+                                                    title="{{ __('site.users.list.assign_permissions') }}"
+                                                    click="$dispatch('openModal', { component: 'usuarios.manage-permissions-system', arguments: {usuario: {{ $usuario['id'] }}} })" />
+                                            </li>
+                                        @elseif(user()->hasRole('Admin') && !App\Models\User::find($usuario['id'])->hasRole('Admin'))
+                                            <li class="list-inline-item">
+                                                <x-action icon="gear"
+                                                    title="{{ __('site.users.list.assign_permissions') }}"
+                                                    click="$dispatch('openModal', { component: 'usuarios.manage-permissions', arguments: {usuario: {{ $usuario['id'] }}} })" />
                                             </li>
                                         @endif
                                     @endcan
@@ -116,7 +140,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ user()->cliente_id ? '5' : '6' }}">
+                        <td colspan="{{ user()->hasAnyRole(['Admin', 'Manager']) ? 6 : 7 }}">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>

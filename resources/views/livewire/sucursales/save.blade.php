@@ -38,7 +38,7 @@
                 @endif
             </div>
             <div class="col-12 col-md-9">
-                @if (user()->is_super_admin)
+                @if (user()->hasAnyRole(['SuperAdmin', 'Accountant']))
                     <div class="row mb-3">
                         <div class="col-md-6 col-12">
                             @if ($from_subscription || $this->sucursal->id)

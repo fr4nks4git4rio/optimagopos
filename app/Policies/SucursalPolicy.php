@@ -13,13 +13,7 @@ class SucursalPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->cliente_id && $user->is_admin)
-            return true;
-
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
+        return $user->can('branches-viewAny');
     }
 
     /**
@@ -27,19 +21,17 @@ class SucursalPolicy
      */
     public function view(User $user, Sucursal $sucursal): bool
     {
-        if ($user->cliente_id) {
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
             if (
-                $user->is_admin
-                && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+                $user->can('branches-view')
+                && $sucursal->cliente_id == $user->cliente_id
                 && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
         }
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        return $user->can('branches-view');
     }
 
     /**
@@ -47,13 +39,10 @@ class SucursalPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->cliente_id)
+        if ($user->hasAnyRole(['Admin', 'Manager']))
             return false;
 
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
+        return $user->can('branches-create');
     }
 
     /**
@@ -61,19 +50,17 @@ class SucursalPolicy
      */
     public function update(User $user, Sucursal $sucursal): bool
     {
-        if ($user->cliente_id) {
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
             if (
-                $user->is_admin
-                && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+                $user->can('branches-update')
+                && $sucursal->cliente_id == $user->cliente_id
                 && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
         }
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        return $user->can('branches-update');
     }
 
     /**
@@ -81,19 +68,17 @@ class SucursalPolicy
      */
     public function delete(User $user, Sucursal $sucursal): bool
     {
-        if ($user->cliente_id) {
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
             if (
-                $user->is_admin
-                && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+                $user->can('branches-delete')
+                && $sucursal->cliente_id == $user->cliente_id
                 && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
         }
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        return $user->can('branches-delete');
     }
 
     /**
@@ -101,19 +86,17 @@ class SucursalPolicy
      */
     public function restore(User $user, Sucursal $sucursal): bool
     {
-        if ($user->cliente_id) {
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
             if (
-                $user->is_admin
-                && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+                $user->can('branches-restore')
+                && $sucursal->cliente_id == $user->cliente_id
                 && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
         }
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        return $user->can('branches-restore');
     }
 
     /**
@@ -126,34 +109,30 @@ class SucursalPolicy
 
     public function setConfigs(User $user, Sucursal $sucursal): bool
     {
-        if ($user->cliente_id) {
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
             if (
-                $user->is_admin
-                && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+                $user->can('branches-setConfigs')
+                && $sucursal->cliente_id == $user->cliente_id
                 && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
         }
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        return $user->can('branches-setConfigs');
     }
     public function setPaymentForms(User $user, Sucursal $sucursal): bool
     {
-        if ($user->cliente_id) {
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
             if (
-                $user->is_admin
-                && in_array($sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
+                $user->can('branches-setPaymentForms')
+                && $sucursal->cliente_id == $user->cliente_id
                 && in_array($sucursal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
             )
                 return true;
             return false;
         }
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        return $user->can('branches-setPaymentForms');
     }
 }

@@ -14,10 +14,7 @@ class FacturaPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->is_admin)
-            return true;
-
-        return false;
+        return $user->hasAnyRole(['Admin', 'Manager']) && $user->can('invoices-viewAny');
     }
 
     /**
@@ -27,10 +24,12 @@ class FacturaPolicy
     {
         if ($factura->del_sistema)
             return false;
+
         if (
-            $user->is_admin
+            $user->hasAnyRole(['Admin', 'Manager'])
+            && $user->can('invoices-view')
             && $user->cliente_id == $factura->propietario_id
-            && in_array($factura->propietario_id, $user->suscripciones_activas()->pluck('id')->toArray())
+            && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
         )
             return true;
 
@@ -42,10 +41,7 @@ class FacturaPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->is_admin)
-            return true;
-
-        return false;
+        return $user->hasAnyRole(['Admin', 'Manager']) && $user->can('invoices-createInvoice');
     }
 
     /**
@@ -55,10 +51,28 @@ class FacturaPolicy
     {
         if ($factura->del_sistema)
             return false;
+
         if (
-            $user->is_admin
+            $user->hasAnyRole(['Admin', 'Manager'])
+            && $user->can('invoices-updateInvoice')
             && $user->cliente_id ==  $factura->propietario_id
-            && in_array($factura->propietario_id, $user->suscripciones_activas()->pluck('id')->toArray())
+            && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
+        )
+            return true;
+
+        return false;
+    }
+
+    public function stamp(User $user, Factura $factura): bool
+    {
+        if ($factura->del_sistema)
+            return false;
+
+        if (
+            $user->hasAnyRole(['Admin', 'Manager'])
+            && $user->can('invoices-stamp')
+            && $user->cliente_id ==  $factura->propietario_id
+            && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
         )
             return true;
 
@@ -72,10 +86,12 @@ class FacturaPolicy
     {
         if ($factura->del_sistema)
             return false;
+
         if (
-            $user->is_admin
+            $user->hasAnyRole(['Admin', 'Manager'])
+            && $user->can('invoices-delete')
             && $user->cliente_id ==  $factura->propietario_id
-            && in_array($factura->propietario_id, $user->suscripciones_activas()->pluck('id')->toArray())
+            && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
         )
             return true;
 
@@ -102,31 +118,17 @@ class FacturaPolicy
     {
         if ($factura->del_sistema)
             return false;
+
         if (
-            $user->is_admin
+            $user->hasAnyRole(['Admin', 'Manager'])
+            && $user->can('invoices-cancel')
             && $user->cliente_id ==  $factura->propietario_id
-            && in_array($factura->propietario_id, $user->suscripciones_activas()->pluck('id')->toArray())
+            && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
         )
             return true;
 
         return false;
     }
-
-    public function setPanelPac(User $user)
-    {
-        if ($user->is_admin)
-            return true;
-
-        return false;
-    }
-    public function setCabeceraFactura(User $user)
-    {
-        if ($user->is_admin)
-            return true;
-
-        return false;
-    }
-
 
     //TODO Facturas del sistema
     /**
@@ -134,10 +136,10 @@ class FacturaPolicy
      */
     public function viewAnyFacturaSistema(User $user): bool
     {
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('invoices-viewAny');
     }
 
     /**
@@ -147,10 +149,11 @@ class FacturaPolicy
     {
         if (!$factura->del_sistema)
             return false;
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
+
+        return $user->can('invoices-view');
     }
 
     /**
@@ -158,10 +161,24 @@ class FacturaPolicy
      */
     public function createFacturaSistema(User $user): bool
     {
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('invoices-createInvoice');
+    }
+    public function createComplementoSistema(User $user): bool
+    {
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
+
+        return $user->can('invoices-createComplement');
+    }
+    public function createNotaCreditoSistema(User $user): bool
+    {
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
+
+        return $user->can('invoices-createCreditNote');
     }
 
     /**
@@ -169,25 +186,33 @@ class FacturaPolicy
      */
     public function updateFacturaSistema(User $user, Factura $factura): bool
     {
-        if (!$factura->del_sistema)
+        if ($user->hasAnyRole(['Admin', 'Manager']) || !$factura->del_sistema)
             return false;
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        if ($factura->es_complemento)
+            return $user->can('invoices-updateComplement');
+        if ($factura->es_nota_credito)
+            return $user->can('invoices-updateCreditNote');
+        return $user->can('invoices-updateInvoice');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
+    public function stampFacturaSistema(User $user, Factura $factura): bool
+    {
+        if ($user->hasAnyRole(['Admin', 'Manager']) || !$factura->del_sistema)
+            return false;
+
+        return $user->can('invoices-stamp');
+    }
+
     public function deleteFacturaSistema(User $user, Factura $factura): bool
     {
-        if (!$factura->del_sistema)
+        if ($user->hasAnyRole(['Admin', 'Manager']) || !$factura->del_sistema)
             return false;
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
+        return $user->can('invoices-delete');
     }
 
     /**
@@ -208,26 +233,9 @@ class FacturaPolicy
 
     public function cancelFacturaSistema(User $user, Factura $factura): bool
     {
-        if (!$factura->del_sistema)
+        if ($user->hasAnyRole(['Admin', 'Manager']) || !$factura->del_sistema)
             return false;
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
 
-        return false;
-    }
-
-    public function setPanelPacFacturaSistema(User $user)
-    {
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
-    }
-    public function setCabeceraFacturaFacturaSistema(User $user)
-    {
-        if ($user->is_super_admin || $user->is_contabilidad)
-            return true;
-
-        return false;
+        return $user->can('invoices-cancel');
     }
 }

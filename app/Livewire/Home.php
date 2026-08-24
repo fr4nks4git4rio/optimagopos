@@ -147,16 +147,16 @@ class Home extends Component
 
     public function render()
     {
-        if (user()->cliente_id)
-            return view('livewire.home', [
-                'sucursalesDisponibles' => Sucursal::where('cliente_id', user()->cliente_id)->whereIn('id', user()->sucursales->pluck('id')->toArray())->get()->map(function ($value) {
-                    return [
-                        'value' => $value->id,
-                        'label' => Crypt::decrypt($value->nombre_comercial)
-                    ];
-                })->toArray()
-            ]);
-        return view('livewire.home-admin');
+        // if (user()->cliente_id)
+        return view('livewire.home', [
+            'sucursalesDisponibles' => Sucursal::where('cliente_id', user()->cliente_id)->whereIn('id', user()->sucursales->pluck('id')->toArray())->get()->map(function ($value) {
+                return [
+                    'value' => $value->id,
+                    'label' => Crypt::decrypt($value->nombre_comercial)
+                ];
+            })->toArray()
+        ]);
+        // return view('livewire.home-admin');
     }
 
     public function init()
@@ -171,7 +171,8 @@ class Home extends Component
 
     private function commonWhere($query)
     {
-        $query->where('ticket.modo_entrenamiento', 0);
+        if ($this->tab == 'foh')
+            $query->where('ticket.modo_entrenamiento', 0);
         if ($this->fecha_inicio)
             $query->whereDate('ticket.fecha_transaccion', '>=', "$this->fecha_inicio 00:00:00");
         if ($this->fecha_fin)
@@ -264,15 +265,15 @@ class Home extends Component
                         $multimoneda_q = $this->commonWhere($multimoneda_q);
                         $this->resumenData['multimoneda'] = $multimoneda_q->count();
 
-                        $ventas_neta_operacion_q = DB::table('tb_tickets as ticket')
-                            ->selectRaw("ticket.importe, ticket.id as id")
-                            ->leftJoin('tb_ticket_operaciones as to', 'ticket.id', 'to.ticket_id')
+                        $ventas_neta_operacion_q = DB::table('tb_ticket_operaciones as to')
+                            ->selectRaw("SUM(to.monto) as importe, ticket.id as id")
+                            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
                             ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
                             ->where('sucursal.cliente_id', user()->cliente_id)
                             ->orderByRaw("HOUR(ticket.fecha_transaccion) asc")
-                            ->where('ticket.importe', '>', 0)
+                            // ->where('ticket.importe', '>', 0)
                             ->groupBy('ticket.id');
 
                         $ventas_neta_operacion_q = $this->commonWhere($ventas_neta_operacion_q);
@@ -333,34 +334,52 @@ class Home extends Component
                         $operaciones_q = $this->commonWhere($operaciones_q);
                         $this->operacionesData['operaciones'] = $operaciones_q->count();
 
-                        $tickets_promedio_q = DB::table('tb_tickets as ticket')
-                            ->selectRaw("AVG(ticket.importe) as promedio")
-                            ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                            ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id)
-                            ->where('ticket.importe', '>', 0);
+                        $tickets_promedio_q = DB::query()
+                            ->fromSub(function ($query) {
+                                $query->from('tb_ticket_operaciones as top')
+                                    ->selectRaw('top.ticket_id, SUM(top.monto) as total_ticket')
+                                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'top.ticket_id')
+                                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                                    ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
+                                    ->where('sucursal.cliente_id', user()->cliente_id);
 
-                        $tickets_promedio_q = $this->commonWhere($tickets_promedio_q);
+                                $query = $this->commonWhere($query);
+                                $query->groupBy('top.ticket_id');
+                            }, 'sub')
+                            ->selectRaw('AVG(sub.total_ticket) as promedio');
+
                         $this->operacionesData['ticket_promedio'] = $tickets_promedio_q->value('promedio');
 
-                        $mayor_ticket_q = DB::table('tb_tickets as ticket')
-                            ->selectRaw("MAX(ticket.importe) as mayor")
-                            ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                            ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id)
-                            ->where('ticket.importe', '>', 0);
+                        $mayor_ticket_q = DB::query()
+                            ->fromSub(function ($query) {
+                                $query->from('tb_ticket_operaciones as top')
+                                    ->selectRaw('top.ticket_id, SUM(top.monto) as total_ticket')
+                                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'top.ticket_id')
+                                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                                    ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
+                                    ->where('sucursal.cliente_id', user()->cliente_id);
 
-                        $mayor_ticket_q = $this->commonWhere($mayor_ticket_q);
+                                $query = $this->commonWhere($query); // filtro común AQUÍ, antes del groupBy
+                                $query->groupBy('top.ticket_id');
+                            }, 'sub')
+                            ->selectRaw('MAX(sub.total_ticket) as mayor');
+
                         $this->operacionesData['mayor_ticket'] = $mayor_ticket_q->value('mayor');
 
-                        $menor_ticket_q = DB::table('tb_tickets as ticket')
-                            ->selectRaw("MIN(ticket.importe) as menor")
-                            ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
-                            ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id)
-                            ->where('ticket.importe', '>', 0);
+                        $menor_ticket_q = DB::query()
+                            ->fromSub(function ($query) {
+                                $query->from('tb_ticket_operaciones as top')
+                                    ->selectRaw('top.ticket_id, SUM(top.monto) as total_ticket')
+                                    ->leftJoin('tb_tickets as ticket', 'ticket.id', 'top.ticket_id')
+                                    ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                                    ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
+                                    ->where('sucursal.cliente_id', user()->cliente_id);
 
-                        $menor_ticket_q = $this->commonWhere($menor_ticket_q);
+                                $query = $this->commonWhere($query); // filtro común AQUÍ, antes del groupBy
+                                $query->groupBy('top.ticket_id');
+                            }, 'sub')
+                            ->selectRaw('MIN(sub.total_ticket) as menor');
+
                         $this->operacionesData['menor_ticket'] = $menor_ticket_q->value('menor');
 
                         $correcciones_q = DB::table('tb_ticket_producto_correcciones as tpc')

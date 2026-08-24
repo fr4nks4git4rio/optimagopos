@@ -13,10 +13,10 @@ class SuscripcionPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('subscriptions-viewAny');
     }
 
     /**
@@ -24,10 +24,10 @@ class SuscripcionPolicy
      */
     public function view(User $user, Suscripcion $suscripcion): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('subscriptions-view');
     }
 
     /**
@@ -35,10 +35,10 @@ class SuscripcionPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('subscriptions-create');
     }
 
     /**
@@ -49,10 +49,10 @@ class SuscripcionPolicy
         if (!in_array($suscripcion->estado, ['PENDIENTE', 'ACTIVA']))
             return false;
 
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('subscriptions-viewAny');
     }
 
     public function activate(User $user, Suscripcion $suscripcion): bool
@@ -60,10 +60,10 @@ class SuscripcionPolicy
         if ($suscripcion->estado != 'PENDIENTE')
             return false;
 
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('subscriptions-viewAny');
     }
 
     public function deactivate(User $user, Suscripcion $suscripcion): bool
@@ -71,10 +71,10 @@ class SuscripcionPolicy
         if (!in_array($suscripcion->estado, ['PENDIENTE', 'ACTIVA']))
             return false;
 
-        if ($user->is_super_admin)
-            return true;
+        if($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('subscriptions-viewAny');
     }
 
     /**

@@ -77,7 +77,7 @@ class ArticulosVendidos extends Component
                 'sucursal.nombre_comercial as sucursal',
                 'producto.nombre as producto',
                 DB::raw('SUM(t_producto.precio) as monto'),
-                DB::raw('COUNT(*) as vendidos')
+                DB::raw('SUM(t_producto.cantidad as vendidos')
             )
             ->leftJoin('tb_tickets as ticket', 'ticket.id', 't_producto.ticket_id')
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
@@ -147,6 +147,14 @@ class ArticulosVendidos extends Component
         ];
     }
 
+    public function init()
+    {
+        if (user()->cannot('reportsArticlesSold-viewAny')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function changeSort($sort)
     {
         $this->order = !$this->order || $this->sort != $sort ? 'asc' : ($this->order == 'asc' ? 'desc' : '');
@@ -155,6 +163,10 @@ class ArticulosVendidos extends Component
 
     public function imprimirPdf()
     {
+        if (user()->cannot('reportsArticlesSold-print')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return;
+        }
         $name = __('site.reports.articles_sold.title');
         if (File::exists(public_path("$name.pdf"))) {
             File::delete(public_path("$name.pdf"));
@@ -181,6 +193,10 @@ class ArticulosVendidos extends Component
 
     public function exportarExcel()
     {
+        if (user()->cannot('reportsArticlesSold-export')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return;
+        }
         $name = __('site.reports.articles_sold.title');
         $fileName = "$name.xlsx";
 

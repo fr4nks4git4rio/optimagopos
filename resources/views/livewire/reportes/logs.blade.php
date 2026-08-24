@@ -1,6 +1,6 @@
 @section('title', __('site.reports.data_received.title'))
 
-<div>
+<div wire:init="init">
     <div wire:loading.delay>
         <div class="loading">
             <img src="{{ asset('img/loading.gif') }}" />

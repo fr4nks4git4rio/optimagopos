@@ -53,7 +53,7 @@ class SocialAuthController extends Controller
                 ]);
         }
 
-        if ($user->cliente_id && $user->suscripciones_activas()->count() == 0) {
+        if ($user->hasAnyRole(['Admin', 'Manager']) && $user->suscripciones_activas()->count() == 0) {
             return redirect()
                 ->route('login')
                 ->withErrors([

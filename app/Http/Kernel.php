@@ -9,6 +9,8 @@ use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TwoFactorAuthenticated;
 use App\Http\Middleware\UserActiveSubscription;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 class Kernel extends HttpKernel
 {
@@ -72,6 +74,8 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         '2fa' => TwoFactorAuthenticated::class,
         'hasRole' => HasRole::class,
+        'role' => RoleMiddleware::class,
+        'permission' => PermissionMiddleware::class,
         'conFacturacion' => ConFacturacion::class,
         'set.locale' => SetLocale::class,
         'two-factor' => EnsureTwoFactorIsVerified::class,

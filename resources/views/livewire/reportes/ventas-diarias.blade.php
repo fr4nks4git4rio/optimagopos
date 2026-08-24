@@ -1,6 +1,6 @@
 @section('title', __('site.reports.daily_dales.title'))
 
-<div>
+<div wire:init="init">
     <div wire:loading.delay.longer>
         <div class="loading">
             <img src="{{ asset('img/loading.gif') }}" />
@@ -26,14 +26,18 @@
             </div>
         </div>
         <div class="mb-1 col-md-2 text-end">
-            <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
-                <span class="bi bi-file-pdf"></span>
-                {{ __('site.common.print') }}
-            </button>
-            <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
-                <span class="bi bi-file-excel"></span>
-                {{ __('site.common.export') }}
-            </button>
+            @can('reportsDailySales-print')
+                <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
+                    <span class="bi bi-file-pdf"></span>
+                    {{ __('site.common.print') }}
+                </button>
+            @endcan
+            @can('reportsDailySales-export')
+                <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
+                    <span class="bi bi-file-excel"></span>
+                    {{ __('site.common.export') }}
+                </button>
+            @endcan
         </div>
     </div>
 
@@ -89,7 +93,8 @@
 
                     {{-- Totalizador por sucursal --}}
                     <tr class="table-success fw-bold">
-                        <td class="text-end" colspan="2">{{__('site.reports.daily_dales.total')}} {{ $sucursalData['sucursal'] }}</td>
+                        <td class="text-end" colspan="2">{{ __('site.reports.daily_dales.total') }}
+                            {{ $sucursalData['sucursal'] }}</td>
                         @foreach ($formasPago as $i => $formaPago)
                             @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                             <td class="text-end">{{ number_format($totalCelda['monto'], 2) }}</td>
@@ -100,7 +105,7 @@
                     <tr>
                         <td colspan="{{ 2 + count($formasPago) * 2 }}" class="text-center">
                             <div class="list-group-item">
-                                {{__('site.common.results_not_found')}}...
+                                {{ __('site.common.results_not_found') }}...
                             </div>
                         </td>
                     </tr>
@@ -109,7 +114,7 @@
             @if (count($records) > 0)
                 <tfoot>
                     <tr class="table-dark fw-bold">
-                        <td colspan="2" class="text-end">{{__('site.reports.daily_dales.grand_total')}}</td>
+                        <td colspan="2" class="text-end">{{ __('site.reports.daily_dales.grand_total') }}</td>
                         @foreach ($formasPago as $i => $formaPago)
                             @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                             <td class="text-end">{{ number_format($totalGeneral['monto'], 2) }}</td>

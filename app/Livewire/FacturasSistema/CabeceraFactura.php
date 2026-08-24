@@ -83,7 +83,7 @@ class CabeceraFactura extends Component
 
     public function init()
     {
-        if (user()->cannot('setCabeceraFacturaFacturaSistema', [Factura::class])) {
+        if (user()->cannot('invoiceHeader-update')) {
             $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }

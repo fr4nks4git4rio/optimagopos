@@ -59,6 +59,14 @@ class VentasOperador extends Component
         return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
+    public function init()
+    {
+        if (user()->cannot('reportsSalesByOperator-viewAny')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function render()
     {
         $res = $this->query();
@@ -216,6 +224,10 @@ class VentasOperador extends Component
 
     public function imprimirPdf()
     {
+        if (user()->cannot('reportsSalesByOperator-print')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return;
+        }
         $name = __('site.reports.sales_by_operator.title');
         if (File::exists(public_path("$name.pdf"))) {
             File::delete(public_path("$name.pdf"));
@@ -241,6 +253,10 @@ class VentasOperador extends Component
 
     public function exportarExcel()
     {
+        if (user()->cannot('reportsSalesByOperator-export')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return;
+        }
         $name = __('site.reports.sales_by_operator.title');
         $fileName = "$name.xlsx";
 

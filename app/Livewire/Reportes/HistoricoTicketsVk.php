@@ -73,6 +73,14 @@ class HistoricoTicketsVk extends Component
         return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
+    public function init()
+    {
+        if (user()->cannot('reportsVKTicketHistory-viewAny')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function render()
     {
         $res = $this->query();
@@ -124,8 +132,7 @@ class HistoricoTicketsVk extends Component
             )
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
-            ->where('sucursal.cliente_id', user()->cliente_id)
-            ->where('ticket.modo_entrenamiento', 0);
+            ->where('sucursal.cliente_id', user()->cliente_id);
 
         if ($this->fechaInicio) {
             $query->whereDate('ticket.fecha_transaccion', '>=', $this->fechaInicio);
@@ -272,6 +279,10 @@ class HistoricoTicketsVk extends Component
 
     public function imprimirPdf()
     {
+        if (user()->cannot('reportsVKTicketHistory-print')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return;
+        }
         $name = __('site.reports.vk_ticket_history.title');
         if (File::exists(public_path("$name.pdf"))) {
             File::delete(public_path("$name.pdf"));
@@ -308,6 +319,10 @@ class HistoricoTicketsVk extends Component
 
     public function exportarExcel()
     {
+        if (user()->cannot('reportsVKTicketHistory-export')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return;
+        }
         $name =  __('site.reports.vk_ticket_history.title');
         $fileName = "$name.xlsx";
         $estados = Arr::pluck([

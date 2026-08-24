@@ -13,10 +13,10 @@ class PaquetePolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('packages-viewAny');
     }
 
     /**
@@ -24,10 +24,10 @@ class PaquetePolicy
      */
     public function view(User $user, Paquete $paquete): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('packages-view');
     }
 
     /**
@@ -35,10 +35,10 @@ class PaquetePolicy
      */
     public function create(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('packages-create');
     }
 
     /**
@@ -46,10 +46,10 @@ class PaquetePolicy
      */
     public function update(User $user, Paquete $paquete): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('packages-update');
     }
 
     /**
@@ -57,10 +57,10 @@ class PaquetePolicy
      */
     public function delete(User $user, Paquete $paquete): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('packages-delete');
     }
 
     /**
@@ -68,10 +68,10 @@ class PaquetePolicy
      */
     public function restore(User $user, Paquete $paquete): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('packages-restore');
     }
 
     /**
@@ -79,9 +79,6 @@ class PaquetePolicy
      */
     public function forceDelete(User $user, Paquete $paquete): bool
     {
-        if ($user->is_super_admin)
-            return true;
-
         return false;
     }
 }

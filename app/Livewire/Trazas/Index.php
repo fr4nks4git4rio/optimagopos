@@ -73,7 +73,7 @@ class Index extends Component
             )
             ->leftJoin('tb_usuarios as user', 'log.causer_id', '=', 'user.id');
 
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $query->where('user.cliente_id', user()->cliente_id);
         }
 

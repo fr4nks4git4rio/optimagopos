@@ -91,7 +91,7 @@
                                                 click="$dispatch('openModal', { component: 'clientes.save', arguments: {cliente: {{ $cliente['id'] }}} })" />
                                         </li>
                                     @endcan
-                                    @can('manageClientSuscripcion', App\Models\Cliente::find($cliente['id']))
+                                    @can('crate', [App\Models\Suscripcion::class]))
                                         <li class="list-inline-item">
                                             <x-action icon="bag-check" title="Nueva Suscripción"
                                                 click="gestionarSuscripcion({{ $cliente['id'] }})" />

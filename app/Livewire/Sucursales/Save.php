@@ -62,8 +62,7 @@ class Save extends ModalComponent
 
         if (!isset($this->sucursal)) {
             $this->sucursal = new Sucursal();
-            if (user()->is_admin)
-                $this->cliente_id = user()->cliente_id;
+            $this->cliente_id = $this->cliente_id ?? (user()->cliente_id ?? null);
         } else {
             $this->sucursal = Sucursal::decryptInfo($this->sucursal);
             $this->nombre_comercial = $this->sucursal->nombre_comercial;

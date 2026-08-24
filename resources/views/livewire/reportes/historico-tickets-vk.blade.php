@@ -36,14 +36,18 @@
             </div>
         </div>
         <div class="mb-1 col-md-2 text-end">
-            <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
-                <span class="bi bi-file-pdf"></span>
-                {{ __('site.common.print') }}
-            </button>
-            <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
-                <span class="bi bi-file-excel"></span>
-                {{ __('site.common.export') }}
-            </button>
+            @can('reportsVKTicketHistory-print')
+                <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
+                    <span class="bi bi-file-pdf"></span>
+                    {{ __('site.common.print') }}
+                </button>
+            @endcan
+            @can('reportsVKTicketHistory-export')
+                <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
+                    <span class="bi bi-file-excel"></span>
+                    {{ __('site.common.export') }}
+                </button>
+            @endcan
         </div>
     </div>
 
@@ -167,12 +171,14 @@
                         <td colspan="3" class="text-end">{{ __('site.reports.vk_ticket_history.grand_total') }}</td>
                         <td class="text-center" colspan="2">
                             {{ $totalGeneral['tickets_abiertos'] }}
-                            ({{ __('site.reports.vk_ticket_history.average_time') }}: {{ $totalGeneral['promedio_tickets_abiertos'] }})
+                            ({{ __('site.reports.vk_ticket_history.average_time') }}:
+                            {{ $totalGeneral['promedio_tickets_abiertos'] }})
                         </td>
                         <td colspan="2"></td>
                         <td class="text-center" colspan="2">
                             {{ $totalGeneral['tickets_demorados'] }}
-                            ({{ __('site.reports.vk_ticket_history.average_time') }}: {{ $totalGeneral['promedio_tickets_demorados'] }})</td>
+                            ({{ __('site.reports.vk_ticket_history.average_time') }}:
+                            {{ $totalGeneral['promedio_tickets_demorados'] }})</td>
                         <td></td>
                     </tr>
                 </tfoot>

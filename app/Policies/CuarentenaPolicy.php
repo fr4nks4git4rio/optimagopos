@@ -13,13 +13,7 @@ class CuarentenaPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->cliente_id)
-            return false;
-
-        if ($user->is_super_admin)
-            return true;
-
-        return false;
+        return $user->can('quarantine-viewAny');
     }
 
     /**
@@ -27,13 +21,7 @@ class CuarentenaPolicy
      */
     public function view(User $user, Cuarentena $cuarentena): bool
     {
-        if ($user->cliente_id)
-            return false;
-
-        if ($user->is_super_admin)
-            return true;
-
-        return false;
+        return $user->can('quarantine-viewAny');
     }
 
     /**
@@ -41,12 +29,6 @@ class CuarentenaPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->cliente_id)
-            return false;
-
-        if ($user->is_super_admin)
-            return true;
-
         return false;
     }
 
@@ -55,24 +37,12 @@ class CuarentenaPolicy
      */
     public function update(User $user, Cuarentena $cuarentena): bool
     {
-        if ($user->cliente_id)
-            return false;
-
-        if ($user->is_super_admin)
-            return true;
-
         return false;
     }
 
     public function fix(User $user, Cuarentena $cuarentena): bool
     {
-        if ($user->cliente_id)
-            return false;
-
-        if ($user->is_super_admin)
-            return true;
-
-        return false;
+        return $user->can('quarantine-fix');
     }
 
     /**
@@ -80,13 +50,7 @@ class CuarentenaPolicy
      */
     public function delete(User $user, Cuarentena $cuarentena): bool
     {
-        if ($user->cliente_id)
-            return false;
-
-        if ($user->is_super_admin)
-            return true;
-
-        return false;
+        return $user->can('quarantine-delete');
     }
 
     /**

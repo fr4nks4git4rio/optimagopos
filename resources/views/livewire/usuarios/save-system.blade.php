@@ -43,14 +43,14 @@
                         <div class="row mb-2">
                             <div class="col-sm-6">
                                 <x-select2-component-modals label="{{ __('site.users.save.role') }}"
-                                    placeholder="{{ __('site.common.select') }}" class="form-control" :options="$roles"
-                                    model="rol_id" />
+                                    placeholder="{{ __('site.common.select') }}" class="form-control" :options="$rolesAll"
+                                    model="roles" />
                             </div>
                             <div class="col-sm-6">
                                 <x-input label="{{ __('site.users.save.email') }}" type="email" model="email" />
                             </div>
                         </div>
-                        @if (!in_array($rol_id, [1, 3]))
+                        @if (!in_array($roles, ['SuperAdmin', 'Accountant']))
                             <div class="row mb-2">
                                 <div class="col-sm-6">
                                     @if ($from_subscription)

@@ -20,6 +20,15 @@ class Show extends Modal
         return view('livewire.trazas.show');
     }
 
+    public function init()
+    {
+        if (user()->cannot('logs-view')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            $this->dispatch('closeModal');
+            return;
+        }
+    }
+
     public function getDataAttributes($attributes)
     {
         if ($this->log->subject_type == Cliente::class) {

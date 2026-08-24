@@ -116,7 +116,7 @@ class FormasPago extends Modal
             ->leftJoin('tb_sucursales as s', 's.id', 'sfp.sucursal_id')
             ->where('sfp.nombre', $data['forma_pago_activa']['nombre'])
             ->where('sfp.id', '!=', $data['forma_pago_activa']['id'])
-            ->where('s.cliente_id', $this->sucursal->cliente_id)
+            ->where('s.id', $this->sucursal->id)
             ->count() > 0
         ) {
             $this->addError('forma_pago_activa.nombre', __('validation.unique', ['attribute' => 'nombre']));

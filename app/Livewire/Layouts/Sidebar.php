@@ -14,8 +14,9 @@ class Sidebar extends Component
     }
     public function getAdminRoutesActiveProperty()
     {
-        $prefix = user()->cliente_id ? 'cliente' : 'admin';
+        $prefix = user()->hasAnyRole(['SuperAdmin', 'Accountant']) ? 'admin' : 'cliente';
         return Request::is("$prefix/usuarios*")
+            || Request::is("$prefix/roles*")
             || Request::is("$prefix/modulos*")
             || Request::is("$prefix/paquetes*")
             || Request::is("$prefix/clientes*")
@@ -30,7 +31,7 @@ class Sidebar extends Component
 
     public function getFacturacionRoutesActiveProperty()
     {
-        $prefix = user()->cliente_id ? 'cliente' : 'admin';
+        $prefix = user()->hasAnyRole(['SuperAdmin', 'Accountant']) ? 'admin' : 'cliente';
         return Request::is("$prefix/pre-facturas*")
             || Request::is("$prefix/almacen-facturas*")
             || Request::is("$prefix/cabecera-factura*")
@@ -41,8 +42,9 @@ class Sidebar extends Component
     }
     public function getReportesRoutesActiveProperty()
     {
-        $prefix = user()->cliente_id ? 'cliente' : 'admin';
+        $prefix = user()->hasAnyRole(['SuperAdmin', 'Accountant']) ? 'admin' : 'cliente';
         return Request::is($prefix . '/reportes/historico-operaciones*')
+            || Request::is($prefix . '/reportes/testing-historico-operaciones*')
             || Request::is($prefix . '/reportes/logs*')
             || Request::is($prefix . '/reportes/ingresos*')
             || Request::is($prefix . '/reportes/historico-tickets-vk*')

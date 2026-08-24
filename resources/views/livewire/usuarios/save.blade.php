@@ -43,20 +43,20 @@
                         <div class="row mb-2">
                             <div class="col-sm-6">
                                 <x-select2-component-modals label="{{ __('site.users.save.role') }}"
-                                    placeholder="{{ __('site.common.select') }}" class="form-control" :options="$roles"
-                                    model="rol_id" />
+                                    placeholder="{{ __('site.common.select') }}" class="form-control" :options="$rolesAll"
+                                    model="roles" />
                             </div>
                             <div class="col-sm-6">
                                 <x-input label="{{ __('site.users.save.email') }}" type="email" model="email" />
                             </div>
                         </div>
-                        <div class="row mb-2">
+                        {{-- <div class="row mb-2">
                             <div class="col-sm-12">
                                 <x-select2-multiple-component-modals label="{{ __('site.users.save.subscriptions') }}"
                                     placeholder="{{ __('site.common.select') }}" :options="$suscripcionesAll" class="form-control"
                                     model="suscripciones" :dynamic="true" />
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="row mb-2">
                             <div class="col-sm-6">
                                 <x-input label="{{ __('site.users.save.first_name') }}" type="text"

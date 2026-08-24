@@ -5,10 +5,10 @@
 
     <div class="row justify-content-between">
         <div class="col-md-9 col-12 mb-3 row">
-            @if (!user()->cliente_id)
+            @if (user()->hasAnyRole(['SuperAdmin', 'Accountant']))
                 <div class="col-6">
-                    <x-select2-multiple label="{{ __('site.branches.index.client') }}" model="clientes" class="form-control" :lazy="true"
-                        :options="$clientesAll"></x-select2-multiple>
+                    <x-select2-multiple label="{{ __('site.branches.index.client') }}" model="clientes"
+                        class="form-control" :lazy="true" :options="$clientesAll"></x-select2-multiple>
                 </div>
             @endif
             <div class="col-6">
@@ -81,7 +81,7 @@
                         <td>{{ $sucursal['rfc'] }}</td>
                         <td>{{ $sucursal['razon_social'] }}</td>
                         <td>{{ $sucursal['telefono'] }}</td>
-                        @if (user()->is_super_admin)
+                        @if (user()->hasAnyRole(['SuperAdmin', 'Accountant']))
                             <td>{{ $sucursal['cliente'] }}</td>
                         @endif
                         <td>{{ $sucursal['suscripcion'] }}</td>
@@ -125,7 +125,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ user()->cliente_id ? 7 : 8 }}">
+                        <td colspan="{{ user()->hasAnyRole(['Admin', 'Manager']) ? 7 : 8 }}">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}
                             </div>

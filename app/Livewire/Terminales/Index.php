@@ -37,7 +37,7 @@ class Index extends Component
 
     public function mount()
     {
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $this->sorts = [
                 __('site.terminals.index.identifier'),
                 __('site.terminals.index.name'),
@@ -69,7 +69,7 @@ class Index extends Component
         $this->sucursales = [];
         $this->suscripciones = [];
 
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $this->sucursalesAll = DB::table('tb_sucursales')->where('id', user()->cliente_id)
                 ->get()->map(function ($element) {
                     return [
@@ -137,7 +137,7 @@ class Index extends Component
     public function render()
     {
         $clientes_q = DB::table('tb_clientes')->where('es_cliente', 1)->whereNull('deleted_at');
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $clientes_q->where('id', user()->cliente_id);
         }
         $clientes = $clientes_q->get()->map(function ($element) {
@@ -189,7 +189,7 @@ class Index extends Component
             ->leftJoin('tb_suscripciones as subs', 'subs.id', '=', 't.suscripcion_id')
             ->leftJoin('tb_paquetes as paquete', 'paquete.id', '=', 'subs.paquete_id');
 
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $query->where('s.cliente_id', user()->cliente_id);
         }
 

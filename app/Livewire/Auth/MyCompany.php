@@ -43,6 +43,7 @@ class MyCompany extends Modal
 
     public function mount()
     {
+        $this->company = user()->cliente ?? get_system_owner();
         $this->regimenesFiscales = RegimenFiscal::orderBy('codigo')->get()->map->only(['label', 'value']);
 
         $this->company = Cliente::decryptInfo($this->company);
@@ -130,6 +131,12 @@ class MyCompany extends Modal
 
     public function save()
     {
+        if (user()->cannot('myCompany-update')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            $this->dispatch('closeModal');
+            return;
+        }
+
         $data = $this->validate(
             $this->rules(),
             // $this->messages()
@@ -231,6 +238,12 @@ class MyCompany extends Modal
 
     public function init()
     {
+        if (user()->cannot('myCompany-view')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            $this->dispatch('closeModal');
+            return;
+        }
+
         if ($this->direccion_fiscal['estado_id']) {
             $estado = Estado::find($this->direccion_fiscal['estado_id']);
             $this->dispatch("set-data-direccion_fiscal-estado_id", ['data' => [$estado->only('id', 'text')], 'term' => '', 'value' => $estado->id]);

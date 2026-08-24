@@ -40,7 +40,7 @@
                     {{-- <i class="bi bi-gear"></i> --}}
                     {{-- </a> --}}
                     {{-- </div> --}}
-                    @if (!user()->cliente_id)
+                    @if (user()->hasAnyRole(['SuperAdmin', 'Accountant']))
                         <div class="nav-item flex-shrink-0 mr-2">
                             <livewire:layouts.tipo-cambio-sistema />
                         </div>
@@ -63,7 +63,8 @@
                                     <div class="row">
                                         <div class="col-lg-12 col-sm-12 col-12">
                                             <span>{{ __('nav.notifications') }} {{ count($notifications) }}</span>
-                                            <a href="javascript:void(0)" wire:click="$dispatch('markNotificationsAllAsRead')"
+                                            <a href="javascript:void(0)"
+                                                wire:click="$dispatch('markNotificationsAllAsRead')"
                                                 class="float-end text-light">{{ __('site.nav.mark-as-reads') }}</a>
                                         </div>
                                     </div>
@@ -138,10 +139,10 @@
                             <x-dropdown-item label="{{ __('site.nav.change-password') }}"
                                 click="$dispatch('openModal', { component: 'auth.change-password' })" />
 
-                            @if (user()->is_admin)
+                            @can('myCompany-view')
                                 <x-dropdown-item label="{{ __('site.nav.my-company') }}"
-                                    click="$dispatch('openModal', { component: 'auth.my-company', arguments: {company: {{ user()->cliente_id }}} })" />
-                            @endif
+                                    click="$dispatch('openModal', { component: 'auth.my-company'})" />
+                            @endcan
 
                             <x-dropdown-item :label="__('Logout')" click="logout" />
                         </div>

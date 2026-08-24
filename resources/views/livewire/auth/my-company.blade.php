@@ -161,6 +161,8 @@
             wire:click="$dispatch('closeModal')">
             {{ __('site.common.close') }}
         </button>
-        <button type="submit" class="btn btn-primary">{{ __('site.clients.save.save_client') }}</button>
+        @can('myCompany-update')
+            <button type="submit" class="btn btn-primary">{{ __('site.clients.save.save_client') }}</button>
+        @endcan
     </x-slot:buttons>
 </x-modal>

@@ -24,11 +24,11 @@ return new class extends Migration
             $table->text('contacto_telefono')->nullable();
             $table->text('contacto_cargo')->nullable();
             $table->text('logo')->nullable();
-            $table->boolean('es_comensal')->default(false);
-            $table->boolean('es_cliente')->default(false);
-            $table->boolean('es_propietario')->default(false);
-            $table->boolean('con_facturacion')->default(false);
-            $table->boolean('es_cliente_fiel')->default(false);
+            $table->boolean('es_comensal')->default(false)->nullable();
+            $table->boolean('es_cliente')->default(false)->nullable();
+            $table->boolean('es_propietario')->default(false)->nullable();
+            $table->boolean('con_facturacion')->default(false)->nullable();
+            $table->boolean('es_cliente_fiel')->default(false)->nullable();
             $table->text('comentarios')->nullable();
             $table->text('portal_pac')->nullable();
             $table->string('usuario_integrador_sat', 100)->nullable();

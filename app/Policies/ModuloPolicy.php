@@ -13,10 +13,10 @@ class ModuloPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('modules-viewAny');
     }
 
     /**
@@ -24,10 +24,10 @@ class ModuloPolicy
      */
     public function view(User $user, Modulo $modulo): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('modules-view');
     }
 
     /**
@@ -35,10 +35,10 @@ class ModuloPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('modules-create');
     }
 
     /**
@@ -46,10 +46,10 @@ class ModuloPolicy
      */
     public function update(User $user, Modulo $modulo): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('modules-update');
     }
 
     /**
@@ -57,10 +57,10 @@ class ModuloPolicy
      */
     public function delete(User $user, Modulo $modulo): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('modules-delete');
     }
 
     /**
@@ -68,10 +68,10 @@ class ModuloPolicy
      */
     public function restore(User $user, Modulo $modulo): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('modules-restore');
     }
 
     /**
@@ -79,9 +79,6 @@ class ModuloPolicy
      */
     public function forceDelete(User $user, Modulo $modulo): bool
     {
-        if ($user->is_super_admin)
-            return true;
-
         return false;
     }
 }

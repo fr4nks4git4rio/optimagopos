@@ -59,6 +59,14 @@ class VentasDiarias extends Component
         return $this->order == 'asc' ? 'bi bi-sort-up-alt' : 'bi bi-sort-down-alt';
     }
 
+    public function init()
+    {
+        if (user()->cannot('reportsDailySales-viewAny')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return redirect()->to('/');
+        }
+    }
+
     public function render()
     {
         $res = $this->query();
@@ -101,7 +109,6 @@ class VentasDiarias extends Component
             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'operacion.ticket_id')
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
             ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'operacion.sucursal_forma_pago_id')
-            ->where('operacion.monto', '>', 0)
             ->where('sucursal.cliente_id', user()->cliente_id)
             ->where('ticket.modo_entrenamiento', 0)
             ->groupByRaw('DATE(ticket.fecha_transaccion), operacion.sucursal_forma_pago_id');
@@ -203,6 +210,11 @@ class VentasDiarias extends Component
 
     public function imprimirPdf()
     {
+        if (user()->cannot('reportsDailySales-print')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return;
+        }
+
         $name = __('site.reports.daily_dales.title');
         if (File::exists(public_path("$name.pdf"))) {
             File::delete(public_path("$name.pdf"));
@@ -229,6 +241,10 @@ class VentasDiarias extends Component
 
     public function exportarExcel()
     {
+        if (user()->cannot('reportsDailySales-export')) {
+            $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
+            return;
+        }
         $name = __('site.reports.daily_dales.title');
         $fileName = "$name.xlsx";
 

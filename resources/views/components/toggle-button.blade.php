@@ -106,7 +106,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 35px;
+        min-width: 35px;
         height: 35px;
         color: #fff;
         font-size: 16px;

@@ -10,9 +10,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 /**
  * Class Cliente
@@ -247,6 +250,11 @@ class Cliente extends Model
         return $this->direccion_fiscal()->exists() ? $this->direccion_fiscal->codigo_postal : '';
     }
 
+    public function rolePermissions(mixed $role_id)
+    {
+        return $this->roles_permissions()->wherePivot('client_id', $this->getKey())->wherePivotIn('role_id', Arr::wrap($role_id))->get();
+    }
+
     public function direccion_fiscal()
     {
         return $this->belongsTo(Direccion::class)->withDefault([
@@ -297,5 +305,10 @@ class Cliente extends Model
     public function sucursales()
     {
         return $this->hasMany(Sucursal::class, 'cliente_id');
+    }
+
+    public function roles_permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'role_client_has_permissions', 'client_id', 'permission_id');
     }
 }

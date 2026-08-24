@@ -3,19 +3,16 @@
 namespace App\Livewire\Usuarios;
 
 use App\Livewire\Layouts\Modal;
-use App\Models\Cliente;
-use App\Models\Role;
 use App\Models\Suscripcion;
 use App\Models\User;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
+use Spatie\Permission\Models\Role;
 
 class Save extends Modal
 {
@@ -28,13 +25,13 @@ class Save extends Modal
     public $email;
     public $nombre;
     public $apellidos;
-    public $rol_id;
+    public $roles;
     public $cliente_id;
     public $password;
     public $password_confirmation;
     public $avatar_src;
     public $suscripciones = [];
-    public $roles = [];
+    public $rolesAll = [];
     public $suscripcionesAll = [];
 
     protected $listeners = ['$refresh'];
@@ -45,7 +42,8 @@ class Save extends Modal
         $this->email = isset($this->user) ? $this->user->email : '';
         $this->nombre = isset($this->user) ? $this->user->nombre : '';
         $this->apellidos = isset($this->user) ? $this->user->apellidos : '';
-        $this->rol_id = isset($this->user) ? $this->user->rol_id : '';
+        $this->roles = isset($this->user) ? $this->user->roles()->first()->name : null;
+
         $this->cliente_id = user()->cliente_id;
         if (isset($this->user))
             $this->suscripciones = $this->user->suscripciones()->pluck('id')->toArray();
@@ -53,9 +51,12 @@ class Save extends Modal
             $this->user = new User();
         }
 
-        $this->roles = DB::table('tb_roles')->select('id as value', 'nombre as label')->whereIn('id', [2])->get()->map(function ($element) {
-            return (array) $element;
-        })->toArray();
+        $this->rolesAll = DB::table('roles')->select('name as value', 'name as label')
+            ->whereIn('name', ['Manager'])
+            ->get()->map(function ($element) {
+                $element->label = __('site.roles.values.' . $element->label);
+                return (array)$element;
+            })->toArray();
         $this->loadSuscripciones();
     }
 
@@ -91,10 +92,23 @@ class Save extends Modal
             Arr::forget($data, ['password']);
         }
 
-        $this->user->fill(Arr::except($data, ['suscripciones']))->save();
+        $this->user->fill(Arr::except($data, ['suscripciones', 'roles']))->save();
         $this->user->suscripciones()->sync($data['suscripciones']);
+        $oldRoles = $this->user->roles()->pluck('name')->toArray();
+        $this->user->syncRoles(Arr::wrap($data['roles']));
+
+        $permissions = $this->user->permissions()->pluck('name')->toArray();
+        foreach (Arr::wrap($data['roles']) as $rol) {
+            $permsRol = user()->cliente->rolePermissions(Role::findByName($rol)->id)->pluck('name')->toArray();
+            foreach ($permsRol as $pR)
+                if (!in_array($pR, $permissions))
+                    $permissions[] = $pR;
+        }
+
+        $this->user->syncPermissions($permissions);
 
         $attributes = Arr::except($this->user->getDirty(), ['created_at', 'updated_at', 'deleted_at']);
+        $attributes['roles'] = $data['roles'];
         if ($this->user->wasRecentlyCreated) {
             $log = __('site.users.save.log_created_detail', ['email' => $this->user->email]);
             activity(__('site.users.save.log_created'))
@@ -103,12 +117,14 @@ class Save extends Modal
                 ->withProperties(User::parseData($attributes))
                 ->log($log);
         } else {
+            $oldData = User::parseData(Arr::only($this->user->getOriginal(), array_keys($attributes)));
+            $oldData['roles'] = $oldRoles[0];
             $log = __('site.users.save.log_updated_detail', ['email' => $this->user->email]);
             activity(__('site.users.save.log_updated'))
                 ->on($this->user)
                 ->event('updated')
                 ->withProperty('attributes', User::parseData($attributes))
-                ->withProperty('old', User::parseData(Arr::only($this->user->getOriginal(), array_keys($attributes))))
+                ->withProperty('old', $oldData)
                 ->log($log);
         }
 

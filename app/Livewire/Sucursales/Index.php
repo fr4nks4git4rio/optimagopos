@@ -31,7 +31,7 @@ class Index extends Component
 
     public function mount()
     {
-        if (user()->is_super_admin)
+        if (user()->hasRole('SuperAdmin'))
             $this->sorts = [__('site.branches.index.commercial_name'), __('site.branches.index.rfc'), __('site.branches.index.social_reason'), __('site.branches.index.phone'), __('site.branches.index.client'), __('site.branches.index.subscription')];
         else
             $this->sorts = [__('site.branches.index.commercial_name'), __('site.branches.index.rfc'), __('site.branches.index.social_reason'), __('site.branches.index.phone'), __('site.branches.index.subscription')];
@@ -60,7 +60,7 @@ class Index extends Component
     public function render()
     {
         $clientes_q = DB::table('tb_clientes')->where('es_cliente', 1)->whereNull('deleted_at');
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $clientes_q->where('id', user()->cliente_id);
         }
         $clientes = $clientes_q->get()->map(function ($element) {
@@ -122,7 +122,7 @@ class Index extends Component
                 $query->where('s.id', '>', 0);
         }
 
-        if (user()->cliente_id) {
+        if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $query->where('s.cliente_id', user()->cliente_id);
         } else {
             if (count($this->clientes) > 0) {

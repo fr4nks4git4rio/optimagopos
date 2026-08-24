@@ -12,13 +12,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
-
-        if ($user->is_admin)
-            return true;
-
-        return false;
+        return $user->can('users-viewAny');
     }
 
     /**
@@ -26,13 +20,13 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if ($user->can('users-view') && $model->cliente_id == $user->cliente_id)
+                return true;
+            return false;
+        }
 
-        if ($user->is_admin && $model->cliente_id == $user->cliente_id)
-            return true;
-
-        return false;
+        return $user->can('users-view');
     }
 
     /**
@@ -40,10 +34,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
-
-        return false;
+        return $user->can('users-create');
     }
 
     /**
@@ -51,13 +42,37 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if ($user->can('users-update') && $model->cliente_id == $user->cliente_id)
+                return true;
+            return false;
+        }
 
-        if ($user->is_admin && $model->cliente_id == $user->cliente_id)
-            return true;
+        return $user->can('users-update');
+    }
 
-        return false;
+    public function assignPermissions(User $user, User $model)
+    {
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if ($user->can('users-assignPermissions') && $model->cliente_id == $user->cliente_id && !$model->hasRole('Admin'))
+                return true;
+            return false;
+        }
+
+        return $user->can('users-assignPermissions');
+    }
+    public function setBranches(User $user, User $model)
+    {
+        if ($model->hasAnyRole(['SuperAdmin', 'Accountant']))
+            return false;
+
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if ($user->can('users-setBranches') && $model->cliente_id == $user->cliente_id && !$model->hasRole('Admin'))
+                return true;
+            return false;
+        }
+
+        return $user->can('users-setBranches');
     }
 
     /**
@@ -65,19 +80,13 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        if ($model->is_super_admin)
-            return  false;
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if ($user->can('users-delete') && $model->cliente_id == $user->cliente_id)
+                return true;
+            return false;
+        }
 
-        if ($user->id == $model->id)
-            return  false;
-
-        if ($user->is_super_admin)
-            return true;
-
-        if ($user->is_admin && $model->cliente_id == $user->cliente_id)
-            return true;
-
-        return false;
+        return $user->can('users-delete');
     }
 
     /**
@@ -85,13 +94,13 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if ($user->can('users-restore') && $model->cliente_id == $user->cliente_id)
+                return true;
+            return false;
+        }
 
-        if ($user->is_admin && $model->cliente_id == $user->cliente_id)
-            return true;
-
-        return false;
+        return $user->can('users-restore');
     }
 
     /**

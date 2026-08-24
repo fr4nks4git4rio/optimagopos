@@ -35,7 +35,7 @@ class Activar extends Modal
         $this->selectedSubscriptionData = [
             'id' => $this->suscripcion->id,
             'cliente_nombre' => Crypt::decrypt($this->suscripcion->cliente->nombre_comercial),
-            'plan_nombre' => $this->suscripcion->paquete->nombre,
+            'plan_nombre' => optional($this->suscripcion->paquete)->nombre ?? 'CUSTOM',
             'monto' => $this->suscripcion->total,
             'frecuencia' => $this->suscripcion->periodicidad_pagos,
             'proximo_pago' => $this->suscripcion->fecha_inicio_pagos->format('d/m/Y'),
@@ -104,7 +104,7 @@ class Activar extends Modal
             $factura->tipo_comprobante_id = 1;
             $factura->porciento_iva = system_iva();
             $factura->propietario_id = get_system_owner()->id;
-            $factura->comentarios = "Suscripción " . $this->suscripcion->paquete->nombre;
+            $factura->comentarios = "Suscripción " . (optional($this->suscripcion->paquete)->nombre ?? 'CUSTOM');
             $factura->suscripcion_id = $this->suscripcion->id;
 
             $subtotal = round($this->suscripcion->total * $this->suscripcion->multiplicador_periodicidad, 2);
@@ -127,7 +127,7 @@ class Activar extends Modal
             $factura->factura_conceptos()->create([
                 'cantidad' => 1,
                 'precio_unitario' => $subtotal,
-                'descripcion' => "Suscripción " . $this->suscripcion->paquete->nombre,
+                'descripcion' => "Suscripción " . (optional($this->suscripcion->paquete)->nombre ?? 'CUSTOM'),
                 'clave_unidad_id' => $claveProdServ?->clave_unidad_id,
                 'clave_prod_serv_id' => $claveProdServ?->id,
                 'objeto_impuesto_id' => 2,

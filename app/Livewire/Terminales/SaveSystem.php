@@ -66,7 +66,7 @@ class SaveSystem extends Modal
 
             if ($this->from_subscription)
                 $sucursales_q->whereIn('id', explode(',', $this->sucursalesFromSubsOpts));
-            
+
             $this->sucursales = $sucursales_q->get()->map(function ($element) {
                 $element->label = Crypt::decrypt($element->label);
                 return (array) $element;
@@ -137,7 +137,7 @@ class SaveSystem extends Modal
             while (DB::table(table: 'tb_terminales')->where('identificador', $data['identificador'])->count() > 0) {
                 $data['identificador'] = str_shuffle(uniqid());
             }
-
+        $data['suscripcion_id'] = $data['suscripcion_id'] ?: null;
         $this->terminal->fill($data)->save();
 
         if ($this->terminal->isDirty('sucursal_id') && $this->terminal->suscripcion_id) {

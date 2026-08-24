@@ -13,13 +13,7 @@ class TerminalPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
-
-        if ($user->is_admin)
-            return true;
-
-        return false;
+        return $user->can('terminals-viewAny');
     }
 
     /**
@@ -27,17 +21,17 @@ class TerminalPolicy
      */
     public function view(User $user, Terminal $terminal): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if (
+                $user->can('terminals-view')
+                && $terminal->sucursal->cliente_id == $user->cliente_id
+                && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
+            )
+                return true;
+            return false;
+        }
 
-        if (
-            $user->is_admin
-            && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-            && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
-        )
-            return true;
-
-        return false;
+        return $user->can('terminals-view');
     }
 
     /**
@@ -45,10 +39,10 @@ class TerminalPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager']))
+            return false;
 
-        return false;
+        return $user->can('terminals-create');
     }
 
     /**
@@ -56,17 +50,17 @@ class TerminalPolicy
      */
     public function update(User $user, Terminal $terminal): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if (
+                $user->can('terminals-update')
+                && $terminal->sucursal->cliente_id == $user->cliente_id
+                && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
+            )
+                return true;
+            return false;
+        }
 
-        if (
-            $user->is_admin
-            && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-            && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
-        )
-            return true;
-
-        return false;
+        return $user->can('terminals-update');
     }
 
     /**
@@ -74,17 +68,17 @@ class TerminalPolicy
      */
     public function delete(User $user, Terminal $terminal): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if (
+                $user->can('terminals-delete')
+                && $terminal->sucursal->cliente_id == $user->cliente_id
+                && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
+            )
+                return true;
+            return false;
+        }
 
-        if (
-            $user->is_admin
-            && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-            && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
-        )
-            return true;
-
-        return false;
+        return $user->can('terminals-delete');
     }
 
     /**
@@ -92,17 +86,17 @@ class TerminalPolicy
      */
     public function restore(User $user, Terminal $terminal): bool
     {
-        if ($user->is_super_admin)
-            return true;
+        if ($user->hasAnyRole(['Admin', 'Manager'])) {
+            if (
+                $user->can('terminals-restore')
+                && $terminal->sucursal->cliente_id == $user->cliente_id
+                && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
+            )
+                return true;
+            return false;
+        }
 
-        if (
-            $user->is_admin
-            && in_array($terminal->sucursal->cliente_id, $user->cliente->sucursales->pluck('cliente_id')->toArray())
-            && in_array($terminal->suscripcion_id, $user->suscripciones_activas->pluck('id')->toArray())
-        )
-            return true;
-
-        return false;
+        return $user->can('terminals-restore');
     }
 
     /**
