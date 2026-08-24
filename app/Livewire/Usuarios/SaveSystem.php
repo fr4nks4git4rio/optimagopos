@@ -88,7 +88,7 @@ class SaveSystem extends Modal
     {
         if (in_array($value, ['SuperAdmin', 'Accountant'])) {
             $this->dispatch("set-data-cliente_id", ['data' => [['id' => null, 'text' => '']], 'term' => '', 'value' => null]);
-            $this->cliente_id = null;
+            $this->cliente_id = get_system_owner()->id;
             $this->suscripciones = [];
             $this->suscripcionesAll = [];
         }
