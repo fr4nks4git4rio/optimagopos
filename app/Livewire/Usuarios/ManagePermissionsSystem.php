@@ -76,7 +76,7 @@ class ManagePermissionsSystem extends Modal
 
                 $log = __('site.users.manage_permissions.log_revoke_permission_success_detail', ['user' => $this->usuario->email]);
                 activity(__('site.users.manage_permissions.log_revoke_permission_success'))
-                    ->on($this->role)
+                    ->on($this->usuario)
                     ->event('updated')
                     ->withProperty('permiso', __('site.permissions.' . $this->othersPermissionsGroup[$res[1]][$res[2]]['name']))
                     ->withProperty('usuario', "{$this->usuario->nombre_completo} ({$this->usuario->email})")
