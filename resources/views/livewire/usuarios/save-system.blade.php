@@ -42,9 +42,15 @@
                     <div class="card-body">
                         <div class="row mb-2">
                             <div class="col-sm-6">
-                                <x-select2-component-modals label="{{ __('site.users.save.role') }}"
-                                    placeholder="{{ __('site.common.select') }}" class="form-control" :options="$rolesAll"
-                                    model="roles" />
+                                @if ($user->id && in_array($roles, ['SuperAdmin']))
+                                    <x-select2-component-modals label="{{ __('site.users.save.role') }}"
+                                        placeholder="{{ __('site.common.select') }}" class="form-control"
+                                        :options="$rolesAll" model="roles" disabled />
+                                @else
+                                    <x-select2-component-modals label="{{ __('site.users.save.role') }}"
+                                        placeholder="{{ __('site.common.select') }}" class="form-control"
+                                        :options="$rolesAll" model="roles" />
+                                @endif
                             </div>
                             <div class="col-sm-6">
                                 <x-input label="{{ __('site.users.save.email') }}" type="email" model="email" />
