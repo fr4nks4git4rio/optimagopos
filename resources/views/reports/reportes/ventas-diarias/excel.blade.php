@@ -10,7 +10,7 @@
                 {{ __('site.common.period') }}:&nbsp;{{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
                 @if (!empty($sucursalesSeleccionadas))
                     &nbsp;|&nbsp;
-                    {{__('site.reports.daily_dales.branches')}}: &nbsp;
+                    {{__('site.reports.daily_sales.branches')}}: &nbsp;
                     {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $sucursalesSeleccionadas)) }}
                 @endif
             </td>
@@ -30,8 +30,8 @@
         </tr>
         <tr>
             @foreach ($formasPago as $formaPago)
-                <th style="text-align: center;">{{__('site.reports.daily_dales.amount')}}</th>
-                <th style="text-align: center;">{{__('site.reports.daily_dales.quantity')}}</th>
+                <th style="text-align: center;">{{__('site.reports.daily_sales.amount')}}</th>
+                <th style="text-align: center;">{{__('site.reports.daily_sales.quantity')}}</th>
             @endforeach
         </tr>
     </thead>
@@ -57,7 +57,7 @@
             {{-- Totalizador por sucursal --}}
             <tr>
                 <td>
-                    {{__('site.reports.daily_dales.total')}} {{ $sucursalData['sucursal'] }}</td>
+                    {{__('site.reports.daily_sales.total')}} {{ $sucursalData['sucursal'] }}</td>
                 @foreach ($formasPago as $i => $formaPago)
                     @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                     <td style="text-align: right; font-weight: bold;">
@@ -79,7 +79,7 @@
     @if (count($records) > 0)
         <tfoot>
             <tr>
-                <td colspan="2" style="text-align: right; font-weight: bold;">{{__('site.reports.daily_dales.grand_total')}}</td>
+                <td colspan="2" style="text-align: right; font-weight: bold;">{{__('site.reports.daily_sales.grand_total')}}</td>
                 @foreach ($formasPago as $i => $formaPago)
                     @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                     <td style="text-align: right; font-weight: bold;">{{ number_format($totalGeneral['monto'], 2) }}

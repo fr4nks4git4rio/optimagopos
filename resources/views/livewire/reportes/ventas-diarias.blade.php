@@ -1,4 +1,4 @@
-@section('title', __('site.reports.daily_dales.title'))
+@section('title', __('site.reports.daily_sales.title'))
 
 <div wire:init="init">
     <div wire:loading.delay.longer>
@@ -12,15 +12,15 @@
     <div class="row justify-content-between">
         <div class="row mb-1 col-md-10">
             <div class="col-sm-2">
-                <x-input label="{{ __('site.reports.daily_dales.start_date') }}" type="date" :lazy="true"
+                <x-input label="{{ __('site.reports.daily_sales.start_date') }}" type="date" :lazy="true"
                     model="fechaInicio" />
             </div>
             <div class="col-sm-2">
-                <x-input label="{{ __('site.reports.daily_dales.end_date') }}" type="date" :lazy="true"
+                <x-input label="{{ __('site.reports.daily_sales.end_date') }}" type="date" :lazy="true"
                     model="fechaFin" />
             </div>
             <div class="col-sm-8">
-                <x-select2-multiple label="{{ __('site.reports.daily_dales.branches') }}"
+                <x-select2-multiple label="{{ __('site.reports.daily_sales.branches') }}"
                     placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$sucursalesAll"
                     model="sucursal" :lazy="true" :dynamic="true" />
             </div>
@@ -66,9 +66,9 @@
                     <tr>
                         @foreach ($formasPago as $formaPago)
                             <th class="text-end" style="white-space: nowrap !important">
-                                {{ __('site.reports.daily_dales.amount') }}</th>
+                                {{ __('site.reports.daily_sales.amount') }}</th>
                             <th class="text-center" style="white-space: nowrap !important">
-                                {{ __('site.reports.daily_dales.quantity') }}</th>
+                                {{ __('site.reports.daily_sales.quantity') }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -93,7 +93,7 @@
 
                     {{-- Totalizador por sucursal --}}
                     <tr class="table-success fw-bold">
-                        <td class="text-end" colspan="2">{{ __('site.reports.daily_dales.total') }}
+                        <td class="text-end" colspan="2">{{ __('site.reports.daily_sales.total') }}
                             {{ $sucursalData['sucursal'] }}</td>
                         @foreach ($formasPago as $i => $formaPago)
                             @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
@@ -114,7 +114,7 @@
             @if (count($records) > 0)
                 <tfoot>
                     <tr class="table-dark fw-bold">
-                        <td colspan="2" class="text-end">{{ __('site.reports.daily_dales.grand_total') }}</td>
+                        <td colspan="2" class="text-end">{{ __('site.reports.daily_sales.grand_total') }}</td>
                         @foreach ($formasPago as $i => $formaPago)
                             @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
                             <td class="text-end">{{ number_format($totalGeneral['monto'], 2) }}</td>

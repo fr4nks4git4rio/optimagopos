@@ -35,12 +35,12 @@ class VentasDiarias extends Component
     public function mount()
     {
         $this->order = $this->order ?? 'desc';
-        $this->sort = $this->sort ?? __('site.reports.daily_dales.date');
+        $this->sort = $this->sort ?? __('site.reports.daily_sales.date');
         $this->fechaInicio = $this->fechaInicio ?? today()->format('Y-m-d');
         $this->fechaFin = $this->fechaFin ?? today()->format('Y-m-d');
         $this->sucursal = $this->sucursal ?? null;
 
-        $this->sorts = [__('site.reports.daily_dales.branch'), __('site.reports.daily_dales.date')];
+        $this->sorts = [__('site.reports.daily_sales.branch'), __('site.reports.daily_sales.date')];
         $this->perPages = [10, 25, 50, 100];
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
@@ -126,7 +126,7 @@ class VentasDiarias extends Component
         }
 
         switch ($this->sort) {
-            case __('site.reports.daily_dales.date'):
+            case __('site.reports.daily_sales.date'):
                 if ($this->order == 'asc')
                     $query->orderByRaw('DATE(ticket.fecha_transaccion) asc');
                 else
@@ -142,7 +142,7 @@ class VentasDiarias extends Component
         });
 
         switch ($this->sort) {
-            case __('site.reports.daily_dales.branch'):
+            case __('site.reports.daily_sales.branch'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('sucursal', SORT_NATURAL)->values();
                 else
@@ -215,7 +215,7 @@ class VentasDiarias extends Component
             return;
         }
 
-        $name = __('site.reports.daily_dales.title');
+        $name = __('site.reports.daily_sales.title');
         if (File::exists(public_path("$name.pdf"))) {
             File::delete(public_path("$name.pdf"));
         }
@@ -245,7 +245,7 @@ class VentasDiarias extends Component
             $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
             return;
         }
-        $name = __('site.reports.daily_dales.title');
+        $name = __('site.reports.daily_sales.title');
         $fileName = "$name.xlsx";
 
         $res = $this->query();

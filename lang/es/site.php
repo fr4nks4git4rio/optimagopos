@@ -1519,14 +1519,14 @@ return [
             'ongoing' => 'en curso',
             'ongoing_detail' => 'Ticket aún en curso, tiempo calculado hasta ahora',
         ],
-        'daily_dales' => [
+        'daily_sales' => [
             'title' => 'Ventas Diarias',
             'start_date' => 'Fecha Inicio',
             'end_date' => 'Fecha Fin',
             'branches' => 'Sucursales',
             'branch' => 'Sucursal',
             'date' => 'Fecha',
-            'Amount' => 'Monto',
+            'amount' => 'Monto',
             'quantity' => 'Cantidad',
             'total' => 'Total',
             'grand_total' => 'Total General'

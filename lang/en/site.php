@@ -1505,14 +1505,14 @@ return [
             'ongoing' => 'ongoing',
             'ongoing_detail' => 'Ticket still in progress, time calculated so far'
         ],
-        'daily_dales' => [
+        'daily_sales' => [
             'title' => 'Daily Sales',
             'start_date' => 'Start Date',
             'end_date' => 'End Date',
             'branches' => 'Branches',
             'branch' => 'Branch',
             'date' => 'Date',
-            'Amount' => 'Amount',
+            'amount' => 'Amount',
             'quantity' => 'Quantity',
             'total' => 'Total',
             'grand_total' => 'Grand Total'

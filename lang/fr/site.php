@@ -1503,14 +1503,14 @@ return [
             'ongoing' => 'en cours',
             'ongoing_detail' => 'Ticket toujours en cours de traitement, temps estimé à ce jour',
         ],
-        'daily_dales' => [
+        'daily_sales' => [
             'title' => 'Ventes Quotidiennes',
             'start_date' => 'Date de Début',
             'end_date' => 'Date de Fin',
             'branches' => 'Succursales',
             'branch' => 'Succursale',
             'date' => 'Date',
-            'Amount' => 'Montant',
+            'amount' => 'Montant',
             'quantity' => 'Quantité',
             'total' => 'Total',
             'grand_total' => 'Total Général'
