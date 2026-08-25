@@ -166,7 +166,6 @@ class VentasOperador extends Component
 
         $finalRecords = [];
         $grandTotal = null;
-        dd($records);
 
         foreach ($records as $record) {
             $sucursalId = $record->sucursal_id;
@@ -174,7 +173,7 @@ class VentasOperador extends Component
             $empleado_id = $record->empleado_id;
 
             if (!isset($finalRecords[$sucursalId])) {
-                $finalRecords[$sucursalId] = [
+                $finalRecords[$sucursalId][] = [
                     'sucursal' => $record->sucursal,
                     'operadores' => [],
                     'totales' => null,
