@@ -100,8 +100,7 @@ class VentasOperador extends Component
         $operacionesSub = DB::table('tb_ticket_operaciones')
             ->select(
                 'ticket_id',
-                DB::raw('SUM(IF(monto > 0, monto, 0)) as ventas_importe'),
-                DB::raw('SUM(IF(monto > 0, 1, 0)) as ventas_cant')
+                DB::raw('SUM(monto) as ventas_importe')
             )
             ->groupBy('ticket_id');
 
@@ -121,7 +120,7 @@ class VentasOperador extends Component
                 'empleado.nombre as empleado',
                 'empleado.id_empleado as id_empleado',
                 DB::raw('COALESCE(SUM(op.ventas_importe), 0) as ventas_importe'),
-                DB::raw('COALESCE(SUM(op.ventas_cant), 0) as ventas_cant'),
+                DB::raw('COUNT(ticket.id) as ventas_cant'),
                 DB::raw('COALESCE(SUM(cor.correcciones_importe), 0) as correcciones_importe'),
                 DB::raw('COALESCE(SUM(cor.correcciones_cant), 0) as correcciones_cant')
             )
