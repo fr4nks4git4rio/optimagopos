@@ -111,13 +111,6 @@ class HomeController
             return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
-        ModelsLog::create([
-            'log' => __('site.data_parser.data_received'),
-            'data' => $decoded ? json_encode($decoded) : '',
-            'status' => 200,
-            'sucursal_id' => $terminal->sucursal_id
-        ]);
-
         $terminal->id_pos = $decoded['PosId'];
         $terminal->save();
 
@@ -450,6 +443,13 @@ class HomeController
             $ticket->importe = $importe;
             $ticket->save();
 
+            ModelsLog::create([
+                'log' => __('site.data_parser.data_received'),
+                'data' => $decoded ? json_encode($decoded) : '',
+                'status' => 200,
+                'sucursal_id' => $terminal->sucursal_id
+            ]);
+
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
@@ -541,13 +541,6 @@ class HomeController
             ]);
             return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
-
-        ModelsLog::create([
-            'log' => __('site.data_parser.data_received'),
-            'data' => $decoded ? json_encode($decoded) : '',
-            'status' => 200,
-            'sucursal_id' => $terminal->sucursal_id
-        ]);
 
         $ticket_vk = TicketVK::where('terminal_id', $terminal->id)->where('id_transaccion', $decoded['Data']['orderNumber'])->first();
         if ($ticket_vk) {
@@ -684,6 +677,12 @@ class HomeController
                 }
             }
 
+            ModelsLog::create([
+                'log' => __('site.data_parser.data_received'),
+                'data' => $decoded ? json_encode($decoded) : '',
+                'status' => 200,
+                'sucursal_id' => $terminal->sucursal_id
+            ]);
             DB::commit();
         } catch (Exception $e) {
             ModelsLog::create([
