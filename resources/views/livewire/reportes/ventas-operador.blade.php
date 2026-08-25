@@ -1,6 +1,6 @@
 @section('title', __('site.reports.sales_by_operator.title'))
 
-<div wire:ignore="init">
+<div wire:init="init">
     <div wire:loading.delay.longer>
         <div class="loading">
             <img src="{{ asset('img/loading.gif') }}" />
