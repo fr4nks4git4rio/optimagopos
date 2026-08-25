@@ -61,7 +61,7 @@
                     <tr>
                         <td>{{ $log->fecha }}</td>
                         <td>{{ $log->log }}</td>
-                        <td>{{ $log->data }}</td>
+                        <td style="word-break: break-all">{{ $log->data }}</td>
                         <td>{{ $log->status }}</td>
                     </tr>
                 @empty
