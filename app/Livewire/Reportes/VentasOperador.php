@@ -144,8 +144,6 @@ class VentasOperador extends Component
             $query->whereIn('ticket.sucursal_id', user()->sucursales->pluck('id')->toArray());
         }
 
-        dd($query->toRawSql());
-
         $records = $query->get()->each(function ($value, $key) {
             $value->sucursal = Crypt::decrypt($value->sucursal);
             $value->empleado = Crypt::decrypt($value->empleado);
@@ -168,7 +166,7 @@ class VentasOperador extends Component
 
         $finalRecords = [];
         $grandTotal = null;
-        // dd($records);
+        dd($records);
 
         foreach ($records as $record) {
             $sucursalId = $record->sucursal_id;
