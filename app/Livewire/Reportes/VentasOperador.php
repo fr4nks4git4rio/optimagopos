@@ -209,7 +209,8 @@ class VentasOperador extends Component
             ];
         }
 
-        dd($finalRecords);
+        if (count($finalRecords) > 0)
+            dd($finalRecords);
 
         return [
             'finalRecords' => $finalRecords,
