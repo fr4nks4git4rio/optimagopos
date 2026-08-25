@@ -209,6 +209,8 @@ class VentasOperador extends Component
             ];
         }
 
+        dd($finalRecords);
+
         return [
             'finalRecords' => $finalRecords,
             'grandTotal' => $grandTotal,
