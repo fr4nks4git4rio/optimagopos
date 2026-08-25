@@ -77,7 +77,7 @@ class ArticulosVendidos extends Component
                 'sucursal.nombre_comercial as sucursal',
                 'producto.nombre as producto',
                 DB::raw('SUM(t_producto.precio) as monto'),
-                DB::raw('SUM(t_producto.cantidad as vendidos')
+                DB::raw('SUM(t_producto.cantidad) as vendidos')
             )
             ->leftJoin('tb_tickets as ticket', 'ticket.id', 't_producto.ticket_id')
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
