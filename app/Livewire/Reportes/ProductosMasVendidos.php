@@ -97,6 +97,8 @@ class ProductosMasVendidos extends Component
         }
         if ($this->sucursal) {
             $query->where('t.sucursal_id', $this->sucursal);
+        }else{
+            $query->whereIn('sucursal.id', user()->sucursales->pluck('id')->toArray());
         }
 
         return $query;
