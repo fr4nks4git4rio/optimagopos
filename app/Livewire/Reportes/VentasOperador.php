@@ -130,7 +130,7 @@ class VentasOperador extends Component
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
             ->leftJoin('tb_empleados as empleado', 'empleado.id', 'ticket.empleado_id')
             ->where('ticket.modo_entrenamiento', 0)
-            ->groupBy('sucursal.id', 'sucursal.nombre_comercial', 'empleado.id', 'empleado.nombre');
+            ->groupBy('sucursal.id', 'empleado.id');
 
         if ($this->fechaInicio) {
             $query->whereDate('ticket.fecha_transaccion', '>=', $this->fechaInicio);
@@ -143,6 +143,8 @@ class VentasOperador extends Component
         } else {
             $query->whereIn('ticket.sucursal_id', user()->sucursales->pluck('id')->toArray());
         }
+
+        dd($query->toRawSql());
 
         $records = $query->get()->each(function ($value, $key) {
             $value->sucursal = Crypt::decrypt($value->sucursal);

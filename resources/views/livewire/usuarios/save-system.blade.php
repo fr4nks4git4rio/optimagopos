@@ -58,7 +58,7 @@
                         </div>
                         @if (!in_array($roles, ['SuperAdmin', 'Accountant']))
                             <div class="row mb-2">
-                                <div class="col-sm-6">
+                                <div class="col-12">
                                     @if ($from_subscription)
                                         <x-select2-component-modals label="{{ __('site.users.save.client') }}"
                                             placeholder="{{ __('site.common.select') }}" class="form-control"
@@ -69,7 +69,7 @@
                                             :options="$clientes" model="cliente_id" :dynamic="true" />
                                     @endif
                                 </div>
-                                <div class="col-sm-6">
+                                {{-- <div class="col-sm-6">
                                     @if ($from_subscription)
                                         <x-select2-multiple-component-modals
                                             label="{{ __('site.users.save.subscriptions') }}"
@@ -81,7 +81,7 @@
                                             placeholder="{{ __('site.common.select') }}" :options="$suscripcionesAll"
                                             class="form-control" model="suscripciones" :dynamic="true" />
                                     @endif
-                                </div>
+                                </div> --}}
                             </div>
                         @endif
                         <div class="row mb-2">
