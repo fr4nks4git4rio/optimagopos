@@ -26,7 +26,7 @@
         <table class="table table-responsive table-striped">
             <thead>
                 <tr>
-                    <th class="text-center">{{__('site.reports.best_selling_products.producto')}}</th>
+                    <th class="text-center">{{__('site.reports.best_selling_products.product')}}</th>
                     <th class="text-center">{{__('site.reports.best_selling_products.quantity_sold')}}</th>
                 </tr>
             </thead>
