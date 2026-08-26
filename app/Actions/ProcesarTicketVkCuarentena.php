@@ -53,14 +53,14 @@ class ProcesarTicketVkCuarentena
 
         if (!$terminal) {
             $this->registro->update([
-                'texto' => 'Terminal no encontrada'
+                'texto' => __('site.data_parser.terminal_not_found')
             ]);
             return false;
         }
 
         if (!$terminal->es_vk) {
             $this->registro->update([
-                'texto' => 'La Ternminal no está marcada como dispositivo de Video Kitchen'
+                'texto' => __('site.data_parser.terminal_not_vk')
             ]);
             return false;
         }
@@ -125,7 +125,7 @@ class ProcesarTicketVkCuarentena
                 $itemItecketVK->ticket_vk_id = $ticketVK->id;
                 if (!isset($item['name'])) {
                     $this->registro->update([
-                        'texto' => 'Propiedad no recibida en item. Propiedad esperada: name'
+                        'texto' => __('site.data_parser.property_not_found_in_package', ['property' => 'name'])
                     ]);
                     DB::rollBack();
                     return false;
@@ -137,7 +137,7 @@ class ProcesarTicketVkCuarentena
                     $itemItecketVK->nombre = $coincidencias[2];
                 } else {
                     $this->registro->update([
-                        'texto' => "La propiedad 'name' no cumple con e formato esperado."
+                        'texto' => __('site.data_parser.property_invalid_format', ['property' => 'name'])
                     ]);
                     DB::rollBack();
                     return false;
@@ -165,7 +165,7 @@ class ProcesarTicketVkCuarentena
             DB::commit();
         } catch (Exception $e) {
             $this->registro->update([
-                'texto' => "Error procesando el ticket json. Error: {$e->getMessage()}"
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage()])
             ]);
             DB::rollBack();
             return false;

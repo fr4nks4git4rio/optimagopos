@@ -1622,6 +1622,7 @@ return [
         'terminal_not_vk' => 'Le Terminal n\'est pas reconnu comme un dispositif Video Kitchen.',
         'data_received' => 'Données reçues',
         'employee_id_not_received' => 'ID d\'employé non reçu.',
+        'id_transaction_already_exists' => 'Il existe déjà un ticket pour le terminal :terminal avec le même identifiant de transaction :id_transaction.',
         'properties_not_found' => 'Propriété non reçue dans l\'élément :item. Propriétés attendues : :properties.',
         'payment_form_not_found' => 'Mode de paiement introuvable : :payment_form',
         'exception_error' => 'Erreur lors de la réception du ticket json. Erreur : :error',

@@ -1624,6 +1624,7 @@ return [
         'terminal_not_vk' => 'The Terminal is not recognized as a Video Kitchen device.',
         'data_received' => 'Data received',
         'employee_id_not_received' => 'Employee ID not received.',
+        'id_transaction_already_exists' => 'A ticket already exists for terminal :terminal with the same transaction ID :id_transaction.',
         'properties_not_found' => 'Property not received in item :item. Expected properties: :properties.',
         'payment_form_not_found' => 'Payment method not found: :payment_form',
         'exception_error' => 'Error receiving ticket json. Error: :error',

@@ -40,7 +40,7 @@ class ProcesarTicketCuarentena
             || !isset($decoded['TransactionStartTime'])
         ) {
             $this->registro->update([
-                'texto' => 'JSON inválido o incompleto'
+                'texto' => __('site.data_parser.incomplete_jason')
             ]);
             return false;
         }
@@ -56,14 +56,14 @@ class ProcesarTicketCuarentena
 
         if (!$terminal) {
             $this->registro->update([
-                'texto' => 'Terminal no encontrada.'
+                'texto' => __('site.data_parser.terminal_not_found')
             ]);
             return false;
         }
 
         if ($terminal->es_vk) {
             $this->registro->update([
-                'texto' => 'La Terminal está reconocida como dispositivo de Video Kitchen.'
+                'texto' => __('site.data_parser.terminal_is_vk')
             ]);
             return false;
         }
@@ -77,7 +77,7 @@ class ProcesarTicketCuarentena
             // Paso 4: Acceder a datos generales
             if (!$decoded['ClerkId']) {
                 $this->registro->update([
-                    'texto' => 'Id de empleado no recibido.'
+                    'texto' => __('site.data_parser.employee_id_not_received')
                 ]);
                 DB::rollBack();
                 return false;
@@ -120,9 +120,9 @@ class ProcesarTicketCuarentena
                     break;
             }
 
-            if (Ticket::where('id_transaccion', $decoded['TransactionId'])->where('terminal_id', $terminal->id)->exists()) {
+            if (Ticket::where('id_transaccion', $decoded['TransactionId'])->where('terminal_id', $terminal->id)->where('fecha_transaccion', Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'))->exists()) {
                 $this->registro->update([
-                    'texto' => "Ya existe un ticket para la terminal {$terminal->identificador} con el mismo id de transacción: {$decoded['TransactionId']}."
+                    'texto' => __('site.data_parser.id_transaction_already_exists', ['terminal' => $terminal->identificador, 'id_transaction' => $decoded['TransactionId']])
                 ]);
                 DB::rollBack();
                 return false;
@@ -149,23 +149,24 @@ class ProcesarTicketCuarentena
 
 
                 if ($type === 'Tax') {
-                    if (!isset($item['Name']) || !isset($item['Amount'])) {
+                    if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Taxable'])) {
                         $this->registro->update([
-                            'texto' => 'Propiedad no recibida en ítem Tax. Propiedades esperadas: Name y Amount.'
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Taxable'])
                         ]);
                         DB::rollBack();
                         return false;
                     }
                     $ticket->impuestos()->create([
                         'nombre' => $item['Name'],
-                        'monto' => $item['Amount']
+                        'monto' => $item['Amount'],
+                        'gravable' => $item['Taxable']
                     ]);
                 }
 
                 if ($type === 'Tender') {
                     if (!isset($item['Name']) || !isset($item['Amount'])) {
                         $this->registro->update([
-                            'texto' => 'Propiedad no recibida en ítem Tender. Propiedades esperadas: Name y Amount.'
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Tender', 'properties' => 'Name ' . __('site.common.and') . ' Amount'])
                         ]);
                         DB::rollBack();
                         return false;
@@ -204,7 +205,7 @@ class ProcesarTicketCuarentena
                 if ($type === 'Product') {
                     if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
                         $this->registro->update([
-                            'texto' => 'Propiedad no recibida en ítem Product. Propiedades esperadas: Id, Name, Amount, Qty, DepartmentId y DepartmentName.'
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Product', 'properties' => 'Id, Name, Amount, Qty, DepartmentId ' . __('site.common.and') . ' DepartmentName'])
                         ]);
                         DB::rollBack();
                         return false;
@@ -261,7 +262,7 @@ class ProcesarTicketCuarentena
                 if ($type === 'Department') {
                     if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
                         $this->registro->update([
-                            'texto' => 'Propiedad no recibida en ítem Department. Propiedades esperadas: Id, Name, Amount y Qty.'
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Department', 'properties' => 'Id, Name, Amount ' . __('site.common.and') . ' Qty'])
                         ]);
                         DB::rollBack();
                         return false;
@@ -301,7 +302,7 @@ class ProcesarTicketCuarentena
                 if ($type === 'Correction') {
                     if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
                         $this->registro->update([
-                            'texto' => 'Propiedad no recibida en ítem Correction. Propiedades esperadas: Name, Amount y Qty.'
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Correction', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Qty'])
                         ]);
                         DB::rollBack();
                         return false;
@@ -328,7 +329,7 @@ class ProcesarTicketCuarentena
             return true;
         } catch (Exception $e) {
             $this->registro->update([
-                'texto' => "Error recibiendo ticket json. Error: {$e->getMessage()}"
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage()])
             ]);
             DB::rollBack();
             return false;

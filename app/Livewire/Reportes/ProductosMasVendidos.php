@@ -84,6 +84,7 @@ class ProductosMasVendidos extends Component
                 DB::raw('ROUND(SUM(tp.cantidad), 2) as total_vendido'),
                 DB::raw("DATE(t.fecha_transaccion) as fecha_transaccion")
             )
+            ->whereNotNull('tp.producto_id')
             ->where('t.modo_entrenamiento', 0)
             ->groupBy('p.id', 'p.nombre')
             ->orderByDesc('total_vendido')

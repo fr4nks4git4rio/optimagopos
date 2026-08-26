@@ -15,6 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *
  * @property string $nombre
  * @property float $monto
+ * @property float $gravable
  * @property integer $ticket_id
  */
 class TicketImpuesto extends Model
@@ -24,6 +25,7 @@ class TicketImpuesto extends Model
     public $fillable = [
         'nombre',
         'monto',
+        'gravable',
         'ticket_id'
     ];
 

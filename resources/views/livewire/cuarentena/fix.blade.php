@@ -213,6 +213,7 @@
                                             <th style="width: 70px">SKU</th>
                                             <th style="width: 70px">Qty</th>
                                             <th>Amount</th>
+                                            <th>Taxable</th>
                                             <th style="width: 70px">Tip</th>
                                             <th>Discount</th>
                                             <th>DepartmentId</th>
@@ -252,6 +253,11 @@
                                                 <td>
                                                     <input type="number" step="0.01"
                                                         class="form-control form-control-sm"
+                                                        wire:model.live="items.{{ $index }}.Taxable">
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01"
+                                                        class="form-control form-control-sm"
                                                         wire:model.live="items.{{ $index }}.Tip">
                                                 </td>
                                                 <td>
@@ -273,7 +279,7 @@
                                         @endforeach
                                         @if (count($items) === 0)
                                             <tr>
-                                                <td colspan="9" class="text-center text-muted py-3">
+                                                <td colspan="10" class="text-center text-muted py-3">
                                                     {{ __('site.quarantine.fix.no_items') }}
                                                 </td>
                                             </tr>

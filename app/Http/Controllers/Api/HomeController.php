@@ -174,6 +174,25 @@ class HomeController
                     break;
             }
 
+            if (Ticket::where('id_transaccion', $decoded['TransactionId'])->where('terminal_id', $terminal->id)->where('fecha_transaccion', Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'))->exists()) {
+                ModelsLog::create([
+                    'log' => __('site.data_parser.id_transaction_already_exists', ['terminal' => $terminal->identificador, 'id_transaction' => $decoded['TransactionId']]),
+                    'data' => $decoded ? json_encode($decoded) : '',
+                    'status' => 400,
+                    'sucursal_id' => $terminal->sucursal_id
+                ]);
+                Cuarentena::create([
+                    'texto' => __('site.data_parser.id_transaction_already_exists', ['terminal' => $terminal->identificador, 'id_transaction' => $decoded['TransactionId']]),
+                    'ip' => $request->ip(),
+                    'data' => $decoded ? json_encode($decoded) : '',
+                    'cliente_id' => $terminal->sucursal->cliente_id,
+                    'sucursal_id' => $terminal->sucursal_id,
+                    'terminal_id' => $terminal->id,
+                    'es_vk' => 0
+                ]);
+                return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
+            }
+
             $ticket = Ticket::create([
                 'ubicacion' => $decoded['Location'] ?? '',
                 'id_transaccion' => $decoded['TransactionId'],
@@ -194,16 +213,16 @@ class HomeController
                 $type = $item['Type'] ?? 'Product';
 
                 if ($type === 'Tax') {
-                    if (!isset($item['Name']) || !isset($item['Amount'])) {
+                    if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Taxable'])) {
                         DB::rollBack();
                         ModelsLog::create([
-                            'log' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name ' . __('site.common.and') . ' Amount']),
+                            'log' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Taxable']),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'status' => 400,
                             'sucursal_id' => $terminal->sucursal_id
                         ]);
                         Cuarentena::create([
-                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name ' . __('site.common.and') . ' Amount']),
+                            'texto' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Taxable']),
                             'ip' => $request->ip(),
                             'data' => $decoded ? json_encode($decoded) : '',
                             'terminal_id' => $terminal->id,
@@ -215,7 +234,8 @@ class HomeController
                     }
                     $ticket->impuestos()->create([
                         'nombre' => $item['Name'],
-                        'monto' => $item['Amount']
+                        'monto' => $item['Amount'],
+                        'gravable' => $item['Taxable']
                     ]);
                 }
 

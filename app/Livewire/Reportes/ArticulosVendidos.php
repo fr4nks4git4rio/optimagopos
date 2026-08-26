@@ -82,6 +82,7 @@ class ArticulosVendidos extends Component
             ->leftJoin('tb_tickets as ticket', 'ticket.id', 't_producto.ticket_id')
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
             ->leftJoin('tb_productos as producto', 'producto.id', 't_producto.producto_id')
+            ->whereNotNull('t_producto.producto_id')
             ->where('sucursal.cliente_id', user()->cliente_id)
             ->where('ticket.modo_entrenamiento', 0)
             ->groupByRaw('producto.id');

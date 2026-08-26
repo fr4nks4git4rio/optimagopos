@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('tb_ticket_impuestos', function (Blueprint $table) {
 
             $table->id();
-            $table->float('nombre')->nullable();
-            $table->string('monto', 50)->nullable();
-            $table->unsignedBigInteger('ticket_id')->nullable();
+            $table->string('nombre', 100)->nullable();
+            $table->double('monto', 8, 2)->nullable()->default(0);
+            $table->double('gravable', 8, 2)->nullable()->default(0);
+            $table->unsignedBigInteger('ticket_id');
             $table->timestamps();
 
             $table->foreign('ticket_id')->references('id')->on('tb_tickets');
