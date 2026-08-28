@@ -160,7 +160,6 @@ class Home extends Component
 
     public function getConImpuestosProperty()
     {
-        Log::info(count($this->impuestosData['impuestos']));
         return count($this->impuestosData['impuestos']) > 0;
     }
 
