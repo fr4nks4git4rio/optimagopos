@@ -613,8 +613,6 @@ class Home extends Component
                         $correcciones_q = $this->commonWhere($correcciones_q);
                         $this->correccionesData['correcciones'] = $correcciones_q->get()->toArray();
 
-                        dd($this->correccionesData['correcciones']);
-
                         $total_ventas_q = DB::table('tb_ticket_productos as tp')
                             ->selectRaw("SUM(tp.precio) as total")
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
