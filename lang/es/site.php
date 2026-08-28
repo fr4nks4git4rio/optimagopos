@@ -71,6 +71,13 @@ return [
             'Delayed' => 'Demorado'
         ]
     ],
+    'corrections' => [
+        'Delete' => 'Eliminación',
+        'Refund' => 'Devolución',
+        'Cancel' => 'Cancelación',
+        'Void' => 'Anulación',
+        'Tender Correction' => 'Corrección de la licitación',
+    ],
     'permissions' => [
         'dashboardResume-viewAny' => 'Ver datos de la Portada Resumen',
         'dashboardResume-filterData' => 'Filtrar datos de la Portada Resumen',
@@ -314,9 +321,11 @@ return [
         'operations' => 'Operaciones',
         'products' => 'Productos',
         'payments' => 'Pagos',
-        'corrections' => 'Corrections',
+        'corrections' => 'Correcciones',
+        'sale_operations' => 'Operaciones de Venta',
         'net_sale' => 'Venta Neta',
         'total_sale' => 'Venta Total',
+        'incomes' => 'Ingresos',
         'department_sale' => 'Ventas por Departamento',
         'multi_currency' => 'Multimoneda',
         'items_sold' => 'Arículos Vendidos',
@@ -349,7 +358,7 @@ return [
         'top_products_by_quantity' => 'Top productos por cantidad',
         'import' => 'Importe',
         'top_products_by_import' => 'Top productos por importe',
-        'net_sale_by_payment_form' => 'Venta Neta por Formas de Pago',
+        'incomes_by_payment_form' => 'Ingresos por Formas de Pago',
         'quantity_by_payment_form' => 'Cantidad por Formas de Pago',
         'dominant_method' => 'Método Dominante',
         'payment_forms' => 'Formas de Pago',

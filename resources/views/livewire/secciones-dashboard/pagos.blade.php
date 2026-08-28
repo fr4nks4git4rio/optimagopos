@@ -3,15 +3,15 @@
         <div class="col-12 col-sm-6 col-lg">
             <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
                 <div class="card-body align-items-center d-flex flex-column">
-                    <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale') }}</span>
-                    <span class="fs-3 text-primary m-auto">${{ number_format(max($pagosData['ventas_netas'], 0), 2) }}</span>
+                    <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.incomes') }}</span>
+                    <span class="fs-3 text-primary m-auto">${{ number_format(max($pagosData['ingresos'], 0), 2) }}</span>
                 </div>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-lg">
             <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
                 <div class="card-body align-items-center d-flex flex-column">
-                    <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.net_sale_by_payment_form') }}</span>
+                    <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.incomes_by_payment_form') }}</span>
                     @if (count($pagosData['ventas_formas_pago']) == 0)
                         <div class="text-center py-4 text-muted">
                             <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
@@ -53,6 +53,14 @@
                     @else
                         <span class="fs-3 text-primary m-auto">{{ $pagosData['metodo_pago_dominante'] }}</span>
                     @endif
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg">
+            <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
+                <div class="card-body align-items-center d-flex flex-column">
+                    <p class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.multi_currency') }}</p>
+                    <p class="fs-3 text-primary m-auto">{{ $pagosData['multimoneda'] }}</p>
                 </div>
             </div>
         </div>

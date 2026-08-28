@@ -72,6 +72,13 @@ return [
             'Delayed' => 'Delayed'
         ]
     ],
+    'corrections' => [
+        'Delete' => 'Delete',
+        'Refund' => 'Refund',
+        'Cancel' => 'Cancel',
+        'Void' => 'Void',
+        'Tender Correction' => 'Tender Correction',
+    ],
     'permissions' => [
         'dashboardResume-viewAny' => 'View Dashboard Summary data',
         'dashboardResume-filterData' => 'Filter Dashboard Summary data',
@@ -317,8 +324,10 @@ return [
         'products' => 'Products',
         'payments' => 'Payments',
         'corrections' => 'Corrections',
+        'sale_operations' => 'Sale Transactions',
         'net_sale' => 'Net Sales',
         'total_sale' => 'Total Sales',
+        'incomes' => 'Incomes',
         'department_sale' => 'Department Sales',
         'multi_currency' => 'Multi-currency',
         'items_sold' => 'Products Sold',
@@ -351,7 +360,7 @@ return [
         'top_products_by_quantity' => 'Top Products by Units Sold',
         'import' => 'Amount',
         'top_products_by_import' => 'Top Products by Revenue',
-        'net_sale_by_payment_form' => 'Sales by Payment Method',
+        'incomes_by_payment_form' => 'Incomes by Payment Method',
         'quantity_by_payment_form' => 'Transactions by Payment Method',
         'dominant_method' => 'Most-Used Payment Method',
         'payment_forms' => 'Payment Methods',

@@ -209,9 +209,15 @@ class HomeController
             $correccion = null;
             $importe = 0;
             $prevProduct = null;
-            foreach ($items as $item) {
+            $tenders = [];
+            $poras = [];
+            foreach ($items as $pos => $item) {
                 $type = $item['Type'] ?? 'Product';
 
+                if ($type === 'PORA') {
+                    $item['pos'] = $pos;
+                    $poras[] = $item;
+                }
                 if ($type === 'Tax') {
                     if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Taxable'])) {
                         DB::rollBack();
@@ -291,7 +297,8 @@ class HomeController
                             $tasa_cambio = $tipo_cambio->tasa;
                         }
                     }
-                    // Guardar método de pago en tabla pagos
+                    $item['pos'] = $pos;
+                    $tenders[] = $item;
                     $ticket->operaciones()->create([
                         'nombre' => $item['Name'] ?? '',
                         'monto' => $item['Amount'] ?? 0,
@@ -460,6 +467,67 @@ class HomeController
                     $prevProduct = null;
                 }
             }
+
+            if (count($poras) > 0) {
+                foreach ($poras as $pora) {
+                    $ts = array_values(array_filter($tenders, function ($value) use ($pora) {
+                        return $value['Amount'] == $pora['Amount'];
+                    }));
+
+                    if (count($ts) == 0)
+                        continue;
+
+                    if (count($ts) == 1) {
+                        $ts = $ts[0];
+                        $forma_pago = DB::table('tb_sucursal_forma_pagos')
+                            ->where('sucursal_id', $terminal->sucursal_id)
+                            ->where('nombre', $ts['Name'])
+                            ->whereNull('deleted_at')
+                            ->get();
+                        $ticket->operaciones()->create([
+                            'nombre' => $t['Name'] ?? '',
+                            'monto' => $pora['Amount'] ?? 0,
+                            'sucursal_forma_pago_id' => $forma_pago->id,
+                            'es_pora' => 1,
+                            'nombre_pora' => $pora['Name']
+                        ]);
+                        foreach ($tenders as $i => $t)
+                            if ($t['pos']  == $ts['pos']) {
+                                array_splice($tenders, $i, 1);
+                                $tenders = array_values($tenders);
+                                break;
+                            }
+
+                        continue;
+                    }
+
+                    $referencia = $pora['pos'];
+                    $posiciones = [];
+                    foreach ($ts as $t)
+                        $posiciones[] = $t['pos'];
+                    usort($posiciones, fn($a, $b) => abs($a - $referencia) <=> abs($b - $referencia));
+                    foreach ($tenders as $i => $t) {
+                        if ($t['pos'] == $posiciones[0]) {
+                            $forma_pago = DB::table('tb_sucursal_forma_pagos')
+                                ->where('sucursal_id', $terminal->sucursal_id)
+                                ->where('nombre', $t['Name'])
+                                ->whereNull('deleted_at')
+                                ->get();
+                            $ticket->operaciones()->create([
+                                'nombre' => $t['Name'] ?? '',
+                                'monto' => $pora['Amount'] ?? 0,
+                                'sucursal_forma_pago_id' => $forma_pago->id,
+                                'es_pora' => 1,
+                                'nombre_pora' => $pora['Name']
+                            ]);
+                            array_splice($tenders, $i, 1);
+                            $tenders = array_values($tenders);
+                            break;
+                        }
+                    }
+                }
+            }
+
             $ticket->importe = $importe;
             $ticket->save();
 

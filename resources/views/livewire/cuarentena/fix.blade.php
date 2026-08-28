@@ -231,6 +231,7 @@
                                                         <option value="Tender">Tender</option>
                                                         <option value="Correction">Correction</option>
                                                         <option value="Tax">Tax</option>
+                                                        <option value="PORA">PORA</option>
                                                     </select>
                                                 </td>
                                                 <td>

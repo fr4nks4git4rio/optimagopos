@@ -4,7 +4,7 @@
             <div
                 class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray h-100">
                 <div class="card-body align-items-center d-flex flex-column">
-                    <p class="fw-bold text-uppercase fs-5 dashboard-card-title">{{ __('site.dashboard.operations') }}</p>
+                    <p class="fw-bold text-uppercase fs-5 dashboard-card-title">{{ __('site.dashboard.sale_operations') }}</p>
                     <p class="fs-3 text-primary m-auto  dashboard-card-value">{{ max($resumenData['operaciones'], 0) }}</p>
                 </div>
             </div>
@@ -25,9 +25,9 @@
                 class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray h-100">
                 <div class="card-body align-items-center d-flex flex-column">
                     <span
-                        class="fs-5 fw-bold text-uppercase dashboard-card-title">{{ __('site.dashboard.department_sale') }}</span>
+                        class="fs-5 fw-bold text-uppercase dashboard-card-title">{{ __('site.dashboard.incomes') }}</span>
                     <span
-                        class="fs-3  text-primary m-auto  dashboard-card-value">${{ number_format(max($resumenData['ventas_departamento'], 0), 2) }}</span>
+                        class="fs-3  text-primary m-auto  dashboard-card-value">${{ number_format(max($resumenData['ingresos'], 0), 2) }}</span>
                 </div>
             </div>
         </div>
