@@ -1,7 +1,7 @@
 @can('dashboardResume-viewCorrections')
     <div class="row g-3 mb-3 px-1">
         @foreach ($correccionesData['correcciones'] as $correction)
-            <div class="col-12 col-sm-6 col-lg">
+            <div class="col-12 col-sm-6 col-md-4 col-lg">
                 <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center h-100">
                     <div class="card-body align-items-center d-flex flex-column">
                         <span class="fs-5 fw-bold text-uppercase">{{ __('site.corrections.' . $correction->nombre) }}</span>
@@ -11,7 +11,7 @@
                 </div>
             </div>
         @endforeach
-        <div class="col-12 col-sm-6 col-lg">
+        <div class="col-12 col-sm-6 col-md-4 col-lg">
             <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center h-100">
                 <div class="card-body align-items-center d-flex flex-column">
                     <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.influence') }}</span>
