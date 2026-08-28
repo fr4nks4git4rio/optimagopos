@@ -19,7 +19,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $tipo_cambio
  * @property boolean $es_cambio
  * @property boolean $es_pora
- * @property boolean $nombre_pora
+ * @property string $nombre_pora
  * @property integer $ticket_id
  * @property integer $sucursal_forma_pago_id
  * @property integer $factura_id

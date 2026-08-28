@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('propina', 10, 2)->default(0.00);
             $table->decimal('tipo_cambio', 8, 4)->default(1.0000);
             $table->boolean('es_cambio')->default(false);
+            $table->boolean('es_pora')->default(false);
+            $table->string('nombre_pora', 100)->nullable();
             $table->unsignedBigInteger('ticket_id');
             $table->unsignedBigInteger('sucursal_forma_pago_id')->nullable();
             $table->unsignedBigInteger('factura_id')->nullable();
