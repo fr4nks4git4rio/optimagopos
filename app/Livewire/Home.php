@@ -611,7 +611,7 @@ class Home extends Component
                             ->orderByDesc('total');
 
                         $correcciones_q = $this->commonWhere($correcciones_q);
-                        $this->correccionesData['correcciones'] = $correcciones_q->pluck('total', 'cantidad', 'nombre');
+                        $this->correccionesData['correcciones'] = $correcciones_q->get()->only('total', 'cantidad', 'nombre')->toArray();
 
                         dd($this->correccionesData['correcciones']);
 
