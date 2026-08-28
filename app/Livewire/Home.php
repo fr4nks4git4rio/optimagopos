@@ -15,6 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Home extends Component
@@ -159,6 +160,7 @@ class Home extends Component
 
     public function getConImpuestosProperty()
     {
+        Log::info(count($this->impuestosData['impuestos']));
         return count($this->impuestosData['impuestos']) > 0;
     }
 
