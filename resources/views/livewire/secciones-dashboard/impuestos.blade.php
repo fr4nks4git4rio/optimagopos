@@ -1,4 +1,4 @@
-@can('dashboardResume-viewTaxes')
+@can('dashboardResume-viewTaxes' && count($impuestosData['impuestos']) > 0)
     <div class="row g-3 mb-3 px-1">
         @foreach ($impuestosData['impuestos'] as $impuesto)
             <div class="col-12 col-sm-6 col-md-3">
