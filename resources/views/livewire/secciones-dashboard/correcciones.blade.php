@@ -4,9 +4,9 @@
             <div class="col-12 col-sm-6 col-lg">
                 <div class="card border-0 border-start border-danger bg-dark-subtle shadow-sm border-4 text-center h-100">
                     <div class="card-body align-items-center d-flex flex-column">
-                        <span class="fs-5 fw-bold text-uppercase">{{ __('site.corrections.' . $correction['nombre']) }}</span>
-                        <span class="fs-3 text-danger m-auto">{{ $correction['cantidad'] }} ->
-                            {{ $correction['total'] }}</span>
+                        <span class="fs-5 fw-bold text-uppercase">{{ __('site.corrections.' . $correction->nombre) }}</span>
+                        <span class="fs-3 text-danger m-auto">{{ $correction->cantidad }} ->
+                            {{ $correction->total }}</span>
                     </div>
                 </div>
             </div>
