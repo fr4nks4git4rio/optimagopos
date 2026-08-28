@@ -141,12 +141,12 @@
                                             {{ __('site.dashboard.corrections') }}
                                         </a>
                                     @endcan
-                                    @can('dashboardResume-viewTaxes' && $this->con_impuestos)
+                                    @if(user()->can('dashboardResume-viewTaxes') && $this->con_impuestos)
                                         <a href="{{ route('home', ['seccion' => 'impuestos', 'fecha_inicio' => $fecha_inicio ?? '', 'fecha_fin' => $fecha_fin, 'sucursales_query' => implode(',', $sucursales), 'terminales_query' => implode(',', $terminales)]) }}"
                                             class="btn btn-outline-site-primary btn-sm btn-md-lg text-nowrap @if ($seccion == 'impuestos') active @endif">
                                             {{ __('site.dashboard.taxes') }}
                                         </a>
-                                    @endcan
+                                    @endif
                                 </div>
 
                                 @if ($seccion)
