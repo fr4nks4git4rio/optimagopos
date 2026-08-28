@@ -81,6 +81,9 @@ class Home extends Component
         'grafica_correcciones_operador' => [],
         'grafica_correcciones_hora' => []
     ];
+    public $impuestosData = [
+        'impuestos' => []
+    ];
 
     public $videoKitchenData = [
         'cantidadOrdenesAbiertas' => '',
@@ -118,6 +121,18 @@ class Home extends Component
         }
         if ($this->terminales_query)
             $this->terminales = explode(',', $this->terminales_query);
+
+        $impuestos_q = DB::table('tb_ticket_impuestos as ti')
+            ->select('ti.nombre', DB::raw("SUM(ti.monto) as impuesto"), DB::raw("SUM(ti.gravable) as gravable"))
+            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'ti.ticket_id')
+            ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+            ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
+            ->where('sucursal.cliente_id', user()->cliente_id)
+            ->groupBy('ti.nombre')
+            ->orderByDesc('impuesto');
+
+        $impuestos_q = $this->commonWhere($impuestos_q);
+        $this->impuestosData['impuestos'] = $impuestos_q->get()->toArray();
     }
 
     public function hydrate()
@@ -599,8 +614,6 @@ class Home extends Component
                         $this->pagosData['grafica_comportamiento_pagos_hora'] = $datos_comportamiento_pagos_hora;
                         break;
                     case 'correcciones':
-                        // Similar lógica para cargar datos específicos de la sección de correcciones
-
                         $correcciones_q = DB::table('tb_ticket_producto_correcciones as tpc')
                             ->select('tpc.nombre', DB::raw("COUNT(tpc.id) as cantidad"), DB::raw("SUM(tpc.precio) as total"))
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
@@ -665,6 +678,19 @@ class Home extends Component
                                 $datos_grafica_correcciones_hora[$value->hora] = $value->cantidad;
                             });
                         $this->correccionesData['grafica_correcciones_hora'] = $datos_grafica_correcciones_hora;
+                        break;
+                    case 'impuestos':
+                        $impuestos_q = DB::table('tb_ticket_impuestos as ti')
+                            ->select('ti.nombre', DB::raw("SUM(ti.monto) as impuesto"), DB::raw("SUM(ti.gravable) as gravable"))
+                            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'ti.ticket_id')
+                            ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+                            ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
+                            ->where('sucursal.cliente_id', user()->cliente_id)
+                            ->groupBy('ti.nombre')
+                            ->orderByDesc('impuesto');
+
+                        $impuestos_q = $this->commonWhere($impuestos_q);
+                        $this->impuestosData['impuestos'] = $impuestos_q->get()->toArray();
                         break;
                 }
                 break;

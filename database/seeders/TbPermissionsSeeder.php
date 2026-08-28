@@ -29,6 +29,7 @@ class TbPermissionsSeeder extends Seeder
         DB::table('permissions')->insert(['name' => 'dashboardResume-viewProducts', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
         DB::table('permissions')->insert(['name' => 'dashboardResume-viewPayments', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
         DB::table('permissions')->insert(['name' => 'dashboardResume-viewCorrections', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'dashboardResume-viewTaxes', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
         DB::table('permissions')->insert(['name' => 'dashboardResume-VideoKitchen', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
 
         DB::table('permissions')->insert(['name' => 'clients-viewAny', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);

@@ -87,6 +87,7 @@ return [
         'dashboardResume-viewProducts' => 'Ver datos de Productos',
         'dashboardResume-viewPayments' => 'Ver datos de Pagos',
         'dashboardResume-viewCorrections' => 'Ver datos de Correcciones',
+        'dashboardResume-viewTaxes' => 'Ver datos de Impuestos',
         'dashboardResume-VideoKitchen' => 'Ver Video Kitchen',
         'clients-viewAny' => 'Ver listado de clientes',
         'clients-view' => 'Ver datos de cliente',
@@ -322,6 +323,7 @@ return [
         'products' => 'Productos',
         'payments' => 'Pagos',
         'corrections' => 'Correcciones',
+        'taxes' => 'Impuestos',
         'sale_operations' => 'Operaciones de Venta',
         'net_sale' => 'Venta Neta',
         'total_sale' => 'Venta Total',
@@ -373,6 +375,8 @@ return [
         'terminal' => 'Terminal',
         'location' => 'Lugar',
         'emitted' => 'Emitido',
+        'tax' => 'Impuesto',
+        'taxable' => 'Gravable'
     ],
     'users' => [
         'list' => [
