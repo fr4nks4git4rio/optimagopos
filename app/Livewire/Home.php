@@ -157,6 +157,11 @@ class Home extends Component
         $this->dispatch('reApplySelect2');
     }
 
+    public function getConImpuestosProperty()
+    {
+        return count($this->impuestosData['impuestos']) > 0;
+    }
+
     public function render()
     {
         // if (user()->cliente_id)
