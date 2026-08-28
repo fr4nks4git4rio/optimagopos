@@ -35,16 +35,6 @@
             <div
                 class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray h-100">
                 <div class="card-body align-items-center d-flex flex-column">
-                    <p class="fs-5 fw-bold text-uppercase dashboard-card-title">{{ __('site.dashboard.multi_currency') }}
-                    </p>
-                    <p class="fs-3 text-primary m-auto  dashboard-card-value">{{ max($resumenData['multimoneda'], 0) }}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-lg">
-            <div
-                class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray h-100">
-                <div class="card-body align-items-center d-flex flex-column">
                     <p class="fs-5 fw-bold text-uppercase dashboard-card-title">{{ __('site.dashboard.items_sold') }}</p>
                     <p class="fs-3 text-primary m-auto  dashboard-card-value">
                         {{ $resumenData['articulos_vendidos'] ?: 0 }}</p>

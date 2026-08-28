@@ -38,7 +38,6 @@ class Home extends Component
         'importes_devueltos' => '',
         'deletes' => '',
         'cancels' => '',
-        'multimoneda' => '',
         'articulos_vendidos' => '',
         'cuarentena' => '',
         'grafica_actividad' => [],
@@ -247,19 +246,6 @@ class Home extends Component
 
                         $articulos_vendidos_q = $this->commonWhere($articulos_vendidos_q);
                         $this->resumenData['articulos_vendidos'] = $articulos_vendidos_q->value('cantidad');
-
-                        $multimoneda_q = DB::table('tb_ticket_operaciones as to')
-                            ->join('tb_sucursal_forma_pagos as sfp', 'sfp.id', '=', 'to.sucursal_forma_pago_id')
-                            ->join('tb_tickets as ticket', 'ticket.id', '=', 'to.ticket_id')
-                            ->join('tb_sucursales as sucursal', 'sucursal.id', '=', 'ticket.sucursal_id')
-                            ->join('tb_terminales as terminal', 'terminal.id', '=', 'ticket.terminal_id')
-                            ->where('sucursal.cliente_id', user()->cliente_id)
-                            ->select('to.ticket_id')
-                            ->groupBy('to.ticket_id')
-                            ->havingRaw('COUNT(DISTINCT sfp.moneda_id) >= 2');
-
-                        $multimoneda_q = $this->commonWhere($multimoneda_q);
-                        $this->resumenData['multimoneda'] = $multimoneda_q->count();
 
                         $ventas_neta_operacion_q = DB::table('tb_ticket_operaciones as to')
                             ->selectRaw("SUM(to.monto) as importe, ticket.id as id")
