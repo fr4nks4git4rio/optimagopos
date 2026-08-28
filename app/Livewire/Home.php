@@ -205,7 +205,7 @@ class Home extends Component
                         $this->resumenData['operaciones'] = $operaciones_q->count();
 
                         $ingresos_q = DB::table('tb_ticket_operaciones as to')
-                            ->selectRaw("SUM(ROUND(to.monto, 2)) as total")
+                            ->selectRaw("SUM(to.monto) as total")
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
@@ -487,7 +487,7 @@ class Home extends Component
                             ->pluck('cantidad', 'nombre');
 
                         $top_productos_ingreso_q = DB::table('tb_ticket_productos as tp')
-                            ->select('p.nombre', DB::raw("ROUND(SUM(tp.precio), 2) as ingreso"))
+                            ->select('p.nombre', DB::raw("SUM(tp.precio) as ingreso"))
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
@@ -503,7 +503,7 @@ class Home extends Component
                         break;
                     case 'pagos':
                         $ingresos_q = DB::table('tb_ticket_operaciones as to')
-                            ->selectRaw("SUM(ROUND(to.monto, 2)) as total")
+                            ->selectRaw("SUM(to.monto) as total")
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
@@ -513,7 +513,7 @@ class Home extends Component
                         $this->pagosData['ingresos'] = $ingresos_q->value('total');
 
                         $ventas_formas_pago_q = DB::table('tb_ticket_operaciones as to')
-                            ->select('sfp.nombre', DB::raw("SUM(ROUND(to.monto, 2)) as total"))
+                            ->select('sfp.nombre', DB::raw("SUM(to.monto) as total"))
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'to.ticket_id')
                             ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'to.sucursal_forma_pago_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
@@ -616,7 +616,7 @@ class Home extends Component
                         // Similar lógica para cargar datos específicos de la sección de correcciones
 
                         $correcciones_q = DB::table('tb_ticket_producto_correcciones as tpc')
-                            ->select('tpc.nombre', DB::raw("COUNT(tpc.id) as cantidad"), DB::raw("SUM(ROUND(tpc.precio, 2)) as total"))
+                            ->select('tpc.nombre', DB::raw("COUNT(tpc.id) as cantidad"), DB::raw("SUM(tpc.precio) as total"))
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tpc.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
