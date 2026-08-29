@@ -1654,7 +1654,7 @@ return [
         'id_transaction_already_exists' => 'Ya existe un ticket para la terminal :terminal con el mismo id de transacción :id_transaction.',
         'properties_not_found' => 'Propiedad no recibida en ítem :item. Propiedades esperadas: :properties.',
         'payment_form_not_found' => 'Forma de pago no encontrada: :payment_form',
-        'exception_error' => 'Error recibiendo ticket json. Error: :error',
+        '   ' => 'Error recibiendo ticket json. Error: :error',
         'property_not_found_in_package' => 'Propiedad no recibida en el paquete. Propiedad esperada: :property.',
         'property_invalid_format' => 'La propiedad: :property no cumple con el formato esperado.',
     ]

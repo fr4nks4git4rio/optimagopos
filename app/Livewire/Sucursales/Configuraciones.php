@@ -180,7 +180,7 @@ class Configuraciones extends Modal
         }
         $this->tipo_cambio = [
             'id' => $tipo_cambio->id,
-            'tasa' => $tipo_cambio->ratetasa,
+            'tasa' => $tipo_cambio->tasa,
             'from_id' => $tipo_cambio->from_id,
             'to_id' => $tipo_cambio->to_id
         ];

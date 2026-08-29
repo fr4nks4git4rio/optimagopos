@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProcesarTicketCuarentena
 {
@@ -76,10 +77,10 @@ class ProcesarTicketCuarentena
         try {
             // Paso 4: Acceder a datos generales
             if (!$decoded['ClerkId']) {
+                DB::rollBack();
                 $this->registro->update([
                     'texto' => __('site.data_parser.employee_id_not_received')
                 ]);
-                DB::rollBack();
                 return false;
             }
             $clerk = Empleado::where('sucursal_id', $terminal->sucursal_id)->where('id_empleado', $decoded['ClerkId'])->first();
@@ -121,10 +122,10 @@ class ProcesarTicketCuarentena
             }
 
             if (Ticket::where('id_transaccion', $decoded['TransactionId'])->where('terminal_id', $terminal->id)->where('fecha_transaccion', Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'))->exists()) {
+                DB::rollBack();
                 $this->registro->update([
                     'texto' => __('site.data_parser.id_transaction_already_exists', ['terminal' => $terminal->identificador, 'id_transaction' => $decoded['TransactionId']])
                 ]);
-                DB::rollBack();
                 return false;
             }
 
@@ -153,12 +154,13 @@ class ProcesarTicketCuarentena
                     $item['pos'] = $pos;
                     $poras[] = $item;
                 }
+
                 if ($type === 'Tax') {
                     if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Taxable'])) {
+                        DB::rollBack();
                         $this->registro->update([
                             'texto' => __('site.data_parser.properties_not_found', ['item' => 'Tax', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Taxable'])
                         ]);
-                        DB::rollBack();
                         return false;
                     }
                     $ticket->impuestos()->create([
@@ -170,10 +172,10 @@ class ProcesarTicketCuarentena
 
                 if ($type === 'Tender') {
                     if (!isset($item['Name']) || !isset($item['Amount'])) {
+                        DB::rollBack();
                         $this->registro->update([
                             'texto' => __('site.data_parser.properties_not_found', ['item' => 'Tender', 'properties' => 'Name ' . __('site.common.and') . ' Amount'])
                         ]);
-                        DB::rollBack();
                         return false;
                     }
                     $forma_pago = DB::table('tb_sucursal_forma_pagos')
@@ -182,10 +184,10 @@ class ProcesarTicketCuarentena
                         ->whereNull('deleted_at')
                         ->get()->first();
                     if (!$forma_pago) {
-                        $this->registro->update([
-                            'texto' => 'Forma de pago no encontrada.'
-                        ]);
                         DB::rollBack();
+                        $this->registro->update([
+                            'texto' => __('site.data_parser.payment_form_not_found', ['payment_form' => $item['Name']])
+                        ]);
                         return false;
                     }
                     $tasa_cambio = 1;
@@ -211,10 +213,10 @@ class ProcesarTicketCuarentena
 
                 if ($type === 'Product') {
                     if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        DB::rollBack();
                         $this->registro->update([
                             'texto' => __('site.data_parser.properties_not_found', ['item' => 'Product', 'properties' => 'Id, Name, Amount, Qty, DepartmentId ' . __('site.common.and') . ' DepartmentName'])
                         ]);
-                        DB::rollBack();
                         return false;
                     }
 
@@ -268,10 +270,10 @@ class ProcesarTicketCuarentena
 
                 if ($type === 'Department') {
                     if (!isset($item['Id']) || !isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        DB::rollBack();
                         $this->registro->update([
                             'texto' => __('site.data_parser.properties_not_found', ['item' => 'Department', 'properties' => 'Id, Name, Amount ' . __('site.common.and') . ' Qty'])
                         ]);
-                        DB::rollBack();
                         return false;
                     }
 
@@ -308,10 +310,10 @@ class ProcesarTicketCuarentena
 
                 if ($type === 'Correction') {
                     if (!isset($item['Name']) || !isset($item['Amount']) || !isset($item['Qty'])) {
+                        DB::rollBack();
                         $this->registro->update([
                             'texto' => __('site.data_parser.properties_not_found', ['item' => 'Correction', 'properties' => 'Name, Amount ' . __('site.common.and') . ' Qty'])
                         ]);
-                        DB::rollBack();
                         return false;
                     }
 
@@ -345,9 +347,9 @@ class ProcesarTicketCuarentena
                             ->where('sucursal_id', $terminal->sucursal_id)
                             ->where('nombre', $ts['Name'])
                             ->whereNull('deleted_at')
-                            ->get();
+                            ->get()->first();
                         $ticket->operaciones()->create([
-                            'nombre' => $t['Name'] ?? '',
+                            'nombre' => $ts['Name'] ?? '',
                             'monto' => $pora['Amount'] ?? 0,
                             'sucursal_forma_pago_id' => $forma_pago->id,
                             'es_pora' => 1,
@@ -374,7 +376,7 @@ class ProcesarTicketCuarentena
                                 ->where('sucursal_id', $terminal->sucursal_id)
                                 ->where('nombre', $t['Name'])
                                 ->whereNull('deleted_at')
-                                ->get();
+                                ->get()->first();
                             $ticket->operaciones()->create([
                                 'nombre' => $t['Name'] ?? '',
                                 'monto' => $pora['Amount'] ?? 0,
@@ -396,10 +398,10 @@ class ProcesarTicketCuarentena
             DB::commit();
             return true;
         } catch (Exception $e) {
-            $this->registro->update([
-                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage()])
-            ]);
             DB::rollBack();
+            $this->registro->update([
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage().' '.$e->getTraceAsString()])
+            ]);
             return false;
         }
     }

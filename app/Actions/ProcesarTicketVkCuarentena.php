@@ -124,10 +124,10 @@ class ProcesarTicketVkCuarentena
                 $itemItecketVK = new ItemTicketVK();
                 $itemItecketVK->ticket_vk_id = $ticketVK->id;
                 if (!isset($item['name'])) {
+                    DB::rollBack();
                     $this->registro->update([
                         'texto' => __('site.data_parser.property_not_found_in_package', ['property' => 'name'])
                     ]);
-                    DB::rollBack();
                     return false;
                 }
 
@@ -136,10 +136,10 @@ class ProcesarTicketVkCuarentena
                     $itemItecketVK->cantidad = $coincidencias[1];
                     $itemItecketVK->nombre = $coincidencias[2];
                 } else {
+                    DB::rollBack();
                     $this->registro->update([
                         'texto' => __('site.data_parser.property_invalid_format', ['property' => 'name'])
                     ]);
-                    DB::rollBack();
                     return false;
                 }
 
@@ -164,10 +164,10 @@ class ProcesarTicketVkCuarentena
 
             DB::commit();
         } catch (Exception $e) {
-            $this->registro->update([
-                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage()])
-            ]);
             DB::rollBack();
+            $this->registro->update([
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage().' '.$e->getTraceAsString()])
+            ]);
             return false;
         }
 

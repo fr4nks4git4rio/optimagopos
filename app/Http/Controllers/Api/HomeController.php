@@ -483,9 +483,9 @@ class HomeController
                             ->where('sucursal_id', $terminal->sucursal_id)
                             ->where('nombre', $ts['Name'])
                             ->whereNull('deleted_at')
-                            ->get();
+                            ->get()->first();
                         $ticket->operaciones()->create([
-                            'nombre' => $t['Name'] ?? '',
+                            'nombre' => $ts['Name'] ?? '',
                             'monto' => $pora['Amount'] ?? 0,
                             'sucursal_forma_pago_id' => $forma_pago->id,
                             'es_pora' => 1,
@@ -512,7 +512,7 @@ class HomeController
                                 ->where('sucursal_id', $terminal->sucursal_id)
                                 ->where('nombre', $t['Name'])
                                 ->whereNull('deleted_at')
-                                ->get();
+                                ->get()->first();
                             $ticket->operaciones()->create([
                                 'nombre' => $t['Name'] ?? '',
                                 'monto' => $pora['Amount'] ?? 0,
@@ -547,12 +547,12 @@ class HomeController
                 'status' => 400
             ]);
             Cuarentena::create([
-                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage()]),
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage() . ' ' . $e->getTraceAsString()]),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 0
             ]);
-            Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage()]));
+            Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage() . ' ' . $e->getTraceAsString()]));
             return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
@@ -701,6 +701,7 @@ class HomeController
                 $itemItecketVK = new ItemTicketVK();
                 $itemItecketVK->ticket_vk_id = $ticketVK->id;
                 if (!isset($item['name'])) {
+                    DB::rollBack();
                     ModelsLog::create([
                         'log' => __('site.data_parser.property_not_found_in_package', ['property' => 'name']),
                         'data' => json_encode($decoded),
@@ -717,7 +718,6 @@ class HomeController
                         'cliente_id' => $terminal->sucursal->cliente_id,
                         'es_vk' => 1
                     ]);
-                    DB::rollBack();
                     return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                 }
 
@@ -726,6 +726,7 @@ class HomeController
                     $itemItecketVK->cantidad = $coincidencias[1];
                     $itemItecketVK->nombre = $coincidencias[2];
                 } else {
+                    DB::rollBack();
                     ModelsLog::create([
                         'log' => __('site.data_parser.property_invalid_format', ['property' => 'name']),
                         'data' => json_encode($decoded),
@@ -742,7 +743,6 @@ class HomeController
                         'cliente_id' => $terminal->sucursal->cliente_id,
                         'es_vk' => 1
                     ]);
-                    DB::rollBack();
                     return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                 }
 
@@ -773,19 +773,19 @@ class HomeController
             ]);
             DB::commit();
         } catch (Exception $e) {
+            DB::rollBack();
             ModelsLog::create([
                 'log' => __('site.data_parser.exception_error', ['error' => $e->getMessage()]),
                 'data' => json_encode($decoded),
                 'status' => 400
             ]);
             Cuarentena::create([
-                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage()]),
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage().' '.$e->getTraceAsString()]),
                 'ip' => $request->ip(),
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 1
             ]);
-            Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage()]));
-            DB::rollBack();
+            Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage().' '.$e->getTraceAsString()]));
             return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 

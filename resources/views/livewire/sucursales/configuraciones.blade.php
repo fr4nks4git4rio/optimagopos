@@ -57,7 +57,7 @@
                                             <td>{{ $tc['tasa'] }}</td>
                                             <td class="text-center">
                                                 <x-action icon="pencil" title="{{ __('site.common.edit') }}"
-                                                    click="editRate({{ $tc['id'] }})" />
+                                                    click="editTasa({{ $tc['id'] }})" />
                                                 <x-action icon="trash" title="{{ __('site.common.delete') }}"
                                                     click="$dispatch('openModal', { component: 'tipos-cambio.delete', arguments: {'tipoCambio': {{ $tc['id'] }}, 'scope': 'sucursales.configuraciones'} })" />
                                             </td>

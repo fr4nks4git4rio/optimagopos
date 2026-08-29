@@ -11,7 +11,7 @@
     }
 }" @toast-message-show.window="show = true; closeProcess();"
     @mouseenter="show_closable = true; can_close = false" @mouseleave="show_closable = false; closeProcess();"
-    x-show="show" x-cloak class="position-fixed" style="top: 50px; right: 10px; z-index: 1066; max-width: 600px">
+    x-show="show" x-cloak class="position-fixed" style="top: 50px; right: 10px; z-index: 9999999; max-width: 600px">
     <div class="{{ $alertTypeClasses[$alertType] }} pb-0 pt-2">
         <x-icon class="fs-3 align-middle position-absolute" style="top: 0; left:0"
             name="{{ $icons[$alertType] }}"></x-icon>
