@@ -114,6 +114,10 @@ class Ticket extends Model
     {
         return $this->hasMany(TicketOperacion::class, 'ticket_id');
     }
+    public function movimientos_caja()
+    {
+        return $this->hasMany(TicketMovimientoCaja::class, 'ticket_id');
+    }
     public function impuestos()
     {
         return $this->hasMany(TicketImpuesto::class, 'ticket_id');

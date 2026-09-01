@@ -165,8 +165,8 @@ class ProcesarTicketCuarentena
                     }
                     $ticket->impuestos()->create([
                         'nombre' => $item['Name'],
-                        'monto' => $item['Amount'],
-                        'gravable' => $item['Taxable']
+                        'monto' => truncate_decimals((float)$item['Amount']),
+                        'gravable' => truncate_decimals((float)$item['Taxable'])
                     ]);
                 }
 
@@ -202,8 +202,8 @@ class ProcesarTicketCuarentena
                     $tenders[] = $item;
                     $ticket->operaciones()->create([
                         'nombre' => $item['Name'] ?? '',
-                        'monto' => $item['Amount'] ?? 0,
-                        'propina' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? (float)$item['Tip'] : 0,
+                        'monto' => truncate_decimals((float)$item['Amount']),
+                        'propina' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? truncate_decimals((float)$item['Tip']) : 0,
                         'empleado_id' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? optional($clerk)->id : null,
                         'sucursal_forma_pago_id' => optional($forma_pago)->id,
                         'es_cambio' => $prevProduct != null && $item['Amount'] < 0 ? 1 : 0,
@@ -246,8 +246,8 @@ class ProcesarTicketCuarentena
                     }
 
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
-                    $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
-                    $discount = $item['Discount'] ? (float)$item['Discount'] : 0;
+                    $amount = $item['Amount'] ? truncate_decimals((float)$item['Amount']) : 0;
+                    $discount = $item['Discount'] ? truncate_decimals((float)$item['Discount']) : 0;
                     $ticketProducto = TicketProducto::where('ticket_id', $ticket->id)->where('producto_id', $producto->id)->where('departamento_id', $departamento?->id)->first();
                     if (!$ticketProducto) {
                         $ticketProducto = new TicketProducto();
@@ -289,8 +289,8 @@ class ProcesarTicketCuarentena
                     }
 
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
-                    $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
-                    $discount = $item['Discount'] ? (float)$item['Discount'] : 0;
+                    $amount = $item['Amount'] ? truncate_decimals((float)$item['Amount']) : 0;
+                    $discount = $item['Discount'] ? truncate_decimals((float)$item['Discount']) : 0;
                     $ticketDepartamento = TicketProducto::where('ticket_id', $ticket->id)->where('departamento_id', $departamento->id)->whereNull('producto_id')->first();
                     if (!$ticketDepartamento) {
                         $ticketDepartamento = new TicketProducto();
@@ -318,7 +318,7 @@ class ProcesarTicketCuarentena
                     }
 
                     $qty = $item['Qty'] ? (float)$item['Qty'] : 0;
-                    $amount = $item['Amount'] ? (float)$item['Amount'] : 0;
+                    $amount = $item['Amount'] ? truncate_decimals((float)$item['Amount']) : 0;
 
                     $correccion = new TicketProductoCorreccion();
                     $correccion->nombre = $item['Name'];
@@ -348,12 +348,10 @@ class ProcesarTicketCuarentena
                             ->where('nombre', $ts['Name'])
                             ->whereNull('deleted_at')
                             ->get()->first();
-                        $ticket->operaciones()->create([
-                            'nombre' => $ts['Name'] ?? '',
-                            'monto' => $pora['Amount'] ?? 0,
-                            'sucursal_forma_pago_id' => $forma_pago->id,
-                            'es_pora' => 1,
-                            'nombre_pora' => $pora['Name']
+                        $ticket->movimientos_caja()->create([
+                            'nombre' => $pora['Name'] ?? '',
+                            'monto' => truncate_decimals((float)$pora['Amount']),
+                            'sucursal_forma_pago_id' => $forma_pago->id
                         ]);
                         foreach ($tenders as $i => $t)
                             if ($t['pos']  == $ts['pos']) {
@@ -377,12 +375,10 @@ class ProcesarTicketCuarentena
                                 ->where('nombre', $t['Name'])
                                 ->whereNull('deleted_at')
                                 ->get()->first();
-                            $ticket->operaciones()->create([
-                                'nombre' => $t['Name'] ?? '',
-                                'monto' => $pora['Amount'] ?? 0,
-                                'sucursal_forma_pago_id' => $forma_pago->id,
-                                'es_pora' => 1,
-                                'nombre_pora' => $pora['Name']
+                            $ticket->movimientos_caja()->create([
+                                'nombre' => $pora['Name'] ?? '',
+                                'monto' => truncate_decimals((float)$pora['Amount']),
+                                'sucursal_forma_pago_id' => $forma_pago->id
                             ]);
                             array_splice($tenders, $i, 1);
                             $tenders = array_values($tenders);
@@ -400,7 +396,7 @@ class ProcesarTicketCuarentena
         } catch (Exception $e) {
             DB::rollBack();
             $this->registro->update([
-                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage().' '.$e->getTraceAsString()])
+                'texto' => __('site.data_parser.exception_error', ['error' => $e->getMessage() . ' ' . $e->getTraceAsString()])
             ]);
             return false;
         }

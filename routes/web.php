@@ -59,6 +59,7 @@ use App\Livewire\Reportes\ArticulosVendidos;
 use App\Livewire\Reportes\VentasDiarias;
 use App\Livewire\Reportes\VentasOperador;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -78,7 +79,23 @@ use Illuminate\Support\Str;
 // Auth::routes();
 
 Route::get('/test', function () {
-    echo Carbon::parse(Str::replace("Hora:", "", "30 nov. 2022 Hora: 12:22 a. m."));
+    $operaciones = DB::table('tb_ticket_operaciones')
+        ->where('es_pora', 1)
+        ->get();
+
+    foreach ($operaciones as $opPora) {
+        DB::insert('insert into tb_ticket_movimientos_caja (nombre, monto, ticket_id, sucursal_forma_pago_id, created_at, updated_at) values (?, ?, ?, ?, ?, ?)', [
+            $opPora->nombre_pora,
+            $opPora->monto,
+            $opPora->ticket_id,
+            $opPora->sucursal_forma_pago_id,
+            Carbon::now(),
+            Carbon::now()
+        ]);
+        DB::delete('delete from tb_ticket_operaciones where id = ?', [$opPora->id]);
+    }
+
+    echo "Migración de operaciones a movimientos de caja completada.";
 });
 
 Route::domain(config('app.facturacion_url'))->group(function () {
