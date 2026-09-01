@@ -107,7 +107,7 @@ class VentasOperador extends Component
         $correccionesSub = DB::table('tb_ticket_producto_correcciones')
             ->select(
                 'ticket_id',
-                DB::raw('SUM(ABS(precio)) as correcciones_importe'),
+                DB::raw('SUM(precio) as correcciones_importe'),
                 DB::raw('COUNT(id) as correcciones_cant')
             )
             ->groupBy('ticket_id');
