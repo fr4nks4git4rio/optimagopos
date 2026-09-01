@@ -77,27 +77,6 @@ use Illuminate\Support\Str;
 */
 
 // Auth::routes();
-
-Route::get('/test', function () {
-    $operaciones = DB::table('tb_ticket_operaciones')
-        ->where('es_pora', 1)
-        ->get();
-
-    foreach ($operaciones as $opPora) {
-        DB::insert('insert into tb_ticket_movimientos_caja (nombre, monto, ticket_id, sucursal_forma_pago_id, created_at, updated_at) values (?, ?, ?, ?, ?, ?)', [
-            $opPora->nombre_pora,
-            $opPora->monto,
-            $opPora->ticket_id,
-            $opPora->sucursal_forma_pago_id,
-            Carbon::now(),
-            Carbon::now()
-        ]);
-        DB::delete('delete from tb_ticket_operaciones where id = ?', [$opPora->id]);
-    }
-
-    echo "Migración de operaciones a movimientos de caja completada.";
-});
-
 Route::domain(config('app.facturacion_url'))->group(function () {
     Route::get('/', function () {
         return redirect()->route('auto-facturacion');
