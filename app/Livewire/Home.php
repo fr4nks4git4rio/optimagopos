@@ -651,7 +651,7 @@ class Home extends Component
 
                         $total_correcciones_q = $this->commonWhere($total_correcciones_q);
                         $totalCorrecciones = $total_correcciones_q->value('total') ?? 0;
-                        $this->correccionesData['influencia_correcciones'] = $totalVentas > 0 ? round((abs($totalCorrecciones) / $totalVentas) * 100, 2) : 0;
+                        $this->correccionesData['influencia_correcciones'] = $totalVentas > 0 ? round(($totalCorrecciones / $totalVentas) * 100, 2) : 0;
 
                         $datos_grafica_correcciones_operador = [];
                         $grafica_correcciones_operador_q = DB::table('tb_ticket_producto_correcciones as tpc')
