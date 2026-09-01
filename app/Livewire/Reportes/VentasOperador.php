@@ -97,10 +97,10 @@ class VentasOperador extends Component
 
     public function query()
     {
-        $operacionesSub = DB::table('tb_ticket_operaciones')
+        $operacionesSub = DB::table('tb_ticket_productos')
             ->select(
                 'ticket_id',
-                DB::raw('SUM(monto) as ventas_importe')
+                DB::raw('SUM(precio) as ventas_importe')
             )
             ->groupBy('ticket_id');
 
