@@ -28,6 +28,17 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        RateLimiter::for('gopos', function (Request $request) {
+            $terminal = $request->attributes->get('gopos_terminal_id', 'unknown');
+
+            return [
+                Limit::perMinute((int) config('services.gopos.requests_per_minute', 120))
+                    ->by('terminal:' . $terminal . '|ip:' . $request->ip()),
+                Limit::perMinute((int) config('services.gopos.ip_requests_per_minute', 300))
+                    ->by('ip:' . $request->ip()),
+            ];
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

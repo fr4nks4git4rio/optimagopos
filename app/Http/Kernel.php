@@ -5,6 +5,7 @@ namespace App\Http;
 use App\Http\Middleware\ConFacturacion;
 use App\Http\Middleware\EnsureTwoFactorIsVerified;
 use App\Http\Middleware\HasRole;
+use App\Http\Middleware\SecureGoPosRequest;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TwoFactorAuthenticated;
 use App\Http\Middleware\UserActiveSubscription;
@@ -79,6 +80,7 @@ class Kernel extends HttpKernel
         'conFacturacion' => ConFacturacion::class,
         'set.locale' => SetLocale::class,
         'two-factor' => EnsureTwoFactorIsVerified::class,
-        'user-with-active-subscription' => UserActiveSubscription::class
+        'user-with-active-subscription' => UserActiveSubscription::class,
+        'gopos.security' => SecureGoPosRequest::class
     ];
 }

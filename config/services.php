@@ -2,6 +2,15 @@
 
 return [
 
+    'gopos' => [
+        'max_body_bytes' => (int) env('GOPOS_MAX_BODY_BYTES', 1048576),
+        'requests_per_minute' => (int) env('GOPOS_REQUESTS_PER_MINUTE', 120),
+        'ip_requests_per_minute' => (int) env('GOPOS_IP_REQUESTS_PER_MINUTE', 300),
+        'require_signature' => (bool) env('GOPOS_REQUIRE_SIGNATURE', false),
+        'signature_secret' => env('GOPOS_SIGNATURE_SECRET'),
+        'signature_tolerance' => (int) env('GOPOS_SIGNATURE_TOLERANCE', 300),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
