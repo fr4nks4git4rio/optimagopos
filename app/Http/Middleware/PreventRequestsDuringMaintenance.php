@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Closure;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance as Middleware;
 
 class PreventRequestsDuringMaintenance extends Middleware
@@ -14,4 +15,13 @@ class PreventRequestsDuringMaintenance extends Middleware
     protected $except = [
         //
     ];
+
+    public function handle($request, Closure $next)
+    {
+        if (config('app.site_maintenance') && ! $this->inExceptArray($request)) {
+            return response()->view('errors.503', [], 503);
+        }
+
+        return parent::handle($request, $next);
+    }
 }
