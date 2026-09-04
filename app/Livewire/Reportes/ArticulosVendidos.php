@@ -112,7 +112,6 @@ class ArticulosVendidos extends Component
         foreach ($this->sucursalesAll as $suc)
             $sucursales[$suc['value']] = $suc['label'];
 
-        dd($query->toRawSql(), $query->getBindings());
         $records = $query->get()->each(function ($value, $key) use (&$sucursales) {
             if (!isset($sucursales[$value->sucursal_id])) {
                 $sucursales[$value->sucursal_id] = Crypt::decrypt($value->sucursal);
