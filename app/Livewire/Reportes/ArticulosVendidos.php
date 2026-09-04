@@ -109,6 +109,8 @@ class ArticulosVendidos extends Component
         }
 
         $sucursales = [];
+        foreach ($this->sucursalesAll as $suc)
+            $sucursales[$suc['value']] = $suc['label'];
         $records = $query->get()->each(function ($value, $key) use (&$sucursales) {
             if (!isset($sucursales[$value->sucursal_id])) {
                 $sucursales[$value->sucursal_id] = Crypt::decrypt($value->sucursal);
