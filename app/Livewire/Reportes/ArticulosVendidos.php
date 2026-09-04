@@ -88,10 +88,10 @@ class ArticulosVendidos extends Component
             ->groupByRaw('producto.id');
 
         if ($this->fechaInicio) {
-            $query->whereDate('ticket.fecha_transaccion', '>=', $this->fechaInicio);
+            $query->where('ticket.fecha_transaccion', '>=', $this->fechaInicio . ' 00:00:00');
         }
         if ($this->fechaFin) {
-            $query->whereDate('ticket.fecha_transaccion', '<=', $this->fechaFin);
+            $query->where('ticket.fecha_transaccion', '<=', $this->fechaFin . ' 23:59:59');
         }
         if ($this->sucursal) {
             $query->whereIn('sucursal.id', $this->sucursal);
