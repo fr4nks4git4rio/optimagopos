@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\ConFacturacion;
+use App\Http\Middleware\DisableActivityLogging;
 use App\Http\Middleware\EnsureTwoFactorIsVerified;
 use App\Http\Middleware\HasRole;
 use App\Http\Middleware\SecureGoPosRequest;
@@ -81,6 +82,7 @@ class Kernel extends HttpKernel
         'set.locale' => SetLocale::class,
         'two-factor' => EnsureTwoFactorIsVerified::class,
         'user-with-active-subscription' => UserActiveSubscription::class,
-        'gopos.security' => SecureGoPosRequest::class
+        'gopos.security' => SecureGoPosRequest::class,
+        'no.activitylog' => DisableActivityLogging::class
     ];
 }

@@ -3,7 +3,7 @@
         <div class="col-12 col-sm-6 col-lg">
             <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
                 <div class="card-body align-items-center d-flex flex-column">
-                    <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.incomes') }}</span>
+                    <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.income') }}</span>
                     <span class="fs-3 text-primary m-auto">${{ number_format(max($pagosData['ingresos'], 0), 2) }}</span>
                 </div>
             </div>
@@ -11,7 +11,7 @@
         <div class="col-12 col-sm-6 col-lg">
             <div class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center h-100">
                 <div class="card-body align-items-center d-flex flex-column">
-                    <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.incomes_by_payment_form') }}</span>
+                    <span class="fs-5 fw-bold text-uppercase">{{ __('site.dashboard.income_by_payment_form') }}</span>
                     @if (count($pagosData['ventas_formas_pago']) == 0)
                         <div class="text-center py-4 text-muted">
                             <i class="bi bi-credit-card fs-3 d-block mb-1"></i>
@@ -73,7 +73,11 @@
                 sinDatos: false,
 
                 init() {
-                    this.$watch('datosMetodosPagos', value => {
+                    const actualizarMetodos = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -83,9 +87,11 @@
                             let nombresProductos = items.map(([clave, valor]) => clave);
                             let presenciaValores = items.map(([clave, valor]) => Number(valor));
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-metodos-pagos');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -179,7 +185,9 @@
                                 this.chart.updateSeries([]);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosMetodosPagos', actualizarMetodos);
+                    actualizarMetodos(this.datosMetodosPagos);
                 },
                 destroy() {
                     if (this.chart) this.chart.destroy();
@@ -217,7 +225,11 @@
                         return i.toString().padStart(2, '0') + ':00';
                     });
 
-                    this.$watch('datosPagosHora', value => {
+                    const actualizarPagosHora = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -235,9 +247,11 @@
                                 return 0;
                             });
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-pagos-hora');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -309,7 +323,9 @@
                                 this.chart.updateSeries([{ data: serieVacia }]);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosPagosHora', actualizarPagosHora);
+                    actualizarPagosHora(this.datosPagosHora);
                 },
 
                 destroy() {

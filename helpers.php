@@ -493,8 +493,7 @@ if (!function_exists('parse_fecha_espanol')) {
         return Carbon::create((int) $anio, $mes, (int) $dia, $hora, (int) $minuto, 0);
     }
 }
-
-if(!function_exists('truncate_decimals')) {
+if (!function_exists('truncate_decimals')) {
     /**
      * Truncates a float to a specified number of decimal places without rounding.
      *
@@ -506,5 +505,27 @@ if(!function_exists('truncate_decimals')) {
     {
         $factor = 10 ** $decimals;
         return ($value < 0 ? ceil($value * $factor) : floor($value * $factor)) / $factor;
+    }
+}
+
+if (!function_exists('sucursales_disponibles')) {
+    /**
+     * Sucursales del usuario con nombre desencriptado, cacheadas 5 min (single-server).
+     * Evita repetir la consulta + N decrypts en cada render Livewire (dashboard, reportes).
+     *
+     * @return array{value: int, label: string}[]
+     */
+    function sucursales_disponibles()
+    {
+        return \Illuminate\Support\Facades\Cache::remember(
+            'home|sucs|' . user()->cliente_id,
+            now()->addMinutes(5),
+            fn() => Sucursal::where('cliente_id', user()->cliente_id)
+                ->whereIn('id', user()->sucursales->pluck('id')->toArray())
+                ->get()->map(fn($value) => [
+                    'value' => $value->id,
+                    'label' => \Illuminate\Support\Facades\Crypt::decrypt($value->nombre_comercial),
+                ])->toArray()
+        );
     }
 }

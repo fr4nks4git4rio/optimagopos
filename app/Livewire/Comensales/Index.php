@@ -4,6 +4,7 @@ namespace App\Livewire\Comensales;
 
 use App\Models\Cliente;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -68,17 +69,23 @@ class Index extends Component
             default => user()->cliente->comensales(),
         };
 
-        $clientes = $query->get()->map(function ($value) {
-            Cliente::decryptInfo($value);
-            return [
-                'id' => $value->id,
-                'nombre_comercial' => $value->nombre_comercial,
-                'rfc' => $value->rfc,
-                'razon_social' => $value->razon_social,
-                'telefono' => $value->telefono,
-                'activo' => $value->pivot->activo
-            ];
-        })->toArray();
+        // Cache 5 min (single-server): evita re-desencriptar todos los comensales en cada
+        // tecla, orden o pagina. El cifrado se mantiene intacto (decision del proyecto).
+        $clientes = Cache::remember(
+            'comensales|idx|' . user()->cliente_id . '|' . $this->filter,
+            now()->addMinutes(5),
+            fn() => $query->get()->map(function ($value) {
+                Cliente::decryptInfo($value);
+                return [
+                    'id' => $value->id,
+                    'nombre_comercial' => $value->nombre_comercial,
+                    'rfc' => $value->rfc,
+                    'razon_social' => $value->razon_social,
+                    'telefono' => $value->telefono,
+                    'activo' => $value->pivot->activo
+                ];
+            })->toArray()
+        );
 
         $records_final = collect();
 

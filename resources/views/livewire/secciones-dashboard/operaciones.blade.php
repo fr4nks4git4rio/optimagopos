@@ -59,7 +59,11 @@
                         return i.toString().padStart(2, '0') + ':00';
                     });
 
-                    this.$watch('datosOperacionesHora', value => {
+                    const actualizarOperacionesHora = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -77,9 +81,11 @@
                                 return 0;
                             });
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-operaciones-hora');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -151,7 +157,9 @@
                                 this.chart.updateSeries([{ data: serieVacia }]);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosOperacionesHora', actualizarOperacionesHora);
+                    actualizarOperacionesHora(this.datosOperacionesHora);
                 },
 
                 destroy() {
@@ -187,7 +195,11 @@
                 sinDatos: false,
 
                 init() {
-                    this.$watch('datosTopTickets', value => {
+                    const actualizarTopTickets = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -197,9 +209,11 @@
                             let nombresTickets = items.map(([clave, valor]) => valor.id_transaccion);
                             let importesTickets = items.map(([clave, valor]) => Number(valor.importe));
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-top-tickets');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -299,7 +313,9 @@
                                 }, false, true);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosTopTickets', actualizarTopTickets);
+                    actualizarTopTickets(this.datosTopTickets);
                 },
 
                 destroy() {
@@ -310,7 +326,7 @@
             }" class="card shadow-sm bg-site-primary-subtle">
                 <div class="card-body">
                     <span class="fs-5 fw-bold">
-                        {{ __('site.dashboard.top_tickets') }}
+                        {{ __('site.dashboard.top_tickets') }}</span>
                     </span>
                     <template x-if="!chart && !sinDatos">
                         <div class="text-center py-3 text-muted">

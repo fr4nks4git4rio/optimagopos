@@ -14,7 +14,7 @@ class ClaveProdServController extends Controller
             ->select('id', 'codigo', 'nombre', DB::raw('CONCAT(nombre, " (", codigo, ")") as text'));
 
         if($request->term){
-            $clavesProdServs = $query->whereRaw('CONCAT(nombre, " (", codigo, ")") like ?',['%'.$request->term.'%'])->get()->toArray();
+            $clavesProdServs = $query->whereRaw('CONCAT(nombre, " (", codigo, ")") like ?',['%'.$request->term.'%'])->limit(50)->get()->toArray();
         }else{
             $clavesProdServs = [];
         }

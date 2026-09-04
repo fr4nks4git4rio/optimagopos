@@ -25,7 +25,7 @@
                 class="card border-0 border-start border-primary bg-primary-subtle shadow-sm border-4 text-center bg-gray h-100">
                 <div class="card-body align-items-center d-flex flex-column">
                     <span
-                        class="fs-5 fw-bold text-uppercase dashboard-card-title">{{ __('site.dashboard.incomes') }}</span>
+                        class="fs-5 fw-bold text-uppercase dashboard-card-title">{{ __('site.dashboard.income') }}</span>
                     <span
                         class="fs-3  text-primary m-auto  dashboard-card-value">${{ number_format(max($resumenData['ingresos'], 0), 2) }}</span>
                 </div>
@@ -78,7 +78,13 @@
                 sinDatos: false,
 
                 init() {
-                    this.$watch('datosServidor', value => {
+                    const actualizar = (value) => {
+                        // null = aun no responde el servidor -> mantener loading.
+                        // vacio = ya respondio sin datos -> mostrar aviso sin datos.
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -90,9 +96,11 @@
 
                             // Esperamos a que Alpine aplique x-show y el layout se estabilice
                             // ANTES de medir el contenedor o crear/actualizar el chart.
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-venta-neta');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -161,7 +169,11 @@
                                 this.chart.updateSeries([{ data: [] }]);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosServidor', actualizar);
+                    // Evaluación inicial: si Livewire ya devolvió vacío (o datos) antes de
+                    // registrar el watcher, salimos del loading. Si aún es null, seguimos en loading.
+                    actualizar(this.datosServidor);
                 },
 
                 destroy() {
@@ -204,7 +216,11 @@
                         return i.toString().padStart(2, '0') + ':00';
                     });
 
-                    this.$watch('datosActividad', value => {
+                    const actualizarActividad = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -222,9 +238,11 @@
                                 return 0;
                             });
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-actividad');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -302,7 +320,9 @@
                                 this.chart.updateSeries([{ data: serieVacia }]);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosActividad', actualizarActividad);
+                    actualizarActividad(this.datosActividad);
                 },
 
                 destroy() {

@@ -11,4 +11,16 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    build: {
+        sourcemap: false,
+        chunkSizeWarningLimit: 600,
+        rollupOptions: {
+            output: {
+                // ApexCharts va en chunk propio via import() dinamico (ver app.js).
+                manualChunks: {
+                    vendor: ['jquery', 'bootstrap', 'axios', 'select2'],
+                },
+            },
+        },
+    },
 });

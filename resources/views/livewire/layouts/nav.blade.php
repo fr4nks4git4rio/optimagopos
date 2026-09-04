@@ -5,7 +5,7 @@
             <div class="topbar-left hidden-xs " :class="class_logo">
                 <div class="text-center">
                     <a href="{{ url('/') }}" class="logo">
-                        <h1 class="fs-3">NEXORA</h1>
+                        <h1 class="fs-3">{{ config('app.name') }}</h1>
                     </a>
                 </div>
             </div>
@@ -76,7 +76,8 @@
                                                 <img src="{{ isset($notification->data['img']) && $notification->data['img'] != ''
                                                     ? asset($notification->data['img'])
                                                     : asset('img/no_avatar.png') }}"
-                                                    class="rounded-circle img-thumbnail notification-avatar">
+                                                    class="rounded-circle img-thumbnail notification-avatar" loading="lazy"
+                                                    decoding="async">
                                             </div>
                                             <div class="col-lg-10 col-sm-10 col-10 no-padding-right">
                                                 <strong

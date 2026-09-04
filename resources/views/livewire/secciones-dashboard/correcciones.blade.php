@@ -28,7 +28,11 @@
                 sinDatos: false,
 
                 init() {
-                    this.$watch('datosCorreccionesOperador', value => {
+                    const actualizarOperador = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -38,9 +42,11 @@
                             let nombresOperadores = items.map(([clave, valor]) => clave);
                             let importesCorrecciones = items.map(([clave, valor]) => Number(valor));
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-top-correcciones-operador');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -141,7 +147,9 @@
                                 }, false, true);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosCorreccionesOperador', actualizarOperador);
+                    actualizarOperador(this.datosCorreccionesOperador);
                 },
 
                 destroy() {
@@ -184,7 +192,11 @@
                         return i.toString().padStart(2, '0') + ':00';
                     });
 
-                    this.$watch('datosCorreccionesHora', value => {
+                    const actualizarCorreccionesHora = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -202,9 +214,11 @@
                                 return 0;
                             });
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-correcciones-hora');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -276,7 +290,9 @@
                                 this.chart.updateSeries([{ data: serieVacia }]);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosCorreccionesHora', actualizarCorreccionesHora);
+                    actualizarCorreccionesHora(this.datosCorreccionesHora);
                 },
 
                 destroy() {

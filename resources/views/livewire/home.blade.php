@@ -1,21 +1,78 @@
 @section('title', __('site.dashboard.dashboard'))
 <div wire:init="init" class="row" x-data="{
     mostrarFiltros: true,
+    busyVitals: false,
+    busyDetalle: false,
     init() {
-        this.loadData();
+        // Un cambio de filtro (fecha/sucursal/terminal) viaja como commit de
+        // datos sin llamadas a metodos, mientras que los polls llevan calls
+        // (loadVitals/loadData). Si un poll ganara la carrera a un filtro en
+        // vuelo, su respuesta vieja pisaria los datos nuevos en las graficas.
+        // Por eso los loops se pausan mientras haya un filtro en vuelo.
+        try {
+            if (window.Livewire && Livewire.hook && !window.__homeHookFiltros) {
+                window.__homeHookFiltros = true;
+                window.__homeFiltroEnVuelo = 0;
+                Livewire.hook('commit', ({ commit, succeed, fail }) => {
+                    let esFiltro = false;
+                    try {
+                        esFiltro = !commit.calls || commit.calls.length === 0;
+                    } catch (e) {
+                        esFiltro = false;
+                    }
+                    if (esFiltro) {
+                        window.__homeFiltroEnVuelo++;
+                        const done = () => {
+                            window.__homeFiltroEnVuelo = Math.max(0, (window.__homeFiltroEnVuelo || 1) - 1);
+                        };
+                        try {
+                            succeed(done);
+                        } catch (e) {}
+                        try {
+                            fail(done);
+                        } catch (e) {}
+                    }
+                });
+            }
+        } catch (e) {}
+        this.loopVitals();
+        this.loopDetalle();
         // En móvil arrancamos con filtros ocultos para priorizar contenido
         if (window.innerWidth < 768) {
             this.mostrarFiltros = false;
         }
     },
-    loadData() {
-        @this.loadData();
+    loopVitals() {
         let el = this;
+        // Nivel rapido (5s): contadores y cocina. No solapa requests (busy), no
+        // llama al servidor con pestana oculta ni con un filtro en vuelo.
+        // Servidor cachea 5s el calculo.
+        if (!document.hidden && !el.busyVitals && !window.__homeFiltroEnVuelo) {
+            el.busyVitals = true;
+            @this.loadVitals().then(() => { el.busyVitals = false; }).catch(() => { el.busyVitals = false; });
+        }
         setTimeout(() => {
-            el.loadData();
+            el.loopVitals();
         }, 5000);
+    },
+    loopDetalle() {
+        let el = this;
+        // Nivel detalle (30s): graficas y tops. Servidor cachea 60s el calculo.
+        if (!document.hidden && !el.busyDetalle && !window.__homeFiltroEnVuelo) {
+            el.busyDetalle = true;
+            @this.loadData().then(() => { el.busyDetalle = false; }).catch(() => { el.busyDetalle = false; });
+        }
+        setTimeout(() => {
+            el.loopDetalle();
+        }, 30000);
     }
 }">
+    {{-- Skeleton solo durante la carga inicial (wire:init) --}}
+    <div wire:loading wire:target="init">
+        <div class="loading">
+            <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">Cargando...</span></div>
+        </div>
+    </div>
     @can('dashboardResume-viewAny')
         <div class="col-12">
             <h1 class="fs-2 fs-md-1 mb-3">@yield('title')</h1>
@@ -82,7 +139,7 @@
                 {{-- CONTENIDO PRINCIPAL --}}
                 <div class="col-12 col-md" style="min-width: 0;">
 
-                    <ul class="nav nav-tabs nav-pills justify-content-center border-0 flex-nowrap overflow-auto"
+                    <ul class="nav nav-tabs nav-pills justify-content-center border-0 flex-nowrap overflow-auto p-1"
                         id="myTab" role="tablist" style="-webkit-overflow-scrolling: touch;">
                         @can('dashboardResume-viewPOSOperations')
                             <li class="nav-item flex-shrink-0" role="presentation">

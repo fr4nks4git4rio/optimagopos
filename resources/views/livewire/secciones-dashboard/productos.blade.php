@@ -62,7 +62,11 @@
                 sinDatos: false,
 
                 init() {
-                    this.$watch('datosProductosCantidad', value => {
+                    const actualizarCantidad = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -72,9 +76,11 @@
                             let nombresProductos = items.map(([clave, valor]) => clave);
                             let importesProductos = items.map(([clave, valor]) => Number(valor));
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-top-productos-cantidad');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -172,7 +178,9 @@
                                 }, false, true);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosProductosCantidad', actualizarCantidad);
+                    actualizarCantidad(this.datosProductosCantidad);
                 },
 
                 destroy() {
@@ -210,7 +218,11 @@
                 sinDatos: false,
 
                 init() {
-                    this.$watch('datosProductosImporte', value => {
+                    const actualizarImporte = (value) => {
+                        if (value === null || value === undefined) {
+                            this.sinDatos = false;
+                            return;
+                        }
                         const hayDatos = value && Object.keys(value).length > 0;
 
                         if (hayDatos) {
@@ -220,9 +232,11 @@
                             let nombresProductos = items.map(([clave, valor]) => clave);
                             let importesProductos = items.map(([clave, valor]) => Number(valor));
 
-                            this.$nextTick(() => {
+                            this.$nextTick(async () => {
                                 let el = document.getElementById('mi-canvas-grafica-top-productos-importe');
                                 if (!el) return;
+                                // Chunk ApexCharts bajo demanda (ver resources/js/app.js).
+                                await window.loadApexCharts();
 
                                 if (!this.chart) {
                                     let options = {
@@ -323,7 +337,9 @@
                                 }, false, true);
                             }
                         }
-                    });
+                    };
+                    this.$watch('datosProductosImporte', actualizarImporte);
+                    actualizarImporte(this.datosProductosImporte);
                 },
 
                 destroy() {

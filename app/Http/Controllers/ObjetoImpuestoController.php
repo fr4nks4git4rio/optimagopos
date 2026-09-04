@@ -14,7 +14,7 @@ class ObjetoImpuestoController extends Controller
             ->select('id', 'clave', 'descripcion', DB::raw('CONCAT(descripcion, " (", clave, ")") as text'));
 
         if($request->term){
-            $objetosImpuestos = $query->whereRaw('CONCAT(descripcion, " (", clave, ")") like ?',['%'.$request->term.'%'])->get()->toArray();
+            $objetosImpuestos = $query->whereRaw('CONCAT(descripcion, " (", clave, ")") like ?',['%'.$request->term.'%'])->limit(50)->get()->toArray();
         }else{
             $objetosImpuestos = [];
         }

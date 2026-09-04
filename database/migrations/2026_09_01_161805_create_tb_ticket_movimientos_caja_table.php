@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Idempotente: en algunas BD la tabla ya existe creada fuera de migraciones
+        // (con esquema parcial). El drift se concilia en 2026_09_03_000002.
+        if (Schema::hasTable('tb_ticket_movimientos_caja')) {
+            return;
+        }
         Schema::create('tb_ticket_movimientos_caja', function (Blueprint $table) {
 
             $table->id();

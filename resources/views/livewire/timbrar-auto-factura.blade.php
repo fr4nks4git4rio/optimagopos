@@ -207,7 +207,4 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-@endpush
+{{-- AdminLTE retirado: las vistas usan modales Bootstrap 5 nativos (sin dependencias AdminLTE) --}}

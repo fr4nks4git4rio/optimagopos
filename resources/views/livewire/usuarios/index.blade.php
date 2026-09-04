@@ -73,7 +73,7 @@
                     <tr>
                         <td class="text-center">
                             <img src="{{ $usuario['avatar'] ? asset("avatars/{$usuario['avatar']}") : asset('img/avatars/no_avatar.png') }}"
-                                alt="Foto Usuario" style="width: 80px" class="img-thumbnail m-auto">
+                                alt="Foto Usuario" style="width: 80px" class="img-thumbnail m-auto" loading="lazy" decoding="async">
                         </td>
                         <td>{{ $usuario['nombre'] }}</td>
                         <td>{{ $usuario['email'] }}</td>

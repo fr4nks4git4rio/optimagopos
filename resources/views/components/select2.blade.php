@@ -21,6 +21,9 @@
 
 <div class="mb-1">
     <div @if (!$dynamic) wire:ignore @endif x-data="{}" x-init="() => {
+        // Guardia anti doble-init (Alpine puede re-evaluar x-init tras morphs).
+        if ($el.__select2Init) return;
+        $el.__select2Init = true;
         $(document).on('select2:open', () => {
             document.querySelector('.select2-container--open .select2-search__field').focus();
         });
@@ -36,14 +39,8 @@
             let elementName = $(this).attr('id').replaceAll('-', '.');
             @this.set(elementName, e.target.value);
             $dispatch(elementName + 'Changed', [e.target.value]);
-            Livewire.hook('message.processed', (m, component) => {
-                $('#{{ $id }}.select2').select2({
-                    {{--                    matcher: matchCustom, --}}
-                    placeholder: '{{ $placeholder }}',
-                    allowClear: true,
-                    language: 'es'
-                });
-            })
+            // NOTA: no registrar Livewire.hook aqui (acumulaba un hook por cada change).
+            // La re-inicializacion tras roundtrips la cubre el listener 'reApplySelect2'.
         });
         window.addEventListener('reApplySelect2', event => {
             $('#{{ $id }}.select2').select2({

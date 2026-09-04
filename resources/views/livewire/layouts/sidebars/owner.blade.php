@@ -151,7 +151,7 @@
             <li class="w-100 li-item {{ active_route('admin/reportes/ingresos*') }}">
                 <a href="{{ route('admin.reportes.ingresos') }}" class="nav-link submenu">
                     <i class="bi bi-graph-up fs-6"></i> <span
-                        class="d-sm-inline px-2">{{ __('site.sidebar.incomes') }}</span></a>
+                        class="d-sm-inline px-2">{{ __('site.sidebar.income') }}</span></a>
             </li>
         @endcan
         @can('reportsArticlesSold-viewAny')

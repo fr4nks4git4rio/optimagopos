@@ -89,7 +89,7 @@ Route::domain(config('app.facturacion_url'))->group(function () {
 });
 
 Route::domain(config('app.api_url'))->group(function () {
-    Route::middleware(['gopos.security', 'throttle:gopos'])->group(function () {
+    Route::middleware(['gopos.security', 'throttle:gopos', 'no.activitylog'])->group(function () {
         // Route::post('/', [HomeController::class, 'parseTicketJson']);
         Route::post('/parse-ticket-json', [HomeController::class, 'parseTicketJson']);
         Route::post('/parse-ticket-vk-json', [HomeController::class, 'parseTicketVKJson']);
@@ -104,16 +104,19 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
 
     Route::get('/home', Home::class)->name('home');
 
-    Route::get('/load-clientes', [ClienteController::class, 'loadClientes'])->name('clientes.load-clientes');
-    Route::get('/load-comensales', [ClienteController::class, 'loadComensales'])->name('clientes.load-comensales');
-    Route::get('/load-cfdis', [CfdiController::class, 'loadCfdis'])->name('cfdis.load-cfdis');
-    Route::get('/load-claves-prod-servs', [ClaveProdServController::class, 'loadClavesProdServs'])->name('claves-prod-servs.load-claves-prod-servs');
-    Route::get('/load-claves-unidades', [ClaveUnidadController::class, 'loadClavesUnidades'])->name('claves-unidades.load-claves-unidades');
-    Route::get('/load-formas-pagos', [FormaPagoController::class, 'loadFormasPagos'])->name('formas-pagos.load-formas-pagos');
-    Route::get('/load-metodos-pagos', [MetodoPagoController::class, 'loadMetodosPagos'])->name('metodos-pagos.load-metodos-pagos');
-    Route::get('/load-objetos-impuestos', [ObjetoImpuestoController::class, 'loadObjetosImpuestos'])->name('objetos-impuestos.load-objetos-impuestos');
-    Route::get('/load-tipos-comprobantes', [TipoComprobanteController::class, 'loadTiposComprobantes'])->name('tipos-comprobantes.load-tipos-comprobantes');
-    Route::get('/load-series', [SerieController::class, 'loadSeries'])->name('series.load-series');
+    Route::middleware('throttle:120,1')->group(function () {
+        // Autocompletes Select2 (1 request por tecla con debounce): tope anti-abuso.
+        Route::get('/load-clientes', [ClienteController::class, 'loadClientes'])->name('clientes.load-clientes');
+        Route::get('/load-comensales', [ClienteController::class, 'loadComensales'])->name('clientes.load-comensales');
+        Route::get('/load-cfdis', [CfdiController::class, 'loadCfdis'])->name('cfdis.load-cfdis');
+        Route::get('/load-claves-prod-servs', [ClaveProdServController::class, 'loadClavesProdServs'])->name('claves-prod-servs.load-claves-prod-servs');
+        Route::get('/load-claves-unidades', [ClaveUnidadController::class, 'loadClavesUnidades'])->name('claves-unidades.load-claves-unidades');
+        Route::get('/load-formas-pagos', [FormaPagoController::class, 'loadFormasPagos'])->name('formas-pagos.load-formas-pagos');
+        Route::get('/load-metodos-pagos', [MetodoPagoController::class, 'loadMetodosPagos'])->name('metodos-pagos.load-metodos-pagos');
+        Route::get('/load-objetos-impuestos', [ObjetoImpuestoController::class, 'loadObjetosImpuestos'])->name('objetos-impuestos.load-objetos-impuestos');
+        Route::get('/load-tipos-comprobantes', [TipoComprobanteController::class, 'loadTiposComprobantes'])->name('tipos-comprobantes.load-tipos-comprobantes');
+        Route::get('/load-series', [SerieController::class, 'loadSeries'])->name('series.load-series');
+    });
 
     Route::middleware(['role:SuperAdmin|Accountant'])->prefix('admin')->group(function () {
 
@@ -142,6 +145,7 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
 
         Route::get('/load-cuentas-cobrar', [FacturaController::class, 'loadCuentasCobrar'])->name('admin.cuentas-cobrar.load');
         Route::get('/print-listado-cuentas-cobrar', [FacturaController::class, 'imprimirListadoCuentasCobrar'])->name('admin.cuentas-cobrar.print-listado');
+        Route::get('/pdf-cuentas-cobrar/{f}', [FacturaController::class, 'descargarPdf'])->where('f', '[A-Za-z0-9._-]+')->name('admin.cuentas-cobrar.pdf');
 
         Route::prefix('reportes')->group(function () {
             Route::get('/historico-tickets-vk', HistoricoTicketsVk::class)->name('admin.reportes.historico-tickets-vk')->middleware('permission:reportsVKTicketHistory-viewAny');
@@ -165,7 +169,7 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
         Route::get('/terminales', IndexTerminales::class)->name('cliente.terminales.index')->middleware('permission:terminals-viewAny');
 
         Route::middleware('conFacturacion')->group(function () {
-            Route::get('/pre-facturas/save/{id?}', SavePreFacturas::class)->name('cliente.pre-facturas.save')->middleware('permission:invoices-create|invoices-update');
+            Route::get('/pre-facturas/save/{id?}', SavePreFacturas::class)->name('cliente.pre-facturas.save')->middleware('permission:invoices-createInvoice|invoices-updateInvoice');
             Route::get('/pre-facturas', IndexPreFacturas::class)->name('cliente.pre-facturas.index')->middleware('permission:invoices-viewAny');
 
             Route::get('/almacen-facturas', IndexAlmacenFacturas::class)->name('cliente.almacen-facturas.index')->middleware('permission:invoices-viewAny');

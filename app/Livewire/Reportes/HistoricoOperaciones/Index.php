@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Reportes\HistoricoOperaciones;
 
-use App\Models\Sucursal;
 use App\Models\Terminal;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -111,14 +111,7 @@ class Index extends Component
         $tickets = new LengthAwarePaginator($currentItems, $total, $this->perPage, $currentPage);
         return view('livewire.reportes.historico-operaciones.index', [
             'tickets' => $tickets,
-            'sucursalesDisponibles' => Sucursal::where('cliente_id', user()->cliente_id)
-                ->whereIn('id', user()->sucursales->pluck('id')
-                    ->toArray())->get()->map(function ($value) {
-                    return [
-                        'value' => $value->id,
-                        'label' => Crypt::decrypt($value->nombre_comercial)
-                    ];
-                })->toArray()
+            'sucursalesDisponibles' => sucursales_disponibles()
         ]);
     }
 
@@ -137,53 +130,68 @@ class Index extends Component
 
     public function query()
     {
-        $query = DB::table('tb_tickets as t')
-            ->select(
-                't.id',
-                't.id_transaccion',
-                't.ubicacion',
-                't.fecha_transaccion',
-                DB::raw("DATE_FORMAT(t.fecha_transaccion, '%d/%m/%Y %H:%i') as fecha_transaccion_str"),
-                'c.nombre_comercial as cliente',
-                's.nombre_comercial as sucursal',
-                'ter.nombre as terminal',
-                'e.nombre as empleado',
-                't.importe',
-                DB::raw("(SELECT GROUP_CONCAT(CONCAT(p.nombre, ' (', tp.cantidad, ')')) from tb_ticket_productos as tp left join tb_productos as p on p.id = tp.producto_id where tp.ticket_id = t.id) as productos"),
-                DB::raw("(SELECT GROUP_CONCAT(CONCAT(operacion.nombre, ' (', operacion.monto, ')')) from tb_ticket_operaciones as operacion where operacion.ticket_id = t.id) as pagos"),
-                DB::raw("(SELECT GROUP_CONCAT(distinct d.nombre) from tb_ticket_productos as tp left join tb_departamentos as d on d.id = tp.departamento_id where tp.ticket_id = t.id) as departamentos")
-            )
-            ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id')
-            ->leftJoin('tb_terminales as ter', 'ter.id', '=', 't.terminal_id')
-            ->leftJoin('tb_empleados as e', 'e.id', '=', 't.empleado_id')
-            ->leftJoin('tb_clientes as c', 'c.id', '=', 't.comensal_id')
-            ->where('s.cliente_id', user()->cliente_id)
-            ->where('t.modo_entrenamiento', 0)
-            ->groupBy('t.id');
+        $sucIds = count(Arr::wrap($this->sucursales)) > 0
+            ? array_values(array_map('intval', Arr::wrap($this->sucursales)))
+            : user()->sucursales->pluck('id')->all();
+        $termIds = count(Arr::wrap($this->terminales)) > 0
+            ? array_values(array_map('intval', Arr::wrap($this->terminales)))
+            : user()->terminales->pluck('id')->all();
 
-        if ($this->fecha_inicio)
-            $query->whereDate('t.fecha_transaccion', '>=', $this->fecha_inicio);
-        if ($this->fecha_fin)
-            $query->whereDate('t.fecha_transaccion', '<=', $this->fecha_fin);
-        if (count(Arr::wrap($this->sucursales)) > 0)
-            $query->whereIn('s.id', $this->sucursales);
-        else
-            $query->whereIn('s.id', user()->sucursales->pluck('id')->toArray());
-        if (count(Arr::wrap($this->terminales)) > 0)
-            $query->whereIn('ter.id', $this->terminales);
-        else
-            $query->whereIn('ter.id', user()->terminales->pluck('id')->toArray());
+        // Cache 60s (single-server): la consulta con 3 subselects GROUP_CONCAT + decrypt
+        // por fila no se repite en cada tecla, orden o pagina.
+        $tickets = Cache::remember(
+            'hist|' . user()->cliente_id . '|' . $this->fecha_inicio . '|' . $this->fecha_fin . '|' . implode(',', $sucIds) . '|' . implode(',', $termIds),
+            now()->addSeconds(60),
+            function () use ($sucIds, $termIds) {
+                $query = DB::table('tb_tickets as t')
+                    ->select(
+                        't.id',
+                        't.id_transaccion',
+                        't.ubicacion',
+                        't.fecha_transaccion',
+                        DB::raw("DATE_FORMAT(t.fecha_transaccion, '%d/%m/%Y %H:%i') as fecha_transaccion_str"),
+                        'c.nombre_comercial as cliente',
+                        's.nombre_comercial as sucursal',
+                        'ter.nombre as terminal',
+                        'e.nombre as empleado',
+                        't.importe',
+                        DB::raw("(SELECT GROUP_CONCAT(CONCAT(p.nombre, ' (', tp.cantidad, ')')) from tb_ticket_productos as tp left join tb_productos as p on p.id = tp.producto_id where tp.ticket_id = t.id) as productos"),
+                        DB::raw("(SELECT GROUP_CONCAT(CONCAT(operacion.nombre, ' (', operacion.monto, ')')) from tb_ticket_operaciones as operacion where operacion.ticket_id = t.id) as pagos"),
+                        DB::raw("(SELECT GROUP_CONCAT(distinct d.nombre) from tb_ticket_productos as tp left join tb_departamentos as d on d.id = tp.departamento_id where tp.ticket_id = t.id) as departamentos")
+                    )
+                    ->leftJoin('tb_sucursales as s', 's.id', '=', 't.sucursal_id')
+                    ->leftJoin('tb_terminales as ter', 'ter.id', '=', 't.terminal_id')
+                    ->leftJoin('tb_empleados as e', 'e.id', '=', 't.empleado_id')
+                    ->leftJoin('tb_clientes as c', 'c.id', '=', 't.comensal_id')
+                    ->where('s.cliente_id', user()->cliente_id)
+                    ->where('t.modo_entrenamiento', 0)
+                    ->groupBy('t.id');
 
-        $tickets = $query->get()->map(function ($element) {
-            return (array) $element;
-        })->toArray();
+                // Rango sargable sobre la columna (puede usar indice).
+                if ($this->fecha_inicio)
+                    $query->where('t.fecha_transaccion', '>=', $this->fecha_inicio . ' 00:00:00');
+                if ($this->fecha_fin)
+                    $query->where('t.fecha_transaccion', '<=', $this->fecha_fin . ' 23:59:59');
+                $query->whereIn('s.id', $sucIds);
+                $query->whereIn('ter.id', $termIds);
+
+                $tickets = $query->get()->map(function ($element) {
+                    return (array) $element;
+                })->toArray();
+
+                foreach ($tickets as &$ticket) {
+                    $ticket['cliente'] = $ticket['cliente'] ? Crypt::decrypt($ticket['cliente']) : '';
+                    $ticket['sucursal'] = $ticket['sucursal'] ? Crypt::decrypt($ticket['sucursal']) : '';
+                    $ticket['empleado'] = $ticket['empleado'] ? Crypt::decrypt($ticket['empleado']) : '';
+                }
+                unset($ticket);
+
+                return $tickets;
+            }
+        );
         $records_final = collect();
 
         foreach ($tickets as $ticket) {
-            $ticket['cliente'] = $ticket['cliente'] ? Crypt::decrypt($ticket['cliente']) : '';
-            $ticket['sucursal'] = $ticket['sucursal'] ? Crypt::decrypt($ticket['sucursal']) : '';
-            $ticket['empleado'] = $ticket['empleado'] ? Crypt::decrypt($ticket['empleado']) : '';
-
             if (
                 !$this->search
                 || Str::contains(Str::upper($ticket['id_transaccion']), Str::upper($this->search))
@@ -242,7 +250,7 @@ class Index extends Component
             case __('site.reports.operations_history.location'):
                 if ($this->sort == 'asc')
                     $records_final = $records_final->sortBy('ubicacion', SORT_NATURAL)->values();
-                if ($this->sort == 'asc')
+                else
                     $records_final = $records_final->sortByDesc('ubicacion', SORT_NATURAL)->values();
                 break;
             case __('site.reports.operations_history.products'):

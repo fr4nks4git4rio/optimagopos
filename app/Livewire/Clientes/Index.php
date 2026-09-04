@@ -5,6 +5,7 @@ namespace App\Livewire\Clientes;
 use App\Models\Cliente;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -82,7 +83,13 @@ class Index extends Component
             default => Cliente::withTrashed(),
         };
 
-        $clientes = $query->where('es_cliente', 1)->get()->map->only(['id', 'logo', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at'])->toArray();
+        $clientes = Cache::remember(
+            'clientes|idx|' . $this->filter,
+            now()->addMinutes(5),
+            // Cache 5 min (single-server): evita re-desencriptar toda tb_clientes en cada
+            // tecla, orden o pagina. El cifrado se mantiene intacto (decision del proyecto).
+            fn() => $query->where('es_cliente', 1)->get()->map->only(['id', 'logo', 'nombre_comercial', 'rfc', 'razon_social', 'telefono', 'deleted_at'])->toArray()
+        );
         $records_final = collect();
 
         foreach ($clientes as $cliente) {

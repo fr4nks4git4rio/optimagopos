@@ -96,7 +96,7 @@ class Facturador
         $Builder->setAtributoReceptor('Rfc', $factura->cliente->rfc);
         $Builder->setAtributoReceptor('Nombre', Crypt::decrypt($factura->cliente->razon_social));
         $Builder->setAtributoReceptor('RegimenFiscalReceptor', $factura->cliente->regimen_fiscal->codigo ?? '');
-        $Builder->setAtributoReceptor('DomicilioFiscalReceptor', $factura->cliente->direccion_fiscal->codigo_postal);
+        $Builder->setAtributoReceptor('DomicilioFiscalReceptor', $factura->cliente->rfc == 'XAXX010101000' ? $factura->lugar_expedicion : $factura->cliente->direccion_fiscal->codigo_postal);
 
 
 

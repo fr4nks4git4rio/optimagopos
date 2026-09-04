@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Libraries\Pdf;
-use App\Models\Factura;
-use App\Models\FacturaConcepto;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request as FacadesRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class FacturaController extends Controller
@@ -42,15 +39,19 @@ class FacturaController extends Controller
             ->where('factura.es_complemento', 0)
             // ->where('factura.modo_prueba_cfdi', NULL)
             ->where('factura.del_sistema', 1)
-            ->leftJoin('tb_clientes as cliente', 'factura.cliente_id', '=', 'cliente.id')
-            ->leftJoin('tb_factura_conceptos as f_c', 'f_c.factura_id', '=', 'f_c.id');
+            ->leftJoin('tb_clientes as cliente', 'factura.cliente_id', '=', 'cliente.id');
+        // Sin join a tb_factura_conceptos: ninguna columna f_c.* se usa y el
+        // self-join anterior (f_c.factura_id = f_c.id) generaba cartesiano.
 
+        // Rangos sargables con bindings (pueden usar indice). Equivalen al
+        // filtro por dia completo del DATE() anterior.
         if ($request->fecha_inicio && $request->fecha_fin) {
-            $query->whereRaw("DATE(factura.fecha_certificacion) >= '" . $request->fecha_inicio . "' and DATE(factura.fecha_certificacion) <= '" . $request->fecha_fin . "'");
+            $query->where('factura.fecha_certificacion', '>=', $request->fecha_inicio . ' 00:00:00')
+                ->where('factura.fecha_certificacion', '<=', $request->fecha_fin . ' 23:59:59');
         } elseif ($request->fecha_inicio && !$request->fecha_fin) {
-            $query->whereRaw("DATE(factura.fecha_certificacion) >= '" . $request->fecha_inicio . "'");
+            $query->where('factura.fecha_certificacion', '>=', $request->fecha_inicio . ' 00:00:00');
         } elseif (!$request->fecha_inicio && $request->fecha_fin) {
-            $query->whereRaw("DATE(factura.fecha_certificacion) <= '" . $request->fecha_fin . "'");
+            $query->where('factura.fecha_certificacion', '<=', $request->fecha_fin . ' 23:59:59');
         }
 
         if ($request->cliente && $request->cliente != -1) {
@@ -62,7 +63,9 @@ class FacturaController extends Controller
         }
 
         if ($request->importe) {
-            $query->whereRaw("ROUND(factura.total) = '" . round($request->importe) . "'");;
+            // Equivale a ROUND(total) = N para totales >= 0, pero sargable y con binding.
+            $n = round($request->importe);
+            $query->where('factura.total', '>=', $n - 0.5)->where('factura.total', '<', $n + 0.5);
         }
 
         if ($request->moneda && $request->moneda != -1) {
@@ -98,36 +101,28 @@ class FacturaController extends Controller
 
     public function loadCuentasCobrar(Request $request)
     {
+        // Subconsulta: el having() sobre el alias no sobrevive al COUNT del paginador,
+        // por eso se pagina sobre la subconsulta ya filtrada.
+        $sub = $this->query($request)->having('pendiente_ingresar', '>', 0);
+        $facturas = DB::query()->fromSub($sub, 'f')
+            ->paginate($request->perPage ?: 10, ['*'], 'page', $request->page ?: 1);
 
-        $query = $this->query($request)->having('pendiente_ingresar', '>', 0);
-
-        $records = $query->get()->each(function ($factura) {
+        // Decrypt solo de la pagina actual (antes: toda la tabla).
+        $facturas->getCollection()->each(function ($factura) {
             $factura->cliente_receptor = Crypt::decrypt($factura->cliente_receptor);
             $factura->correo_cliente = Crypt::decrypt($factura->correo_cliente);
         });
-
-        $page = $request->page ?: 1;
-        $perPage = $request->perPage ?: 10;
-        $total = $records->count();
-        $records = $records->forPage($page, $perPage);
-        $facturas = new LengthAwarePaginator($records, $total, $perPage, $page);
 
         return ['success' => true, 'data' => $facturas];
     }
 
     public function imprimirListadoCuentasCobrar(Request $request)
     {
-        $facturas = $this->query($request)->get();
-        foreach ($facturas as &$factura) {
-            $fact = Factura::find($factura->id);
-
-            $monto_ingresado = 0;
-            $fact->ingresos->each(function ($ingreso) use (&$monto_ingresado) {
-                $monto_ingresado += $ingreso->monto_moneda_original;
-            });
-            $factura->monto_ingresado = $monto_ingresado;
-            $factura->pendiente_ingresar = $factura->total - $factura->monto_ingresado;
-
+        // monto_ingresado/pendiente_ingresar ya vienen calculados por subselect en
+        // query(): sin N+1 (antes Factura::find + ingresos->each por fila, que ademas
+        // ignoraba notas de credito y discrepa del listado).
+        $facturas = $this->query($request)->having('pendiente_ingresar', '>', 0)->get();
+        foreach ($facturas as $factura) {
             $factura->cliente_receptor = Crypt::decrypt($factura->cliente_receptor);
         }
         $pdf = new Pdf();
@@ -202,8 +197,26 @@ class FacturaController extends Controller
         $pdf->Cell($col2, 7, number_format($total_total_usd, 2), 'B', 0, 'C');
         $pdf->Cell($col2, 7, number_format($total_pendiente_usd, 2), 'B', 1, 'C');
 
-        $pdf->Output('F', 'Reporte de Cuentas por Cobrar.pdf');
+        // PDF fuera del web root (storage/app/pdfs) + URL de descarga autorizada.
+        // La limpieza de archivos >24h vive en el scheduler (Kernel).
+        Storage::makeDirectory('pdfs');
+        $filename = 'cuentas-cobrar-' . date('YmdHis') . '-' . Str::random(6) . '.pdf';
+        $pdf->Output('F', storage_path('app/pdfs/' . $filename));
 
-        return ['success' => true, 'report' => FacadesRequest::root() . "/Reporte de Cuentas por Cobrar.pdf?" . time()];
+        return ['success' => true, 'report' => route('admin.cuentas-cobrar.pdf', ['f' => $filename])];
+    }
+
+    public function descargarPdf(Request $request, $f)
+    {
+        $f = basename($f);
+        if (!str_ends_with($f, '.pdf') || str_contains($f, '..')) {
+            abort(404);
+        }
+        $path = storage_path('app/pdfs/' . $f);
+        if (!is_file($path)) {
+            abort(404);
+        }
+
+        return response()->download($path, 'Reporte de Cuentas por Cobrar.pdf');
     }
 }

@@ -14,7 +14,7 @@ class CfdiController extends Controller
             ->select('id', 'codigo', 'descripcion', DB::raw('CONCAT(descripcion, " (", codigo, ")") as text'));
 
         if($request->term){
-            $cfdis = $query->whereRaw('CONCAT(descripcion, " (", codigo, ")") like ?',['%'.$request->term.'%'])->get()->toArray();
+            $cfdis = $query->whereRaw('CONCAT(descripcion, " (", codigo, ")") like ?',['%'.$request->term.'%'])->limit(50)->get()->toArray();
         }else{
             $cfdis = [];
         }

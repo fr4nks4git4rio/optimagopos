@@ -14,7 +14,7 @@ class FormaPagoController extends Controller
             ->select('id', 'codigo', 'descripcion', DB::raw('CONCAT(descripcion, " (", codigo, ")") as text'));
 
         if($request->term){
-            $formasPago = $query->whereRaw('CONCAT(descripcion, " (", codigo, ")") like ?',['%'.$request->term.'%'])->get()->toArray();
+            $formasPago = $query->whereRaw('CONCAT(descripcion, " (", codigo, ")") like ?',['%'.$request->term.'%'])->limit(50)->get()->toArray();
         }else{
             $formasPago = [];
         }

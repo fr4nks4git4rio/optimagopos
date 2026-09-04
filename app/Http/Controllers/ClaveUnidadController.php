@@ -14,7 +14,7 @@ class ClaveUnidadController extends Controller
             ->select('id', 'codigo', 'descripcion', DB::raw('CONCAT(descripcion, " (", codigo, ")") as text'));
 
         if($request->term){
-            $clavesUnidades = $query->whereRaw('CONCAT(descripcion, " (", codigo, ")") like ?',['%'.$request->term.'%'])->get()->toArray();
+            $clavesUnidades = $query->whereRaw('CONCAT(descripcion, " (", codigo, ")") like ?',['%'.$request->term.'%'])->limit(50)->get()->toArray();
         }else{
             $clavesUnidades = [];
         }

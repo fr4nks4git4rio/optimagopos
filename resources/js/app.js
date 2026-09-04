@@ -1,9 +1,9 @@
 import './bootstrap';
 import $ from 'jquery';
 import select2 from 'select2';
-// 1. Importa ApexCharts
-import ApexCharts from 'apexcharts';
-window.ApexCharts = ApexCharts;
+// ApexCharts YA NO es global: pesa ~550KB min y solo lo usa el dashboard.
+// Se carga bajo demanda (chunk separado) via window.loadApexCharts().
+window.loadApexCharts = () => import('apexcharts').then((m) => (window.ApexCharts = m.default ?? m));
 window.$ = $;
 // 2. Hazlo global asignándolo al objeto window
 select2();

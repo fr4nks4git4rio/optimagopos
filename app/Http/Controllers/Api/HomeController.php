@@ -146,7 +146,7 @@ class HomeController
             }
             $comensal = null;
             if (isset($decoded['CustomerFiscalId']) && $decoded['CustomerFiscalId']) {
-                $comensal = Cliente::where('rfc', $decoded['CustomerFiscalId'])->get()->first();
+                $comensal = Cliente::where('rfc', $decoded['CustomerFiscalId'])->first();
                 if (!$comensal) {
                     $comensal = Cliente::create([
                         'rfc' => $decoded['CustomerFiscalId'],
@@ -156,10 +156,18 @@ class HomeController
                     $comensal->es_comensal = 1;
                     $comensal->save();
                 }
-                $terminal->sucursal->cliente->comensales()->attach($comensal->id);
+                // Sin duplicados en el pivot (attach ciego fallaba/duplicaba al reenviar tickets).
+                $terminal->sucursal->cliente->comensales()->syncWithoutDetaching([$comensal->id]);
             }
 
             $items = $decoded['Items'] ?? [];
+
+            // Precarga 1 sola query: antes se buscaba la forma de pago por cada item/pago del ticket.
+            $formas_pago_map = DB::table('tb_sucursal_forma_pagos')
+                ->where('sucursal_id', $terminal->sucursal_id)
+                ->whereNull('deleted_at')
+                ->pluck('id', 'nombre')
+                ->toArray();
 
             $vigencia_facturacion = null;
             switch ($terminal->sucursal->tipo_vigencia_ticket_facturacion) {
@@ -265,11 +273,7 @@ class HomeController
                         ]);
                         return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                     }
-                    $forma_pago = DB::table('tb_sucursal_forma_pagos')
-                        ->where('sucursal_id', $terminal->sucursal_id)
-                        ->where('nombre', $item['Name'])
-                        ->whereNull('deleted_at')
-                        ->get()->first();
+                    $forma_pago = isset($formas_pago_map[$item['Name']]) ? (object) ['id' => $formas_pago_map[$item['Name']]] : null;
                     if (!$forma_pago) {
                         DB::rollBack();
                         ModelsLog::create([
@@ -479,11 +483,7 @@ class HomeController
 
                     if (count($ts) == 1) {
                         $ts = $ts[0];
-                        $forma_pago = DB::table('tb_sucursal_forma_pagos')
-                            ->where('sucursal_id', $terminal->sucursal_id)
-                            ->where('nombre', $ts['Name'])
-                            ->whereNull('deleted_at')
-                            ->get()->first();
+                        $forma_pago = isset($formas_pago_map[$ts['Name']]) ? (object) ['id' => $formas_pago_map[$ts['Name']]] : null;
                         $ticket->movimientos_caja()->create([
                             'nombre' => $pora['Name'] ?? '',
                             'monto' => truncate_decimals((float)$pora['Amount']),
@@ -506,11 +506,7 @@ class HomeController
                     usort($posiciones, fn($a, $b) => abs($a - $referencia) <=> abs($b - $referencia));
                     foreach ($tenders as $i => $t) {
                         if ($t['pos'] == $posiciones[0]) {
-                            $forma_pago = DB::table('tb_sucursal_forma_pagos')
-                                ->where('sucursal_id', $terminal->sucursal_id)
-                                ->where('nombre', $t['Name'])
-                                ->whereNull('deleted_at')
-                                ->get()->first();
+                                $forma_pago = isset($formas_pago_map[$t['Name']]) ? (object) ['id' => $formas_pago_map[$t['Name']]] : null;
                             $ticket->movimientos_caja()->create([
                                 'nombre' => $pora['Name'] ?? '',
                                 'monto' => truncate_decimals((float)$pora['Amount']),

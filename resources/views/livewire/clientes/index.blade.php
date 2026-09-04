@@ -67,7 +67,7 @@
                     <tr>
                         <td class="text-center">
                             <img src="{{ $cliente['logo'] ? asset("logos/{$cliente['logo']}") : asset('img/no_image.png') }}"
-                                alt="Logo Sucursal" style="width: 80px" class="img-thumbnail m-auto">
+                                alt="Logo Sucursal" style="width: 80px" class="img-thumbnail m-auto" loading="lazy" decoding="async">
                         </td>
                         <td>{{ $cliente['nombre_comercial'] }}</td>
                         <td>{{ $cliente['rfc'] }}</td>

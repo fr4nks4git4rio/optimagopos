@@ -7,7 +7,7 @@
     <div wire:init="init">
         <div wire:loading.delay>
             <div class="loading">
-                <img src="{{ asset('img/loading.gif') }}" />
+                <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">Cargando...</span></div>
             </div>
         </div>
 
@@ -246,7 +246,7 @@
                                     :options="$objetosImpuesto" class="form-control" model="concepto.objeto_impuesto_id" />
                             </td>
                             <td>
-                                <textarea class="form-control" rows="1" wire:model.live="concepto.descripcion"
+                                <textarea class="form-control" rows="1" wire:model="concepto.descripcion"
                                     placeholder="{{ __('site.invoices.save_invoice.concept') }}"></textarea>
                             </td>
                             <td>

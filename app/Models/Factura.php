@@ -443,6 +443,11 @@ class Factura extends Model
 
     public function propietario()
     {
+        $this->setAttribute(
+            'propietario_type',
+            str_replace('\\\\', '\\', (string) $this->getAttribute('propietario_type'))
+        );
+
         return $this->morphTo()->withTrashed();
     }
     public function periodicidad()
@@ -666,7 +671,7 @@ class Factura extends Model
         $pdf->Ln(5);
         $pdf->WriteHTML('<b>Uso de CFDI: </b>' . utf8_decode(optional($invoice->cfdi)->nombre ?? ''), 5);
         $pdf->Ln(5);
-        if ($invoice->cliente_id === 57) {
+        if ($invoice->cliente->rfc === 'XAXX010101000') {
             $pdf->WriteHTML('<b>Periodicidad: </b>' . utf8_decode((optional($invoice->periodicidad)->clave . ' | ' . optional($invoice->periodicidad)->descripcion) ?? ''), 5);
             $pdf->Ln(5);
             $pdf->WriteHTML('<b>Mes: </b>' . utf8_decode((optional($invoice->mes)->clave . ' | ' . optional($invoice->mes)->descripcion) ?? ''), 5);
@@ -739,7 +744,7 @@ class Factura extends Model
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, [
             'name' => $name,
-            'owner' => Cliente::decryptInfo($factura->propietario),
+            'owner' => $factura->propietario->decryptedInfo(),
             'cliente' => Cliente::decryptInfo($factura->cliente),
             'factura' => $factura
         ]);

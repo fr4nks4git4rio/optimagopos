@@ -24,6 +24,9 @@
 
 <div class="mb-1">
     <div @if (!$dynamic) wire:ignore @endif x-data="{}" x-init="() => {
+        // Guardia anti doble-init (Alpine puede re-evaluar x-init tras morphs).
+        if ($el.__select2Init) return;
+        $el.__select2Init = true;
         const maximumSelectionLength = {{ $maxSelectionsJs }};
 
         $(document).on('select2:open', () => {
@@ -55,16 +58,8 @@
             } else {
                 @this.set(elementName, $(this).val());
             }
-            Livewire.hook('message.processed', (m, component) => {
-                $('#{{ $id }}.select2').select2({
-                    placeholder: '{{ $placeholder }}',
-                    language: 'es',
-                    multiple: true,
-                    allowClear: true,
-                    tags: '{{ $tags }}',
-                    maximumSelectionLength: maximumSelectionLength
-                });
-            })
+            // NOTA: no registrar Livewire.hook aqui (acumulaba un hook por cada change).
+            // La re-inicializacion tras roundtrips la cubre el listener 'reApplySelect2'.
         });
         window.addEventListener('reApplySelect2', event => {
             $('#{{ $id }}.select2').select2({

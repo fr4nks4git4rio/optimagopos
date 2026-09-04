@@ -1,7 +1,7 @@
 <x-modal form-action="timbrar">
     <div wire:loading>
         <div class="loading">
-            <img src="{{asset('img/loading.gif')}}"/>
+            <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">Cargando...</span></div>
         </div>
     </div>
     <x-slot:title>

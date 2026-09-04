@@ -55,7 +55,7 @@ class FacturaPolicy
         if (
             $user->hasAnyRole(['Admin', 'Manager'])
             && $user->can('invoices-updateInvoice')
-            && $user->cliente_id ==  $factura->propietario_id
+            && $user->cliente_id ==  $factura->propietario->cliente_id
             && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
         )
             return true;
@@ -71,7 +71,7 @@ class FacturaPolicy
         if (
             $user->hasAnyRole(['Admin', 'Manager'])
             && $user->can('invoices-stamp')
-            && $user->cliente_id ==  $factura->propietario_id
+            && $user->cliente_id ==  $factura->propietario->cliente_id
             && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
         )
             return true;
@@ -90,7 +90,7 @@ class FacturaPolicy
         if (
             $user->hasAnyRole(['Admin', 'Manager'])
             && $user->can('invoices-delete')
-            && $user->cliente_id ==  $factura->propietario_id
+            && $user->cliente_id ==  $factura->propietario->cliente_id
             && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
         )
             return true;
@@ -122,7 +122,7 @@ class FacturaPolicy
         if (
             $user->hasAnyRole(['Admin', 'Manager'])
             && $user->can('invoices-cancel')
-            && $user->cliente_id ==  $factura->propietario_id
+            && $user->cliente_id ==  $factura->propietario->cliente_id
             && in_array($factura->propietario->suscripcion_id, $user->suscripciones_activas()->pluck('id')->toArray())
         )
             return true;

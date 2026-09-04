@@ -6,6 +6,7 @@ use App\Models\Suscripcion;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
@@ -90,15 +91,28 @@ class Index extends Component
             ->leftJoin('tb_clientes as cliente', 'cliente.id', '=', 'sub.cliente_id')
             ->leftJoin('tb_paquetes as paquete', 'paquete.id', '=', 'sub.paquete_id');
 
-        $suscripciones = $query->get()->map(function ($element) {
-            return (array) $element;
-        });
+        // Cache 5 min (single-server): evita repetir la consulta + decrypt por fila
+        // en cada tecla, orden o pagina.
+        $suscripciones = Cache::remember(
+            'subs|idx',
+            now()->addMinutes(5),
+            function () use ($query) {
+                $suscripciones = $query->get()->map(function ($element) {
+                    return (array) $element;
+                });
+
+                foreach ($suscripciones as &$sub) {
+                    $sub['cliente'] = $sub['cliente'] ? Str::upper(Crypt::decrypt($sub['cliente'])) : '';
+                }
+                unset($sub);
+
+                return $suscripciones->toArray();
+            }
+        );
         $records_final = collect();
 
         $search = $this->search ? Str::upper($this->search) : '';
         foreach ($suscripciones as $sub) {
-            $sub['cliente'] = $sub['cliente'] ? Str::upper(Crypt::decrypt($sub['cliente'])) : '';
-
             if (
                 !$search
                 || Str::contains($sub['cliente'], $search)

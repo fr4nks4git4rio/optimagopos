@@ -3,8 +3,11 @@
 
         <div class="text-center mb-4">
             <a href="{{ url('/') }}" class="d-inline-block mb-4">
-                <img src="{{ asset('images/logo_transparent_' . config('app.locale') . '.png') }}"
-                    alt="{{ config('app.name') }}"style="height: 120px; width: auto;">
+                <picture>
+                    <source srcset="{{ asset('images/logo_transparent_' . config('app.locale') . '.webp') }}" type="image/webp">
+                    <img src="{{ asset('images/logo_transparent_' . config('app.locale') . '.png') }}"
+                        alt="{{ config('app.name') }}"style="height: 120px; width: auto;" fetchpriority="high" decoding="async">
+                </picture>
             </a>
             <br>
             <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle mb-3 shadow-sm"

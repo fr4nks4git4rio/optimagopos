@@ -1,0 +1,3 @@
+/* Entry del layout guest (login/recuperacion). Importa los estilos extraidos del
+   <style> inline de layouts/guest.blade.php para servirlos cacheados via Vite. */
+@import "./layout-guest.css";

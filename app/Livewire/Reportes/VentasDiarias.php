@@ -4,6 +4,8 @@ namespace App\Livewire\Reportes;
 
 use App\Exports\VentasDiariasExport;
 use App\Models\Sucursal;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -74,27 +76,38 @@ class VentasDiarias extends Component
         return view('livewire.reportes.ventas-diarias', [
             'records' => $res['finalRecords'],
             'grandTotal' => $res['grandTotal'],
-            'sucursalesAll' => DB::table('tb_sucursales')
-                ->select('id', 'nombre_comercial', 'razon_social')
-                ->whereIn('id', user()->sucursales->pluck('id')->toArray())
-                ->whereNull('deleted_at')
-                ->where('cliente_id', user()->cliente_id)
-                ->get()
-                ->map(function ($value, $key) {
-                    $nombre_comercial = Crypt::decrypt($value->nombre_comercial);
-                    $razon_social = $value->razon_social ? Crypt::decrypt($value->razon_social) : '';
-                    $label = $nombre_comercial . ($razon_social ? (" | $razon_social") : '');
-                    return [
-                        'value' => $value->id,
-                        'label' => $label
-                    ];
-                })->toArray(),
+            // Cache 5 min (single-server): render() corre en cada roundtrip Livewire.
+            'sucursalesAll' => Cache::remember(
+                'vd|sucs|' . user()->cliente_id,
+                now()->addMinutes(5),
+                fn() => DB::table('tb_sucursales')
+                    ->select('id', 'nombre_comercial', 'razon_social')
+                    ->whereIn('id', user()->sucursales->pluck('id')->toArray())
+                    ->whereNull('deleted_at')
+                    ->where('cliente_id', user()->cliente_id)
+                    ->get()
+                    ->map(function ($value, $key) {
+                        $nombre_comercial = Crypt::decrypt($value->nombre_comercial);
+                        $razon_social = $value->razon_social ? Crypt::decrypt($value->razon_social) : '';
+                        $label = $nombre_comercial . ($razon_social ? (" | $razon_social") : '');
+                        return [
+                            'value' => $value->id,
+                            'label' => $label
+                        ];
+                    })->toArray()
+            ),
             'formasPago' => $res['formasPago']
         ]);
     }
 
     public function query()
     {
+        // Cache 60s (single-server): el mismo calculo alimenta tabla, PDF y Excel.
+        $cacheKey = 'vd|' . user()->cliente_id . '|' . $this->fechaInicio . '|' . $this->fechaFin . '|' . implode(',', Arr::wrap($this->sucursal)) . '|' . $this->sort . '|' . $this->order;
+        $cached = Cache::get($cacheKey);
+        if (is_array($cached))
+            return $cached;
+
         $query = DB::table('tb_ticket_operaciones as operacion')
             ->select(
                 'sucursal.id as sucursal_id',
@@ -114,10 +127,10 @@ class VentasDiarias extends Component
             ->groupByRaw('DATE(ticket.fecha_transaccion), operacion.sucursal_forma_pago_id');
 
         if ($this->fechaInicio) {
-            $query->whereDate('ticket.fecha_transaccion', '>=', $this->fechaInicio);
+            $query->where('ticket.fecha_transaccion', '>=', $this->fechaInicio . ' 00:00:00');
         }
         if ($this->fechaFin) {
-            $query->whereDate('ticket.fecha_transaccion', '<=', $this->fechaFin);
+            $query->where('ticket.fecha_transaccion', '<=', $this->fechaFin . ' 23:59:59');
         }
         if ($this->sucursal) {
             $query->whereIn('ticket.sucursal_id', $this->sucursal);
@@ -195,11 +208,14 @@ class VentasDiarias extends Component
             ];
         }
 
-        return [
+        $result = [
             'finalRecords' => $finalRecords,
             'grandTotal' => $grandTotal,
             'formasPago' => $formasPago
         ];
+        Cache::put($cacheKey, $result, now()->addSeconds(60));
+
+        return $result;
     }
 
     public function changeSort($sort)
@@ -221,12 +237,14 @@ class VentasDiarias extends Component
         }
         $view = 'reports.reportes.ventas-diarias.pdf';
 
+        // Un solo query(): antes se ejecutaba 3 veces para el mismo PDF.
+        $res = $this->query();
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, [
             'name' => $name,
             'sorts' => $this->sorts,
-            'records' => $this->query()['finalRecords'],
-            'formasPago' => $this->query()['formasPago'],
-            'grandTotal' => $this->query()['grandTotal'],
+            'records' => $res['finalRecords'],
+            'formasPago' => $res['formasPago'],
+            'grandTotal' => $res['grandTotal'],
             'fechaInicio' => $this->fechaInicio,
             'fechaFin' => $this->fechaFin,
             'sucursalesSeleccionadas' => Sucursal::whereIn('id', $this->sucursal)->get()->each(function ($element) {

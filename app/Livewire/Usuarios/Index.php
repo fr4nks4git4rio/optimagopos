@@ -5,6 +5,8 @@ namespace App\Livewire\Usuarios;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -139,15 +141,28 @@ class Index extends Component
             }
         }
 
-        $usuarios = $query->get()->map(function ($element) {
-            return (array) $element;
-        })->toArray();
+        // Cache 5 min (single-server): evita repetir GROUP_CONCAT + decrypt por fila
+        // en cada tecla, orden o pagina.
+        $usuarios = Cache::remember(
+            'usuarios|idx|' . user()->id . '|' . $this->filter . '|' . implode(',', Arr::wrap($this->clientes ?? [])) . '|' . app()->getLocale(),
+            now()->addMinutes(5),
+            function () use ($query) {
+                $usuarios = $query->get()->map(function ($element) {
+                    return (array) $element;
+                })->toArray();
+
+                foreach ($usuarios as &$usuario) {
+                    $usuario['cliente'] = $usuario['cliente'] ? Crypt::decrypt($usuario['cliente']) : '';
+                    $usuario['suscripciones'] = Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', $usuario['suscripciones']);
+                }
+                unset($usuario);
+
+                return $usuarios;
+            }
+        );
         $records_final = collect();
 
         foreach ($usuarios as $usuario) {
-            $usuario['cliente'] = $usuario['cliente'] ? Crypt::decrypt($usuario['cliente']) : '';
-            $usuario['suscripciones'] = Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', $usuario['suscripciones']);
-
             if (
                 !$this->search
                 || Str::contains(Str::upper($usuario['nombre']), Str::upper($this->search))

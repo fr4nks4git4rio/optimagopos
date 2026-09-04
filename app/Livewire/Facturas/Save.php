@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Facturas;
 
+use App\Models\Cliente;
 use App\Models\Factura;
 use App\Models\Sucursal;
 use App\Models\SucursalFormaPago;
@@ -11,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Save extends Component
@@ -243,34 +245,7 @@ class Save extends Component
 
     public function getReceptorProperty()
     {
-        $receptor = DB::table('tb_clientes as cliente')
-            ->select(
-                'cliente.id',
-                'cliente.razon_social',
-                'cliente.rfc',
-                DB::raw("CONCAT_WS(' | ', regimen_fiscal.codigo, regimen_fiscal.descripcion) as regimen_fiscal"),
-                DB::raw("CONCAT_WS(', ', direccion.calle, direccion.no_exterior, direccion.no_interior, direccion.colonia, localidad.nombre, municipio.nombre, estado.nombre, CONCAT('CP:',direccion.codigo_postal)) as direccion"),
-                DB::raw("CONCAT(
-                IF(direccion.calle != '', CONCAT(direccion.calle, ', '), ''),
-                IF(direccion.no_exterior != '', CONCAT(direccion.no_exterior, ', '), ''),
-                IF(direccion.no_interior != '', CONCAT(direccion.no_interior, ', '), ''),
-                IF(direccion.colonia != '', CONCAT(direccion.colonia, ', '), ''),
-                IF(localidad.nombre != '', CONCAT(localidad.nombre, ', '), ''),
-                IF(municipio.nombre != '', CONCAT(municipio.nombre, ', '), ''),
-                IF(estado.nombre != '', CONCAT(estado.nombre, ', '), ''),
-                CONCAT('CP: ',direccion.codigo_postal)) as direccion")
-            )
-            ->leftJoin('tb_regimen_fiscales as regimen_fiscal', 'regimen_fiscal.id', '=', 'cliente.regimen_fiscal_id')
-            ->leftJoin('tb_direcciones as direccion', 'direccion.id', '=', 'cliente.direccion_fiscal_id')
-            ->leftJoin('tb_localidades as localidad', 'localidad.id', '=', 'direccion.localidad_id')
-            ->leftJoin('tb_municipios as municipio', 'municipio.id', '=', 'direccion.municipio_id')
-            ->leftJoin('tb_estados as estado', 'estado.id', '=', 'direccion.estado_id')
-            ->where('es_comensal', 1)
-            ->where('cliente.id', $this->cliente_id)->get()->map(function ($element) {
-                $element->razon_social = Crypt::decrypt($element->razon_social);
-                return $element;
-            })->first();
-        return $receptor;
+        return Cliente::decryptInfo(Cliente::find($this->cliente_id));
     }
 
     public function getNombreReceptorProperty()
@@ -283,11 +258,11 @@ class Save extends Component
     }
     public function getDireccionFiscalReceptorProperty()
     {
-        return optional($this->getReceptorProperty())->direccion;
+        return optional(Cliente::find($this->propietario_id))->direccion_plain;
     }
     public function getRegimenFiscalReceptorProperty()
     {
-        return optional($this->getReceptorProperty())->regimen_fiscal;
+        return optional($this->getReceptorProperty())->regimen_fiscal?->nombre;
     }
 
     public function getFechaEmisionStrProperty()
@@ -435,58 +410,70 @@ class Save extends Component
             // ]
         );
 
-        $this->factura->fill(Arr::except($data, [
-            'total_resumen_tickets',
-            'regimen_receptor',
-            'factura_conceptos',
-            'tickets'
-        ]))->save();
+        DB::beginTransaction();
+        try {
+            $this->factura->fill(Arr::except($data, [
+                'total_resumen_tickets',
+                'regimen_receptor',
+                'factura_conceptos',
+                'tickets'
+            ]))->save();
 
-        $conceptos_ids = [];
-        foreach ($data['factura_conceptos'] as $concepto) {
-            if ($concepto['id']) {
-                DB::table('tb_factura_conceptos')
-                    ->where('id', $concepto['id'])
-                    ->update(array_merge(Arr::except($concepto, ['id']), ['updated_at' => now()]));
-                $id = $concepto['id'];
-            } else {
-                $id = DB::table('tb_factura_conceptos')
-                    ->insertGetId(array_merge(Arr::except($concepto, ['id']), ['factura_id' => $this->factura->id, 'created_at' => now()]));
+            $this->factura->load('cliente');
+
+            $conceptos_ids = [];
+            foreach ($data['factura_conceptos'] as $concepto) {
+                if ($concepto['id']) {
+                    DB::table('tb_factura_conceptos')
+                        ->where('id', $concepto['id'])
+                        ->update(array_merge(Arr::except($concepto, ['id']), ['updated_at' => now()]));
+                    $id = $concepto['id'];
+                } else {
+                    $id = DB::table('tb_factura_conceptos')
+                        ->insertGetId(array_merge(Arr::except($concepto, ['id']), ['factura_id' => $this->factura->id, 'created_at' => now()]));
+                }
+                $conceptos_ids[] = $id;
             }
-            $conceptos_ids[] = $id;
+
+            $this->factura->factura_conceptos()
+                ->whereNotIn('id', $conceptos_ids)
+                ->delete();
+
+            $this->factura->ticket_operaciones->map(function (TicketOperacion $operacion) {
+                $operacion->factura_id = null;
+                $operacion->save();
+            });
+            foreach ($data['tickets'] as $ticket) {
+                DB::table('tb_ticket_operaciones')
+                    ->whereIn('id', explode(',', $ticket['operaciones']))
+                    ->update(['factura_id' => $this->factura->id, 'updated_at' => now()]);
+            }
+
+            $attributes = Arr::except($this->factura->getDirty(), ['created_at', 'updated_at']);
+            if ($this->factura->wasRecentlyCreated) {
+                $log = __('site.invoices.save_invoice.log_created_detail', ['id' => $this->factura->id, 'nombre_comercial' => Crypt::decrypt($this->factura->cliente->nombre_comercial)]);
+                activity(__('site.invoices.save_invoice.log_created'))
+                    ->on($this->factura)
+                    ->event('created')
+                    ->withProperties(Factura::parseData($attributes))
+                    ->log($log);
+            } else {
+                $log = __('site.invoices.save_invoice.log_updated_detail', ['id' => $this->factura->id, 'nombre_comercial' => Crypt::decrypt($this->factura->cliente->nombre_comercial)]);
+                activity(__('site.invoices.save_invoice.log_updated'))
+                    ->on($this->factura)
+                    ->event('updated')
+                    ->withProperty('attributes', Factura::parseData($attributes))
+                    ->withProperty('old', Factura::parseData(Arr::only($this->factura->getOriginal(), array_keys($attributes))))
+                    ->log($log);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al guardar la factura: ' . $e->getTraceAsString());
+            $this->dispatch('show-toast', __('site.invoices.save_invoice.error_saving_invoice'), 'danger');
+            return;
         }
 
-        $this->factura->factura_conceptos()
-            ->whereNotIn('id', $conceptos_ids)
-            ->delete();
-
-        $this->factura->ticket_operaciones->map(function (TicketOperacion $operacion) {
-            $operacion->factura_id = null;
-            $operacion->save();
-        });
-        foreach ($data['tickets'] as $ticket) {
-            DB::table('tb_ticket_operaciones')
-                ->whereIn('id', explode(',', $ticket['operaciones']))
-                ->update(['factura_id' => $this->factura->id, 'updated_at' => now()]);
-        }
-
-        $attributes = Arr::except($this->factura->getDirty(), ['created_at', 'updated_at']);
-        if ($this->factura->wasRecentlyCreated) {
-            $log = __('site.invoices.save_invoice.log_created_detail', ['id' => $this->factura->id, 'nombre_comercial' => Crypt::decrypt($this->factura->cliente->nombre_comercial)]);
-            activity(__('site.invoices.save_invoice.log_created'))
-                ->on($this->factura)
-                ->event('created')
-                ->withProperties(Factura::parseData($attributes))
-                ->log($log);
-        } else {
-            $log = __('site.invoices.save_invoice.log_updated_detail', ['id' => $this->factura->id, 'nombre_comercial' => Crypt::decrypt($this->factura->cliente->nombre_comercial)]);
-            activity(__('site.invoices.save_invoice.log_updated'))
-                ->on($this->factura)
-                ->event('updated')
-                ->withProperty('attributes', Factura::parseData($attributes))
-                ->withProperty('old', Factura::parseData(Arr::only($this->factura->getOriginal(), array_keys($attributes))))
-                ->log($log);
-        }
+        DB::commit();
 
         $this->dispatch('show-toast', __('site.invoices.save_invoice.saved_invoice_successfully'));
         $this->goToList();
@@ -641,7 +628,7 @@ class Save extends Component
 
     public function goToList()
     {
-        return redirect()->route('pre-facturas.index');
+        return redirect()->route('cliente.pre-facturas.index');
     }
 
     public function timbrar()

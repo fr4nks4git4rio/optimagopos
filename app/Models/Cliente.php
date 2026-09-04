@@ -186,6 +186,25 @@ class Cliente extends Model
         return $data;
     }
 
+    public function decryptedInfo()
+    {
+        $cliente = $this;
+
+        if ($cliente && (!isset($cliente->decrypted) || !$cliente->decrypted)) {
+            $cliente->nombre_comercial = isset($cliente->nombre_comercial) && $cliente->nombre_comercial ? Crypt::decrypt($cliente->nombre_comercial) : '';
+            $cliente->razon_social = isset($cliente->razon_social) && $cliente->razon_social ? Crypt::decrypt($cliente->razon_social) : '';
+            $cliente->correo = isset($cliente->correo) && $cliente->correo ? Crypt::decrypt($cliente->correo) : '';
+            $cliente->telefono = isset($cliente->telefono) && $cliente->telefono ? Crypt::decrypt($cliente->telefono) : '';
+            $cliente->contacto_nombre = isset($cliente->contacto_nombre) && $cliente->contacto_nombre ? Crypt::decrypt($cliente->contacto_nombre) : '';
+            $cliente->contacto_correo = isset($cliente->contacto_correo) && $cliente->contacto_correo ? Crypt::decrypt($cliente->contacto_correo) : '';
+            $cliente->contacto_telefono = isset($cliente->contacto_telefono) && $cliente->contacto_telefono ? Crypt::decrypt($cliente->contacto_telefono) : '';
+            $cliente->contacto_cargo = isset($cliente->contacto_cargo) && $cliente->contacto_cargo ? Crypt::decrypt($cliente->contacto_cargo) : '';
+            $cliente->decrypted = true;
+        }
+
+        return $cliente;
+    }
+
     public function getValueAttribute()
     {
         return $this->id;

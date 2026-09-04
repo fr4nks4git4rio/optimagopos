@@ -251,8 +251,13 @@ class IndexPreFacturas extends Component
     {
         $cliente_publico_general = DB::table('tb_clientes')->where('rfc', 'XAXX010101000')->get()->first();
         if (!$cliente_publico_general) {
-            $this->dispatch('show-toast', __('site.invoices.index.no_generic_client_exists'), 'danger');
-            return;
+            DB::table('tb_clientes')->insert([
+                'nombre_comercial' => Crypt::encrypt('Público General'),
+                'razon_social' => Crypt::encrypt('VENTA A PUBLICO GENERAL'),
+                'rfc' => 'XAXX010101000',
+                'es_cliente' => 1,
+                'regimen_fiscal_id' => 1
+            ]);
         }
         return redirect()->route('cliente.pre-facturas.save');
     }

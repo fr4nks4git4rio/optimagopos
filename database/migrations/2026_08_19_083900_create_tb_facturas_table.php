@@ -45,7 +45,7 @@ return new class extends Migration
             $table->boolean('es_complemento')->default(false);
             $table->boolean('es_nota_credito')->default(false);
             $table->boolean('del_sistema')->default(false);
-            $table->string('propietario_type', 50)->default('App\\Models\\Sucursal');
+            $table->string('propietario_type', 50)->default('App\Models\Sucursal');
             $table->unsignedBigInteger('cfdi_id')->nullable();
             $table->unsignedBigInteger('metodo_pago_id')->nullable();
             $table->unsignedBigInteger('forma_pago_id')->nullable();

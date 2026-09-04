@@ -14,7 +14,7 @@ class TipoComprobanteController extends Controller
             ->select('id', 'codigo', 'descripcion', DB::raw('CONCAT(descripcion, " (", codigo, ")") as text'));
 
         if($request->term){
-            $tiposComprobantes = $query->whereRaw('CONCAT(descripcion, " (", codigo, ")") like ?',['%'.$request->term.'%'])->get()->toArray();
+            $tiposComprobantes = $query->whereRaw('CONCAT(descripcion, " (", codigo, ")") like ?',['%'.$request->term.'%'])->limit(50)->get()->toArray();
         }else{
             $tiposComprobantes = [];
         }

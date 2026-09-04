@@ -11,6 +11,5 @@
 // personal styles
 @import "../css/styles.css";
 @import "../css/sidebar_styles.css";
-
-// select2
-@import "select2";
+@import "../css/layout-app.css";
+// NOTA: select2.css ya se importa en resources/js/app.js (evita duplicarlo aqui).

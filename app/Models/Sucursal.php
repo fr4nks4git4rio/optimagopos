@@ -168,6 +168,21 @@ class Sucursal extends Model
         return $data;
     }
 
+    public function decryptedInfo()
+    {
+        $sucursal = $this;
+
+        if ($sucursal && (!isset($sucursal->decrypted) || !$sucursal->decrypted)) {
+            $sucursal->nombre_comercial = isset($sucursal->nombre_comercial) && $sucursal->nombre_comercial ? Crypt::decrypt($sucursal->nombre_comercial) : '';
+            $sucursal->razon_social = isset($sucursal->razon_social) && $sucursal->razon_social ? Crypt::decrypt($sucursal->razon_social) : '';
+            $sucursal->correo = isset($sucursal->correo) && $sucursal->correo ? Crypt::decrypt($sucursal->correo) : '';
+            $sucursal->telefono = isset($sucursal->telefono) && $sucursal->telefono ? Crypt::decrypt($sucursal->telefono) : '';
+            $sucursal->decrypted = true;
+        }
+
+        return $sucursal;
+    }
+
     public function getValueAttribute()
     {
         return $this->id;
