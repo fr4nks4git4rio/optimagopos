@@ -164,10 +164,11 @@ class HomeController
 
             // Precarga 1 sola query: antes se buscaba la forma de pago por cada item/pago del ticket.
             $formas_pago_map = DB::table('tb_sucursal_forma_pagos')
+                ->select('id', 'nombre', 'moneda_id')
                 ->where('sucursal_id', $terminal->sucursal_id)
                 ->whereNull('deleted_at')
-                ->pluck('id', 'nombre')
-                ->toArray();
+                ->get()
+                ->keyBy('nombre');
 
             $vigencia_facturacion = null;
             switch ($terminal->sucursal->tipo_vigencia_ticket_facturacion) {
@@ -273,7 +274,7 @@ class HomeController
                         ]);
                         return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
                     }
-                    $forma_pago = isset($formas_pago_map[$item['Name']]) ? (object) ['id' => $formas_pago_map[$item['Name']]] : null;
+                    $forma_pago = $formas_pago_map->get($item['Name']);
                     if (!$forma_pago) {
                         DB::rollBack();
                         ModelsLog::create([
@@ -483,7 +484,7 @@ class HomeController
 
                     if (count($ts) == 1) {
                         $ts = $ts[0];
-                        $forma_pago = isset($formas_pago_map[$ts['Name']]) ? (object) ['id' => $formas_pago_map[$ts['Name']]] : null;
+                        $forma_pago = $formas_pago_map->get($ts['Name']);
                         $ticket->movimientos_caja()->create([
                             'nombre' => $pora['Name'] ?? '',
                             'monto' => truncate_decimals((float)$pora['Amount']),
@@ -506,7 +507,7 @@ class HomeController
                     usort($posiciones, fn($a, $b) => abs($a - $referencia) <=> abs($b - $referencia));
                     foreach ($tenders as $i => $t) {
                         if ($t['pos'] == $posiciones[0]) {
-                                $forma_pago = isset($formas_pago_map[$t['Name']]) ? (object) ['id' => $formas_pago_map[$t['Name']]] : null;
+                                $forma_pago = $formas_pago_map->get($t['Name']);
                             $ticket->movimientos_caja()->create([
                                 'nombre' => $pora['Name'] ?? '',
                                 'monto' => truncate_decimals((float)$pora['Amount']),

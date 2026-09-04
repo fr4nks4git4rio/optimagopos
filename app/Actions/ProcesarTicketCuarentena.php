@@ -107,6 +107,12 @@ class ProcesarTicketCuarentena
             }
 
             $items = $decoded['Items'] ?? [];
+            $formas_pago_map = DB::table('tb_sucursal_forma_pagos')
+                ->select('id', 'nombre', 'moneda_id')
+                ->where('sucursal_id', $terminal->sucursal_id)
+                ->whereNull('deleted_at')
+                ->get()
+                ->keyBy('nombre');
 
             $vigencia_facturacion = null;
             switch ($terminal->sucursal->tipo_vigencia_ticket_facturacion) {
@@ -178,11 +184,7 @@ class ProcesarTicketCuarentena
                         ]);
                         return false;
                     }
-                    $forma_pago = DB::table('tb_sucursal_forma_pagos')
-                        ->where('sucursal_id', $terminal->sucursal_id)
-                        ->where('nombre', $item['Name'])
-                        ->whereNull('deleted_at')
-                        ->get()->first();
+                    $forma_pago = $formas_pago_map->get($item['Name']);
                     if (!$forma_pago) {
                         DB::rollBack();
                         $this->registro->update([
@@ -343,11 +345,7 @@ class ProcesarTicketCuarentena
 
                     if (count($ts) == 1) {
                         $ts = $ts[0];
-                        $forma_pago = DB::table('tb_sucursal_forma_pagos')
-                            ->where('sucursal_id', $terminal->sucursal_id)
-                            ->where('nombre', $ts['Name'])
-                            ->whereNull('deleted_at')
-                            ->get()->first();
+                        $forma_pago = $formas_pago_map->get($ts['Name']);
                         $ticket->movimientos_caja()->create([
                             'nombre' => $pora['Name'] ?? '',
                             'monto' => truncate_decimals((float)$pora['Amount']),
@@ -370,11 +368,7 @@ class ProcesarTicketCuarentena
                     usort($posiciones, fn($a, $b) => abs($a - $referencia) <=> abs($b - $referencia));
                     foreach ($tenders as $i => $t) {
                         if ($t['pos'] == $posiciones[0]) {
-                            $forma_pago = DB::table('tb_sucursal_forma_pagos')
-                                ->where('sucursal_id', $terminal->sucursal_id)
-                                ->where('nombre', $t['Name'])
-                                ->whereNull('deleted_at')
-                                ->get()->first();
+                            $forma_pago = $formas_pago_map->get($t['Name']);
                             $ticket->movimientos_caja()->create([
                                 'nombre' => $pora['Name'] ?? '',
                                 'monto' => truncate_decimals((float)$pora['Amount']),
