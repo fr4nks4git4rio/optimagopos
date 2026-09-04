@@ -76,7 +76,7 @@ class ArticulosVendidos extends Component
                 'sucursal.id as sucursal_id',
                 'sucursal.nombre_comercial as sucursal',
                 'producto.nombre as producto',
-                DB::raw('SUM(t_producto.precio + t_producto.descuento) as monto'),
+                DB::raw('SUM(t_producto.precio) as monto'),
                 DB::raw('SUM(t_producto.cantidad) as vendidos')
             )
             ->leftJoin('tb_tickets as ticket', 'ticket.id', 't_producto.ticket_id')
@@ -111,6 +111,8 @@ class ArticulosVendidos extends Component
         $sucursales = [];
         foreach ($this->sucursalesAll as $suc)
             $sucursales[$suc['value']] = $suc['label'];
+
+        dd($query->toRawSql(), $query->getBindings());
         $records = $query->get()->each(function ($value, $key) use (&$sucursales) {
             if (!isset($sucursales[$value->sucursal_id])) {
                 $sucursales[$value->sucursal_id] = Crypt::decrypt($value->sucursal);
