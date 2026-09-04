@@ -454,7 +454,7 @@ class Home extends Component
                 $tickets_promedio_q = DB::query()
                     ->fromSub(function ($query) {
                         $query->from('tb_ticket_productos as tp')
-                            ->selectRaw('tp.ticket_id, SUM(tp.precio) as total_ticket')
+                            ->selectRaw('tp.ticket_id, SUM(tp.precio + tp.descuento) as total_ticket')
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
@@ -470,7 +470,7 @@ class Home extends Component
                 $mayor_ticket_q = DB::query()
                     ->fromSub(function ($query) {
                         $query->from('tb_ticket_productos as tp')
-                            ->selectRaw('tp.ticket_id, SUM(tp.precio) as total_ticket')
+                            ->selectRaw('tp.ticket_id, SUM(tp.precio + tp.descuento) as total_ticket')
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
@@ -486,7 +486,7 @@ class Home extends Component
                 $menor_ticket_q = DB::query()
                     ->fromSub(function ($query) {
                         $query->from('tb_ticket_productos as tp')
-                            ->selectRaw('tp.ticket_id, SUM(tp.precio) as total_ticket')
+                            ->selectRaw('tp.ticket_id, SUM(tp.precio + tp.descuento) as total_ticket')
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                             ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
@@ -550,7 +550,7 @@ class Home extends Component
                 $this->productosData['mas_popular'] = $mas_popular_q->first()->nombre ?? '';
 
                 $mayor_ingreso_q = DB::table('tb_ticket_productos as tp')
-                    ->select('p.nombre', DB::raw("SUM(tp.precio) as ingreso"))
+                    ->select('p.nombre', DB::raw("SUM(tp.precio + tp.descuento) as ingreso"))
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
@@ -629,7 +629,7 @@ class Home extends Component
                 $this->correccionesData['correcciones'] = $correcciones_q->get()->toArray();
 
                 $total_ventas_q = DB::table('tb_ticket_productos as tp')
-                    ->selectRaw("SUM(tp.precio) as total")
+                    ->selectRaw("SUM(tp.precio + tp.descuento) as total")
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
@@ -695,7 +695,7 @@ class Home extends Component
                 $this->resumenData['importes_devueltos'] = abs($importes_devueltos);
 
                 $ventas_totales_q = DB::table('tb_ticket_productos as tp')
-                    ->selectRaw('SUM(tp.precio) as total')
+                    ->selectRaw('SUM(tp.precio + tp.descuento) as total')
                     ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                     ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
                     ->leftJoin('tb_terminales as terminal', 'terminal.id', 'ticket.terminal_id')
@@ -834,7 +834,7 @@ class Home extends Component
                             ->pluck('cantidad', 'nombre');
 
                         $top_productos_ingreso_q = DB::table('tb_ticket_productos as tp')
-                            ->select('p.nombre', DB::raw("SUM(tp.precio) as ingreso"))
+                            ->select('p.nombre', DB::raw("SUM(tp.precio + tp.descuento) as ingreso"))
                             ->leftJoin('tb_tickets as ticket', 'ticket.id', 'tp.ticket_id')
                             ->leftJoin('tb_productos as p', 'p.id', 'tp.producto_id')
                             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
