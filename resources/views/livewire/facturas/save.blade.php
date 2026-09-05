@@ -7,7 +7,7 @@
     <div wire:init="init">
         <div wire:loading.delay>
             <div class="loading">
-                <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">Cargando...</span></div>
+                <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">{{ __('site.common.loading') }}...</span></div>
             </div>
         </div>
 

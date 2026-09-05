@@ -307,6 +307,7 @@ class HomeController
                     $ticket->operaciones()->create([
                         'nombre' => $item['Name'] ?? '',
                         'monto' => truncate_decimals((float)$item['Amount']),
+                        'descuento' => isset($item['Discount']) ? truncate_decimals((float)$item['Discount'] ?? 0) : 0,
                         'propina' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? truncate_decimals((float)$item['Tip']) : 0,
                         'empleado_id' => $item['Tip'] != '' && (float)$item['Tip'] > 0 ? optional($clerk)->id : null,
                         'sucursal_forma_pago_id' => optional($forma_pago)->id,
@@ -507,7 +508,7 @@ class HomeController
                     usort($posiciones, fn($a, $b) => abs($a - $referencia) <=> abs($b - $referencia));
                     foreach ($tenders as $i => $t) {
                         if ($t['pos'] == $posiciones[0]) {
-                                $forma_pago = $formas_pago_map->get($t['Name']);
+                            $forma_pago = $formas_pago_map->get($t['Name']);
                             $ticket->movimientos_caja()->create([
                                 'nombre' => $pora['Name'] ?? '',
                                 'monto' => truncate_decimals((float)$pora['Amount']),

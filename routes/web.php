@@ -56,8 +56,12 @@ use App\Livewire\Reportes\Ingresos as ReporteIngresos;
 use App\Livewire\TimbrarAutoFactura;
 use App\Livewire\Auth\TwoFactorChallenge;
 use App\Livewire\Reportes\ArticulosVendidos;
+use App\Livewire\Reportes\IngresosDiarios;
+use App\Livewire\Reportes\MovimientosCaja;
+use App\Livewire\Reportes\VentasDepartamento;
 use App\Livewire\Reportes\VentasDiarias;
 use App\Livewire\Reportes\VentasOperador;
+use App\Livewire\Reportes\VentasTotalesDepartamento;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -150,11 +154,15 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
         Route::prefix('reportes')->group(function () {
             Route::get('/historico-tickets-vk', HistoricoTicketsVk::class)->name('admin.reportes.historico-tickets-vk')->middleware('permission:reportsVKTicketHistory-viewAny');
             Route::get('/ventas-diarias', VentasDiarias::class)->name('admin.reportes.ventas-diarias')->middleware('permission:reportsDailySales-viewAny');
+            Route::get('/ingresos-diarios', IngresosDiarios::class)->name('admin.reportes.ingresos-diarios')->middleware('permission:reportsDailyIncome-viewAny');
             Route::get('/articulos-vendidos', ArticulosVendidos::class)->name('admin.reportes.articulos-vendidos')->middleware('permission:reportsArticlesSold-viewAny');
             Route::get('/ventas-operador', VentasOperador::class)->name('admin.reportes.ventas-operador')->middleware('permission:reportsSalesByOperator-viewAny');
             Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('admin.reportes.productos-mas-vendidos')->middleware('permission:reportsBestSellingProducts-viewAny');
             Route::get('/historico-operaciones', IndexHistoricoOperaciones::class)->name('admin.reportes.historico-operaciones')->middleware('permission:reportsOperationsHistory-viewAny');
             Route::get('/testing-historico-operaciones', IndexHistoricoOperacionesTesting::class)->name('admin.reportes.testing-historico-operaciones')->middleware('permission:reportsTestingOperationsHistory-viewAny');
+            Route::get('/ventas-departamento', VentasDepartamento::class)->name('admin.reportes.ventas-departamento')->middleware('permission:reportsSalesByDepartment-viewAny');
+            Route::get('/ventas-totales-departamento', VentasTotalesDepartamento::class)->name('admin.reportes.ventas-totales-departamento')->middleware('permission:reportsTotalSalesByDepartment-viewAny');
+            Route::get('/movimientos-caja', MovimientosCaja::class)->name('admin.reportes.movimientos-caja')->middleware('permission:reportsCashMovements-viewAny');
             Route::get('/ingresos', ReporteIngresos::class)->name('admin.reportes.ingresos');
             Route::get('/logs', Logs::class)->name('admin.reportes.logs');
         });
@@ -181,11 +189,15 @@ Route::middleware(['auth', 'set.locale', 'two-factor', 'user-with-active-subscri
         Route::prefix('reportes')->group(function () {
             Route::get('/historico-tickets-vk', HistoricoTicketsVk::class)->name('cliente.reportes.historico-tickets-vk')->middleware('permission:reportsVKTicketHistory-viewAny');
             Route::get('/ventas-diarias', VentasDiarias::class)->name('cliente.reportes.ventas-diarias')->middleware('permission:reportsDailySales-viewAny');
+            Route::get('/ingresos-diarios', IngresosDiarios::class)->name('cliente.reportes.ingresos-diarios')->middleware('permission:reportsDailyIncome-viewAny');
             Route::get('/articulos-vendidos', ArticulosVendidos::class)->name('cliente.reportes.articulos-vendidos')->middleware('permission:reportsArticlesSold-viewAny');
             Route::get('/ventas-operador', VentasOperador::class)->name('cliente.reportes.ventas-operador')->middleware('permission:reportsSalesByOperator-viewAny');
             Route::get('/productos-mas-vendidos', ProductosMasVendidos::class)->name('cliente.reportes.productos-mas-vendidos')->middleware('permission:reportsBestSellingProducts-viewAny');
             Route::get('/historico-operaciones', IndexHistoricoOperaciones::class)->name('cliente.reportes.historico-operaciones')->middleware('permission:reportsOperationsHistory-viewAny');
             Route::get('/testing-historico-operaciones', IndexHistoricoOperacionesTesting::class)->name('cliente.reportes.testing-historico-operaciones')->middleware('permission:reportsTestingOperationsHistory-viewAny');
+            Route::get('/ventas-departamento', VentasDepartamento::class)->name('cliente.reportes.ventas-departamento')->middleware('permission:reportsSalesByDepartment-viewAny');
+            Route::get('/ventas-totales-departamento', VentasTotalesDepartamento::class)->name('cliente.reportes.ventas-totales-departamento')->middleware('permission:reportsTotalSalesByDepartment-viewAny');
+            Route::get('/movimientos-caja', MovimientosCaja::class)->name('cliente.reportes.movimientos-caja')->middleware('permission:reportsCashMovements-viewAny');
             Route::get('/logs', Logs::class)->name('cliente.reportes.logs')->middleware('permission:reportsDataReceived-viewAny');
         });
     });

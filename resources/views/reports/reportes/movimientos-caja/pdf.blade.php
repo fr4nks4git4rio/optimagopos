@@ -122,12 +122,14 @@
             background-color: #dee0e2;
         }
 
+        /* Total por sucursal */
         tr.subtotal-row td {
             background-color: #dfeee2;
             font-weight: bold;
             border-top: 1.5px solid #7fb894;
         }
 
+        /* Total general */
         tr.grand-total-row td {
             background-color: #065f46;
             color: #ffffff;
@@ -205,7 +207,7 @@
                         <div class="company-meta">
                             RFC: {{ $empresa->rfc ?? '' }}
                             @if (!empty($empresa->direccion_fiscal))
-                                &nbsp;|&nbsp; {{__('site.address.address')}}: {{ $empresa->direccion_plain }}
+                                &nbsp;|&nbsp; {{ __('site.address.address') }}: {{ $empresa->direccion_plain }}
                             @endif
                         </div>
                     @endif
@@ -222,11 +224,11 @@
 
     {{-- ================= FILTROS APLICADOS ================= --}}
     <div class="filters-box">
-        <strong>{{__('site.common.period')}}:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
+        <strong>{{ __('site.common.period') }}:</strong> {{ $fechaInicio ?: '-' }} al {{ $fechaFin ?: '-' }}
         @if (!empty($sucursalesSeleccionadas))
             &nbsp;&nbsp;|&nbsp;&nbsp;
-            <strong>{{__('site.reports.daily_sales.branches')}}:</strong>
-            {{ Illuminate\Support\Str::replaceLast(', ', ' '.__('site.common.and').' ', implode(', ', $sucursalesSeleccionadas)) }}
+            <strong>{{ __('site.reports.cash_movements.branches') }}:</strong>
+            {{ Illuminate\Support\Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', implode(', ', $sucursalesSeleccionadas)) }}
         @endif
     </div>
 
@@ -236,7 +238,7 @@
             <thead>
                 <tr>
                     @foreach ($sorts as $sort)
-                        <th>{{ $sort }}</th>
+                        <th style="text-align: center">{{ $sort }}</th>
                     @endforeach
                 </tr>
             </thead>
@@ -245,35 +247,37 @@
         <tbody>
             @forelse($records as $sucursal_id => $sucursalData)
                 @php
-                    $totalFilas = count($sucursalData['fechas']);
+                    $totalFilas = count($sucursalData['movimientos']);
                     $pos = 0;
                 @endphp
 
-                @foreach ($sucursalData['fechas'] as $index => $record)
+                @foreach ($sucursalData['movimientos'] as $index => $record)
                     <tr class="{{ $pos % 2 == 1 ? 'row-even' : '' }}">
                         @if ($pos == 0)
-                            <td class="text-left" rowspan="{{ $totalFilas }}">
+                            <td style="text-align: center" rowspan="{{ $totalFilas }}">
                                 {{ $sucursalData['sucursal'] }}
                             </td>
                         @endif
-                        <td>{{ $record->fecha_transaccion_str }}</td>
-                        <td class="text-right">{{ number_format($record->monto, 2) }}</td>
-                        <td>{{ $record->ventas }}</td>
+                        <td>{{ $record->fecha_str }}</td>
+                        <td>{{ $record->movimiento }}</td>
+                        <td>{{ $record->forma_pago }}</td>
+                        <td>{{ $record->creado_por }}</td>
+                        <td style="text-align: right">{{ number_format($record->monto, 2) }}</td>
                     </tr>
                     @php $pos++; @endphp
                 @endforeach
 
                 {{-- Totalizador por sucursal --}}
                 <tr class="subtotal-row">
-                    <td colspan="2" style="text-align: right">{{__('site.reports.daily_sales.total')}} {{ $sucursalData['sucursal'] }}</td>
-                    @php $totalCelda = $sucursalData['totales'] ?? ['monto' => 0, 'ventas' => 0]; @endphp
-                    <td style="text-align: right">{{ number_format($totalCelda['monto'], 2) }}</td>
-                    <td style="text-align: center">{{ $totalCelda['ventas'] }}</td>
+                    <td colspan="5" style="text-align: right">{{ __('site.reports.cash_movements.total') }}
+                        {{ $sucursalData['sucursal'] }}</td>
+                    <td style="text-align: right">{{ number_format($sucursalData['total'], 2) }}
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="no-results">
-                        {{__('site.common.results_not_found')}}...
+                    <td colspan="6" class="no-results">
+                        {{ __('site.common.results_not_found') }}...
                     </td>
                 </tr>
             @endforelse
@@ -282,10 +286,8 @@
         @if (count($records) > 0)
             <tfoot>
                 <tr class="grand-total-row">
-                    <td colspan="2" style="text-align: right">{{__('site.reports.daily_sales.grand_total')}}</td>
-                    @php $totalGeneral = $grandTotal ?? ['monto' => 0, 'ventas' => 0]; @endphp
-                    <td style="text-align: right">{{ number_format($totalGeneral['monto'], 2) }}</td>
-                    <td style="text-align: center">{{ $totalGeneral['ventas'] }}</td>
+                    <td colspan="5" style="text-align: right">{{ __('site.reports.cash_movements.grand_total') }}</td>
+                    <td style="text-align: right">{{ number_format($grandTotal, 2) }}</td>
                 </tr>
             </tfoot>
         @endif

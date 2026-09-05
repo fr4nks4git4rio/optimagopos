@@ -11,9 +11,9 @@ class Loading extends Component
     public $message;
     public $close;
 
-    public function setLoading($message = 'Cargando...', $close = false)
+    public function setLoading($message = '', $close = false)
     {
-        $this->message = $message;
+        $this->message = $message ?: __('site.common.loading');
         $this->close = $close;
 
         $this->dispatch('loading-show');

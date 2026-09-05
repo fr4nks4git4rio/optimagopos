@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre', 100);
             $table->decimal('monto', 10, 2)->default(0.00);
+            $table->decimal('descuento', 10, 2)->nullable()->default(0.00);
             $table->decimal('propina', 10, 2)->default(0.00);
             $table->decimal('tipo_cambio', 8, 4)->default(1.0000);
             $table->boolean('es_cambio')->default(false);

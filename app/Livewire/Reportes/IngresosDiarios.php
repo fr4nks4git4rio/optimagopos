@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Reportes;
 
+use App\Exports\IngresosDiariosExport;
 use App\Exports\VentasDiariasExport;
 use App\Models\Sucursal;
 use Illuminate\Support\Arr;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Livewire\Component;
 
-class VentasDiarias extends Component
+class  IngresosDiarios extends Component
 {
     public $perPages;
     public $order;
@@ -37,12 +38,12 @@ class VentasDiarias extends Component
     public function mount()
     {
         $this->order = $this->order ?? 'desc';
-        $this->sort = $this->sort ?? __('site.reports.daily_sales.date');
+        $this->sort = $this->sort ?? __('site.reports.daily_income.date');
         $this->fechaInicio = $this->fechaInicio ?? today()->format('Y-m-d');
         $this->fechaFin = $this->fechaFin ?? today()->format('Y-m-d');
         $this->sucursal = $this->sucursal ?? null;
 
-        $this->sorts = [__('site.reports.daily_sales.branch'), __('site.reports.daily_sales.date'), __('site.reports.daily_sales.amount'), __('site.reports.daily_sales.quantity')];
+        $this->sorts = [__('site.reports.daily_income.branch'), __('site.reports.daily_income.date')];
         $this->perPages = [10, 25, 50, 100];
         //        $this->filters = ['Activos', 'Inactivos', 'Todos'];
     }
@@ -63,7 +64,7 @@ class VentasDiarias extends Component
 
     public function init()
     {
-        if (user()->cannot('reportsDailySales-viewAny')) {
+        if (user()->cannot('reportsDailyIncome-viewAny')) {
             $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
             return redirect()->to('/');
         }
@@ -73,7 +74,7 @@ class VentasDiarias extends Component
     {
         $res = $this->query();
 
-        return view('livewire.reportes.ventas-diarias', [
+        return view('livewire.reportes.ingresos-diarios', [
             'records' => $res['finalRecords'],
             'grandTotal' => $res['grandTotal'],
             // Cache 5 min (single-server): render() corre en cada roundtrip Livewire.
@@ -95,32 +96,36 @@ class VentasDiarias extends Component
                             'label' => $label
                         ];
                     })->toArray()
-            )
+            ),
+            'formasPago' => $res['formasPago']
         ]);
     }
 
     public function query()
     {
         // Cache 60s (single-server): el mismo calculo alimenta tabla, PDF y Excel.
-        $cacheKey = 'vd|' . user()->cliente_id . '|' . $this->fechaInicio . '|' . $this->fechaFin . '|' . implode(',', Arr::wrap($this->sucursal)) . '|' . $this->sort . '|' . $this->order;
+        $cacheKey = 'id|' . user()->cliente_id . '|' . $this->fechaInicio . '|' . $this->fechaFin . '|' . implode(',', Arr::wrap($this->sucursal)) . '|' . $this->sort . '|' . $this->order;
         $cached = Cache::get($cacheKey);
         if (is_array($cached))
             return $cached;
 
-        $query = DB::table('tb_ticket_productos as venta')
+        $query = DB::table('tb_ticket_operaciones as operacion')
             ->select(
                 'sucursal.id as sucursal_id',
                 'sucursal.nombre_comercial as sucursal',
                 DB::raw("DATE(ticket.fecha_transaccion) as fecha_transaccion"),
                 DB::raw("DATE_FORMAT(ticket.fecha_transaccion, '%d/%m/%Y') as fecha_transaccion_str"),
-                DB::raw('SUM(venta.precio) as monto'),
-                DB::raw('COUNT(venta.id) as ventas')
+                'sfp.id as forma_pago_id',
+                'sfp.nombre as forma_pago_nombre',
+                DB::raw('SUM(operacion.monto) as monto'),
+                DB::raw('COUNT(*) as operaciones')
             )
-            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'venta.ticket_id')
+            ->leftJoin('tb_tickets as ticket', 'ticket.id', 'operacion.ticket_id')
             ->leftJoin('tb_sucursales as sucursal', 'sucursal.id', 'ticket.sucursal_id')
+            ->leftJoin('tb_sucursal_forma_pagos as sfp', 'sfp.id', 'operacion.sucursal_forma_pago_id')
             ->where('sucursal.cliente_id', user()->cliente_id)
             ->where('ticket.modo_entrenamiento', 0)
-            ->groupByRaw('DATE(ticket.fecha_transaccion)');
+            ->groupByRaw('DATE(ticket.fecha_transaccion), operacion.sucursal_forma_pago_id');
 
         if ($this->fechaInicio) {
             $query->where('ticket.fecha_transaccion', '>=', $this->fechaInicio . ' 00:00:00');
@@ -135,7 +140,7 @@ class VentasDiarias extends Component
         }
 
         switch ($this->sort) {
-            case __('site.reports.daily_sales.date'):
+            case __('site.reports.daily_income.date'):
                 if ($this->order == 'asc')
                     $query->orderByRaw('DATE(ticket.fecha_transaccion) asc');
                 else
@@ -143,12 +148,15 @@ class VentasDiarias extends Component
                 break;
         }
 
-        $records = $query->get()->each(function ($value, $key) {
+        $formasPago = [];
+        $records = $query->get()->each(function ($value, $key) use (&$formasPago) {
             $value->sucursal = Crypt::decrypt($value->sucursal);
+            if (isset($formasPago[$value->forma_pago_id]) == false)
+                $formasPago[$value->forma_pago_id] = $value->forma_pago_nombre;
         });
 
         switch ($this->sort) {
-            case __('site.reports.daily_sales.branch'):
+            case __('site.reports.daily_income.branch'):
                 if ($this->order == 'asc')
                     $records = $records->sortBy('sucursal', SORT_NATURAL)->values();
                 else
@@ -157,46 +165,54 @@ class VentasDiarias extends Component
         }
 
         $finalRecords = [];
-        $grandTotal = 0;
+        $grandTotal = [];
 
         foreach ($records as $record) {
             $sucursalId = $record->sucursal_id;
             $fecha = $record->fecha_transaccion;
+            $formaPagoId = $record->forma_pago_id;
 
             if (!isset($finalRecords[$sucursalId])) {
                 $finalRecords[$sucursalId] = [
                     'sucursal' => $record->sucursal,
                     'fechas' => [],
-                    'totales' => null,
+                    'totales' => [],
                 ];
             }
 
             if (!isset($finalRecords[$sucursalId]['fechas'][$fecha])) {
                 $finalRecords[$sucursalId]['fechas'][$fecha] = (object) [
                     'fecha_transaccion_str' => $record->fecha_transaccion_str,
-                    'monto' => $record->monto,
-                    'ventas' => $record->ventas,
+                    'montos' => [],
                 ];
             }
 
+            // Detalle por fecha
+            $actual = $finalRecords[$sucursalId]['fechas'][$fecha]->montos[$formaPagoId] ?? ['monto' => 0, 'operaciones' => 0];
+            $finalRecords[$sucursalId]['fechas'][$fecha]->montos[$formaPagoId] = [
+                'monto'       => $actual['monto'] + $record->monto,
+                'operaciones' => $actual['operaciones'] + $record->operaciones,
+            ];
+
             // Totalizador por sucursal
-            $actualSucursal = $finalRecords[$sucursalId]['totales'] ?: ['monto' => 0, 'ventas' => 0];
-            $finalRecords[$sucursalId]['totales'] = [
-                'monto'  => $actualSucursal['monto'] + $record->monto,
-                'ventas' => $actualSucursal['ventas'] + $record->ventas,
+            $actualSucursal = $finalRecords[$sucursalId]['totales'][$formaPagoId] ?? ['monto' => 0, 'operaciones' => 0];
+            $finalRecords[$sucursalId]['totales'][$formaPagoId] = [
+                'monto'       => $actualSucursal['monto'] + $record->monto,
+                'operaciones' => $actualSucursal['operaciones'] + $record->operaciones,
             ];
 
             // Totalizador general
-            $actualGeneral = $grandTotal ?: ['monto' => 0, 'ventas' => 0];
-            $grandTotal = [
-                'monto'  => $actualGeneral['monto'] + $record->monto,
-                'ventas' => $actualGeneral['ventas'] + $record->ventas,
+            $actualGeneral = $grandTotal[$formaPagoId] ?? ['monto' => 0, 'operaciones' => 0];
+            $grandTotal[$formaPagoId] = [
+                'monto'       => $actualGeneral['monto'] + $record->monto,
+                'operaciones' => $actualGeneral['operaciones'] + $record->operaciones,
             ];
         }
 
         $result = [
             'finalRecords' => $finalRecords,
-            'grandTotal' => $grandTotal
+            'grandTotal' => $grandTotal,
+            'formasPago' => $formasPago
         ];
         Cache::put($cacheKey, $result, now()->addSeconds(60));
 
@@ -211,16 +227,16 @@ class VentasDiarias extends Component
 
     public function imprimirPdf()
     {
-        if (user()->cannot('reportsDailySales-print')) {
+        if (user()->cannot('reportsDailyIncome-print')) {
             $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
             return;
         }
 
-        $name = __('site.reports.daily_sales.title');
+        $name = __('site.reports.daily_income.title');
         if (File::exists(public_path("$name.pdf"))) {
             File::delete(public_path("$name.pdf"));
         }
-        $view = 'reports.reportes.ventas-diarias.pdf';
+        $view = 'reports.reportes.ingresos-diarios.pdf';
 
         // Un solo query(): antes se ejecutaba 3 veces para el mismo PDF.
         $res = $this->query();
@@ -228,6 +244,7 @@ class VentasDiarias extends Component
             'name' => $name,
             'sorts' => $this->sorts,
             'records' => $res['finalRecords'],
+            'formasPago' => $res['formasPago'],
             'grandTotal' => $res['grandTotal'],
             'fechaInicio' => $this->fechaInicio,
             'fechaFin' => $this->fechaFin,
@@ -238,26 +255,27 @@ class VentasDiarias extends Component
         $pdf->save("$name.pdf");
 
         $this->iframeSrc = \Illuminate\Support\Facades\Request::root() . "/$name.pdf?" . time();
-        $this->dispatch('show-sub-modal', 'pdf-ventas-diarias');
+        $this->dispatch('show-sub-modal', 'pdf-ingresos-diarios');
     }
 
     public function exportarExcel()
     {
-        if (user()->cannot('reportsDailySales-export')) {
+        if (user()->cannot('reportsDailyIncome-export')) {
             $this->dispatch('show-toast', __('site.common.client_no_permissions'), 'danger');
             return;
         }
-        $name = __('site.reports.daily_sales.title');
+        $name = __('site.reports.daily_income.title');
         $fileName = "$name.xlsx";
 
         $res = $this->query();
         $sucursalesSeleccionadas = Sucursal::whereIn('id', $this->sucursal)->get()->each(function ($element) {
             $element->nombre_comercial = Crypt::decrypt($element->nombre_comercial);
         })->pluck('nombre_comercial')->toArray();
-        return (new VentasDiariasExport(
+        return (new IngresosDiariosExport(
             $name,
             $this->sorts,
             $res['finalRecords'],
+            $res['formasPago'],
             $res['grandTotal'],
             $this->fechaInicio,
             $this->fechaFin,

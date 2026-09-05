@@ -180,10 +180,22 @@ return [
         'reportsDailySales-viewAny' => 'View daily sales report',
         'reportsDailySales-print' => 'Print daily sales list PDF',
         'reportsDailySales-export' => 'Export daily sales list to Excel',
+        'reportsDailyIncome-viewAny' => 'View daily income report',
+        'reportsDailyIncome-print' => 'Print daily income list PDF',
+        'reportsDailyIncome-export' => 'Export daily income list to Excel',
         'reportsSalesByOperator-viewAny' => 'View sales by operator report',
         'reportsSalesByOperator-print' => 'Print sales by operator list PDF',
         'reportsSalesByOperator-export' => 'Export sales by operator list to Excel',
-        'reportsTestingOperationsHistory-viewAny' => 'View test operation history report'
+        'reportsTestingOperationsHistory-viewAny' => 'View test operation history report',
+        'reportsSalesByDepartment-viewAny' => 'View sales by department report',
+        'reportsSalesByDepartment-print' => 'Print sales by department list PDF',
+        'reportsSalesByDepartment-export' => 'Export sales by department list to Excel',
+        'reportsTotalSalesByDepartment-viewAny' => 'View total sales by department report',
+        'reportsTotalSalesByDepartment-print' => 'Print total sales by department list PDF',
+        'reportsTotalSalesByDepartment-export' => 'Export total sales by department list to Excel',
+        'reportsCashMovements-viewAny' => 'View cash movements report',
+        'reportsCashMovements-print' => 'Print cash movements list PDF',
+        'reportsCashMovements-export' => 'Export cash movements list to Excel'
     ],
     'validation' => [
         'rfc_format' => 'The RFC does not have a valid format.',
@@ -276,8 +288,12 @@ return [
         'quarantine' => 'Quarantine',
         'vk_ticket_history' => 'Video Kitchen Ticket History',
         'daily_sales' => 'Daily Sales',
+        'daily_income' => 'Daily Income',
         'articles_sold' => 'Articles Sold',
         'sales_by_operator' => 'Sales by Operator',
+        'sales_by_department' => 'Sales by Department',
+        'total_sales_by_department' => 'Total Sales by Department',
+        'cash_movements' => 'Cash Movements',
         'best_selling_products' =>  'Best Selling Products',
         'operations_history' => 'Operations History',
         'operations_history_testing' => 'Testing Operations History',
@@ -496,8 +512,12 @@ return [
             'reportsOperationsHistory' => 'Operations History Report',
             'reportsVKTicketHistory' => 'Video Kitchen Ticket History Report',
             'reportsDailySales' => 'Daily Sales Report',
+            'reportsDailyIncome' => 'Daily Income Report',
             'reportsSalesByOperator' => 'Sales by Operator Report',
             'reportsTestingOperationsHistory' => 'Testing Operations History Report',
+            'reportsSalesByDepartment' => 'Sales by Department Report',
+            'reportsTotalSalesByDepartment' => 'Total Sales by Department Report',
+            'reportsCashMovements' => 'Cash Movements Report',
             'set_permission_success' => 'Permission granted successfully.',
             'log_set_permission_success'  => 'Permission granted to role.',
             'log_set_permission_success_detail'  => 'Permission granted to role :rol.',
@@ -1530,6 +1550,18 @@ return [
             'total' => 'Total',
             'grand_total' => 'Grand Total'
         ],
+        'daily_income' => [
+            'title' => 'Daily Income',
+            'start_date' => 'Start Date',
+            'end_date' => 'End Date',
+            'branches' => 'Branches',
+            'branch' => 'Branch',
+            'date' => 'Date',
+            'amount' => 'Amount',
+            'quantity' => 'Quantity',
+            'total' => 'Total',
+            'grand_total' => 'Grand Total'
+        ],
         'sales_by_operator' => [
             'title' => 'Sales by Operator',
             'start_date' => 'Start Date',
@@ -1574,7 +1606,47 @@ return [
             'amount_collected' => 'Amount Collected',
             'payment_date' => 'Payment Date',
             'comments' => 'Comments'
-        ]
+        ],
+        'sales_by_department' => [
+            'title' => 'Sales by Department',
+            'start_date' => 'Start Date',
+            'end_date' => 'End Date',
+            'branches' => 'Branches',
+            'branch' => 'Branch',
+            'department' => 'Department',
+            'sales' => 'Sales',
+            'amount' => 'Amount',
+            'quantity' => 'Quantity',
+            'total' => 'Total',
+            'grand_total' => 'Grand Total'
+        ],
+        'total_sales_by_department' => [
+            'title' => 'Total Sales by Department',
+            'start_date' => 'Start Date',
+            'end_date' => 'End Date',
+            'branches' => 'Branches',
+            'branch' => 'Branch',
+            'department' => 'Department',
+            'sales' => 'Sales',
+            'amount' => 'Amount',
+            'quantity' => 'Quantity',
+            'total' => 'Total',
+            'grand_total' => 'Grand Total'
+        ],
+        'cash_movements' => [
+            'title' => 'Cash Movements',
+            'start_date' => 'Start Date',
+            'end_date' => 'End Date',
+            'branches' => 'Branches',
+            'branch' => 'Branch',
+            'date' => 'Date',
+            'movement_type' => 'Movement Type',
+            'payment_form' => 'Payment Method',
+            'created_by' => 'Created By',
+            'amount' => 'Amount',
+            'total' => 'Total',
+            'grand_total' => 'Grand Total'
+        ],
     ],
     'self_billing' => [
         'pending_tickets' => 'Pending Tickets',
@@ -1628,7 +1700,6 @@ return [
         'concept_2' => 'BEVERAGE CONSUMPTION',
         'concept_3' => 'FOOD CONSUMPTION',
         'concept_4' => 'MISCELLANEOUS'
-
     ],
     'data_parser' => [
         'incomplete_jason' => 'Invalid or incomplete JSON',

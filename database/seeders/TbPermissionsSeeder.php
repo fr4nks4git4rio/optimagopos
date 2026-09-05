@@ -146,9 +146,25 @@ class TbPermissionsSeeder extends Seeder
         DB::table('permissions')->insert(['name' => 'reportsDailySales-print', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
         DB::table('permissions')->insert(['name' => 'reportsDailySales-export', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
 
+        DB::table('permissions')->insert(['name' => 'reportsDailyIncome-viewAny', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'reportsDailyIncome-print', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'reportsDailyIncome-export', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+
         DB::table('permissions')->insert(['name' => 'reportsSalesByOperator-viewAny', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
         DB::table('permissions')->insert(['name' => 'reportsSalesByOperator-print', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
         DB::table('permissions')->insert(['name' => 'reportsSalesByOperator-export', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+
+        DB::table('permissions')->insert(['name' => 'reportsSalesByDepartment-viewAny', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'reportsSalesByDepartment-print', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'reportsSalesByDepartment-export', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+
+        DB::table('permissions')->insert(['name' => 'reportsTotalSalesByDepartment-viewAny', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'reportsTotalSalesByDepartment-print', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'reportsTotalSalesByDepartment-export', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+
+        DB::table('permissions')->insert(['name' => 'reportsCashMovements-viewAny', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'reportsCashMovements-print', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
+        DB::table('permissions')->insert(['name' => 'reportsCashMovements-export', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
 
         DB::table('permissions')->insert(['name' => 'reportsTestingOperationsHistory-viewAny', 'guard_name' => 'web', 'created_at' => now()->format('Y-m-d H:i:s')]);
 

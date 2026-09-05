@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 
-class VentasDiariasExport implements FromView
+class MovimientosCajaExport implements FromView
 {
     use Exportable;
     private $name;
@@ -31,7 +31,7 @@ class VentasDiariasExport implements FromView
 
     public function view(): View
     {
-        return view('reports.reportes.ventas-diarias.excel', [
+        return view('reports.reportes.movimientos-caja.excel', [
             'name' => $this->name,
             'sorts' => $this->sorts,
             'records' => $this->records,

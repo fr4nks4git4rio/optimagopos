@@ -6,7 +6,7 @@
             <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
                 style="background: rgba(255,255,255,0.7); backdrop-filter: blur(4px); z-index: 1060;">
                 <div class="text-center">
-                    <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">Cargando...</span></div>
+                    <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">{{ __('site.common.loading') }}...</span></div>
                     <p class="text-muted fw-bold small">{{ __('site.invoices.save_credit_note.processing_data') }}...</p>
                 </div>
             </div>

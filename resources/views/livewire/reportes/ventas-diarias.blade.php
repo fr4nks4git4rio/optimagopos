@@ -3,7 +3,7 @@
 <div wire:init="init">
     <div wire:loading.delay.longer>
         <div class="loading">
-            <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">Cargando...</span></div>
+            <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">{{ __('site.common.loading') }}...</span></div>
         </div>
     </div>
 
@@ -48,7 +48,7 @@
                 <thead>
                     <tr>
                         @foreach ($sorts as $sort)
-                            <th class="text-center align-middle cursor-pointer" rowspan="2"
+                            <th class="text-center align-middle cursor-pointer"
                                 style="white-space: nowrap !important" wire:click="changeSort('{{ $sort }}')">
                                 <span>
                                     @if ($this->sort == $sort)
@@ -56,19 +56,6 @@
                                     @endif {{ $sort }}
                                 </span>
                             </th>
-                        @endforeach
-                        @foreach ($formasPago as $formaPago)
-                            <th class="text-center" colspan="2" style="white-space: nowrap !important">
-                                {{ $formaPago }}
-                            </th>
-                        @endforeach
-                    </tr>
-                    <tr>
-                        @foreach ($formasPago as $formaPago)
-                            <th class="text-end" style="white-space: nowrap !important">
-                                {{ __('site.reports.daily_sales.amount') }}</th>
-                            <th class="text-center" style="white-space: nowrap !important">
-                                {{ __('site.reports.daily_sales.quantity') }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -83,11 +70,8 @@
                                 </td>
                             @endif
                             <td class="text-center">{{ $record->fecha_transaccion_str }}</td>
-                            @foreach ($formasPago as $i => $formaPago)
-                                @php $celda = $record->montos[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
-                                <td class="text-end">{{ number_format($celda['monto'], 2) }}</td>
-                                <td class="text-center">{{ $celda['operaciones'] }}</td>
-                            @endforeach
+                            <td class="text-end">{{ number_format($record->monto, 2) }}</td>
+                            <td class="text-center">{{ $record->ventas }}</td>
                         </tr>
                     @endforeach
 
@@ -95,15 +79,13 @@
                     <tr class="table-success fw-bold">
                         <td class="text-end" colspan="2">{{ __('site.reports.daily_sales.total') }}
                             {{ $sucursalData['sucursal'] }}</td>
-                        @foreach ($formasPago as $i => $formaPago)
-                            @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
+                            @php $totalCelda = $sucursalData['totales'] ?? ['monto' => 0, 'ventas' => 0]; @endphp
                             <td class="text-end">{{ number_format($totalCelda['monto'], 2) }}</td>
-                            <td class="text-center">{{ $totalCelda['operaciones'] }}</td>
-                        @endforeach
+                            <td class="text-center">{{ $totalCelda['ventas'] }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ 2 + count($formasPago) * 2 }}" class="text-center">
+                        <td colspan="4" class="text-center">
                             <div class="list-group-item">
                                 {{ __('site.common.results_not_found') }}...
                             </div>
@@ -115,11 +97,9 @@
                 <tfoot>
                     <tr class="table-dark fw-bold">
                         <td colspan="2" class="text-end">{{ __('site.reports.daily_sales.grand_total') }}</td>
-                        @foreach ($formasPago as $i => $formaPago)
-                            @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
-                            <td class="text-end">{{ number_format($totalGeneral['monto'], 2) }}</td>
-                            <td class="text-center">{{ $totalGeneral['operaciones'] }}</td>
-                        @endforeach
+                        @php $totalGeneral = $grandTotal ?? ['monto' => 0, 'ventas' => 0]; @endphp
+                        <td class="text-end">{{ number_format($totalGeneral['monto'], 2) }}</td>
+                        <td class="text-center">{{ $totalGeneral['ventas'] }}</td>
                     </tr>
                 </tfoot>
             @endif

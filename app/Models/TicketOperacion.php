@@ -15,6 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  *
  * @property string $nombre
  * @property float $monto
+ * @property float $descuento
  * @property float $propina
  * @property float $tipo_cambio
  * @property boolean $es_cambio
@@ -30,6 +31,7 @@ class TicketOperacion extends Model
     public $fillable = [
         'nombre',
         'monto',
+        'descuento',
         'propina',
         'tipo_cambio',
         'es_cambio',

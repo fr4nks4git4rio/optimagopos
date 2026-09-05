@@ -236,7 +236,16 @@
             <thead>
                 <tr>
                     @foreach ($sorts as $sort)
-                        <th>{{ $sort }}</th>
+                        <th rowspan="2">{{ $sort }}</th>
+                    @endforeach
+                    @foreach ($formasPago as $formaPago)
+                        <th colspan="2">{{ $formaPago }}</th>
+                    @endforeach
+                </tr>
+                <tr class="sub-header">
+                    @foreach ($formasPago as $formaPago)
+                        <th style="text-align: right">{{__('site.reports.daily_sales.amount')}}</th>
+                        <th>{{__('site.reports.daily_sales.quantity')}}</th>
                     @endforeach
                 </tr>
             </thead>
@@ -257,8 +266,11 @@
                             </td>
                         @endif
                         <td>{{ $record->fecha_transaccion_str }}</td>
-                        <td class="text-right">{{ number_format($record->monto, 2) }}</td>
-                        <td>{{ $record->ventas }}</td>
+                        @foreach ($formasPago as $i => $formaPago)
+                            @php $celda = $record->montos[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
+                            <td class="text-right">{{ number_format($celda['monto'], 2) }}</td>
+                            <td>{{ $celda['operaciones'] }}</td>
+                        @endforeach
                     </tr>
                     @php $pos++; @endphp
                 @endforeach
@@ -266,13 +278,15 @@
                 {{-- Totalizador por sucursal --}}
                 <tr class="subtotal-row">
                     <td colspan="2" style="text-align: right">{{__('site.reports.daily_sales.total')}} {{ $sucursalData['sucursal'] }}</td>
-                    @php $totalCelda = $sucursalData['totales'] ?? ['monto' => 0, 'ventas' => 0]; @endphp
-                    <td style="text-align: right">{{ number_format($totalCelda['monto'], 2) }}</td>
-                    <td style="text-align: center">{{ $totalCelda['ventas'] }}</td>
+                    @foreach ($formasPago as $i => $formaPago)
+                        @php $totalCelda = $sucursalData['totales'][$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
+                        <td style="text-align: right">{{ number_format($totalCelda['monto'], 2) }}</td>
+                        <td style="text-align: center">{{ $totalCelda['operaciones'] }}</td>
+                    @endforeach
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="no-results">
+                    <td colspan="{{ 2 + count($formasPago) * 2 }}" class="no-results">
                         {{__('site.common.results_not_found')}}...
                     </td>
                 </tr>
@@ -283,9 +297,11 @@
             <tfoot>
                 <tr class="grand-total-row">
                     <td colspan="2" style="text-align: right">{{__('site.reports.daily_sales.grand_total')}}</td>
-                    @php $totalGeneral = $grandTotal ?? ['monto' => 0, 'ventas' => 0]; @endphp
-                    <td style="text-align: right">{{ number_format($totalGeneral['monto'], 2) }}</td>
-                    <td style="text-align: center">{{ $totalGeneral['ventas'] }}</td>
+                    @foreach ($formasPago as $i => $formaPago)
+                        @php $totalGeneral = $grandTotal[$i] ?? ['monto' => 0, 'operaciones' => 0]; @endphp
+                        <td style="text-align: right">{{ number_format($totalGeneral['monto'], 2) }}</td>
+                        <td style="text-align: center">{{ $totalGeneral['operaciones'] }}</td>
+                    @endforeach
                 </tr>
             </tfoot>
         @endif

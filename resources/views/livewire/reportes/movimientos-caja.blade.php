@@ -1,9 +1,10 @@
-@section('title', __('site.reports.sales_by_operator.title'))
+@section('title', __('site.reports.cash_movements.title'))
 
 <div wire:init="init">
     <div wire:loading.delay.longer>
         <div class="loading">
-            <div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">{{ __('site.common.loading') }}...</span></div>
+            <div class="spinner-border text-primary my-3" role="status"><span
+                    class="visually-hidden">{{ __('site.common.loading') }}...</span></div>
         </div>
     </div>
 
@@ -12,27 +13,27 @@
     <div class="row justify-content-between">
         <div class="row mb-1 col-md-10">
             <div class="col-sm-2">
-                <x-input label="{{ __('site.reports.sales_by_operator.start_date') }}" type="date" :lazy="true"
+                <x-input label="{{ __('site.reports.cash_movements.start_date') }}" type="date" :lazy="true"
                     model="fechaInicio" />
             </div>
             <div class="col-sm-2">
-                <x-input label="{{ __('site.reports.sales_by_operator.end_date') }}" type="date" :lazy="true"
+                <x-input label="{{ __('site.reports.cash_movements.end_date') }}" type="date" :lazy="true"
                     model="fechaFin" />
             </div>
             <div class="col-sm-8">
-                <x-select2-multiple label="{{ __('site.reports.sales_by_operator.branches') }}"
+                <x-select2-multiple label="{{ __('site.reports.cash_movements.branches') }}"
                     placeholder="{{ __('site.common.select') }}..." class="form-control" :options="$sucursalesAll"
                     model="sucursal" :lazy="true" :dynamic="true" />
             </div>
         </div>
         <div class="mb-1 col-md-2 text-end">
-            @can('reportsSalesByOperator-print')
+            @can('reportsCashMovements-print')
                 <button type="button" class="btn btn-site-primary mr-1" wire:click="imprimirPdf()">
                     <span class="bi bi-file-pdf"></span>
                     {{ __('site.common.print') }}
                 </button>
             @endcan
-            @can('reportsSalesByOperator-export')
+            @can('reportsCashMovements-export')
                 <button type="button" class="btn btn-site-primary mr-1" wire:click="exportarExcel()">
                     <span class="bi bi-file-excel"></span>
                     {{ __('site.common.export') }}
@@ -47,8 +48,8 @@
                 <thead>
                     <tr>
                         @foreach ($sorts as $sort)
-                            <th class="text-center align-middle cursor-pointer" rowspan="2"
-                                style="white-space: nowrap !important" wire:click="changeSort('{{ $sort }}')">
+                            <th class="text-center align-middle cursor-pointer" style="white-space: nowrap !important"
+                                wire:click="changeSort('{{ $sort }}')">
                                 <span>
                                     @if ($this->sort == $sort)
                                         <i class="{{ $this->class_sort }}"></i>
@@ -56,51 +57,32 @@
                                 </span>
                             </th>
                         @endforeach
-                        <th class="text-center" colspan="2" style="white-space: nowrap !important">
-                            {{ __('site.reports.sales_by_operator.sales') }}</th>
-                        <th class="text-center" colspan="2" style="white-space: nowrap !important">
-                            {{ __('site.reports.sales_by_operator.corrections') }}</th>
-                    </tr>
-                    <tr>
-                        <th class="text-end" style="white-space: nowrap !important">
-                            {{ __('site.reports.sales_by_operator.amount') }}</th>
-                        <th class="text-center" style="white-space: nowrap !important">
-                            {{ __('site.reports.sales_by_operator.quantity') }}</th>
-                        <th class="text-end" style="white-space: nowrap !important">
-                            {{ __('site.reports.sales_by_operator.amount') }}</th>
-                        <th class="text-center" style="white-space: nowrap !important">
-                            {{ __('site.reports.sales_by_operator.quantity') }}</th>
                     </tr>
                 </thead>
             @endif
             <tbody>
                 @forelse($records as $sucursal_id => $sucursalData)
-                    @foreach ($sucursalData['operadores'] as $record)
+                    @foreach ($sucursalData['movimientos'] as $record)
                         <tr>
                             @if ($loop->first)
                                 <td class="text-center align-middle"
-                                    rowspan="{{ count($sucursalData['operadores']) }}">
+                                    rowspan="{{ count($sucursalData['movimientos']) }}">
                                     {{ $sucursalData['sucursal'] }}
                                 </td>
                             @endif
-                            <td class="text-center">{{ $record->nombre }}</td>
-                            <td class="text-end">{{ number_format($record->ventas_importe, 2) }}</td>
-                            <td class="text-center">{{ $record->ventas_cant }}</td>
-                            <td class="text-end">{{ number_format($record->correcciones_importe, 2) }}</td>
-                            <td class="text-center">{{ $record->correcciones_cant }}</td>
+                            <td class="text-center">{{ $record->fecha_str }}</td>
+                            <td class="text-center">{{ $record->movimiento }}</td>
+                            <td class="text-center">{{ $record->forma_pago }}</td>
+                            <td class="text-center">{{ $record->creado_por }}</td>
+                            <td class="text-end">{{ number_format($record->monto, 2) }}</td>
                         </tr>
                     @endforeach
 
                     {{-- Totalizador por sucursal --}}
                     <tr class="table-success fw-bold">
-                        <td class="text-end" colspan="2">{{ __('site.reports.sales_by_operator.total') }}
+                        <td class="text-end" colspan="5">{{ __('site.reports.sales_by_department.total') }}
                             {{ $sucursalData['sucursal'] }}</td>
-                        <td class="text-end">{{ number_format($sucursalData['totales']['ventas_importe'], 2) }}</td>
-                        <td class="text-center">{{ $sucursalData['totales']['ventas_cant'] }}</td>
-                        <td class="text-end">{{ number_format($sucursalData['totales']['correcciones_importe'], 2) }}
-                        </td>
-                        <td class="text-center">{{ $sucursalData['totales']['correcciones_cant'] }}
-                        </td>
+                        <td class="text-end">{{ number_format($sucursalData['total'], 2) }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -115,18 +97,16 @@
             @if (count($records) > 0)
                 <tfoot>
                     <tr class="table-dark fw-bold">
-                        <td colspan="2" class="text-end">{{ __('site.reports.sales_by_operator.grand_total') }}</td>
-                        <td class="text-end">{{ number_format($grandTotal['ventas_importe'], 2) }}</td>
-                        <td class="text-center">{{ $grandTotal['ventas_cant'] }}</td>
-                        <td class="text-end">{{ number_format($grandTotal['correcciones_importe'], 2) }}</td>
-                        <td class="text-center">{{ $grandTotal['correcciones_cant'] }}</td>
+                        <td colspan="5" class="text-end">{{ __('site.reports.sales_by_department.grand_total') }}
+                        </td>
+                        <td class="text-end">{{ number_format($grandTotal, 2) }}</td>
                     </tr>
                 </tfoot>
             @endif
         </table>
     </div>
 
-    <div class="modal fade" id="pdf-ventas-operador">
+    <div class="modal fade" id="pdf-movimientos-caja">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">

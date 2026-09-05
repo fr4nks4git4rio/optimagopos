@@ -194,6 +194,14 @@
                     </span></a>
             </li>
         @endcan
+        @can('reportsDailyIncome-viewAny')
+            <li class="w-100 li-item {{ active_route('admin/reportes/ingresos-diarios*') }}">
+                <a href="{{ route('admin.reportes.ingresos-diarios') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.daily_income') }}
+                    </span></a>
+            </li>
+        @endcan
         @can('reportsSalesByOperator-viewAny')
             <li class="w-100 li-item {{ active_route('admin/reportes/ventas-operador*') }}">
                 <a href="{{ route('admin.reportes.ventas-operador') }}" class="nav-link submenu">
@@ -207,6 +215,30 @@
                 <a href="{{ route('admin.reportes.testing-historico-operaciones') }}" class="nav-link submenu">
                     <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
                         {{ __('site.sidebar.operations_history_testing') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsSalesByDepartment-viewAny')
+            <li class="w-100 li-item {{ active_route('admin/reportes/ventas-departamento*') }}">
+                <a href="{{ route('admin.reportes.ventas-departamento') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.sales_by_department') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsTotalSalesByDepartment-viewAny')
+            <li class="w-100 li-item {{ active_route('admin/reportes/ventas-totales-departamento*') }}">
+                <a href="{{ route('admin.reportes.ventas-totales-departamento') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.total_sales_by_department') }}
+                    </span></a>
+            </li>
+        @endcan
+        @can('reportsCashMovements-viewAny')
+            <li class="w-100 li-item {{ active_route('admin/reportes/movimientos-caja*') }}">
+                <a href="{{ route('admin.reportes.movimientos-caja') }}" class="nav-link submenu">
+                    <i class="bi bi-cart fs-6"></i> <span class="d-sm-inline px-2">
+                        {{ __('site.sidebar.cash_movements') }}
                     </span></a>
             </li>
         @endcan

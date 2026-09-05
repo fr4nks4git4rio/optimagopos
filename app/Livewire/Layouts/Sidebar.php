@@ -49,8 +49,12 @@ class Sidebar extends Component
             || Request::is($prefix . '/reportes/ingresos*')
             || Request::is($prefix . '/reportes/historico-tickets-vk*')
             || Request::is($prefix . '/reportes/ventas-diarias*')
+            || Request::is($prefix . '/reportes/ingresos-diarios*')
             || Request::is($prefix . '/reportes/articulos-vendidos*')
             || Request::is($prefix . '/reportes/ventas-operador*')
+            || Request::is($prefix . '/reportes/ventas-departamento*')
+            || Request::is($prefix . '/reportes/ventas-totales-departamento*')
+            || Request::is($prefix . '/reportes/movimientos-caja*')
             || Request::is($prefix . '/reportes/productos-mas-vendidos*');
     }
 }
