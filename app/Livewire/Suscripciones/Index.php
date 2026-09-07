@@ -104,7 +104,7 @@ class Index extends Component
                 foreach ($suscripciones as &$sub) {
                     $sub['cliente'] = $sub['cliente'] ? Str::upper(Crypt::decrypt($sub['cliente'])) : '';
                 }
-                unset($sub);
+                // unset($sub);
 
                 return $suscripciones->toArray();
             }
