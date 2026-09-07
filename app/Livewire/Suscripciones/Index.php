@@ -93,22 +93,26 @@ class Index extends Component
 
         // Cache 5 min (single-server): evita repetir la consulta + decrypt por fila
         // en cada tecla, orden o pagina.
-        $suscripciones = Cache::remember(
-            'subs|idx',
-            now()->addMinutes(5),
-            function () use ($query) {
-                $suscripciones = $query->get()->map(function ($element) {
-                    return (array) $element;
-                });
+        // $suscripciones = Cache::remember(
+        //     'subs|idx',
+        //     now()->addMinutes(5),
+        //     function () use ($query) {
+        //         $suscripciones = $query->get()->map(function ($element) {
+        //             return (array) $element;
+        //         });
 
-                foreach ($suscripciones as &$sub) {
-                    $sub['cliente'] = $sub['cliente'] ? Str::upper(Crypt::decrypt($sub['cliente'])) : '';
-                }
-                // unset($sub);
+        //         foreach ($suscripciones as &$sub) {
+        //             $sub['cliente'] = $sub['cliente'] ? Str::upper(Crypt::decrypt($sub['cliente'])) : '';
+        //         }
+        //         // unset($sub);
 
-                return $suscripciones->toArray();
-            }
-        );
+        //         return $suscripciones->toArray();
+        //     }
+        // );
+        $suscripciones = $query->get()->map(function ($element) {
+            $element->cliente = $element->cliente ? Crypt::decrypt($element->cliente) : '';
+            return (array) $element;
+        })->toArray();
         $records_final = collect();
 
         $search = $this->search ? Str::upper($this->search) : '';
