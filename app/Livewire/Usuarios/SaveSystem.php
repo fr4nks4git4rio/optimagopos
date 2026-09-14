@@ -106,7 +106,7 @@ class SaveSystem extends Modal
     public function render()
     {
         return view('livewire.usuarios.save-system', [
-            'clientes' => Cliente::where('es_cliente', 1)->get()->map(function ($element) {
+            'clientes' => Cliente::where('es_cliente', 1)->where('rfc', '!=', 'XAXX010101000')->get()->map(function ($element) {
                 return [
                     'value' => $element->id,
                     'label' => Crypt::decrypt($element->label)

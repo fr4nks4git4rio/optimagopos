@@ -62,7 +62,7 @@ class Index extends Component
 
     public function render()
     {
-        $clientes_q = DB::table('tb_clientes')->where('es_cliente', 1)->whereNull('deleted_at');
+        $clientes_q = DB::table('tb_clientes')->where('es_cliente', 1)->where('rfc', '!=', 'XAXX010101000')->whereNull('deleted_at');
         if (user()->hasAnyRole(['Admin', 'Manager'])) {
             $clientes_q->where('id', user()->cliente_id);
         }
@@ -143,23 +143,16 @@ class Index extends Component
 
         // Cache 5 min (single-server): evita repetir GROUP_CONCAT + decrypt por fila
         // en cada tecla, orden o pagina.
-        $usuarios = Cache::remember(
-            'usuarios|idx|' . user()->id . '|' . $this->filter . '|' . implode(',', Arr::wrap($this->clientes ?? [])) . '|' . app()->getLocale(),
-            now()->addMinutes(5),
-            function () use ($query) {
-                $usuarios = $query->get()->map(function ($element) {
-                    return (array) $element;
-                })->toArray();
+        $usuarios = $usuarios = $query->get()->map(function ($element) {
+            return (array) $element;
+        })->toArray();
 
-                foreach ($usuarios as &$usuario) {
-                    $usuario['cliente'] = $usuario['cliente'] ? Crypt::decrypt($usuario['cliente']) : '';
-                    $usuario['suscripciones'] = Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', $usuario['suscripciones']);
-                }
-                unset($usuario);
-
-                return $usuarios;
-            }
-        );
+        foreach ($usuarios as &$usuario) {
+            $usuario['cliente'] = $usuario['cliente'] ? Crypt::decrypt($usuario['cliente']) : '';
+            $usuario['suscripciones'] = Str::replaceLast(', ', ' ' . __('site.common.and') . ' ', $usuario['suscripciones']);
+        }
+        unset($usuario);
+        
         $records_final = collect();
 
         foreach ($usuarios as $usuario) {
