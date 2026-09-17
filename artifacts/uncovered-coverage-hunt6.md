@@ -1,0 +1,9 @@
+# Uncovered coverage — hunt6 — HTML/JS sinks in Livewire Blade views
+
+coverage_id: `resources/views/livewire/**/*.blade.php#HTML/JS sinks::resources/views/components/select2-ajax.blade.php#inline script URL injection::profile/quick/all-in-scope-subsystems::ATTACK-CLASSES.md#Injection`
+
+- **Browser-context confirmation of candidate S-8 (trazas stored HTML).** All repository-relative facts are resolved by source (no-RFC client/comensal save → decrypted `nombre_comercial` in `activity_log.description` → unescaped `{!! !!}` in `livewire/trazas/index.blade.php`). The remaining fact — that the payload's `<img onerror>` executes in a victim browser and is not blocked by deployed CSP/headers — requires a bounded sandboxed browser run that this session cannot perform (method: source only). Should be re-validated by a client-side run on the same repo.
+- **Deployed response headers (CSP, X-XSS-Protection).** No CSP/security-header config found in `config/`, `app/` or the app layout; actual Nginx/Apache layer not observable. If a future deployment adds CSP without `unsafe-inline`, S-8 still fires for markup (only script execution blocked); to be confirmed when headers are visible.
+- **PDF rendering pipeline (`App\Http\Libraries\PdfFacturacion`, `Factura::generatePdf`) with raw `razon_social`/`comentarios` via WriteHTML.** A TCPDF WriteHTML path takes decrypted client data; PDF viewers do not execute inline scripts but the subsystem is outside this `livewire/**/*.blade.php` coverage unit and unowned.
+- **POS ingest (gopos) product/terminal names flowing into dashboard ApexCharts categories.** Rendered as text nodes; a future chart config using `formatter`/`tooltip` HTML would need revisit. Data shaping lives in non-BLade components (out of this unit).
+- **`x-data` attribute breakout through `$model`/`$id` server-determined strings** (`components/select2-ajax.blade.php::L35`, `L41`). Never attacker-derived in current callers; flagged for mention only.

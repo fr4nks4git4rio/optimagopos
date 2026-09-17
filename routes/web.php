@@ -80,6 +80,10 @@ use Illuminate\Support\Str;
 |
 */
 
+Route::get('/test', function(){
+    echo truncate_decimals_bcadd(-1.28954875, 2);
+});
+
 // Auth::routes();
 Route::domain(config('app.facturacion_url'))->group(function () {
     Route::get('/', function () {

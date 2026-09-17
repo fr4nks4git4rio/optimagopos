@@ -1,0 +1,2 @@
+coverage_id,assigned,profile,group,candidates,hardening_items,sinks_resolved,sinks_hunt6
+resources/views/livewire/**/*.blade.php#HTML/JS sinks::resources/views/components/select2-ajax.blade.php#inline script URL injection::profile/quick/all-in-scope-subsystems::ATTACK-CLASSES.md#Injection,true,quick/all-in-scope-subsystems,1 (single assignment),1 (S-8 trazas stored HTML needs_validation),5 (see hardening-hunt6.md),13 rows (resolve-sinks-hunt6.csv),10 source checks + 4 derived rows

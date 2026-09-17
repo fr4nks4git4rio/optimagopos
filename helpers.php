@@ -508,6 +508,20 @@ if (!function_exists('truncate_decimals')) {
     }
 }
 
+if (!function_exists('truncate_decimals_bcadd')) {
+    /**
+     * Truncates a float to a specified number of decimal places without rounding.
+     *
+     * @param float $value The value to truncate.
+     * @param int $decimals The number of decimal places to keep.
+     * @return float The truncated value.
+     */
+    function truncate_decimals_bcadd(float $value, int $decimals = 2): float
+    {
+        return (float) bcadd((string) $value, '0', $decimals);
+    }
+}
+
 if (!function_exists('sucursales_disponibles')) {
     /**
      * Sucursales del usuario con nombre desencriptado, cacheadas 5 min (single-server).
