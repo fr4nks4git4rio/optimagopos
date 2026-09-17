@@ -102,8 +102,18 @@ Route::domain(config('app.api_url'))->group(function () {
 
 Route::domain(config('app.url'))->group(function () {
 
-    Route::get('/', function () {
-        return redirect()->route('home');
+    Route::middleware(['guest'])->group(function () {
+        Route::get('/login', Login::class)->name('login');
+        Route::get('/', function () {
+            return redirect()->route('login');
+        });
+        Route::get('/two-factor', TwoFactorChallenge::class)->name('auth.two-factor');
+
+
+        Route::get('forgot-password', ForgotPassword::class)->name('password.forgot');
+        // Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::get('reset-password/{token}', ResetPassword::class)->name('password.reset');
+        // Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
     });
 
     Route::get('/load-estados', [EstadoController::class, 'loadEstados'])->name('estados.load-estados');
@@ -214,18 +224,4 @@ Route::domain(config('app.url'))->group(function () {
 
     Route::get('/oauth2/redirect', [GmailOAuthController::class, 'redirect']);
     Route::get('/oauth2/callback', [GmailOAuthController::class, 'callback']);
-
-    Route::middleware(['guest'])->group(function () {
-        Route::get('/login', Login::class)->name('login');
-        Route::get('/', function () {
-            return redirect()->route('login');
-        });
-        Route::get('/two-factor', TwoFactorChallenge::class)->name('auth.two-factor');
-
-
-        Route::get('forgot-password', ForgotPassword::class)->name('password.forgot');
-        // Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-        Route::get('reset-password/{token}', ResetPassword::class)->name('password.reset');
-        // Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
-    });
 });
