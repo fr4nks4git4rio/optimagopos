@@ -200,7 +200,8 @@ return [
     'validation' => [
         'rfc_format' => 'The RFC does not have a valid format.',
         'rfc_fiscal_regimen_incoherent' => 'The RFC and the fiscal regime are not consistent.',
-        'exchange_type_missing' => 'You must define the exchange rate for today!'
+        'exchange_type_missing' => 'You must define the exchange rate for today!',
+        'unexpected_system_error' => 'An unexpected error has occurred in: :app_name'
     ],
     'contextual_help' => [
         'no_data' => 'No help is available for this page.'

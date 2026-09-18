@@ -199,7 +199,8 @@ return [
     'validation' => [
         'rfc_format' => 'El RFC no tiene un formato válido.',
         'rfc_fiscal_regimen_incoherent' => 'El RFC y el régimen fiscal no son coherentes.',
-        'exchange_type_missing' => 'Debe definir el Tipo de Cambio para hoy!'
+        'exchange_type_missing' => 'Debe definir el Tipo de Cambio para hoy!',
+        'unexpected_system_error' => 'Se ha producido un error inesperado en: :app_name'
     ],
     'contextual_help' => [
         'no_data' => 'No hay ayudas disponibles para esta página.'

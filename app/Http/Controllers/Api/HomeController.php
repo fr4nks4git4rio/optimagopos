@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Jobs\SendEmailJob;
 use App\Models\Administracion\CodificadoresGenerales\PuntoRuta;
 use App\Models\API\CargaObject;
 use App\Models\API\GlobalSiteValues;
@@ -19,6 +20,7 @@ use App\Models\TicketProducto;
 use App\Models\TicketProductoCorreccion;
 use App\Models\TicketVK;
 use App\Models\UbicacionVk;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -36,6 +38,10 @@ class HomeController
         // Paso 1: Obtener contenido crudo
         $raw = $request->getContent();
 
+        DB::beginTransaction();
+
+        try {
+
         $decoded = json_decode($raw, true);
         if (is_string($decoded)) {
             $decoded = json_decode($decoded, true); // <- ahora sí tenés el array
@@ -52,6 +58,7 @@ class HomeController
             || !isset($decoded['TransactionId'])
             || !isset($decoded['TransactionStartTime'])
         ) {
+                DB::rollBack();
             ModelsLog::create([
                 'log' => __('site.data_parser.incomplete_jason'),
                 'data' => $decoded ? json_encode($decoded) : '',
@@ -79,6 +86,7 @@ class HomeController
         }
 
         if (!$terminal) {
+                DB::rollBack();
             ModelsLog::create([
                 'log' => __('site.data_parser.terminal_not_found'),
                 'data' => json_encode($decoded),
@@ -94,6 +102,7 @@ class HomeController
         }
 
         if ($terminal->es_vk) {
+                DB::rollBack();
             ModelsLog::create([
                 'log' => __('site.data_parser.terminal_is_vk'),
                 'data' => json_encode($decoded),
@@ -113,12 +122,9 @@ class HomeController
 
         $terminal->id_pos = $decoded['PosId'];
         $terminal->save();
-
-        DB::beginTransaction();
-
-        try {
             // Paso 4: Acceder a datos generales
             if (!$decoded['ClerkId']) {
+                DB::rollBack();
                 ModelsLog::create([
                     'log' => __('site.data_parser.employee_id_not_received'),
                     'data' => $decoded ? json_encode($decoded) : '',
@@ -184,6 +190,7 @@ class HomeController
             }
 
             if (Ticket::where('id_transaccion', $decoded['TransactionId'])->where('terminal_id', $terminal->id)->where('fecha_transaccion', Carbon::createFromFormat('d/m/Y H:i:s', $decoded['TransactionStartTime'])->format('Y-m-d H:i:s'))->exists()) {
+                DB::rollBack();
                 ModelsLog::create([
                     'log' => __('site.data_parser.id_transaction_already_exists', ['terminal' => $terminal->identificador, 'id_transaction' => $decoded['TransactionId']]),
                     'data' => $decoded ? json_encode($decoded) : '',
@@ -547,9 +554,34 @@ class HomeController
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 0
             ]);
+
             Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage() . ' ' . $e->getTraceAsString()]));
+
+            $superAdmins = User::role('SuperAdmin')
+                ->whereHas('cliente', function ($query) {
+                    return $query->where('es_propietario', 1);
+                })->get();
+
+            foreach ($superAdmins as $superAdmin) {
+                SendEmailJob::dispatch(
+                    recipients: $superAdmin->email,
+                    from_email: '',
+                    from_name: '',
+                    subject: __('site.validation.unexpected_system_error', ['app_name' => config('app.name')]),
+                    view: 'emails.notifications.unexpected-system-error',
+                    data: [
+                        'error' => $e->getMessage() . ' ' . $e->getTraceAsString()
+                    ],
+                    others: '',
+                    attachment: '',
+                    delete_attachment_on_sent: false
+                );
+                usleep(1000);
+            }
+
             return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
+
 
         return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
     }
@@ -558,6 +590,9 @@ class HomeController
     {
         // return response()->json(['success' => false, 'message' => 'API fuera de servicio.']);
         $raw = $request->getContent();
+        DB::beginTransaction();
+
+        try {
 
         $decoded = json_decode($raw, true);
         if (is_string($decoded)) {
@@ -573,6 +608,8 @@ class HomeController
             || !isset($decoded['Data']['orderNumber'])
             || !isset($decoded['Data']['timestamp'])
         ) {
+                DB::rollBack();
+
             ModelsLog::create([
                 'log' => __('site.data_parser.incomplete_jason'),
                 'data' => $decoded ? json_encode($decoded) : '',
@@ -593,6 +630,8 @@ class HomeController
         $terminal = Terminal::findByIdentificador($terminalId);
 
         if (!$terminal) {
+                DB::rollBack();
+
             ModelsLog::create([
                 'log' => __('site.data_parser.terminal_not_found'),
                 'data' => json_encode($decoded),
@@ -608,6 +647,8 @@ class HomeController
         }
 
         if (!$terminal->es_vk) {
+                DB::rollBack();
+
             ModelsLog::create([
                 'log' => __('site.data_parser.terminal_not_vk'),
                 'data' => json_encode($decoded),
@@ -642,12 +683,9 @@ class HomeController
                     break;
             }
             $ticket_vk->update($update);
+                DB::commit();
             return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
-
-        DB::beginTransaction();
-
-        try {
             $data = $decoded['Data'];
 
             $empleado = null;
@@ -780,7 +818,31 @@ class HomeController
                 'data' => $decoded ? json_encode($decoded) : '',
                 'es_vk' => 1
             ]);
+
             Log::error(__('site.data_parser.exception_error', ['error' => $e->getMessage() . ' ' . $e->getTraceAsString()]));
+
+            $superAdmins = User::role('SuperAdmin')
+                ->whereHas('cliente', function ($query) {
+                    return $query->where('es_propietario', 1);
+                })->get();
+
+            foreach ($superAdmins as $superAdmin) {
+                SendEmailJob::dispatch(
+                    recipients: $superAdmin->email,
+                    from_email: '',
+                    from_name: '',
+                    subject: __('site.validation.unexpected_system_error', ['app_name' => config('app.name')]),
+                    view: 'emails.notifications.unexpected-system-error',
+                    data: [
+                        'error' => $e->getMessage() . ' ' . $e->getTraceAsString()
+                    ],
+                    others: '',
+                    attachment: '',
+                    delete_attachment_on_sent: false
+                );
+                usleep(1000);
+            }
+
             return response()->json(['success' => true, 'message' => __('site.data_parser.data_received')]);
         }
 
