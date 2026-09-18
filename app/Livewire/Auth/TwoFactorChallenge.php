@@ -41,6 +41,15 @@ class TwoFactorChallenge extends Component
             return;
         }
 
+        // Replicar la validacion de Login: un Admin/Manager sin suscripcion activa
+        // no queda autenticado (evita llegar al redirect loop de /home -> / -> /home).
+        if ($user->hasAnyRole(['Admin', 'Manager']) && $user->suscripciones_activas()->count() == 0) {
+            session()->forget(['two_factor_user_id', 'two_factor_remember']);
+
+            $this->addError('code', __('auth.subscription_failed'));
+            return;
+        }
+
         // Limpiar código usado
         $user->update([
             'two_factor_code' => null,

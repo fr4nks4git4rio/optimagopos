@@ -62,6 +62,7 @@ use App\Livewire\Reportes\VentasDepartamento;
 use App\Livewire\Reportes\VentasDiarias;
 use App\Livewire\Reportes\VentasOperador;
 use App\Livewire\Reportes\VentasTotalesDepartamento;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -81,7 +82,7 @@ use Illuminate\Support\Str;
 */
 
 // Auth::routes();
-Route::domain(config('app.facturacion_url'))->group(function () {
+Route::domain(config('app.facturacion_url'))->middleware('throttle:60,1')->group(function () {
     Route::get('/', function () {
         return redirect()->route('auto-facturacion');
     });

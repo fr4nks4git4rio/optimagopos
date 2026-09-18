@@ -14,9 +14,19 @@ class UserActiveSubscription
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Si el usuario tiene una sesión temporal de 2FA activa...
-        if (user()->hasAnyRole(['Admin', 'Manager']) && user()->suscripciones_activas()->count() == 0) {
-            return redirect()->to('/')->withErrors(['email' => __('auth.subscription_failed')]);
+        if (! $user = user()) {
+            return $next($request);
+        }
+
+        if ($user->hasAnyRole(['Admin', 'Manager']) && $user->suscripciones_activas()->count() == 0) {
+            // Redirigir a una ruta del grupo 'guest' (/ , /login) provoca un redirect
+            // loop: /home -> / -> RedirectIfAuthenticated -> /home -> ...
+            // Cerramos sesion y volvemos al login para romper el ciclo.
+            auth()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->withErrors(['email' => __('auth.subscription_failed')]);
         }
 
         return $next($request);

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -69,16 +70,29 @@ class Login extends Component
 
         $throttleKey = Str::lower($this->email) . '|' . request()->ip();
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        // RateLimiter es best-effort: si el store de cache falla (p.ej.
+        // storage/framework/cache sin permisos o tras un cache:clear),
+        // se degrada a "sin limite" en lugar de romper el login con un 500.
+        $throttled = $this->rateLimiterSafe(
+            fn() => RateLimiter::tooManyAttempts($throttleKey, 5),
+            'verificacion de intentos',
+            $throttleKey
+        ) ?? false;
+
+        if ($throttled) {
             $this->addError('email', __('auth.throttle', [
-                'seconds' => RateLimiter::availableIn($throttleKey),
+                'seconds' => $this->rateLimiterSafe(
+                    fn() => RateLimiter::availableIn($throttleKey),
+                    'tiempo restante',
+                    $throttleKey
+                ) ?? 0,
             ]));
 
             return;
         }
 
         if (! auth()->validate(Arr::only($data, ['email', 'password']))) {
-            RateLimiter::hit($throttleKey);
+            $this->rateLimiterSafe(fn() => RateLimiter::hit($throttleKey), 'registro de intento', $throttleKey);
 
             $this->addError('email', __('auth.failed'));
             return;
@@ -97,7 +111,7 @@ class Login extends Component
         if (Cookie::has($cookieName)) {
             // Dispositivo de confianza: Loguear directo
             auth()->login($user, $data['remember']);
-            RateLimiter::clear($throttleKey);
+            $this->rateLimiterSafe(fn() => RateLimiter::clear($throttleKey), 'limpieza de intentos', $throttleKey);
 
             activity(__('site.auth.log_user_logged'))
                 ->on($user)
@@ -138,8 +152,22 @@ class Login extends Component
         // 4. Guardar temporalmente el ID del usuario en la sesión para el componente Livewire
         session(['two_factor_user_id' => $user->id, 'two_factor_remember' => $data['remember']]);
 
-        RateLimiter::clear($throttleKey);
+        $this->rateLimiterSafe(fn() => RateLimiter::clear($throttleKey), 'limpieza de intentos', $throttleKey);
 
         return redirect()->route('auth.two-factor');
+    }
+
+    private function rateLimiterSafe(callable $fn, string $context, string $throttleKey): mixed
+    {
+        try {
+            return $fn();
+        } catch (\Throwable $e) {
+            Log::warning(
+                "Rate limiter no operativo durante {$context} en login: " . $e->getMessage(),
+                ['key' => $throttleKey]
+            );
+
+            return null;
+        }
     }
 }

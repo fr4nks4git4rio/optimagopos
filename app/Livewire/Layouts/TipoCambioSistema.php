@@ -20,8 +20,12 @@ class TipoCambioSistema extends Component
 
     public function saveTipoCambio()
     {
+        try {
         ModelsTipoCambioSistema::CreateOrUpdate($this->tipo_cambio);
         $this->dispatch('show-toast', 'Tipo de Cambio guardado satisfactoriamente!');
+        } catch (\InvalidArgumentException $e) {
+            $this->dispatch('show-toast', $e->getMessage(), 'danger');
+        }
     }
 
     public function searchDof()

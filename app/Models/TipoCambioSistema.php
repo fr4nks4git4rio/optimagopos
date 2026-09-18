@@ -54,6 +54,11 @@ class TipoCambioSistema extends Model
 
     public static function CreateOrUpdate($value)
     {
+        if (!is_numeric($value) || floatval($value) < 1.0 || floatval($value) > 100.0) {
+            throw new \InvalidArgumentException('La tasa de cambio debe ser un valor numérico entre 1.0 y 100.0.');
+        }
+        $value = floatval($value);
+
         $element = TipoCambioSistema::whereRaw("DATE(created_at) = '" . today()->format('Y-m-d') . "'")->first();
         if ($element)
             $element->update(['tasa' => $value]);
@@ -91,7 +96,7 @@ class TipoCambioSistema extends Model
                     $existe = preg_match('/\d{2}[.]\d{6}/', $site, $coincidencias);
                     if ($existe && count($coincidencias) == 1) {
                         $tipo_cambio = $coincidencias[0];
-                        if ($tipo_cambio && floatval($tipo_cambio)) {
+                        if ($tipo_cambio && floatval($tipo_cambio) >= 1.0 && floatval($tipo_cambio) <= 100.0) {
                             $change_type = TipoCambioSistema::create([
                                 'tasa' => $tipo_cambio
                             ]);
@@ -104,10 +109,13 @@ class TipoCambioSistema extends Model
                 }
                 if (!$existe) {
                     $ct = TipoCambioSistema::orderBy('id', 'desc')->first();
+                    if ($ct) {
                     $change_type = TipoCambioSistema::create([
                         'tasa' => $ct->tasa
                     ]);
                     return $change_type;
+                    }
+                    return 'No se pudo obtener el Tipo de Cambio del DOF.';
                 }
             } catch (\Exception $e) {
                 Log::log('warning', "Error en la consulta. " . $e->getMessage());
