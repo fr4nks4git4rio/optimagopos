@@ -164,10 +164,11 @@ class Home extends Component
             ->orderByDesc('impuesto');
 
         $impuestos_q = $this->commonWhere($impuestos_q);
-        // Cache 5 min (single-server): mount() corre en cada carga completa de pagina.
+        // Cache 30s (single-server): misma cadencia que detalle2 para que impuestos
+        // nunca desfase mas que el polling; mount() corre en cada carga completa.
         $this->impuestosData['impuestos'] = Cache::remember(
             $this->dashboardCacheKey('impuestos'),
-            now()->addMinutes(5),
+            now()->addSeconds(30),
             fn() => $impuestos_q->get()->toArray()
         );
     }
@@ -333,7 +334,7 @@ class Home extends Component
         if ($seccion)
             $this->seccion = $seccion;
 
-        // Cache file 60s (single-server): el polling del dashboard reutiliza el calculo
+        // Cache file 30s (single-server): el polling del dashboard reutiliza el calculo
         // en vez de repetir ~11 queries por cada pantalla abierta.
         // Sufijo 'detalle2': invalida entradas 'load' anteriores que mezclaban
         // contadores y graficas en un solo paquete.
@@ -347,7 +348,7 @@ class Home extends Component
 
         $this->computeData();
 
-        Cache::put($cacheKey, $this->tomarFoto($mapa), now()->addSeconds(60));
+        Cache::put($cacheKey, $this->tomarFoto($mapa), now()->addSeconds(30));
     }
 
     public function loadVitals()
