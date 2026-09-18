@@ -191,7 +191,7 @@ if (!function_exists('get_tipo_cambio_sistema')) {
     function get_tipo_cambio_sistema($date = null)
     {
         $date = $date ?? Carbon::now()->format('Y-m-d');
-        $change = TipoCambioSistema::whereRaw("DATE(created_at) = '$date'")
+        $change = TipoCambioSistema::whereDate('created_at', $date)
             ->get();
 
         return $change->count() > 0 ? $change->first() : new TipoCambioSistema();
