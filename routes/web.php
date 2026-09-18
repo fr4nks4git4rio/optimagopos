@@ -80,6 +80,11 @@ use Illuminate\Support\Str;
 |
 */
 
+Route::get('/test/{number}', function($number){
+    $res = truncate_decimals_bcadd((float) $number, 2);
+    echo $res;
+});
+
 // Auth::routes();
 Route::domain(config('app.facturacion_url'))->group(function () {
     Route::get('/', function () {
